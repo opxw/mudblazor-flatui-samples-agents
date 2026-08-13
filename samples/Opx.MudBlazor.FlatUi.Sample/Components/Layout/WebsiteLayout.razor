@@ -1,0 +1,44 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<FlatMudProviders>
+    <div class="website-shell">
+        <header class="website-header">
+            <a class="website-brand" href="/website" aria-label="OPX Flat UI website home">
+                <span class="brand-mark">OPX</span>
+                <span>
+                    <strong>OPX Flat UI</strong>
+                    <small>Website starter</small>
+                </span>
+            </a>
+            <nav class="website-nav" aria-label="Website navigation">
+                <a href="/website">Home</a>
+                <a href="/catalog">Catalog</a>
+                <a href="/blog">Blog</a>
+                <a href="/login">Login</a>
+            </nav>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Small"
+                       Href="/catalog"
+                       StartIcon="@Icons.Material.Outlined.ShoppingBag">
+                Browse
+            </MudButton>
+        </header>
+
+        <main class="website-main">
+            @Body
+        </main>
+
+        <footer class="website-footer">
+            <span>© 2026 opx. All rights reserved.</span>
+            <span>Powered by MudBlazor</span>
+        </footer>
+    </div>
+</FlatMudProviders>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">x</span>
+</div>

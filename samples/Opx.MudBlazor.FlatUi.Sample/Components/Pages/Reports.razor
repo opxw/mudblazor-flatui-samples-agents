@@ -1,0 +1,202 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/reports"
+@inject FlatPageLoadingState PageLoading
+@inject FlatMessageBoxService MessageBox
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="reports-page"
+          InitialLoading="@_initialLoading"
+          SkeletonColumnCount="7"
+          SkeletonRowCount="8"
+          SkeletonMobileRowCount="5"
+          SkeletonMobileFieldCount="4"
+          SkeletonLoadingText="Loading operational report"
+          PullToRefreshEnabled="true"
+          OnRefresh="RefreshAsync">
+    <ChildContent>
+        <section class="flat-panel sample-report-filter">
+            <MudSelect T="string" @bind-Value="_period" Label="Period" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("All")">All periods</MudSelectItem>
+                <MudSelectItem Value="@("August 2026")">August 2026</MudSelectItem>
+                <MudSelectItem Value="@("July 2026")">July 2026</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string" @bind-Value="_status" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("All")">All statuses</MudSelectItem>
+                <MudSelectItem Value="@("Completed")">Completed</MudSelectItem>
+                <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
+                <MudSelectItem Value="@("At risk")">At risk</MudSelectItem>
+            </MudSelect>
+            <MudTextField T="string" @bind-Value="_search" Label="Search operations" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.PlayArrow" Disabled="@_busy" OnClick="GenerateAsync" Class="sample-report-apply">Generate</MudButton>
+        </section>
+
+        <div class="sample-kpis report-kpis">
+            <FlatStatCard Label="Transactions" Value="@FilteredRows.Count.ToString("N0")" Icon="@Icons.Material.Outlined.ReceiptLong" Tone="blue" Note="Generated result" NoteIcon="@Icons.Material.Outlined.CheckCircleOutline" />
+            <FlatStatCard Label="Total amount" Value="@Money(FilteredRows.Sum(row => row.Amount))" Icon="@Icons.Material.Outlined.Payments" Tone="green" Note="Across all groups" />
+            <FlatStatCard Label="Completed" Value="@FilteredRows.Count(row => row.Status == "Completed").ToString("N0")" Icon="@Icons.Material.Outlined.TaskAlt" Tone="green" Note="Closed operations" />
+            <FlatStatCard Label="At risk" Value="@FilteredRows.Count(row => row.Status == "At risk").ToString("N0")" Icon="@Icons.Material.Outlined.WarningAmber" Tone="red" Note="Requires review" NoteIcon="@Icons.Material.Outlined.PriorityHigh" />
+        </div>
+
+        <section class="flat-panel module-panel report-result-panel">
+            <FlatOperationalReportViewer TItem="OperationalReportRow"
+                                         Items="FilteredRows"
+                                         GroupKey="row => row.Department"
+                                         GroupLabel="DepartmentLabel"
+                                         ColumnCount="7"
+                                         Title="Operational activity"
+                                         Subtitle="Grouped by department with subtotal and drill-down"
+                                         Busy="@_busy"
+                                         ErrorMessage="@_errorMessage"
+                                         RowSelected="OpenDetail"
+                                         OnRefresh="RefreshAsync"
+                                         OnRetry="GenerateAsync"
+                                         OnPrint="PrintAsync"
+                                         OnExport="ExportAsync">
+                <HeaderTemplate>
+                    <tr><th>Document</th><th>Date</th><th>Owner</th><th>Status</th><th class="flat-report-number">Quantity</th><th class="flat-report-number">Amount</th><th>Reference</th></tr>
+                </HeaderTemplate>
+                <RowTemplate Context="row">
+                    <td><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Description" /></span><div><strong>@row.Document</strong><small>@row.Code</small></div></div></td>
+                    <td>@row.Date.ToString("dd MMM yyyy")</td>
+                    <td>@row.Owner</td>
+                    <td><span class="@StatusClass(row.Status)"><i></i>@row.Status</span></td>
+                    <td class="flat-report-number">@row.Quantity.ToString("N0")</td>
+                    <td class="flat-report-number">@Money(row.Amount)</td>
+                    <td>@row.Reference</td>
+                </RowTemplate>
+                <GroupFooterTemplate Context="group">
+                    <td colspan="4">@group.Label subtotal</td>
+                    <td class="flat-report-number">@group.Items.Sum(row => row.Quantity).ToString("N0")</td>
+                    <td class="flat-report-number">@Money(group.Items.Sum(row => row.Amount))</td>
+                    <td></td>
+                </GroupFooterTemplate>
+                <FooterTemplate Context="rows">
+                    <tr><th colspan="4">Grand total</th><th class="flat-report-number">@rows.Sum(row => row.Quantity).ToString("N0")</th><th class="flat-report-number">@Money(rows.Sum(row => row.Amount))</th><th></th></tr>
+                </FooterTemplate>
+                <MobileTemplate Context="row">
+                    <article class="report-mobile-card">
+                        <header><div><strong>@row.Document</strong><small>@row.Code · @row.Date.ToString("dd MMM yyyy")</small></div><span class="@StatusClass(row.Status)"><i></i>@row.Status</span></header>
+                        <div class="report-mobile-facts">
+                            <FlatInfoItem Label="Owner" Value="@row.Owner" />
+                            <FlatInfoItem Label="Quantity" Value="@row.Quantity.ToString("N0")" />
+                            <FlatInfoItem Label="Amount" Value="@Money(row.Amount)" />
+                            <FlatInfoItem Label="Reference" Value="@row.Reference" />
+                        </div>
+                    </article>
+                </MobileTemplate>
+                <MobileGroupFooterTemplate Context="group">
+                    <div class="report-mobile-subtotal"><span>Subtotal</span><strong>@Money(group.Items.Sum(row => row.Amount))</strong></div>
+                </MobileGroupFooterTemplate>
+            </FlatOperationalReportViewer>
+        </section>
+    </ChildContent>
+</FlatPage>
+
+<FlatFormModal Open="@(_selected is not null)"
+               OpenChanged="DetailOpenChanged"
+               Title="Operation detail"
+               Mode="Read"
+               SubmitText="Close"
+               AutoRefreshOnSuccess="false"
+               OnSubmit="CloseDetail">
+    @if (_selected is not null)
+    {
+        <div class="report-detail-grid">
+            <FlatInfoItem Label="Document" Value="@_selected.Document" />
+            <FlatInfoItem Label="Code" Value="@_selected.Code" />
+            <FlatInfoItem Label="Department" Value="@_selected.Department" />
+            <FlatInfoItem Label="Owner" Value="@_selected.Owner" />
+            <FlatInfoItem Label="Status" Value="@_selected.Status" />
+            <FlatInfoItem Label="Date" Value="@_selected.Date.ToString("dd MMMM yyyy")" />
+            <FlatInfoItem Label="Quantity" Value="@_selected.Quantity.ToString("N0")" />
+            <FlatInfoItem Label="Amount" Value="@Money(_selected.Amount)" />
+            <FlatInfoItem Label="Reference" Value="@_selected.Reference" Class="wide" />
+        </div>
+    }
+</FlatFormModal>
+
+@code {
+    private static readonly IReadOnlyList<OperationalReportRow> SourceRows =
+    [
+        new("OPS-260801", "Purchase receipt", "PR-260801", "Procurement", "Amelia", new(2026, 8, 1), 32, 48_750_000m, "Completed", "PO-260740"),
+        new("OPS-260802", "Supplier return", "RT-260802", "Procurement", "Bima", new(2026, 8, 3), 4, 6_250_000m, "At risk", "RTV-260018"),
+        new("OPS-260803", "Production output", "WO-260803", "Production", "Citra", new(2026, 8, 4), 410, 184_500_000m, "In progress", "MT410"),
+        new("OPS-260804", "Material issue", "GI-260804", "Production", "Danu", new(2026, 8, 5), 128, 76_200_000m, "Completed", "WO-260803"),
+        new("OPS-260805", "Sales delivery", "DO-260805", "Sales", "Elisa", new(2026, 8, 6), 74, 92_850_000m, "Completed", "SO-260688"),
+        new("OPS-260806", "Back-order release", "BO-260806", "Sales", "Farhan", new(2026, 8, 7), 18, 21_350_000m, "At risk", "SO-260701"),
+        new("OPS-260807", "Cycle count", "CC-260807", "Warehouse", "Gita", new(2026, 8, 8), 286, 0m, "In progress", "WH-JKT-A"),
+        new("OPS-260808", "Inventory transfer", "TR-260808", "Warehouse", "Hendra", new(2026, 8, 9), 65, 37_600_000m, "Completed", "WH-BDG-B"),
+        new("OPS-260709", "Purchase receipt", "PR-260709", "Procurement", "Amelia", new(2026, 7, 21), 19, 27_900_000m, "Completed", "PO-260681"),
+        new("OPS-260710", "Sales delivery", "DO-260710", "Sales", "Elisa", new(2026, 7, 24), 56, 71_300_000m, "Completed", "SO-260622")
+    ];
+
+    private string _period = "August 2026";
+    private string _status = "All";
+    private string _search = string.Empty;
+    private bool _initialLoading = true;
+    private bool _busy;
+    private string? _errorMessage;
+    private OperationalReportRow? _selected;
+
+    private IReadOnlyList<OperationalReportRow> FilteredRows => SourceRows
+        .Where(row => _period == "All" || row.Date.ToString("MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture) == _period)
+        .Where(row => _status == "All" || row.Status == _status)
+        .Where(row => string.IsNullOrWhiteSpace(_search)
+            || row.Document.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Code.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Owner.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Reference.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .ToArray();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        await Task.Delay(500);
+        _initialLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GenerateAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        _errorMessage = null;
+        using var loading = PageLoading.Begin();
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(550);
+        _busy = false;
+    }
+
+    private Task RefreshAsync() => GenerateAsync();
+    private void OpenDetail(OperationalReportRow row) => _selected = row;
+    private void DetailOpenChanged(bool open) { if (!open) _selected = null; }
+    private void CloseDetail() => _selected = null;
+
+    private async Task ExportAsync(FlatReportExportFormat format)
+    {
+        using var loading = PageLoading.Begin();
+        await Task.Delay(350);
+        await MessageBox.InfoAsync($"The {format} export request contains {FilteredRows.Count:N0} records. File generation remains host-owned.", "Export prepared");
+    }
+
+    private Task PrintAsync() => MessageBox.InfoAsync("The print callback is ready. The host can open a print layout or server-generated document.", "Print report");
+
+    private static string DepartmentLabel(string key) => key switch
+    {
+        "Procurement" => "Procurement operations",
+        "Production" => "Production operations",
+        "Sales" => "Sales operations",
+        "Warehouse" => "Warehouse operations",
+        _ => key
+    };
+
+    private static string Money(decimal amount) => $"IDR {amount:N0}";
+    private static string StatusClass(string status) => status switch
+    {
+        "Completed" => "status-chip online",
+        "At risk" => "status-chip offline",
+        _ => "status-chip pending"
+    };
+
+    public sealed record OperationalReportRow(string Code, string Document, string Reference, string Department, string Owner, DateOnly Date, int Quantity, decimal Amount, string Status, string Source);
+}

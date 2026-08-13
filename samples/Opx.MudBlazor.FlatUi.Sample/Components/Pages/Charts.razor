@@ -1,0 +1,319 @@
+@page "/charts"
+
+<FlatPage Kind="FlatPageKind.Dashboard" PageCssClass="all-charts-page no-mobile-fab">
+    <div class="all-charts-grid">
+        <FlatPanel Title="Line" Subtitle="Trend values across ordered categories" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas" role="img" aria-label="MudBlazor line chart sample">
+                <MudChart T="double" ChartType="ChartType.Line" ChartSeries="@LineSeries" ChartLabels="@MonthLabels" Width="100%" Height="230px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@LineCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Bar" Subtitle="Side-by-side category comparison" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas" role="img" aria-label="MudBlazor bar chart sample">
+                <MudChart T="double" ChartType="ChartType.Bar" ChartSeries="@BarSeries" ChartLabels="@MonthLabels" Width="100%" Height="230px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@BarCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Stacked Bar" Subtitle="Composition and total by category" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas" role="img" aria-label="MudBlazor stacked bar chart sample">
+                <MudChart T="double" ChartType="ChartType.StackedBar" ChartSeries="@StackedSeries" ChartLabels="@QuarterLabels" Width="100%" Height="230px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@StackedBarCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Pie" Subtitle="Part-to-whole distribution" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas radial-chart-canvas" role="img" aria-label="MudBlazor pie chart sample">
+                <MudChart T="double" ChartType="ChartType.Pie" ChartSeries="@RadialSeries" ChartLabels="@ChannelLabels" Width="100%" Height="230px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@PieCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Donut" Subtitle="Part-to-whole distribution with center space" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas radial-chart-canvas" role="img" aria-label="MudBlazor donut chart sample">
+                <MudChart T="double" ChartType="ChartType.Donut" ChartSeries="@RadialSeries" ChartLabels="@ChannelLabels" Width="100%" Height="230px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@DonutCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Timeseries" Subtitle="Values plotted against real dates" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas" role="img" aria-label="MudBlazor timeseries chart sample">
+                <MudChart T="double" ChartType="ChartType.Timeseries" ChartSeries="@TimeSeries" Width="100%" Height="230px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@TimeseriesCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Heat Map" Subtitle="Intensity across teams and weekdays" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas" role="img" aria-label="MudBlazor heat map chart sample">
+                <MudChart T="double" ChartType="ChartType.HeatMap" ChartSeries="@HeatMapSeries" ChartLabels="@WeekdayLabels" Width="100%" Height="250px" ChartOptions="@HeatMapOptions" />
+            </div>
+            <ChartCode Code="@HeatMapCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Rose" Subtitle="Radial magnitude by operational area" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas radial-chart-canvas" role="img" aria-label="MudBlazor rose chart sample">
+                <MudChart T="double" ChartType="ChartType.Rose" ChartSeries="@RoseSeries" ChartLabels="@CapabilityLabels" Width="100%" Height="250px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@RoseCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Radar" Subtitle="Compare capability profiles" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas radial-chart-canvas" role="img" aria-label="MudBlazor radar chart sample">
+                <MudChart T="double" ChartType="ChartType.Radar" ChartSeries="@RadarSeries" ChartLabels="@CapabilityLabels" Width="100%" Height="250px" ChartOptions="@SharedOptions" />
+            </div>
+            <ChartCode Code="@RadarCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Sankey" Subtitle="Flow between process stages" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas wide-chart-canvas" role="img" aria-label="MudBlazor Sankey chart sample">
+                <MudChart T="double" ChartType="ChartType.Sankey" ChartSeries="@SankeySeries" Width="100%" Height="270px" ChartOptions="@SankeyOptions" />
+            </div>
+            <ChartCode Code="@SankeyCode" />
+        </FlatPanel>
+
+        <FlatPanel Title="Scatter Plot" Subtitle="Relationship between two numeric variables" CssClass="flat-panel chart-showcase-card">
+            <div class="all-charts-canvas wide-chart-canvas" role="img" aria-label="MudBlazor scatter plot chart sample">
+                <MudChart T="double" ChartType="ChartType.ScatterPlot" ChartSeries="@ScatterSeries" Width="100%" Height="270px" ChartOptions="@ScatterOptions" />
+            </div>
+            <ChartCode Code="@ScatterCode" />
+        </FlatPanel>
+    </div>
+</FlatPage>
+
+@code {
+    private static readonly string[] MonthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+    private static readonly string[] QuarterLabels = ["Q1", "Q2", "Q3", "Q4"];
+    private static readonly string[] ChannelLabels = ["Web", "Store", "Partner", "Marketplace"];
+    private static readonly string[] WeekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+    private static readonly string[] CapabilityLabels = ["Quality", "Speed", "Cost", "Safety", "Delivery"];
+
+    private static readonly ChartOptions SharedOptions = new()
+    {
+        ChartPalette = ["#004a77", "#0ab39c", "#f7b84b", "#f06548", "#299cdb", "#805dca"]
+    };
+
+    private static readonly HeatMapChartOptions HeatMapOptions = new()
+    {
+        ChartPalette = ["#e1f1fa", "#8dc7e8", "#299cdb", "#006da8", "#004a77"],
+        ShowLabels = true,
+        ShowToolTips = true,
+        ValueFormatString = "N0"
+    };
+
+    private static readonly SankeyChartOptions SankeyOptions = new()
+    {
+        ChartPalette = ["#004a77", "#0ab39c", "#f7b84b", "#299cdb", "#805dca"],
+        ShowLabels = true,
+        ShowNodeValues = true,
+        HighlightOnHover = true
+    };
+
+    private static readonly ScatterPlotChartOptions ScatterOptions = new()
+    {
+        ChartPalette = ["#004a77", "#f06548"],
+        PointRadius = 5,
+        ShowDataLabels = false
+    };
+
+    private static readonly List<ChartSeries<double>> LineSeries =
+    [
+        new() { Name = "Actual", Data = new ChartData<double>([42, 51, 48, 63, 72, 78]) },
+        new() { Name = "Target", Data = new ChartData<double>([45, 48, 54, 60, 68, 75]) }
+    ];
+
+    private static readonly List<ChartSeries<double>> BarSeries =
+    [
+        new() { Name = "Revenue", Data = new ChartData<double>([58, 72, 64, 86, 91, 104]) },
+        new() { Name = "Cost", Data = new ChartData<double>([39, 48, 45, 55, 60, 67]) }
+    ];
+
+    private static readonly List<ChartSeries<double>> StackedSeries =
+    [
+        new() { Name = "Completed", Data = new ChartData<double>([68, 74, 83, 91]) },
+        new() { Name = "In progress", Data = new ChartData<double>([18, 20, 14, 11]) },
+        new() { Name = "Blocked", Data = new ChartData<double>([7, 5, 4, 3]) }
+    ];
+
+    private static readonly List<ChartSeries<double>> RadialSeries =
+    [
+        new() { Name = "Orders", Data = new ChartData<double>([46, 28, 16, 10]) }
+    ];
+
+    private static readonly List<ChartSeries<double>> TimeSeries =
+    [
+        new()
+        {
+            Name = "Temperature",
+            Data = new ChartData<double>(new List<(DateTime, double)>
+            {
+                (new DateTime(2026, 8, 1), 29),
+                (new DateTime(2026, 8, 2), 31),
+                (new DateTime(2026, 8, 3), 30),
+                (new DateTime(2026, 8, 4), 33),
+                (new DateTime(2026, 8, 5), 32)
+            })
+        }
+    ];
+
+    private static readonly List<ChartSeries<double>> HeatMapSeries =
+    [
+        new() { Name = "Support", Data = new ChartData<double>([12, 18, 14, 22, 27]) },
+        new() { Name = "Finance", Data = new ChartData<double>([8, 11, 17, 13, 19]) },
+        new() { Name = "Production", Data = new ChartData<double>([25, 29, 23, 31, 35]) },
+        new() { Name = "Sales", Data = new ChartData<double>([17, 21, 26, 24, 30]) }
+    ];
+
+    private static readonly List<ChartSeries<double>> RoseSeries =
+    [
+        new() { Name = "Operations", Data = new ChartData<double>([78, 65, 72, 88, 81]) }
+    ];
+
+    private static readonly List<ChartSeries<double>> RadarSeries =
+    [
+        new() { Name = "Current", Data = new ChartData<double>([78, 65, 72, 88, 81]) },
+        new() { Name = "Target", Data = new ChartData<double>([90, 82, 80, 92, 88]) }
+    ];
+
+    private static readonly List<ChartSeries<double>> SankeySeries =
+    [
+        new()
+        {
+            Name = "Order flow",
+            Data = new ChartData<double>(new List<(string, string, double)>
+            {
+                ("Lead", "Qualified", 80),
+                ("Lead", "Rejected", 20),
+                ("Qualified", "Proposal", 62),
+                ("Qualified", "On hold", 18),
+                ("Proposal", "Won", 44),
+                ("Proposal", "Lost", 18)
+            })
+        }
+    ];
+
+    private static readonly List<ChartSeries<double>> ScatterSeries =
+    [
+        new()
+        {
+            Name = "Plant A",
+            Data = new ChartData<double>(new List<(double, double)> { (12, 64), (18, 71), (25, 78), (31, 82), (39, 91) })
+        },
+        new()
+        {
+            Name = "Plant B",
+            Data = new ChartData<double>(new List<(double, double)> { (10, 58), (17, 67), (23, 70), (34, 79), (42, 86) })
+        }
+    ];
+
+    private const string LineCode = """
+<MudChart T="double" ChartType="ChartType.Line"
+          ChartSeries="@series" ChartLabels="@labels"
+          Width="100%" Height="230px" />
+
+@code {
+    string[] labels = ["Jan", "Feb", "Mar"];
+    List<ChartSeries<double>> series =
+    [
+        new() { Name = "Actual", Data = new ChartData<double>([42, 51, 48]) },
+        new() { Name = "Target", Data = new ChartData<double>([45, 48, 54]) }
+    ];
+}
+""";
+
+    private const string BarCode = """
+<MudChart T="double" ChartType="ChartType.Bar"
+          ChartSeries="@series" ChartLabels="@labels"
+          Width="100%" Height="230px" />
+""";
+
+    private const string StackedBarCode = """
+<MudChart T="double" ChartType="ChartType.StackedBar"
+          ChartSeries="@series" ChartLabels="@labels"
+          Width="100%" Height="230px" />
+""";
+
+    private const string PieCode = """
+<MudChart T="double" ChartType="ChartType.Pie"
+          ChartSeries="@radialSeries" ChartLabels="@channelLabels"
+          Width="100%" Height="230px" />
+""";
+
+    private const string DonutCode = """
+<MudChart T="double" ChartType="ChartType.Donut"
+          ChartSeries="@radialSeries" ChartLabels="@channelLabels"
+          Width="100%" Height="230px" />
+""";
+
+    private const string TimeseriesCode = """
+<MudChart T="double" ChartType="ChartType.Timeseries"
+          ChartSeries="@timeSeries" Width="100%" Height="230px" />
+
+@code {
+    List<ChartSeries<double>> timeSeries =
+    [
+        new() { Name = "Temperature", Data = new ChartData<double>(
+            new List<(DateTime, double)> { (DateTime.Today, 29), (DateTime.Today.AddDays(1), 31) }) }
+    ];
+}
+""";
+
+    private const string HeatMapCode = """
+<MudChart T="double" ChartType="ChartType.HeatMap"
+          ChartSeries="@rows" ChartLabels="@columns"
+          ChartOptions="@heatMapOptions" Width="100%" Height="250px" />
+
+@code {
+    string[] columns = ["Mon", "Tue", "Wed"];
+    List<ChartSeries<double>> rows =
+    [
+        new() { Name = "Support", Data = new ChartData<double>([12, 18, 14]) },
+        new() { Name = "Finance", Data = new ChartData<double>([8, 11, 17]) }
+    ];
+    HeatMapChartOptions heatMapOptions = new() { ShowLabels = true, ShowToolTips = true };
+}
+""";
+
+    private const string RoseCode = """
+<MudChart T="double" ChartType="ChartType.Rose"
+          ChartSeries="@series" ChartLabels="@labels"
+          Width="100%" Height="250px" />
+""";
+
+    private const string RadarCode = """
+<MudChart T="double" ChartType="ChartType.Radar"
+          ChartSeries="@series" ChartLabels="@labels"
+          Width="100%" Height="250px" />
+""";
+
+    private const string SankeyCode = """
+<MudChart T="double" ChartType="ChartType.Sankey"
+          ChartSeries="@flows" Width="100%" Height="270px" />
+
+@code {
+    List<ChartSeries<double>> flows =
+    [
+        new() { Name = "Order flow", Data = new ChartData<double>(
+            new List<(string, string, double)>
+            {
+                ("Lead", "Qualified", 80),
+                ("Qualified", "Proposal", 62),
+                ("Proposal", "Won", 44)
+            }) }
+    ];
+}
+""";
+
+    private const string ScatterCode = """
+<MudChart T="double" ChartType="ChartType.ScatterPlot"
+          ChartSeries="@points" Width="100%" Height="270px" />
+
+@code {
+    List<ChartSeries<double>> points =
+    [
+        new() { Name = "Plant A", Data = new ChartData<double>(
+            new List<(double, double)> { (12, 64), (18, 71), (25, 78) }) }
+    ];
+}
+""";
+}

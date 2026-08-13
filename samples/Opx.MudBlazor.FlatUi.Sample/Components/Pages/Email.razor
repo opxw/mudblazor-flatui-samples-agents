@@ -1,0 +1,358 @@
+@page "/email"
+@inject ISnackbar Snackbar
+
+@* Copyright © 2026 opx. All rights reserved. *@
+
+<PageTitle>Email - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module"
+          UsePanel="false"
+          PageCssClass="email-page"
+          ShowMobilePrimaryAction="true"
+          PullToRefreshEnabled="true"
+          PullToRefreshScrollSelector=".flat-email-message-list"
+          OnRefresh="RefreshMailbox">
+    <ChildContent>
+        <FlatEmailShell ReadingOpen="@_readingOpen" OnBack="BackToList" AriaLabel="Sample mailbox">
+            <FolderPane>
+                <div class="flat-email-brand">
+                    <MudIcon Icon="@Icons.Material.Outlined.MailOutline" />
+                    <span><strong>Mailbox</strong><small>opx@example.test</small></span>
+                </div>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Outlined.Edit"
+                           Class="flat-email-compose-button"
+                           OnClick="OpenCompose">Compose</MudButton>
+                <nav class="flat-email-folder-list" aria-label="Email folders">
+                    @foreach (var folder in Folders)
+                    {
+                        <FlatEmailFolderItem Label="@folder.Label"
+                                             Icon="@folder.Icon"
+                                             Count="@FolderCount(folder.Key)"
+                                             Active="@(folder.Key == _selectedFolder)"
+                                             OnClick="@(() => SelectFolder(folder.Key))" />
+                    }
+                </nav>
+                <div class="flat-email-storage">
+                    <span><strong>Storage</strong><small>2.4 GB of 15 GB</small></span>
+                    <div><i></i></div>
+                </div>
+            </FolderPane>
+            <ListToolbar>
+                <div class="flat-email-mobile-folder-wrap">
+                    <MudSelect T="string"
+                               Value="@_selectedFolder"
+                               ValueChanged="SelectFolder"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="flat-email-mobile-folder"
+                               aria-label="Email folder">
+                        @foreach (var folder in Folders)
+                        {
+                            <MudSelectItem Value="@folder.Key">@folder.Label</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+                <MudTextField T="string"
+                              Value="@_search"
+                              ValueChanged="SearchChanged"
+                              Immediate="true"
+                              Placeholder="Search email..."
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Search"
+                              Class="flat-email-search" />
+                <div class="flat-email-list-actions">
+                    <MudIconButton Icon="@Icons.Material.Outlined.Refresh" OnClick="RefreshMailbox" aria-label="Refresh mailbox" title="Refresh mailbox" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" OnClick="@(() => ShowPlaceholder("Mailbox actions"))" aria-label="Mailbox actions" title="Mailbox actions" />
+                </div>
+            </ListToolbar>
+            <MessageList>
+                <div class="flat-email-list-summary">
+                    <strong>@SelectedFolderLabel</strong>
+                    <small>@FilteredMessages.Count email</small>
+                </div>
+                @foreach (var message in FilteredMessages)
+                {
+                    <FlatEmailMessageItem Sender="@message.Sender"
+                                          Subject="@message.Subject"
+                                          Preview="@message.Preview"
+                                          Time="@message.Time"
+                                          DateTimeValue="@message.DateTimeValue"
+                                          Unread="@message.Unread"
+                                          Selected="@(message.Id == _selectedMessageId)"
+                                          Starred="@message.Starred"
+                                          HasAttachment="@message.HasAttachment"
+                                          OnClick="@(() => SelectMessage(message))"
+                                          OnStar="@(() => ToggleStar(message))" />
+                }
+                @if (FilteredMessages.Count == 0)
+                {
+                    <FlatEmptyState Title="No email found"
+                                    Message="Try another folder or search term."
+                                    Icon="@Icons.Material.Outlined.MarkEmailRead"
+                                    CssClass="empty-state compact" />
+                }
+            </MessageList>
+            <ReadingHeader>
+                @if (SelectedMessage is { } selected)
+                {
+                    <div class="flat-email-reading-title">
+                        <strong>@selected.Subject</strong>
+                        <small>@selected.Sender · @selected.Time</small>
+                    </div>
+                    <div class="flat-email-reading-actions">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Reply" OnClick="@(() => Reply(selected))" aria-label="Reply" title="Reply" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.Forward" OnClick="@(() => Forward(selected))" aria-label="Forward" title="Forward" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.DeleteOutline" OnClick="@(() => Delete(selected))" aria-label="Delete email" title="Delete email" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" OnClick="@(() => ShowPlaceholder("Email actions"))" aria-label="Email actions" title="Email actions" />
+                    </div>
+                }
+            </ReadingHeader>
+            <ReadingBody>
+                @if (SelectedMessage is { } message)
+                {
+                    <div class="flat-email-sender-card">
+                        <FlatProfileAvatar Name="@message.Sender" Initials="@message.Initials" Size="38" />
+                        <span class="flat-email-sender-copy">
+                            <strong>@message.Sender</strong>
+                            <small>to me · @message.FullTime</small>
+                        </span>
+                        <MudIconButton Icon="@(message.Starred ? Icons.Material.Filled.Star : Icons.Material.Outlined.StarBorder)"
+                                       Color="@(message.Starred ? Color.Warning : Color.Default)"
+                                       OnClick="@(() => ToggleStar(message))"
+                                       aria-label="Toggle star"
+                                       title="Toggle star" />
+                    </div>
+                    <div class="flat-email-content">
+                        @foreach (var paragraph in message.Body)
+                        {
+                            <p>@paragraph</p>
+                        }
+                    </div>
+                    @if (message.HasAttachment)
+                    {
+                        <button type="button" class="flat-email-attachment" @onclick="@(() => ShowPlaceholder("Attachment download"))">
+                            <MudIcon Icon="@Icons.Material.Outlined.Description" />
+                            <span><strong>Quarterly-summary.pdf</strong><small>842 KB · Sample attachment</small></span>
+                            <MudIcon Icon="@Icons.Material.Outlined.Download" />
+                        </button>
+                    }
+                    <div class="flat-email-quick-actions">
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Reply" OnClick="@(() => Reply(message))">Reply</MudButton>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Forward" OnClick="@(() => Forward(message))">Forward</MudButton>
+                    </div>
+                }
+                else
+                {
+                    <FlatEmptyState Title="Select an email"
+                                    Message="Choose an item from the mailbox to read it."
+                                    Icon="@Icons.Material.Outlined.MailOutline" />
+                }
+            </ReadingBody>
+        </FlatEmailShell>
+    </ChildContent>
+    <MobilePrimaryAction>
+        <FlatFab Label="Compose" Icon="@Icons.Material.Outlined.Edit" AriaLabel="Compose email" OnClick="OpenCompose" />
+    </MobilePrimaryAction>
+</FlatPage>
+
+@if (_composeOpen)
+{
+    <CrudEditorShell Title="New email"
+                     Mode="Compose"
+                     SubmitText="Send"
+                     SavingText="Sending..."
+                     Saving="@_sending"
+                     IsDirty="@ComposeDirty"
+                     CanSubmit="@CanSend"
+                     OnClose="CloseCompose"
+                     OnSubmit="SendEmail"
+                     ConfirmClose="ConfirmDiscard">
+        <div class="flat-crud-form-grid flat-email-compose-form">
+            <MudTextField T="string" @bind-Value="_draft.To" Label="To" Variant="Variant.Outlined" Margin="Margin.Dense" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Cc" Label="Cc" Variant="Variant.Outlined" Margin="Margin.Dense" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Subject" Label="Subject" Variant="Variant.Outlined" Margin="Margin.Dense" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Body" Label="Message" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="10" Class="wide" />
+            <div class="flat-email-compose-tools wide">
+                <MudIconButton Icon="@Icons.Material.Outlined.AttachFile" OnClick="@(() => ShowPlaceholder("Add attachment"))" aria-label="Add attachment" title="Add attachment" />
+                <MudIconButton Icon="@Icons.Material.Outlined.InsertLink" OnClick="@(() => ShowPlaceholder("Insert link"))" aria-label="Insert link" title="Insert link" />
+                <MudIconButton Icon="@Icons.Material.Outlined.SentimentSatisfiedAlt" OnClick="@(() => ShowPlaceholder("Insert emoji"))" aria-label="Insert emoji" title="Insert emoji" />
+            </div>
+        </div>
+    </CrudEditorShell>
+}
+
+@code {
+    private static readonly MailFolder[] Folders =
+    [
+        new("inbox", "Inbox", Icons.Material.Outlined.Inbox),
+        new("starred", "Starred", Icons.Material.Outlined.StarBorder),
+        new("sent", "Sent", Icons.Material.Outlined.Send),
+        new("drafts", "Drafts", Icons.Material.Outlined.Drafts),
+        new("archive", "Archive", Icons.Material.Outlined.Archive),
+        new("trash", "Trash", Icons.Material.Outlined.DeleteOutline)
+    ];
+
+    private readonly List<MailMessage> _messages =
+    [
+        new("m1", "inbox", "Rina Kusuma", "RK", "Quarterly operations review", "The consolidated report is ready for your review.", "10:42", "2026-08-06T10:42:00+07:00", "Today at 10:42", true, true, true,
+            ["Hello team,", "The consolidated operations report is ready. Please review the capacity notes and the open action list before tomorrow's meeting.", "Regards, Rina"]),
+        new("m2", "inbox", "Finance Workflow", "FW", "Invoice approval required", "Three supplier invoices are waiting for approval.", "09:18", "2026-08-06T09:18:00+07:00", "Today at 09:18", true, false, false,
+            ["Three supplier invoices have completed validation and are waiting for approval.", "This is static sample content; no finance workflow is connected."]),
+        new("m3", "inbox", "Bayu Pratama", "BP", "Mobile layout review", "I checked the safe-area and keyboard behavior notes.", "Yesterday", "2026-08-05T16:34:00+07:00", "Yesterday at 16:34", false, true, false,
+            ["The mobile layout review is complete for the Web breakpoint sample.", "Native MAUI keyboard and safe-area behavior still requires emulator or device verification."]),
+        new("m4", "inbox", "System Notice", "SN", "Planned maintenance window", "Development services will restart this weekend.", "Mon", "2026-08-03T08:00:00+07:00", "Monday at 08:00", false, false, false,
+            ["A sample maintenance window is scheduled for Saturday at 22:00.", "No live system or notification service is connected to this template."]),
+        new("m5", "sent", "Project Atlas", "PA", "Re: Release checklist", "The updated checklist is attached for reference.", "Aug 1", "2026-08-01T14:20:00+07:00", "August 1 at 14:20", false, false, true,
+            ["Hello,", "The updated release checklist is attached for reference.", "Thank you."]),
+        new("m6", "drafts", "Supplier Team", "ST", "Contract clarification", "Draft response about the revised delivery terms.", "Jul 29", "2026-07-29T11:05:00+07:00", "July 29 at 11:05", false, false, false,
+            ["This draft has not been sent.", "Please confirm the revised delivery terms before continuing."])
+    ];
+
+    private string _selectedFolder = "inbox";
+    private string _selectedMessageId = "m1";
+    private string _search = "";
+    private bool _readingOpen;
+    private bool _composeOpen;
+    private bool _sending;
+    private ComposeDraft _draft = new();
+
+    private List<MailMessage> FilteredMessages => _messages
+        .Where(message => FolderMatches(message))
+        .Where(message => string.IsNullOrWhiteSpace(_search)
+            || message.Sender.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)
+            || message.Subject.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)
+            || message.Preview.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    private MailMessage? SelectedMessage => _messages.FirstOrDefault(message => message.Id == _selectedMessageId);
+    private string SelectedFolderLabel => Folders.First(folder => folder.Key == _selectedFolder).Label;
+    private bool CanSend => !string.IsNullOrWhiteSpace(_draft.To) && !string.IsNullOrWhiteSpace(_draft.Subject) && !string.IsNullOrWhiteSpace(_draft.Body);
+    private bool ComposeDirty => !string.IsNullOrWhiteSpace(_draft.To) || !string.IsNullOrWhiteSpace(_draft.Cc) || !string.IsNullOrWhiteSpace(_draft.Subject) || !string.IsNullOrWhiteSpace(_draft.Body);
+
+    private bool FolderMatches(MailMessage message) => _selectedFolder switch
+    {
+        "starred" => message.Starred,
+        _ => message.Folder == _selectedFolder
+    };
+
+    private int FolderCount(string key) => key switch
+    {
+        "inbox" => _messages.Count(message => message.Folder == "inbox" && message.Unread),
+        "starred" => _messages.Count(message => message.Starred),
+        "drafts" => _messages.Count(message => message.Folder == "drafts"),
+        _ => 0
+    };
+
+    private Task SelectFolder(string key)
+    {
+        _selectedFolder = key;
+        _search = "";
+        _selectedMessageId = _messages.FirstOrDefault(FolderMatches)?.Id ?? "";
+        _readingOpen = false;
+        return Task.CompletedTask;
+    }
+
+    private Task SearchChanged(string value)
+    {
+        _search = value;
+        return Task.CompletedTask;
+    }
+
+    private void SelectMessage(MailMessage message)
+    {
+        message.Unread = false;
+        _selectedMessageId = message.Id;
+        _readingOpen = true;
+    }
+
+    private void ToggleStar(MailMessage message) => message.Starred = !message.Starred;
+    private void BackToList() => _readingOpen = false;
+
+    private void OpenCompose()
+    {
+        _draft = new ComposeDraft();
+        _composeOpen = true;
+    }
+
+    private void Reply(MailMessage message)
+    {
+        _draft = new ComposeDraft { To = message.Sender, Subject = $"Re: {message.Subject}" };
+        _composeOpen = true;
+    }
+
+    private void Forward(MailMessage message)
+    {
+        _draft = new ComposeDraft { Subject = $"Fwd: {message.Subject}", Body = $"\n\n---------- Forwarded message ----------\nFrom: {message.Sender}\n\n{string.Join("\n\n", message.Body)}" };
+        _composeOpen = true;
+    }
+
+    private void Delete(MailMessage message)
+    {
+        message.Folder = "trash";
+        _selectedMessageId = FilteredMessages.FirstOrDefault()?.Id ?? "";
+        _readingOpen = false;
+        Snackbar.Add("Email moved to Trash (sample memory only).", Severity.Info);
+    }
+
+    private Task CloseCompose()
+    {
+        _composeOpen = false;
+        return Task.CompletedTask;
+    }
+
+    private Task<bool> ConfirmDiscard() => Task.FromResult(true);
+
+    private async Task SendEmail()
+    {
+        _sending = true;
+        await Task.Delay(350);
+        var id = $"sent-{Guid.NewGuid():N}";
+        _messages.Insert(0, new MailMessage(id, "sent", _draft.To, InitialsFor(_draft.To), _draft.Subject, _draft.Body, "Now", DateTimeOffset.Now.ToString("O"), "Just now", false, false, false, [_draft.Body]));
+        _sending = false;
+        _composeOpen = false;
+        _selectedFolder = "sent";
+        _selectedMessageId = id;
+        _readingOpen = true;
+        Snackbar.Add("Email added to Sent (sample memory only).", Severity.Success);
+    }
+
+    private async Task RefreshMailbox()
+    {
+        await Task.Delay(300);
+        Snackbar.Add("Mailbox sample refreshed.", Severity.Info);
+    }
+
+    private void ShowPlaceholder(string feature) => Snackbar.Add($"{feature} is a UI placeholder.", Severity.Info);
+    private static string InitialsFor(string value) => string.Concat(value.Split([' ', '@', '.', '_'], StringSplitOptions.RemoveEmptyEntries).Take(2).Select(part => char.ToUpperInvariant(part[0])));
+
+    private sealed record MailFolder(string Key, string Label, string Icon);
+
+    private sealed class MailMessage(string id, string folder, string sender, string initials, string subject, string preview, string time, string dateTimeValue, string fullTime, bool unread, bool starred, bool hasAttachment, IReadOnlyList<string> body)
+    {
+        public string Id { get; } = id;
+        public string Folder { get; set; } = folder;
+        public string Sender { get; } = sender;
+        public string Initials { get; } = initials;
+        public string Subject { get; } = subject;
+        public string Preview { get; } = preview;
+        public string Time { get; } = time;
+        public string DateTimeValue { get; } = dateTimeValue;
+        public string FullTime { get; } = fullTime;
+        public bool Unread { get; set; } = unread;
+        public bool Starred { get; set; } = starred;
+        public bool HasAttachment { get; } = hasAttachment;
+        public IReadOnlyList<string> Body { get; } = body;
+    }
+
+    private sealed class ComposeDraft
+    {
+        public string To { get; set; } = "";
+        public string Cc { get; set; } = "";
+        public string Subject { get; set; } = "";
+        public string Body { get; set; } = "";
+    }
+}

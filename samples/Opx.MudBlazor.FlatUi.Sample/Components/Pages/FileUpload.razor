@@ -1,0 +1,21 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/file-upload"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="file-upload-page no-mobile-fab">
+    <FlatPanel Title="Flat File Upload" Subtitle="Host-owned upload, validation, progress, cancel, and retry">
+        <div class="detail-section-body file-upload-sample">
+            <FlatFileUpload Options="UploadOptions" Upload="SimulateUploadAsync" FileCompleted="Completed" FileFailed="Failed" />
+            <div class="sample-code-card"><pre><code>@UploadCode</code></pre></div>
+            @if (!string.IsNullOrWhiteSpace(_result)) { <MudText Typo="Typo.caption" role="status">@_result</MudText> }
+        </div>
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    private string? _result;
+    private readonly FlatFileUploadOptions UploadOptions = new() { Multiple = true, MaximumFileCount = 5, MaximumFileSizeBytes = 5 * 1024 * 1024, AllowedExtensions = [".pdf", ".png", ".jpg", ".csv"], AllowedMimeTypes = ["application/pdf", "image/png", "image/jpeg", "text/csv"] };
+    private async Task<FlatFileUploadResult> SimulateUploadAsync(FlatFileUploadRequest request, CancellationToken token) { for (var progress = 10; progress <= 100; progress += 10) { await Task.Delay(120, token); request.Progress.Report(progress); } return FlatFileUploadResult.Success(); }
+    private void Completed(FlatFileUploadItem item) => _result = $"{item.File.Name} completed in sample memory.";
+    private void Failed(FlatFileUploadItem item) => _result = item.ErrorMessage;
+    private const string UploadCode = "<FlatFileUpload Options=\"uploadOptions\" Upload=\"UploadToHostAsync\" FileCompleted=\"OnCompleted\" />\n\n// UploadToHostAsync receives FlatFileUploadRequest and CancellationToken.\n// Host owns API/storage, authorization, scanning, and stream lifetime.";
+}

@@ -1,0 +1,86 @@
+@page "/"
+@inject SampleCatalog Catalog
+
+<div class="page-content">
+    <div class="page-actions-only">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Refresh">Refresh</MudButton>
+    </div>
+
+    <div class="stat-grid">
+        <FlatStatCard Label="Total Assets" Value="@Catalog.Assets.Count.ToString()" Icon="@Icons.Material.Outlined.Devices" Note="Synced today" />
+        <FlatStatCard Label="Online" Value="@Catalog.Assets.Count(x => x.Status == "Online").ToString()" Icon="@Icons.Material.Outlined.CheckCircle" Tone="green" Note="Healthy devices" />
+        <FlatStatCard Label="Active Tickets" Value="@Catalog.Tickets.Count(x => x.Status != "Done").ToString()" Icon="@Icons.Material.Outlined.ConfirmationNumber" Tone="amber" Note="Needs follow-up" />
+        <FlatStatCard Label="Health Avg" Value="@($"{Catalog.Assets.Average(x => x.Health):N0}%")" Icon="@Icons.Material.Outlined.MonitorHeart" Tone="sky" Note="Sample static" />
+    </div>
+
+    <div class="sample-two-col" style="margin-top:16px">
+        <FlatPanel Title="Ticket Trend" Subtitle="MudBlazor visual panel">
+            <div class="sample-chart" aria-label="MudBlazor bar chart sample">
+                <MudChart T="double"
+                          ChartType="ChartType.Bar"
+                          ChartSeries="@TicketTrendSeries"
+                          ChartLabels="@TicketTrendLabels"
+                          Width="100%"
+                          Height="220px"
+                          ChartOptions="@CompactChartOptions" />
+            </div>
+        </FlatPanel>
+        <FlatPanel Title="Recent Activity" Subtitle="Compact timeline">
+            <div class="sample-timeline">
+                @foreach (var ticket in Catalog.Tickets.Take(4))
+                {
+                    <article>
+                        <i></i>
+                        <div>
+                            <strong>@ticket.Title</strong>
+                            <span>@ticket.Code - @ticket.Department - @ticket.Time</span>
+                        </div>
+                    </article>
+                }
+            </div>
+        </FlatPanel>
+    </div>
+
+    <FlatPanel Title="Priority Assets" Subtitle="Grid sample with status chips" CssClass="flat-panel" >
+        <div class="table-scroll">
+            <table class="monitor-table">
+                <thead>
+                    <tr><th>Asset</th><th>Department</th><th>Owner</th><th>Status</th><th>Health</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var asset in Catalog.Assets.Take(5))
+                    {
+                        <tr>
+                            <td><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Computer" /></span><div><strong>@asset.Name</strong><small>@asset.Code</small></div></div></td>
+                            <td>@asset.Department</td>
+                            <td>@asset.Owner</td>
+                            <td><span class="@StatusClass(asset.Status)"><i></i>@asset.Status</span></td>
+                            <td>@asset.Health%</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </FlatPanel>
+</div>
+
+@code {
+    private readonly string[] TicketTrendLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    private readonly List<ChartSeries<double>> TicketTrendSeries =
+    [
+        new() { Name = "Open", Data = new ChartData<double>([12, 18, 10, 22, 19, 14, 9]) },
+        new() { Name = "Done", Data = new ChartData<double>([8, 14, 13, 17, 15, 11, 12]) }
+    ];
+
+    private readonly ChartOptions CompactChartOptions = new()
+    {
+        ChartPalette = ["#0078d4", "#10b981", "#f59e0b", "#d13438", "#60a5fa"]
+    };
+
+    private static string StatusClass(string status) => status switch
+    {
+        "Online" => "status-chip online",
+        "Offline" => "status-chip offline",
+        _ => "status-chip pending"
+    };
+}

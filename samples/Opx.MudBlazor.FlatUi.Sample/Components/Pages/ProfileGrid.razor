@@ -1,0 +1,124 @@
+@page "/profile-grid"
+@inject ISnackbar Snackbar
+@inject FlatMessageBoxService MessageBox
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Profile Card Grid - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module"
+          UsePanel="false"
+          PageCssClass="profile-grid-page"
+          ShowMobilePrimaryAction="true">
+    <MobilePrimaryAction>
+        <FlatFab Icon="@Icons.Material.Outlined.PersonAdd" Label="Add member" OnClick="OpenAddMember" />
+    </MobilePrimaryAction>
+    <ChildContent>
+        <FlatCardGrid TItem="MemberCard"
+                      Items="@FilteredMembers"
+                      ItemTemplate="MemberTemplate"
+                      SearchText="@_search"
+                      SearchTextChanged="SearchChanged"
+                      SearchPlaceholder="Search for name or designation..."
+                      View="@_view"
+                      ViewChanged="ViewChanged"
+                      AddText="Add member"
+                      OnAdd="OpenAddMember"
+                      OnOverflow="ShowGridMenu"
+                      EmptyTitle="No members found"
+                      EmptyMessage="Try another name or designation."
+                      AriaLabel="Member profile grid" />
+    </ChildContent>
+</FlatPage>
+
+<FlatFormModal @bind-Open="_addOpen"
+               Title="Add member"
+               Mode="Create"
+               Size="@FlatFormModalSize.Small"
+               CanSubmit="@CanAdd"
+               IsDirty="@IsAddDirty"
+               ConfirmClose="ConfirmDiscardAsync"
+               OnSubmit="AddMemberAsync">
+    <MudTextField T="string" @bind-Value="_newName" Immediate="true" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+    <MudTextField T="string" @bind-Value="_newRole" Immediate="true" Label="Designation" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+    <MudTextField T="string" @bind-Value="_newInitials" Immediate="true" Label="Initials (optional)" Variant="Variant.Outlined" Margin="Margin.Dense" />
+</FlatFormModal>
+
+@code {
+    private readonly List<MemberCard> _members =
+    [
+        new("Nancy Martino", "Team Leader & HR", "NM", "/sample-profile.svg", "cover-primary", 225, 197, true),
+        new("Henry Baird", "Full Stack Developer", "HB", null, "cover-info", 352, 376, false),
+        new("Frank Hook", "Project Manager", "FH", null, "cover-success", 164, 182, true),
+        new("Jennifer Carter", "UI/UX Designer", "JC", "/sample-profile.svg", "cover-secondary", 241, 204, true),
+        new("Megan Elmore", "Team Leader & Web Developer", "ME", null, "cover-warning", 201, 263, false),
+        new("Alexis Clarke", "Backend Developer", "AC", null, "cover-success", 132, 147, false),
+        new("Nathan Cole", "Front-End Developer", "NC", null, "cover-primary", 352, 376, true),
+        new("Joseph Parker", "Full Stack Developer", "JP", null, "cover-info", 64, 93, true)
+    ];
+
+    private string _search = "";
+    private string _view = FlatCardGridView.Grid;
+    private bool _addOpen;
+    private string _newName = "";
+    private string _newRole = "";
+    private string _newInitials = "";
+
+    private IReadOnlyList<MemberCard> FilteredMembers => _members
+        .Where(member => string.IsNullOrWhiteSpace(_search)
+            || member.Name.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)
+            || member.Role.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase))
+        .ToList();
+    private bool CanAdd => !string.IsNullOrWhiteSpace(_newName) && !string.IsNullOrWhiteSpace(_newRole);
+    private bool IsAddDirty => !string.IsNullOrWhiteSpace(_newName) || !string.IsNullOrWhiteSpace(_newRole) || !string.IsNullOrWhiteSpace(_newInitials);
+
+    private RenderFragment<MemberCard> MemberTemplate => member => @<FlatProfileCard Name="@member.Name"
+        Subtitle="@member.Role"
+        Initials="@member.Initials"
+        ImageUrl="@member.ImageUrl"
+        CoverTone="@member.CoverTone"
+        Favorite="@member.Favorite"
+        Stats="@member.Stats"
+        OnFavorite="@(() => ToggleFavorite(member))"
+        OnMore="@(() => Snackbar.Add($"Actions for {member.Name} are host-defined.", Severity.Info))"
+        OnView="@(() => Snackbar.Add($"Open profile: {member.Name}", Severity.Info))" />;
+
+    private void SearchChanged(string value) => _search = value ?? "";
+    private void ViewChanged(string value) => _view = value;
+    private void ToggleFavorite(MemberCard member) => member.Favorite = !member.Favorite;
+    private void ShowGridMenu() => Snackbar.Add("Additional grid actions are supplied by the host app.", Severity.Info);
+
+    private void OpenAddMember()
+    {
+        _newName = "";
+        _newRole = "";
+        _newInitials = "";
+        _addOpen = true;
+    }
+
+    private Task<bool> ConfirmDiscardAsync() => MessageBox.QuestionAsync("Discard the new member form?", title: "Close form");
+
+    private Task AddMemberAsync()
+    {
+        if (!CanAdd) return Task.CompletedTask;
+        var initials = string.IsNullOrWhiteSpace(_newInitials) ? null : _newInitials.Trim();
+        _members.Insert(0, new(_newName.Trim(), _newRole.Trim(), initials, null, "cover-primary", 0, 0, false));
+        Snackbar.Add("Member added to sample page memory.", Severity.Success);
+        return Task.CompletedTask;
+    }
+
+    private sealed class MemberCard(string name, string role, string? initials, string? imageUrl, string coverTone, int projects, int tasks, bool favorite)
+    {
+        public string Name { get; } = name;
+        public string Role { get; } = role;
+        public string? Initials { get; } = initials;
+        public string? ImageUrl { get; } = imageUrl;
+        public string CoverTone { get; } = coverTone;
+        public bool Favorite { get; set; } = favorite;
+        public IReadOnlyList<FlatProfileCardStat> Stats { get; } =
+        [
+            new("Projects", projects.ToString()),
+            new("Tasks", tasks.ToString())
+        ];
+    }
+}

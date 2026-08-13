@@ -1,0 +1,58 @@
+@page "/static-data"
+@inject SampleCatalog Catalog
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="static-data-page"
+          RefreshEnabled="true"
+          DownloadVisible="true"
+          DownloadAriaLabel="Download CSV"
+          DownloadLabel="Download CSV"
+          PullToRefreshEnabled="true"
+          OnRefresh="() => StateHasChanged()"
+          ReadOnlySource="Static sample">
+    <ToolbarContent>
+        <MudTextField T="string" @bind-Value="_search" Placeholder="Search master..." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" />
+    </ToolbarContent>
+    <ChildContent>
+        <div class="table-scroll">
+            <table class="monitor-table module-table no-row-actions">
+                <thead><tr><th>Code</th><th>Group</th><th>Name</th><th>Status</th><th>Description</th></tr></thead>
+                <tbody>
+                    @foreach (var row in Rows)
+                    {
+                        <tr>
+                            <td><code>@row.Code</code></td>
+                            <td>@row.Group</td>
+                            <td><strong>@row.Name</strong></td>
+                            <td><span class="status-chip online"><i></i>@row.Status</span></td>
+                            <td>@row.Description</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <FlatMobileGrid TItem="StaticRecord" Items="Rows">
+            <CardTemplate Context="row">
+                <article class="mobile-card">
+                    <header><div><strong>@row.Name</strong><small>@row.Code - @row.Group</small></div><span class="status-chip online"><i></i>@row.Status</span></header>
+                    <div class="sample-mobile-facts">
+                        <FlatInfoItem Label="Group" Value="@row.Group" />
+                        <FlatInfoItem Label="Description" Value="@row.Description" />
+                    </div>
+                </article>
+            </CardTemplate>
+            <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="Master data is empty" /></EmptyContent>
+        </FlatMobileGrid>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private string _search = "";
+    private IReadOnlyList<StaticRecord> Rows => Catalog.StaticData
+        .Where(row => string.IsNullOrWhiteSpace(_search)
+            || row.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Code.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Group.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .ToArray();
+}

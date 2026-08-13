@@ -1,0 +1,302 @@
+@page "/ai-chat"
+@implements IDisposable
+
+@* Copyright © 2026 opx. All rights reserved. *@
+
+<PageTitle>AI Chat - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="chat-page ai-chat-page no-mobile-fab">
+    <ChildContent>
+        <FlatChatShell ConversationOpen="@_conversationOpen"
+                       ScrollVersion="@_scrollVersion"
+                       OnBack="ShowHistory"
+                       AriaLabel="AI assistant sample workspace">
+            <Sidebar>
+                <div class="flat-chat-sidebar-header ai-chat-sidebar-header">
+                    <div>
+                        <strong>AI conversations</strong>
+                        <small>Sample history stored in page memory</small>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Add"
+                                   OnClick="NewConversation"
+                                   aria-label="Start new AI chat"
+                                   title="Start new AI chat" />
+                </div>
+                <div class="flat-chat-search">
+                    <MudTextField T="string"
+                                  Value="@_search"
+                                  ValueChanged="SearchChanged"
+                                  Immediate="true"
+                                  Placeholder="Search conversations..."
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Outlined.Search"
+                                  Class="module-search" />
+                </div>
+                <nav class="flat-chat-conversation-list" aria-label="AI conversation history">
+                    @foreach (var conversation in FilteredConversations)
+                    {
+                        <FlatChatConversationItem Title="@conversation.Title"
+                                                  Preview="@conversation.Preview"
+                                                  Time="@conversation.Time"
+                                                  Initials="AI"
+                                                  Active="@(conversation.Id == _selectedConversationId)"
+                                                  OnClick="@(() => SelectConversation(conversation))" />
+                    }
+                    @if (!FilteredConversations.Any())
+                    {
+                        <FlatEmptyState Title="No conversations found"
+                                        Message="Try another keyword."
+                                        Icon="@Icons.Material.Outlined.SearchOff"
+                                        CssClass="empty-state compact" />
+                    }
+                </nav>
+                <div class="ai-chat-privacy-note">
+                    <MudIcon Icon="@Icons.Material.Outlined.Security" Size="Size.Small" />
+                    <span>This showroom does not send prompts to an external AI service.</span>
+                </div>
+            </Sidebar>
+            <Header>
+                <div class="flat-chat-thread-identity">
+                    <span class="ai-chat-avatar" aria-hidden="true"><MudIcon Icon="@Icons.Material.Outlined.AutoAwesome" /></span>
+                    <span>
+                        <strong>OPX Assistant</strong>
+                        <small>@(_isResponding ? "Generating a sample response..." : "Local simulation · host integration ready")</small>
+                    </span>
+                </div>
+                <div class="flat-chat-thread-actions">
+                    <MudIconButton Icon="@Icons.Material.Outlined.AddComment"
+                                   OnClick="NewConversation"
+                                   aria-label="Start new AI chat"
+                                   title="Start new AI chat" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert"
+                                   OnClick="ShowIntegrationInfo"
+                                   aria-label="AI chat options"
+                                   title="AI chat options" />
+                </div>
+            </Header>
+            <Messages>
+                <div class="flat-chat-date-separator"><span>Sample session</span></div>
+                @foreach (var message in SelectedConversation.Messages)
+                {
+                    <FlatChatMessage Author="@(message.IsOwn ? "You" : "OPX Assistant")"
+                                     Text="@message.Text"
+                                     Time="@message.Time"
+                                     Initials="@(message.IsOwn ? "OU" : "AI")"
+                                     IsOwn="@message.IsOwn"
+                                     Status="@(message.IsOwn ? "Local" : null)" />
+                }
+                @if (SelectedConversation.Messages.Count == 1)
+                {
+                    <div class="ai-chat-suggestions" aria-label="Suggested prompts">
+                        @foreach (var prompt in SuggestedPrompts)
+                        {
+                            <button type="button" @onclick="@(() => UseSuggestion(prompt))">@prompt</button>
+                        }
+                    </div>
+                }
+                @if (_isResponding)
+                {
+                    <FlatChatTypingIndicator Author="OPX Assistant" Initials="AI" />
+                }
+            </Messages>
+            <Composer>
+                <MudIconButton Icon="@Icons.Material.Outlined.AttachFile"
+                               OnClick="ShowAttachmentInfo"
+                               Disabled="@_isResponding"
+                               aria-label="Attach context"
+                               title="Attach context" />
+                <textarea rows="1"
+                          value="@_draft"
+                          @oninput="UpdateDraft"
+                          @onkeydown="ComposerKeyDown"
+                          disabled="@_isResponding"
+                          placeholder="Ask the assistant..."
+                          aria-label="AI prompt"></textarea>
+                <span class="ai-chat-model-badge" title="Configured by the host application">Sample AI</span>
+                @if (_isResponding)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.StopCircle"
+                                   Color="Color.Error"
+                                   OnClick="StopResponse"
+                                   aria-label="Stop response"
+                                   title="Stop response" />
+                }
+                else
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Send"
+                                   Color="Color.Primary"
+                                   Class="flat-chat-send"
+                                   Disabled="@(!CanSend)"
+                                   OnClick="SendPrompt"
+                                   aria-label="Send prompt"
+                                   title="Send prompt" />
+                }
+            </Composer>
+        </FlatChatShell>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private static readonly string[] SuggestedPrompts =
+    [
+        "Summarize today's operational priorities",
+        "Draft a concise incident update",
+        "Explain this dashboard to a new team member"
+    ];
+
+    private readonly List<AiConversation> _conversations =
+    [
+        new("welcome", "Workspace assistant", "Ask about operations, reports, or workflows.", "Now",
+        [new("Hello! I am a reusable AI chat template. Responses on this page are simulated locally; connect the send callback to your own secured AI service.", false, "Now")]),
+        new("incident", "Incident update draft", "A concise stakeholder update template.", "09:36",
+        [
+            new("Create a short incident status update.", true, "09:35"),
+            new("Service recovery is in progress. The team has isolated the affected dependency, customer impact is being monitored, and the next update is scheduled in 30 minutes.", false, "09:36")
+        ]),
+        new("report", "Weekly report summary", "Highlights, risks, and next actions.", "Yesterday",
+        [
+            new("Summarize a weekly operations report.", true, "Yesterday"),
+            new("Highlights: service availability improved and the backlog declined. Risk: two integrations remain above their response-time target. Next: complete tuning and verify the recovery plan.", false, "Yesterday")
+        ])
+    ];
+
+    private string _selectedConversationId = "welcome";
+    private string _search = "";
+    private string _draft = "";
+    private bool _conversationOpen = true;
+    private bool _isResponding;
+    private long _scrollVersion;
+    private CancellationTokenSource? _responseCancellation;
+
+    private AiConversation SelectedConversation =>
+        _conversations.First(item => item.Id == _selectedConversationId);
+    private IEnumerable<AiConversation> FilteredConversations => _conversations.Where(item =>
+        string.IsNullOrWhiteSpace(_search)
+        || item.Title.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)
+        || item.Preview.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase));
+    private bool CanSend => !_isResponding && !string.IsNullOrWhiteSpace(_draft);
+
+    private void SearchChanged(string value) => _search = value ?? "";
+    private void UpdateDraft(ChangeEventArgs args) => _draft = args.Value?.ToString() ?? "";
+    private void ShowHistory() => _conversationOpen = false;
+
+    private void SelectConversation(AiConversation conversation)
+    {
+        CancelPendingResponse();
+        _selectedConversationId = conversation.Id;
+        _conversationOpen = true;
+        _scrollVersion++;
+    }
+
+    private void NewConversation()
+    {
+        CancelPendingResponse();
+        var conversation = new AiConversation(
+            Guid.NewGuid().ToString("N"),
+            "New conversation",
+            "No prompt yet.",
+            "Now",
+            [new("How can I help with your workspace today?", false, "Now")]);
+        _conversations.Insert(0, conversation);
+        _selectedConversationId = conversation.Id;
+        _conversationOpen = true;
+        _draft = "";
+        _scrollVersion++;
+    }
+
+    private void UseSuggestion(string prompt)
+    {
+        _draft = prompt;
+        _ = SendPrompt();
+    }
+
+    private void ComposerKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter" && !args.ShiftKey)
+        {
+            _ = SendPrompt();
+        }
+    }
+
+    private async Task SendPrompt()
+    {
+        if (!CanSend)
+        {
+            return;
+        }
+
+        var prompt = _draft.Trim();
+        var conversation = SelectedConversation;
+        conversation.Messages.Add(new(prompt, true, DateTime.Now.ToString("HH:mm")));
+        conversation.Title = conversation.Messages.Count == 2 ? CreateTitle(prompt) : conversation.Title;
+        conversation.Preview = prompt;
+        conversation.Time = "Now";
+        _draft = "";
+        _isResponding = true;
+        _scrollVersion++;
+        _responseCancellation = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(750, _responseCancellation.Token);
+            conversation.Messages.Add(new(CreateSampleResponse(prompt), false, DateTime.Now.ToString("HH:mm")));
+            conversation.Preview = "Sample response generated locally.";
+        }
+        catch (OperationCanceledException)
+        {
+            conversation.Messages.Add(new("Sample generation stopped. No external request was made.", false, DateTime.Now.ToString("HH:mm")));
+            conversation.Preview = "Generation stopped.";
+        }
+        finally
+        {
+            _responseCancellation?.Dispose();
+            _responseCancellation = null;
+            _isResponding = false;
+            _scrollVersion++;
+        }
+    }
+
+    private void StopResponse() => _responseCancellation?.Cancel();
+    private void ShowAttachmentInfo() => _draft = string.IsNullOrWhiteSpace(_draft) ? "Use the attached context to " : _draft;
+    private void ShowIntegrationInfo() => _draft = "Host integration: connect this template to your secured AI endpoint, authorization, conversation store, and streaming transport.";
+
+    private void CancelPendingResponse()
+    {
+        _responseCancellation?.Cancel();
+        _responseCancellation?.Dispose();
+        _responseCancellation = null;
+        _isResponding = false;
+    }
+
+    private static string CreateTitle(string prompt) => prompt.Length <= 34 ? prompt : $"{prompt[..31]}...";
+
+    private static string CreateSampleResponse(string prompt)
+    {
+        if (prompt.Contains("incident", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Sample response: state the impact, current mitigation, owner, next checkpoint, and expected recovery window. Keep uncertain details clearly marked as estimates.";
+        }
+
+        if (prompt.Contains("report", StringComparison.OrdinalIgnoreCase) || prompt.Contains("summar", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Sample response: organize the result into highlights, exceptions, decisions, and next actions. The host should supply authorized business data through its own backend.";
+        }
+
+        return "Sample response: I can help structure this request, but this showroom is intentionally offline. Replace the local response handler with your host-owned AI service and retain authorization, audit, and error handling at the application boundary.";
+    }
+
+    public void Dispose() => CancelPendingResponse();
+
+    private sealed class AiConversation(string id, string title, string preview, string time, List<AiMessage> messages)
+    {
+        public string Id { get; } = id;
+        public string Title { get; set; } = title;
+        public string Preview { get; set; } = preview;
+        public string Time { get; set; } = time;
+        public List<AiMessage> Messages { get; } = messages;
+    }
+
+    private sealed record AiMessage(string Text, bool IsOwn, string Time);
+}

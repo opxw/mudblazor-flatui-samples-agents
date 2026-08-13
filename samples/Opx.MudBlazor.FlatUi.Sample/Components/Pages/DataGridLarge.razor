@@ -1,0 +1,244 @@
+@* Copyright © 2026 opx. All rights reserved. *@
+@page "/data-grid-large"
+@inject FlatGridOptions GridOptions
+@inject FlatPageLoadingState PageLoading
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="large-data-grid-page"
+          InitialLoading="@_initialLoading"
+          SkeletonColumnCount="12"
+          SkeletonRowCount="9"
+          SkeletonMobileRowCount="6"
+          SkeletonMobileFieldCount="6"
+          SkeletonLoadingText="Loading order data"
+          ReadOnlySource="In-memory sample data"
+          FilterEnabled="@Columns.Any(column => column.FilterEnabled)"
+          FilterActive="@GridState.HasActiveFilters"
+          OnFilter="() => _filterOpen = true"
+          RefreshEnabled="true"
+          RefreshDisabled="@_initialLoading"
+          OnRefresh="RefreshPageAsync">
+    <ToolbarContent>
+        <MudTextField T="string"
+                      Value="_search"
+                      ValueChanged="SearchChanged"
+                      Placeholder="Search orders, customers, or references..."
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search"
+                      Class="module-search" />
+    </ToolbarContent>
+    <ToolbarActions>
+        <MudIconButton Icon="@Icons.Material.Outlined.HourglassTop"
+                       Disabled="@_initialLoading"
+                       OnClick="PreviewInitialLoadAsync"
+                       Class="grid-action-button"
+                       aria-label="Preview initial skeleton loading"
+                       title="Preview initial skeleton loading" />
+    </ToolbarActions>
+    <ChildContent>
+        <div class="large-grid-host">
+                <FlatDataGrid TItem="LargeGridRecord"
+                              State="GridState"
+                              Columns="Columns"
+                              Items="PagedRecords"
+                              Changed="ReloadPage"
+                              AriaLabel="Large data grid with vertical and horizontal scrolling">
+                    <RowTemplate Context="record">
+                        <tr>
+                            <td><div class="primary-cell"><strong>@record.OrderNumber</strong><small>@record.Reference</small></div></td>
+                            <td>@record.Customer</td>
+                            <td>@record.Channel</td>
+                            <td>@record.Region</td>
+                            <td>@record.SalesRepresentative</td>
+                            <td>@record.OrderDate.ToString("yyyy-MM-dd")</td>
+                            <td><span class="@StatusClass(record.Status)"><i></i>@record.Status</span></td>
+                            <td>@record.Warehouse</td>
+                            <td>@record.SkuCount</td>
+                            <td>@record.Quantity</td>
+                            <td>@record.Total.ToString("N0")</td>
+                            <td>@record.DeliveryAddress</td>
+                        </tr>
+                    </RowTemplate>
+                    <EmptyContent>
+                        <FlatEmptyState CssClass="empty-state compact" Title="No orders found" Message="Change the search or filter criteria." />
+                    </EmptyContent>
+                </FlatDataGrid>
+        </div>
+
+            <FlatMobileGrid TItem="LargeGridRecord" Items="PagedRecords">
+                <CardTemplate Context="record">
+                    <article class="mobile-card">
+                        <header>
+                            <div><strong>@record.OrderNumber</strong><small>@record.Customer · @record.Reference</small></div>
+                            <span class="@StatusClass(record.Status)"><i></i>@record.Status</span>
+                        </header>
+                        <div class="mobile-card-body">
+                            <FlatInfoItem Label="Region" Value="@record.Region" />
+                            <FlatInfoItem Label="Channel" Value="@record.Channel" />
+                            <FlatInfoItem Label="Sales rep" Value="@record.SalesRepresentative" />
+                            <FlatInfoItem Label="Warehouse" Value="@record.Warehouse" />
+                            <FlatInfoItem Label="Quantity" Value="@record.Quantity.ToString()" />
+                            <FlatInfoItem Label="Total" Value="@record.Total.ToString("N0")" />
+                        </div>
+                    </article>
+                </CardTemplate>
+                <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="No orders found" /></EmptyContent>
+            </FlatMobileGrid>
+
+        <FlatPager State="GridState" PageSizes="LargePageSizes" Changed="ReloadPage" />
+    </ChildContent>
+</FlatPage>
+
+<MobileGridFilterSheet Open="_filterOpen"
+                       OpenChanged="value => _filterOpen = value"
+                       Columns="Columns"
+                       State="GridState"
+                       OnApplied="ReloadPage" />
+
+@code {
+    private static readonly string[] Customers = ["Northwind Retail Indonesia", "Contoso Distribution", "Adventure Works Commerce", "Fabrikam Manufacturing", "Wide World Importers"];
+    private static readonly string[] Channels = ["Direct", "Marketplace", "Partner", "Web Store"];
+    private static readonly string[] Regions = ["Jakarta", "West Java", "Central Java", "East Java", "Bali"];
+    private static readonly string[] Representatives = ["Amelia Putri", "Bima Santoso", "Citra Lestari", "Danu Prabowo", "Elisa Wijaya"];
+    private static readonly string[] Statuses = ["Processing", "Ready", "Shipped", "On Hold"];
+    private static readonly string[] Warehouses = ["Jakarta Main Warehouse", "Bandung Distribution Center", "Surabaya Fulfillment Hub"];
+    private static readonly IReadOnlyList<int> LargePageSizes = [25, 50, 100];
+    private static readonly IReadOnlyList<LargeGridRecord> Records = Enumerable.Range(1, 120)
+        .Select(index => new LargeGridRecord(
+            $"SO-2026-{index:0000}",
+            $"REF-CUSTOMER-{10000 + index}",
+            Customers[(index - 1) % Customers.Length],
+            Channels[(index - 1) % Channels.Length],
+            Regions[(index - 1) % Regions.Length],
+            Representatives[(index - 1) % Representatives.Length],
+            new DateOnly(2026, 8, 1).AddDays((index - 1) % 28),
+            Statuses[(index - 1) % Statuses.Length],
+            Warehouses[(index - 1) % Warehouses.Length],
+            2 + index % 11,
+            12 + index % 85,
+            1_250_000m + index * 137_500m,
+            $"Business District Block {(char)('A' + index % 6)} No. {10 + index}, {Regions[(index - 1) % Regions.Length]}"))
+        .ToArray();
+
+    private GridViewState GridState = default!;
+    private IReadOnlyList<LargeGridRecord> PagedRecords = [];
+    private string _search = string.Empty;
+    private bool _filterOpen;
+    private bool _initialLoading = true;
+
+    private static readonly IReadOnlyList<GridColumnDefinition> Columns =
+    [
+        new("order", "Order"),
+        new("customer", "Customer"),
+        new("channel", "Channel", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Channels)),
+        new("region", "Region", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Regions)),
+        new("representative", "Sales Representative"),
+        new("date", "Order Date", GridColumnFilterType.Date),
+        new("status", "Status", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Statuses)),
+        new("warehouse", "Warehouse", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Warehouses)),
+        new("sku", "SKU Count", GridColumnFilterType.Number),
+        new("quantity", "Quantity", GridColumnFilterType.Number),
+        new("total", "Order Total", GridColumnFilterType.Number),
+        new("address", "Delivery Address")
+    ];
+
+    protected override void OnInitialized()
+    {
+        GridState = new GridViewState(GridOptions);
+        GridState.SetPageSize(50);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CompleteInitialLoadAsync();
+        }
+    }
+
+    private async Task PreviewInitialLoadAsync()
+    {
+        if (_initialLoading)
+        {
+            return;
+        }
+
+        _initialLoading = true;
+        await InvokeAsync(StateHasChanged);
+        await CompleteInitialLoadAsync();
+    }
+
+    private async Task CompleteInitialLoadAsync()
+    {
+        await Task.Delay(1400);
+        ReloadPage();
+        _initialLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task RefreshPageAsync()
+    {
+        using var loading = PageLoading.Begin();
+        await Task.Delay(700);
+        ReloadPage();
+    }
+
+    private void SearchChanged(string value)
+    {
+        _search = value;
+        GridState.SetPage(0);
+        ReloadPage();
+    }
+
+    private void ReloadPage()
+    {
+        var source = Records.Where(record =>
+            string.IsNullOrWhiteSpace(_search)
+            || record.OrderNumber.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || record.Customer.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || record.Reference.Contains(_search, StringComparison.OrdinalIgnoreCase));
+        PagedRecords = GridState.ApplyPage(source, ValueFor);
+    }
+
+    private static string? ValueFor(LargeGridRecord record, string key) => key switch
+    {
+        "order" => $"{record.OrderNumber} {record.Reference}",
+        "customer" => record.Customer,
+        "channel" => record.Channel,
+        "region" => record.Region,
+        "representative" => record.SalesRepresentative,
+        "date" => record.OrderDate.ToString("yyyy-MM-dd"),
+        "status" => record.Status,
+        "warehouse" => record.Warehouse,
+        "sku" => record.SkuCount.ToString(),
+        "quantity" => record.Quantity.ToString(),
+        "total" => record.Total.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        "address" => record.DeliveryAddress,
+        _ => string.Empty
+    };
+
+    private static string StatusClass(string status) => status switch
+    {
+        "Shipped" => "status-chip online",
+        "On Hold" => "status-chip offline",
+        _ => "status-chip pending"
+    };
+
+    private sealed record LargeGridRecord(
+        string OrderNumber,
+        string Reference,
+        string Customer,
+        string Channel,
+        string Region,
+        string SalesRepresentative,
+        DateOnly OrderDate,
+        string Status,
+        string Warehouse,
+        int SkuCount,
+        int Quantity,
+        decimal Total,
+        string DeliveryAddress);
+}

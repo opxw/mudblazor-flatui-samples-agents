@@ -1,0 +1,90 @@
+@page "/timeline"
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Timeline - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="timeline-page">
+    <ChildContent>
+        <section class="timeline-showcase-section">
+            <h2>Center Timeline</h2>
+            <FlatTimeline TItem="TimelineEvent"
+                          Items="@CenterEvents"
+                          Variant="center"
+                          DateSelector="@(item => item.Date)"
+                          MarkerIconSelector="@(item => item.Icon)"
+                          ItemTemplate="CenterTemplate"
+                          AriaLabel="Center timeline sample" />
+        </section>
+
+        <section class="timeline-showcase-section">
+            <h2>Left Timeline</h2>
+            <FlatTimeline TItem="TimelineEvent"
+                          Items="@LeftEvents"
+                          Variant="left"
+                          DateSelector="@(item => item.Date)"
+                          MetaSelector="@(item => item.Meta)"
+                          MarkerIconSelector="@(item => item.Icon)"
+                          ItemTemplate="LeftTemplate"
+                          AriaLabel="Left timeline sample" />
+        </section>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private readonly IReadOnlyList<TimelineEvent> CenterEvents =
+    [
+        new("15 Dec 2021", "@Erica245", "10 min ago", "Wish someone a sincere ‘good luck in your new job’ with these sweet messages. Make sure you pick out a good luck new job card to go with the words, and pop a beautiful bunch of flowers from our gift range in your basket, to make them feel super special.", Icons.Material.Outlined.Layers, "social"),
+        new("22 Oct 2021", "", "", "Adding a new event with attachments", Icons.Material.Outlined.Diamond, "attachments"),
+        new("10 Jul 2021", "", "", "Create new project building product", Icons.Material.Outlined.CardGiftcard, "project")
+    ];
+
+    private readonly IReadOnlyList<TimelineEvent> LeftEvents =
+    [
+        new("12 Dec 2021", "", "02:35AM to 04:30PM", "Frank hook joined with our company", Icons.Material.Outlined.Circle, "joined"),
+        new(null, "", "02:35AM to 04:30PM", "Trip planning", Icons.Material.Outlined.Circle, "trip"),
+        new("08 Dec 2021", "", "02:35AM to 04:30PM", "Release review completed", Icons.Material.Outlined.Circle, "review")
+    ];
+
+    private RenderFragment<TimelineEvent> CenterTemplate => item => @<div class="timeline-card center-card @item.Kind">
+        @if (item.Kind == "social")
+        {
+            <div class="timeline-card-header">
+                <FlatProfileAvatar ImageUrl="/sample-profile.svg" Initials="ER" Name="Erica" Size="48" />
+                <div><strong>@item.Title</strong><span> - @item.Meta</span><p>@item.Text</p></div>
+            </div>
+            <div class="timeline-reactions"><span>🔥 19</span><span>😍 22</span></div>
+        }
+        else if (item.Kind == "attachments")
+        {
+            <strong class="timeline-card-title">Adding a new event with attachments</strong>
+            <p>Too much or too little spacing can make things unpleasant for the reader.</p>
+            <div class="timeline-attachment-row"><span class="attachment-file image">Business Template - UI/UX design<small>685 KB</small></span><span class="attachment-file document">Bank Management System<small>8.78 MB</small></span></div>
+        }
+        else
+        {
+            <strong class="timeline-card-title">Create new project building product</strong>
+            <p>Every team project can have a shared template board. Use the shared board to discuss, align, and contribute to your project together.</p>
+            <div class="timeline-members"><FlatProfileAvatar ImageUrl="/sample-profile.svg" Initials="A" Name="A" Size="28" /><FlatProfileAvatar Initials="R" Name="R" Size="28" /><span>2+</span></div>
+        }
+    </div>;
+
+    private RenderFragment<TimelineEvent> LeftTemplate => item => @<div class="timeline-card left-card @item.Kind">
+        <strong class="timeline-card-title">@item.Text</strong>
+        @if (item.Kind == "joined")
+        {
+            <div class="timeline-person-row"><FlatProfileAvatar ImageUrl="/sample-profile.svg" Initials="FH" Name="Frank Hook" Size="48" /><p>It makes a statement, it’s impressive graphic design. Increase or decrease the letter spacing depending on the situation and try, try again until it looks right.</p></div>
+        }
+        else if (item.Kind == "trip")
+        {
+            <p>In the trip planner, keep only one or two activities in a day if the purpose of the trip is to relax and take it easy during the vacation.</p>
+            <div class="timeline-photo-row"><i class="photo-one"></i><i class="photo-two"></i><i class="photo-three"></i><i class="photo-four"></i></div>
+        }
+        else
+        {
+            <p>All tasks were reviewed and the next delivery window is ready for the team.</p>
+        }
+    </div>;
+
+    private sealed record TimelineEvent(string? Date, string? Title, string? Meta, string Text, string Icon, string Kind);
+}

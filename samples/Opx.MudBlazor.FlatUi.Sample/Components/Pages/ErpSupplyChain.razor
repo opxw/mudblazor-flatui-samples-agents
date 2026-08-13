@@ -1,0 +1,38 @@
+@page "/erp/procurement"
+@page "/erp/inventory"
+@inject ErpSampleCatalog Erp
+@inject NavigationManager Navigation
+
+@if (IsInventory)
+{
+    <FlatPage Kind="FlatPageKind.Module" PageCssClass="erp-page erp-list-page" RefreshEnabled="true" OnRefresh="() => StateHasChanged()" ExportVisible="true" PullToRefreshEnabled="true">
+        <ToolbarContent><MudTextField @bind-Value="_search" Immediate="true" Placeholder="Search item or warehouse..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" Margin="Margin.Dense" Variant="Variant.Outlined" /></ToolbarContent>
+        <ChildContent>
+            <div class="erp-inventory-summary"><span><strong>3,152</strong><small>Total units</small></span><span><strong>3</strong><small>Warehouses</small></span><span><strong>2</strong><small>Reorder alerts</small></span><span><strong>IDR 824M</strong><small>Stock value</small></span></div>
+            <div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Item</th><th>Category</th><th>Warehouse</th><th>On hand</th><th>Reorder point</th><th>Status</th></tr></thead><tbody>@foreach (var item in FilteredInventory){<tr><td><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Inventory2" /></span><div><strong>@item.Name</strong><small>@item.Code</small></div></div></td><td>@item.Category</td><td>@item.Warehouse</td><td>@item.OnHand.ToString("N0")</td><td>@item.ReorderPoint.ToString("N0")</td><td><span class="@StatusClass(item.Status)">@item.Status</span></td></tr>}</tbody></table></div>
+            <div class="erp-mobile-list">@foreach (var item in FilteredInventory){<article class="mobile-card erp-mobile-card"><header><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Inventory2" /></span><div><strong>@item.Name</strong><small>@item.Code · @item.Category</small></div></div><span class="@StatusClass(item.Status)">@item.Status</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Warehouse" Value="@item.Warehouse" /><FlatInfoItem Label="On hand" Value="@item.OnHand.ToString("N0")" /><FlatInfoItem Label="Reorder point" Value="@item.ReorderPoint.ToString("N0")" /></div></article>}</div>
+        </ChildContent>
+    </FlatPage>
+}
+else
+{
+    <FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+        <div class="stat-grid erp-stat-grid"><FlatStatCard Label="Open purchase orders" Value="24" Icon="@Icons.Material.Outlined.ShoppingCart" Note="IDR 428.6M" Tone="blue" /><FlatStatCard Label="Awaiting approval" Value="5" Icon="@Icons.Material.Outlined.Approval" Note="IDR 116.4M" Tone="amber" /><FlatStatCard Label="On-time delivery" Value="93.6%" Icon="@Icons.Material.Outlined.LocalShipping" Note="Rolling 90 days" Tone="green" /><FlatStatCard Label="Supplier quality" Value="97.2%" Icon="@Icons.Material.Outlined.Verified" Note="Accepted receipts" Tone="sky" /></div>
+        <div class="sample-two-col erp-dashboard-grid">
+            <FlatPanel Title="Spend by category" Subtitle="Month-to-date committed value"><div class="sample-chart"><MudChart T="double" ChartType="ChartType.Donut" ChartSeries="@SpendSeries" ChartLabels="@SpendLabels" Width="100%" Height="220px" ChartOptions="@ChartOptions" /></div></FlatPanel>
+            <FlatPanel Title="Procurement actions" Subtitle="Exceptions and approvals"><div class="erp-workflow-list"><article><span class="erp-workflow-icon amber"><MudIcon Icon="@Icons.Material.Outlined.Approval" /></span><div><strong>5 purchase orders awaiting approval</strong><small>Highest value IDR 76.25M</small></div><span>Review</span></article><article><span class="erp-workflow-icon red"><MudIcon Icon="@Icons.Material.Outlined.Inventory" /></span><div><strong>2 materials below reorder point</strong><small>Bearing and export crate</small></div><span>High</span></article><article><span class="erp-workflow-icon blue"><MudIcon Icon="@Icons.Material.Outlined.EventBusy" /></span><div><strong>3 late supplier deliveries</strong><small>Average delay 2.4 days</small></div><span>Follow up</span></article><article><span class="erp-workflow-icon green"><MudIcon Icon="@Icons.Material.Outlined.PriceCheck" /></span><div><strong>Contract savings realized</strong><small>IDR 28.6M month to date</small></div><span>+6.8%</span></article></div></FlatPanel>
+        </div>
+        <FlatPanel Title="Recent purchase orders" Subtitle="Purchasing document status" CssClass="flat-panel erp-section-panel"><div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Purchase order</th><th>Supplier</th><th>Category</th><th>Amount</th><th>Delivery</th><th>Status</th></tr></thead><tbody>@foreach (var order in Erp.PurchaseOrders){<tr><td><strong>@order.Number</strong></td><td>@order.Supplier</td><td>@order.Category</td><td class="erp-money">@Money(order.Amount)</td><td>@order.DeliveryDate</td><td><span class="@StatusClass(order.Status)">@order.Status</span></td></tr>}</tbody></table></div><div class="erp-mobile-list embedded">@foreach (var order in Erp.PurchaseOrders){<article class="mobile-card erp-mobile-card"><header><div><strong>@order.Supplier</strong><small>@order.Number · @order.Category</small></div><span class="@StatusClass(order.Status)">@order.Status</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Amount" Value="@Money(order.Amount)" /><FlatInfoItem Label="Delivery" Value="@order.DeliveryDate" /></div></article>}</div></FlatPanel>
+    </FlatPage>
+}
+
+@code {
+    private string _search = "";
+    private bool IsInventory => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').EndsWith("inventory", StringComparison.OrdinalIgnoreCase);
+    private IEnumerable<ErpInventoryItem> FilteredInventory => string.IsNullOrWhiteSpace(_search) ? Erp.Inventory : Erp.Inventory.Where(x => $"{x.Code} {x.Name} {x.Category} {x.Warehouse} {x.Status}".Contains(_search, StringComparison.OrdinalIgnoreCase));
+    private static string Money(decimal value) => $"IDR {value / 1_000_000m:N2}M";
+    private readonly string[] SpendLabels = ["Raw Material", "MRO", "Packaging", "Logistics", "Services"];
+    private readonly List<ChartSeries<double>> SpendSeries = [new() { Name = "Spend", Data = new ChartData<double>([186, 76, 33, 48, 64]) }];
+    private readonly ChartOptions ChartOptions = new() { ChartPalette = ["#0078d4", "#10b981", "#f59e0b", "#60a5fa", "#8b5cf6"] };
+    private static string StatusClass(string status) => status switch { "Healthy" or "Approved" or "Sent" => "status-chip online", "Reorder" or "Awaiting approval" or "In production" => "status-chip pending", "Critical" => "status-chip offline", _ => "status-chip neutral" };
+}

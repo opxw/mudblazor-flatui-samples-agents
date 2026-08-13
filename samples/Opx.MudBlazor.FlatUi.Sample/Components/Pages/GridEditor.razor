@@ -1,0 +1,182 @@
+@page "/grid-editor"
+@inject FlatMessageBoxService MessageBox
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="grid-editor-page"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Add line"
+          PrimaryActionIcon="@Icons.Material.Outlined.Add"
+          PrimaryActionAriaLabel="Add grid line"
+          OnPrimaryAction="BeginCreate">
+    <ChildContent>
+        <FlatEditableGrid @ref="_grid"
+                          TItem="EditableLine"
+                          State="GridState"
+                          Columns="Columns"
+                          Items="Lines"
+                          DisplayCells="DisplayCells"
+                          EditCells="EditCells"
+                          MobileDisplayTemplate="MobileDisplay"
+                          MobileEditTemplate="MobileEdit"
+                          ItemKey="line => line.Id"
+                          ItemAriaLabel="line => line.Code"
+                          CloneItem="Clone"
+                          CreateItem="CreateDraft"
+                          ValidateItem="Validate"
+                          SaveRow="SaveLine"
+                          DeleteItem="DeleteLine"
+                          ConfirmDelete="ConfirmDelete"
+                          RowResult="HandleRowResult"
+                          Changed="GridChanged">
+            <EmptyContent>
+                <FlatEmptyState CssClass="empty-state compact" Title="No lines" Message="Use Add line to create the first item." />
+            </EmptyContent>
+        </FlatEditableGrid>
+        @if (_lastRowResult is not null)
+        {
+            <div class="flat-grid-row-result @(_lastRowResult.Succeeded ? "success" : _lastRowResult.Cancelled ? "cancelled" : "error")" role="status">
+                <MudIcon Icon="@(_lastRowResult.Succeeded ? Icons.Material.Outlined.CheckCircle : _lastRowResult.Cancelled ? Icons.Material.Outlined.Cancel : Icons.Material.Outlined.ErrorOutline)" />
+                <span>@RowResultText(_lastRowResult)</span>
+            </div>
+        }
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private readonly GridViewState GridState = new();
+    private FlatEditableGrid<EditableLine>? _grid;
+    private FlatGridRowResult<EditableLine>? _lastRowResult;
+    private IReadOnlyList<EditableLine> Lines => _lines;
+    private readonly List<EditableLine> _lines =
+    [
+        new("1", "MAT-100", "Steel plate 5 mm", 8, 425000m, true),
+        new("2", "MAT-220", "Industrial bearing", 12, 185000m, true),
+        new("3", "SRV-010", "Calibration service", 1, 1250000m, false)
+    ];
+
+    private static readonly IReadOnlyList<GridColumnDefinition> Columns =
+    [
+        new("code", "Item Code", FilterEnabled: false),
+        new("description", "Description", FilterEnabled: false),
+        new("quantity", "Quantity", GridColumnFilterType.Number, false),
+        new("price", "Unit Price", GridColumnFilterType.Number, false),
+        new("active", "Active", GridColumnFilterType.Boolean, false)
+    ];
+
+    private RenderFragment<EditableLine> DisplayCells => line => @<text>
+        <td><strong>@line.Code</strong></td>
+        <td>@line.Description</td>
+        <td>@line.Quantity</td>
+        <td>@line.UnitPrice.ToString("N0")</td>
+        <td><span class="@(line.Active ? "status-chip online" : "status-chip pending")"><i></i>@(line.Active ? "Active" : "Inactive")</span></td>
+    </text>;
+
+    private RenderFragment<EditableLine> EditCells => line => @<text>
+        <td><MudTextField T="string" @bind-Value="line.Code" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Item code" Immediate="true" /></td>
+        <td><MudTextField T="string" @bind-Value="line.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Description" Immediate="true" /></td>
+        <td><MudNumericField T="int" @bind-Value="line.Quantity" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" Immediate="true" /></td>
+        <td><MudNumericField T="decimal" @bind-Value="line.UnitPrice" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Format="N0" Immediate="true" /></td>
+        <td><MudSwitch T="bool" @bind-Value="line.Active" Color="Color.Primary" /></td>
+    </text>;
+
+    private RenderFragment<EditableLine> MobileDisplay => line => @<text>
+        <header><div><strong>@line.Description</strong><small>@line.Code</small></div><span class="@(line.Active ? "status-chip online" : "status-chip pending")"><i></i>@(line.Active ? "Active" : "Inactive")</span></header>
+        <div class="sample-mobile-facts">
+            <FlatInfoItem Label="Quantity" Value="@line.Quantity.ToString()" />
+            <FlatInfoItem Label="Unit price" Value="@line.UnitPrice.ToString("N0")" />
+        </div>
+    </text>;
+
+    private RenderFragment<EditableLine> MobileEdit => line => @<text>
+        <MudTextField T="string" @bind-Value="line.Code" Label="Item Code" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
+        <MudTextField T="string" @bind-Value="line.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
+        <MudNumericField T="int" @bind-Value="line.Quantity" Label="Quantity" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" Immediate="true" />
+        <MudNumericField T="decimal" @bind-Value="line.UnitPrice" Label="Unit Price" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Format="N0" Immediate="true" />
+        <MudSwitch T="bool" @bind-Value="line.Active" Label="Active" Color="Color.Primary" />
+    </text>;
+
+    private Task BeginCreate() => _grid?.BeginCreateAsync() ?? Task.CompletedTask;
+
+    private EditableLine CreateDraft() =>
+        new(Guid.NewGuid().ToString("N"), $"NEW-{_lines.Count + 1:000}", "", 1, 0m, true);
+
+    private static EditableLine Clone(EditableLine line) => line with { };
+
+    private static IReadOnlyList<string> Validate(EditableLine line)
+    {
+        var errors = new List<string>();
+        if (string.IsNullOrWhiteSpace(line.Code)) errors.Add("Item code is required.");
+        if (string.IsNullOrWhiteSpace(line.Description)) errors.Add("Description is required.");
+        if (line.Quantity < 1) errors.Add("Quantity must be at least 1.");
+        if (line.UnitPrice < 0) errors.Add("Unit price cannot be negative.");
+        return errors;
+    }
+
+    private async Task<FlatGridEditResult<EditableLine>> SaveLine(EditableLine draft, bool creating, CancellationToken cancellationToken)
+    {
+        await Task.Delay(350, cancellationToken);
+        if (creating)
+        {
+            var persisted = draft with { Id = Guid.NewGuid().ToString("N") };
+            _lines.Insert(0, persisted);
+            return FlatGridEditResult<EditableLine>.Success(persisted);
+        }
+
+        var index = _lines.FindIndex(line => line.Id == draft.Id);
+        if (index < 0) return FlatGridEditResult<EditableLine>.Failure("The line no longer exists.");
+        _lines[index] = draft;
+        return FlatGridEditResult<EditableLine>.Success(draft);
+    }
+
+    private async Task<FlatGridEditResult> DeleteLine(EditableLine line, CancellationToken cancellationToken)
+    {
+        await Task.Delay(250, cancellationToken);
+        return _lines.RemoveAll(candidate => candidate.Id == line.Id) > 0
+            ? FlatGridEditResult.Success()
+            : FlatGridEditResult.Failure("The line no longer exists.");
+    }
+
+    private Task<bool> ConfirmDelete(EditableLine line) =>
+        MessageBox.QuestionAsync($"Delete {line.Code}?", "Delete line", "Delete", "Cancel");
+
+    private Task GridChanged()
+    {
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task HandleRowResult(FlatGridRowResult<EditableLine> result)
+    {
+        _lastRowResult = result;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private static string RowResultText(FlatGridRowResult<EditableLine> result)
+    {
+        var operation = result.Operation.ToString().ToLowerInvariant();
+        if (result.Cancelled) return $"{result.Item.Code}: {operation} cancelled.";
+        if (!result.Succeeded) return $"{result.Item.Code}: {result.ErrorMessage}";
+        return $"{result.Item.Code}: {operation} completed for row {result.Item.Id[..Math.Min(8, result.Item.Id.Length)]}.";
+    }
+
+    private sealed record EditableLine
+    {
+        public EditableLine(string id, string code, string description, int quantity, decimal unitPrice, bool active)
+        {
+            Id = id;
+            Code = code;
+            Description = description;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
+            Active = active;
+        }
+
+        public string Id { get; init; }
+        public string Code { get; set; }
+        public string Description { get; set; }
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public bool Active { get; set; }
+    }
+}

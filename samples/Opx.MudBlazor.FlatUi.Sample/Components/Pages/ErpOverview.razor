@@ -1,0 +1,72 @@
+@page "/erp"
+@inject ErpSampleCatalog Erp
+
+<FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page erp-overview-page">
+    <div class="stat-grid erp-stat-grid">
+        <FlatStatCard Label="Net Revenue MTD" Value="IDR 1.28B" Icon="@Icons.Material.Outlined.TrendingUp" Note="8.4% above plan" Tone="green" />
+        <FlatStatCard Label="Production OEE" Value="87.4%" Icon="@Icons.Material.Outlined.Factory" Note="Target 85%" Tone="sky" />
+        <FlatStatCard Label="Active Workforce" Value="426" Icon="@Icons.Material.Outlined.Groups" Note="94.8% attendance" Tone="blue" />
+        <FlatStatCard Label="Working Capital" Value="IDR 612M" Icon="@Icons.Material.Outlined.AccountBalance" Note="18.6 days cycle" Tone="amber" />
+    </div>
+
+    <div class="erp-module-launcher" aria-label="ERP modules">
+        <a href="/erp/hr"><MudIcon Icon="@Icons.Material.Outlined.Groups" /><span><strong>Human Resources</strong><small>People, attendance, leave</small></span></a>
+        <a href="/erp/production"><MudIcon Icon="@Icons.Material.Outlined.Factory" /><span><strong>Production</strong><small>Plan, orders, quality</small></span></a>
+        <a href="/erp/finance"><MudIcon Icon="@Icons.Material.Outlined.AccountBalance" /><span><strong>Finance</strong><small>Ledger, AP, AR</small></span></a>
+        <a href="/erp/procurement"><MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" /><span><strong>Procurement</strong><small>Purchasing and suppliers</small></span></a>
+        <a href="/erp/inventory"><MudIcon Icon="@Icons.Material.Outlined.Inventory2" /><span><strong>Inventory</strong><small>Stock and warehouses</small></span></a>
+        <a href="/erp/sales"><MudIcon Icon="@Icons.Material.Outlined.PointOfSale" /><span><strong>Sales</strong><small>Orders and fulfillment</small></span></a>
+    </div>
+
+    <div class="sample-two-col erp-dashboard-grid">
+        <FlatPanel Title="Revenue and operating cost" Subtitle="Six-month financial trend">
+            <div class="sample-chart" aria-label="ERP revenue and cost chart">
+                <MudChart T="double"
+                          ChartType="ChartType.Line"
+                          ChartSeries="@FinancialSeries"
+                          ChartLabels="@MonthLabels"
+                          Width="100%"
+                          Height="220px"
+                          ChartOptions="@ChartOptions" />
+            </div>
+        </FlatPanel>
+        <FlatPanel Title="Workflow inbox" Subtitle="Cross-module approvals requiring attention">
+            <div class="erp-workflow-list">
+                <article><span class="erp-workflow-icon amber"><MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" /></span><div><strong>Purchase order approval</strong><small>PO-2608-032 · IDR 76.25M</small></div><span class="status-chip pending">Due today</span></article>
+                <article><span class="erp-workflow-icon red"><MudIcon Icon="@Icons.Material.Outlined.Payments" /></span><div><strong>Payment run authorization</strong><small>PR-081 · 8 supplier invoices</small></div><span class="status-chip offline">Overdue</span></article>
+                <article><span class="erp-workflow-icon blue"><MudIcon Icon="@Icons.Material.Outlined.Badge" /></span><div><strong>Leave request review</strong><small>3 employee requests</small></div><span class="status-chip pending">2 days</span></article>
+                <article><span class="erp-workflow-icon green"><MudIcon Icon="@Icons.Material.Outlined.FactCheck" /></span><div><strong>Quality release</strong><small>WO-260803 · Motor Unit MT410</small></div><span class="status-chip online">Ready</span></article>
+            </div>
+        </FlatPanel>
+    </div>
+
+    <FlatPanel Title="Business exceptions" Subtitle="Items outside operating tolerance" CssClass="flat-panel erp-exception-panel">
+        <div class="table-scroll erp-desktop-table">
+            <table class="monitor-table erp-table">
+                <thead><tr><th>Area</th><th>Exception</th><th>Owner</th><th>Due</th><th>Priority</th></tr></thead>
+                <tbody>
+                    <tr><td>Production</td><td><strong>Motor Unit MT410 below planned output</strong><small>WO-260803 · 40% complete</small></td><td>Daniel Kim</td><td>08 Aug</td><td><span class="status-chip offline">High</span></td></tr>
+                    <tr><td>Inventory</td><td><strong>Export crate below reorder point</strong><small>PK-CRT-L · 42 on hand / 75 minimum</small></td><td>Samuel Reed</td><td>Today</td><td><span class="status-chip offline">High</span></td></tr>
+                    <tr><td>Finance</td><td><strong>Customer balance past due</strong><small>AR-0998 · IDR 44.20M</small></td><td>Alicia Morgan</td><td>Overdue</td><td><span class="status-chip pending">Medium</span></td></tr>
+                    <tr><td>HR</td><td><strong>Shift coverage below minimum</strong><small>Plant A · Night shift</small></td><td>Maya Chen</td><td>09 Aug</td><td><span class="status-chip pending">Medium</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="erp-mobile-list embedded erp-exception-cards">
+            <article class="mobile-card erp-mobile-card"><header><div><strong>Motor Unit MT410 below planned output</strong><small>Production · WO-260803</small></div><span class="status-chip offline">High</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Owner" Value="Daniel Kim" /><FlatInfoItem Label="Due" Value="08 Aug" /><FlatInfoItem Label="Progress" Value="40% complete" /></div></article>
+            <article class="mobile-card erp-mobile-card"><header><div><strong>Export crate below reorder point</strong><small>Inventory · PK-CRT-L</small></div><span class="status-chip offline">High</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Owner" Value="Samuel Reed" /><FlatInfoItem Label="Due" Value="Today" /><FlatInfoItem Label="Stock" Value="42 / 75 minimum" /></div></article>
+            <article class="mobile-card erp-mobile-card"><header><div><strong>Customer balance past due</strong><small>Finance · AR-0998</small></div><span class="status-chip pending">Medium</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Owner" Value="Alicia Morgan" /><FlatInfoItem Label="Due" Value="Overdue" /><FlatInfoItem Label="Amount" Value="IDR 44.20M" /></div></article>
+            <article class="mobile-card erp-mobile-card"><header><div><strong>Shift coverage below minimum</strong><small>HR · Plant A</small></div><span class="status-chip pending">Medium</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Owner" Value="Maya Chen" /><FlatInfoItem Label="Due" Value="09 Aug" /><FlatInfoItem Label="Shift" Value="Night shift" /></div></article>
+        </div>
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    private readonly string[] MonthLabels = ["Mar", "Apr", "May", "Jun", "Jul", "Aug"];
+    private readonly List<ChartSeries<double>> FinancialSeries =
+    [
+        new() { Name = "Revenue", Data = new ChartData<double>([940, 1020, 1085, 1110, 1195, 1280]) },
+        new() { Name = "Operating cost", Data = new ChartData<double>([712, 748, 781, 806, 842, 886]) }
+    ];
+    private readonly ChartOptions ChartOptions = new() { ChartPalette = ["#0078d4", "#f59e0b"] };
+}

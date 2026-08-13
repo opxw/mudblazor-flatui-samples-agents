@@ -1,0 +1,318 @@
+@page "/chat"
+@using System.Net.WebSockets
+@inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+@inject NavigationManager Navigation
+@inject FlatChatWebSocketClient ChatSocket
+@implements IAsyncDisposable
+
+@* Copyright © 2026 opx. All rights reserved. *@
+
+<PageTitle>Chat - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="chat-page">
+    <ChildContent>
+        <FlatChatShell ConversationOpen="@_conversationOpen"
+                       ScrollVersion="@_scrollVersion"
+                       OnBack="BackToConversations"
+                       AriaLabel="Sample team chat">
+            <Sidebar>
+                <div class="flat-chat-sidebar-header">
+                    <div>
+                        <strong>Messages</strong>
+                        <small>@UnreadSummary</small>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Add"
+                                   OnClick="NewConversation"
+                                   aria-label="Start a conversation"
+                                   title="Start a conversation" />
+                </div>
+                <div class="flat-chat-search">
+                    <MudTextField T="string"
+                                  Value="@_search"
+                                  ValueChanged="SearchChanged"
+                                  Immediate="true"
+                                  Placeholder="Search conversations..."
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Outlined.Search"
+                                  Class="module-search" />
+                </div>
+                <nav class="flat-chat-conversation-list" aria-label="Conversations">
+                    @foreach (var conversation in FilteredConversations)
+                    {
+                        <FlatChatConversationItem Title="@conversation.Title"
+                                                  Preview="@ConversationPreview(conversation)"
+                                                  Time="@conversation.Time"
+                                                  Initials="@conversation.Initials"
+                                                  UnreadCount="@conversation.UnreadCount"
+                                                  Active="@(conversation.Id == _selectedConversationId)"
+                                                  OnClick="@(() => SelectConversation(conversation))" />
+                    }
+                    @if (FilteredConversations.Count == 0)
+                    {
+                        <FlatEmptyState Title="No conversations found"
+                                        Message="Try another name or keyword."
+                                        Icon="@Icons.Material.Outlined.SearchOff"
+                                        CssClass="empty-state compact" />
+                    }
+                </nav>
+            </Sidebar>
+            <Header>
+                <div class="flat-chat-thread-identity">
+                    <FlatProfileAvatar Name="@SelectedConversation.Title" Initials="@SelectedConversation.Initials" Size="36" />
+                    <span>
+                        <strong>@SelectedConversation.Title</strong>
+                        <small>@SelectedConversation.Subtitle</small>
+                    </span>
+                </div>
+                <div class="flat-chat-thread-actions">
+                    <MudIconButton Icon="@Icons.Material.Outlined.Call" OnClick="@(() => ShowPlaceholder("Voice calling"))" aria-label="Start voice call" title="Start voice call" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.Videocam" OnClick="@(() => ShowPlaceholder("Video calling"))" aria-label="Start video call" title="Start video call" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" OnClick="@(() => ShowPlaceholder("Conversation actions"))" aria-label="Conversation actions" title="Conversation actions" />
+                </div>
+            </Header>
+            <Messages>
+                <div class="flat-chat-date-separator"><span>Today</span></div>
+                @foreach (var message in SelectedConversation.Messages)
+                {
+                    <FlatChatMessage Author="@message.Author"
+                                     Text="@message.Text"
+                                     Time="@message.Time"
+                                     Initials="@message.Initials"
+                                     IsOwn="@message.IsOwn"
+                                     Status="@message.Status" />
+                }
+                @if (SelectedConversation.TypingParticipant is { } typingParticipant)
+                {
+                    <FlatChatTypingIndicator Author="@typingParticipant.Name" Initials="@typingParticipant.Initials" />
+                }
+            </Messages>
+            <Composer>
+                <MudIconButton Icon="@Icons.Material.Outlined.AttachFile"
+                               OnClick="@(() => ShowPlaceholder("Attachments"))"
+                               aria-label="Attach file"
+                               title="Attach file" />
+                <textarea rows="1"
+                          value="@_draftMessage"
+                          @oninput="UpdateDraft"
+                          @onkeydown="ComposerKeyDown"
+                          placeholder="Write a message..."
+                          aria-label="Message"></textarea>
+                <MudIconButton Icon="@Icons.Material.Outlined.Mood"
+                               OnClick="@(() => ShowPlaceholder("Emoji picker"))"
+                               aria-label="Choose emoji"
+                               title="Choose emoji" />
+                <MudIconButton Icon="@Icons.Material.Filled.Send"
+                               Color="Color.Primary"
+                               Class="flat-chat-send"
+                               Disabled="@(!CanSend)"
+                               OnClick="SendMessage"
+                               aria-label="Send message"
+                               title="Send message" />
+            </Composer>
+        </FlatChatShell>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private readonly List<ChatConversation> _conversations =
+    [
+        new("project", "Project Atlas", "PA", "Delivery team · 8 members", "Rina: The mobile review is ready.", "10:42", 3,
+        [new("Rina", "RN"), new("Bayu", "BY"), new("Maya", "MY")],
+        [
+            new("Rina", "RN", "I have finished the responsive review for the catalog page.", "09:54", false),
+            new("You", "OP", "Great. Please include the narrow tablet breakpoint in the notes.", "10:01", true, "Read"),
+            new("Bayu", "BY", "The API contract sample is also updated. No live endpoint is connected yet.", "10:18", false),
+            new("Rina", "RN", "The mobile review is ready. I added keyboard and safe-area checks.", "10:42", false)
+        ]),
+        new("finance", "Finance Operations", "FO", "Internal channel · 12 members", "Maya: Weekly close starts at 16:00.", "09:18", 1,
+        [new("Maya", "MY"), new("Dimas", "DM"), new("Rina", "RN")],
+        [
+            new("Maya", "MY", "Weekly close starts at 16:00. Please resolve open exceptions first.", "09:18", false),
+            new("You", "OP", "I will review the approval queue before the cutoff.", "09:24", true, "Delivered")
+        ]),
+        new("support", "Customer Support", "CS", "Shared inbox · 6 members", "Dimas: Ticket CS-204 is assigned.", "Yesterday", 0,
+        [new("Dimas", "DM"), new("Alya", "AP"), new("Bayu", "BY")],
+        [
+            new("Dimas", "DM", "Ticket CS-204 is assigned to the integration team.", "Yesterday", false),
+            new("You", "OP", "Thanks. Keep the customer update in the ticket timeline.", "Yesterday", true, "Read")
+        ]),
+        new("alya", "Alya Pratama", "AP", "Product design", "You: I will check the compact density.", "Mon", 0,
+        [new("Alya Pratama", "AP")],
+        [
+            new("Alya Pratama", "AP", "Could you check the compact density for the new component?", "Mon", false),
+            new("You", "OP", "I will check the compact density and dark theme today.", "Mon", true, "Read")
+        ]),
+        new("procurement", "Procurement Team", "PT", "Internal channel · 5 members", "Bayu: Vendor comparison attached.", "Fri", 0,
+        [new("Bayu", "BY"), new("Maya", "MY"), new("Dimas", "DM")],
+        [
+            new("Bayu", "BY", "The vendor comparison is ready for review.", "Fri", false)
+        ])
+    ];
+
+    private string _selectedConversationId = "project";
+    private string _search = "";
+    private string _draftMessage = "";
+    private bool _conversationOpen;
+    private long _scrollVersion;
+    private bool _socketConnected;
+
+    private ChatConversation SelectedConversation =>
+        _conversations.First(conversation => conversation.Id == _selectedConversationId);
+    private List<ChatConversation> FilteredConversations => _conversations
+        .Where(conversation => string.IsNullOrWhiteSpace(_search)
+            || conversation.Title.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)
+            || conversation.Preview.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase)
+            || conversation.Subtitle.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase))
+        .ToList();
+    private string UnreadSummary => _conversations.Sum(conversation => conversation.UnreadCount) is var count && count > 0
+        ? $"{count} unread"
+        : "All caught up";
+    private bool CanSend => !string.IsNullOrWhiteSpace(_draftMessage);
+
+    protected override async Task OnInitializedAsync()
+    {
+        ChatSocket.EventReceived += HandleSocketEventAsync;
+        ChatSocket.StateChanged += HandleSocketStateChanged;
+        var configured = Configuration["OpxFlatUi:Chat:WebSocketEndpoint"] ?? "/ws/chat-demo";
+        var endpoint = ResolveWebSocketEndpoint(configured);
+        try
+        {
+            await ChatSocket.ConnectAsync(endpoint);
+            _socketConnected = true;
+        }
+        catch (Exception exception) when (exception is WebSocketException or InvalidOperationException)
+        {
+            Snackbar.Add("Demo WebSocket is unavailable. Messages remain in page memory.", Severity.Warning);
+        }
+    }
+
+    private void SearchChanged(string value) => _search = value ?? "";
+    private static string ConversationPreview(ChatConversation conversation) => conversation.TypingParticipant is { } participant
+        ? $"{participant.Name} is typing..."
+        : conversation.Preview;
+
+    private void SelectConversation(ChatConversation conversation)
+    {
+        _selectedConversationId = conversation.Id;
+        conversation.UnreadCount = 0;
+        _conversationOpen = true;
+        _scrollVersion++;
+    }
+
+    private void BackToConversations() => _conversationOpen = false;
+
+    private void UpdateDraft(ChangeEventArgs args) => _draftMessage = args.Value?.ToString() ?? "";
+
+    private void ComposerKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter" && !args.ShiftKey)
+        {
+            _ = SendMessage();
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (!CanSend)
+        {
+            return;
+        }
+
+        var text = _draftMessage.Trim();
+        SelectedConversation.Messages.Add(new ChatMessage("You", "OP", text, DateTime.Now.ToString("HH:mm"), true, "Sent"));
+        SelectedConversation.Preview = $"You: {text}";
+        SelectedConversation.Time = "Now";
+        _draftMessage = "";
+        _scrollVersion++;
+
+        if (_socketConnected)
+        {
+            try
+            {
+                await ChatSocket.SendAsync(new("message", SelectedConversation.Id, "You", "OP", text, Guid.NewGuid().ToString("N")));
+            }
+            catch (Exception exception) when (exception is WebSocketException or InvalidOperationException)
+            {
+                _socketConnected = false;
+                Snackbar.Add("The message remains local because the WebSocket disconnected.", Severity.Warning);
+            }
+        }
+    }
+
+    private void NewConversation() => Snackbar.Add("New conversation is a host application action in this sample.", Severity.Info);
+    private void ShowPlaceholder(string feature) => Snackbar.Add($"{feature} is a host integration placeholder.", Severity.Info);
+
+    private async Task HandleSocketEventAsync(FlatChatSocketEvent item)
+    {
+        await InvokeAsync(() =>
+        {
+            var conversation = _conversations.FirstOrDefault(candidate => candidate.Id == item.ConversationId);
+            if (conversation is null)
+                return;
+
+            if (item.Type == "typing")
+            {
+                conversation.TypingParticipant = new(item.Author, item.Initials);
+                _scrollVersion++;
+            }
+            else if (item.Type == "message" && !string.IsNullOrWhiteSpace(item.Text))
+            {
+                conversation.TypingParticipant = null;
+                conversation.Messages.Add(new(item.Author, item.Initials, item.Text, DateTime.Now.ToString("HH:mm"), false));
+                if (conversation.Messages.Count > 80) conversation.Messages.RemoveAt(0);
+                conversation.Preview = $"{item.Author}: {item.Text}";
+                conversation.Time = "Now";
+                if (conversation.Id != _selectedConversationId) conversation.UnreadCount++;
+                _scrollVersion++;
+            }
+            StateHasChanged();
+        });
+    }
+
+    private void HandleSocketStateChanged(WebSocketState state) => _socketConnected = state == WebSocketState.Open;
+
+    private Uri ResolveWebSocketEndpoint(string configured)
+    {
+        var uri = Uri.TryCreate(configured, UriKind.Absolute, out var absolute)
+            ? absolute
+            : Navigation.ToAbsoluteUri(configured.TrimStart('/'));
+        var builder = new UriBuilder(uri) { Scheme = uri.Scheme == "https" ? "wss" : "ws" };
+        return builder.Uri;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        ChatSocket.EventReceived -= HandleSocketEventAsync;
+        ChatSocket.StateChanged -= HandleSocketStateChanged;
+        await ChatSocket.DisconnectAsync();
+    }
+
+    private sealed class ChatConversation(
+        string id,
+        string title,
+        string initials,
+        string subtitle,
+        string preview,
+        string time,
+        int unreadCount,
+        IReadOnlyList<ChatParticipant> participants,
+        List<ChatMessage> messages)
+    {
+        public string Id { get; } = id;
+        public string Title { get; } = title;
+        public string Initials { get; } = initials;
+        public string Subtitle { get; } = subtitle;
+        public string Preview { get; set; } = preview;
+        public string Time { get; set; } = time;
+        public int UnreadCount { get; set; } = unreadCount;
+        public IReadOnlyList<ChatParticipant> Participants { get; } = participants;
+        public ChatParticipant? TypingParticipant { get; set; }
+        public List<ChatMessage> Messages { get; } = messages;
+    }
+
+    private sealed record ChatParticipant(string Name, string Initials);
+    private sealed record ChatMessage(string Author, string Initials, string Text, string Time, bool IsOwn, string? Status = null);
+}

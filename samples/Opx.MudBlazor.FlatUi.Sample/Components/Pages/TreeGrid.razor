@@ -1,0 +1,69 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/tree-grid"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="tree-grid-page no-mobile-fab">
+    <FlatPanel>
+        <FlatTreeGrid TItem="OrganizationNode"
+                      TKey="string"
+                      Items="_nodes"
+                      ItemKey="node => node.Id"
+                      ParentKey="node => node.ParentId"
+                      ItemAriaLabel="node => node.Name"
+                      TreeTemplate="TreeCell"
+                      DetailTemplate="DetailCell"
+                      MoveItem="MoveNodeAsync"
+                      MoveResult="HandleMoveResult"
+                      Changed="RefreshTree">
+            <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="No hierarchy" Message="Add a root item to begin." /></EmptyContent>
+        </FlatTreeGrid>
+        @if (_lastResult is not null)
+        {
+            <div class="flat-grid-row-result @(_lastResult.Succeeded ? "success" : "error")" role="status">
+                <MudIcon Icon="@(_lastResult.Succeeded ? Icons.Material.Outlined.CheckCircle : Icons.Material.Outlined.ErrorOutline)" />
+                <span>@ResultText(_lastResult)</span>
+            </div>
+        }
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    private readonly List<OrganizationNode> _nodes =
+    [
+        new("company", null, "OPX Company", "Root organization", "Company"),
+        new("operations", "company", "Operations", "Operational services", "Division"),
+        new("it", "operations", "Information Technology", "Applications and infrastructure", "Department"),
+        new("support", "it", "IT Support", "Service desk and device support", "Team"),
+        new("production", "company", "Production", "Manufacturing operations", "Division"),
+        new("line-a", "production", "Line A", "Assembly and packing", "Work center"),
+        new("finance", "company", "Finance", "Accounting and treasury", "Division")
+    ];
+    private FlatTreeGridMoveResult<OrganizationNode, string>? _lastResult;
+
+    private RenderFragment<OrganizationNode> TreeCell => node => @<div class="tree-grid-sample-title"><MudIcon Icon="@NodeIcon(node.Type)" /><span><strong>@node.Name</strong><small>@node.Id</small></span></div>;
+    private RenderFragment<OrganizationNode> DetailCell => node => @<div class="tree-grid-sample-detail"><span>@node.Description</span><small>@node.Type</small></div>;
+
+    private async Task<FlatTreeGridMoveResult<OrganizationNode, string>> MoveNodeAsync(FlatTreeGridMoveRequest<OrganizationNode, string> request, CancellationToken cancellationToken)
+    {
+        await Task.Delay(180, cancellationToken);
+        var index = _nodes.FindIndex(node => node.Id == request.Key);
+        if (index < 0) return FlatTreeGridMoveResult<OrganizationNode, string>.Failure(request, "The item no longer exists.");
+        var persisted = _nodes[index] with { ParentId = request.NewParentKey };
+        _nodes[index] = persisted;
+        return FlatTreeGridMoveResult<OrganizationNode, string>.Success(request, persisted);
+    }
+
+    private Task HandleMoveResult(FlatTreeGridMoveResult<OrganizationNode, string> result) { _lastResult = result; return Task.CompletedTask; }
+    private Task RefreshTree() { StateHasChanged(); return Task.CompletedTask; }
+    private static string ResultText(FlatTreeGridMoveResult<OrganizationNode, string> result) => result.Succeeded
+        ? $"{result.Item.Name}: ParentKey changed from {result.OldParentKey ?? "root"} to {result.NewParentKey ?? "root"}."
+        : $"{result.Item.Name}: {result.ErrorMessage}";
+    private static string NodeIcon(string type) => type switch
+    {
+        "Company" => Icons.Material.Outlined.Business,
+        "Division" => Icons.Material.Outlined.AccountTree,
+        "Department" => Icons.Material.Outlined.Folder,
+        "Team" => Icons.Material.Outlined.Groups,
+        _ => Icons.Material.Outlined.PrecisionManufacturing
+    };
+    private sealed record OrganizationNode(string Id, string? ParentId, string Name, string Description, string Type);
+}

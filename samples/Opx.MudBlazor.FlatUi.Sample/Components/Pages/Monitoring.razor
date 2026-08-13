@@ -1,0 +1,81 @@
+@page "/monitoring"
+@inject SampleCatalog Catalog
+
+<div class="page-content module-page no-mobile-fab">
+    <div class="page-actions-only">
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.History">History</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.PlayArrow">Run Check</MudButton>
+    </div>
+
+    <div class="stat-grid">
+        <FlatStatCard Label="Online" Value="@Catalog.Assets.Count(x => x.Status == "Online").ToString()" Icon="@Icons.Material.Outlined.CheckCircle" Tone="green" Note="Heartbeat normal" />
+        <FlatStatCard Label="Pending" Value="@Catalog.Assets.Count(x => x.Status == "Pending").ToString()" Icon="@Icons.Material.Outlined.PendingActions" Tone="amber" Note="Waiting for inspection" />
+        <FlatStatCard Label="Offline" Value="@Catalog.Assets.Count(x => x.Status == "Offline").ToString()" Icon="@Icons.Material.Outlined.ErrorOutline" Tone="amber" Note="Needs escalation" />
+        <FlatStatCard Label="Avg Health" Value="@($"{Catalog.Assets.Average(x => x.Health):N0}%")" Icon="@Icons.Material.Outlined.MonitorHeart" Tone="sky" Note="Static snapshot" />
+    </div>
+
+    <div class="sample-two-col" style="margin-top:16px">
+        <FlatPanel Title="Live endpoint status" Subtitle="Compact and readable">
+            <div class="table-scroll">
+                <table class="monitor-table">
+                    <thead><tr><th>Service</th><th>Status</th><th>Latency</th><th>Last Check</th></tr></thead>
+                    <tbody>
+                        @foreach (var row in Services)
+                        {
+                            <tr>
+                                <td><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@row.Icon" /></span><div><strong>@row.Name</strong><small>@row.Route</small></div></div></td>
+                                <td><span class="@StatusClass(row.Status)"><i></i>@row.Status</span></td>
+                                <td>@row.Latency ms</td>
+                                <td>@row.LastCheck</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Incident feed" Subtitle="Latest events">
+            <div class="sample-timeline">
+                <article><i></i><div><strong>PC-WHS-021 offline</strong><span>Warehouse - 12 minutes ago</span></div></article>
+                <article><i></i><div><strong>Scanner Gate latency increased</strong><span>Factory - 25 minutes ago</span></div></article>
+                <article><i></i><div><strong>Payroll laptop patched</strong><span>HR - 42 minutes ago</span></div></article>
+                <article><i></i><div><strong>Inventory backup completed</strong><span>System - 1 hour ago</span></div></article>
+            </div>
+        </FlatPanel>
+    </div>
+
+    <div class="sample-grid" style="margin-top:16px">
+        @foreach (var asset in Catalog.Assets.Take(6))
+        {
+            <FlatPanel Title="@asset.Name" Subtitle="@asset.Code">
+                <div class="detail-section-body">
+                    <FlatInfoItem Label="Owner" Value="@asset.Owner" />
+                    <FlatInfoItem Label="Location" Value="@asset.Location" />
+                    <FlatInfoItem Label="Last Seen" Value="@asset.LastSeen" />
+                    <FlatInfoItem Label="Health" Value="@($"{asset.Health}%")" />
+                    <span class="@StatusClass(asset.Status)"><i></i>@asset.Status</span>
+                </div>
+            </FlatPanel>
+        }
+    </div>
+</div>
+
+@code {
+    private static readonly IReadOnlyList<ServiceRow> Services =
+    [
+        new("Administration API", "/administration", "Online", 34, "Just now", Icons.Material.Outlined.AdminPanelSettings),
+        new("Platform Gateway", "/platform", "Online", 48, "Just now", Icons.Material.Outlined.Hub),
+        new("Monitoring Worker", "queue://monitor", "Pending", 120, "2 minutes ago", Icons.Material.Outlined.Sync),
+        new("File CDN", "/cdn", "Online", 29, "Just now", Icons.Material.Outlined.CloudDone),
+        new("Warehouse Scanner", "tcp://scanner", "Offline", 0, "12 minutes ago", Icons.Material.Outlined.QrCodeScanner)
+    ];
+
+    private static string StatusClass(string status) => status switch
+    {
+        "Online" => "status-chip online",
+        "Offline" => "status-chip offline",
+        _ => "status-chip pending"
+    };
+
+    private sealed record ServiceRow(string Name, string Route, string Status, int Latency, string LastCheck, string Icon);
+}

@@ -1,0 +1,505 @@
+@page "/components"
+@inject FlatPageLoadingState PageLoading
+@inject FlatMessageBoxService MessageBox
+@inject ISnackbar Snackbar
+@inject FlatReconnectOptions ReconnectOptions
+
+<div class="page-content">
+    <div class="sample-grid">
+        <FlatPanel Title="Theme Tokens" Subtitle="CSS variable palette">
+            <div class="component-swatch">
+                <span style="background:var(--accent)">accent</span>
+                <span style="background:var(--accent-dark)">accent-dark</span>
+                <span style="background:#059669">success</span>
+                <span style="background:#d97706">warning</span>
+                <span style="background:var(--danger)">danger</span>
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Empty State" Subtitle="Reusable placeholder">
+            <FlatEmptyState CssClass="empty-state compact" Title="No data yet" Message="Actions remain visible and spacing remains proportional.">
+                <Actions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Add">Add</MudButton>
+                </Actions>
+            </FlatEmptyState>
+        </FlatPanel>
+
+        <FlatPanel Title="Button States" Subtitle="Enabled and disabled semantic comparison">
+            <div class="detail-section-body button-state-showcase">
+                <div class="button-state-showcase-group">
+                    <strong>Filled</strong>
+                    <div class="button-state-showcase-heading" aria-hidden="true">
+                        <span>Color</span><span>Enabled</span><span>Disabled</span>
+                    </div>
+                    @foreach (var state in ButtonStateColors)
+                    {
+                        <div class="button-state-showcase-row">
+                            <span>@state.Label</span>
+                            <MudButton Variant="Variant.Filled" Color="@state.Color">Enabled</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="@state.Color" Disabled="true">Disabled</MudButton>
+                        </div>
+                    }
+                </div>
+                <div class="button-state-showcase-group">
+                    <strong>Outlined</strong>
+                    <div class="button-state-showcase-heading" aria-hidden="true">
+                        <span>Color</span><span>Enabled</span><span>Disabled</span>
+                    </div>
+                    @foreach (var state in ButtonStateColors)
+                    {
+                        <div class="button-state-showcase-row">
+                            <span>@state.Label</span>
+                            <MudButton Variant="Variant.Outlined" Color="@state.Color">Enabled</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="@state.Color" Disabled="true">Disabled</MudButton>
+                        </div>
+                    }
+                </div>
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Info Items" Subtitle="Detail facts">
+            <div class="detail-section-body">
+                <FlatInfoItem Label="Application" Value="Opx.MudBlazor.FlatUi" />
+                <FlatInfoItem Label="Target" Value="Blazor Web / MAUI Hybrid" />
+                <FlatInfoItem Label="Copyright" Value="Copyright (c) 2026 opx" />
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Profile Avatar" Subtitle="Photo or configurable initials">
+            <div class="profile-avatar-demo">
+                <FlatProfileAvatar ImageUrl="/sample-profile.svg" Name="Sample Operator" Initials="SO" Size="44" />
+                <FlatProfileAvatar Name="Noviyanto Wibowo" Initials="NW" Size="44" />
+                <FlatProfileAvatar Name="IT Operations" Size="44" />
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Optional Page Heading" Subtitle="No description means no title block">
+            <FlatPageHeading Eyebrow="Rule"
+                             Title="Not rendered"
+                             Description="" />
+            <FlatPageHeading Eyebrow="Rule"
+                             Title="Heading with description"
+                             Description="The heading only appears when a description is explicitly provided." />
+        </FlatPanel>
+
+        <FlatPanel Title="Processing State" Subtitle="AppBar line, disabled content, or optional cancellation">
+            <FlatProcessingContainer @ref="_pageProcessing"
+                                     Mode="FlatProcessingMode.Backdrop"
+                                     Message="Updating page data..."
+                                     OnCompleted="PageProcessingCompleted"
+                                     OnCanceled="PageProcessingCanceled">
+                <div class="detail-section-body">
+                    <MudText Typo="Typo.caption">Use the 2px AppBar line for passive loading, or lock a page section with the shared processing container.</MudText>
+                    <div class="processing-sample-actions">
+                        <MudButton Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Outlined.Sync"
+                                   Disabled="@_loadingPreview"
+                                   OnClick="PreviewAppBarLoadingAsync">
+                            @(_loadingPreview ? "Operation running..." : "Preview loading bar")
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Outlined.HourglassTop"
+                                   OnClick="PreviewPageProcessingAsync">
+                            Preview processing backdrop
+                        </MudButton>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(_pageProcessingResult))
+                    {
+                        <MudText Typo="Typo.caption" Class="messagebox-sample-result">@_pageProcessingResult</MudText>
+                    }
+                </div>
+            </FlatProcessingContainer>
+        </FlatPanel>
+
+        <FlatPanel Title="Message Box" Subtitle="Question, warning, information, and error prompts">
+            <div class="detail-section-body messagebox-sample-actions">
+                <MudText Typo="Typo.caption">Dialogs use the active palette and serialize overlapping requests.</MudText>
+                <div>
+                    <MudButton Variant="Variant.Outlined"
+                               StartIcon="@Icons.Material.Outlined.HelpOutline"
+                               OnClick="PreviewQuestionAsync">
+                        Question
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Warning"
+                               StartIcon="@Icons.Material.Outlined.WarningAmber"
+                               OnClick="PreviewWarningAsync">
+                        Warning
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Info"
+                               StartIcon="@Icons.Material.Outlined.Info"
+                               OnClick="PreviewInfoAsync">
+                        Info
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Error"
+                               StartIcon="@Icons.Material.Outlined.ErrorOutline"
+                               OnClick="PreviewErrorAsync">
+                        Error
+                    </MudButton>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(_messageBoxResult))
+                {
+                    <MudText Typo="Typo.caption" Class="messagebox-sample-result">@_messageBoxResult</MudText>
+                }
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Reconnect Notice" Subtitle="Library override with appsettings text">
+            <div class="detail-section-body processing-sample-actions">
+                <MudText Typo="Typo.caption">Choose a visual state. This preview does not interrupt the active server connection.</MudText>
+                <div>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               OnClick="@(() => _reconnectPreviewState = FlatReconnectPreviewState.Reconnecting)">
+                        Reconnecting
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Warning"
+                               OnClick="@(() => _reconnectPreviewState = FlatReconnectPreviewState.Paused)">
+                        Paused
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Error"
+                               OnClick="@(() => _reconnectPreviewState = FlatReconnectPreviewState.Failed)">
+                        Failed
+                    </MudButton>
+                </div>
+                <FlatReconnectModal ElementId="components-reconnect-preview"
+                                    Options="ReconnectOptions"
+                                    PreviewState="_reconnectPreviewState"
+                                    InlinePreview="true" />
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Form Modal" Subtitle="Simple parameter-driven form dialog">
+            <div class="detail-section-body form-modal-sample-actions">
+                <MudText Typo="Typo.caption">Use <code>@("@bind-Open")</code>, Title, Size, close behavior, validation, and submit callbacks without repeating modal markup.</MudText>
+                <MudText Typo="Typo.caption">Result: @(_formModalResult?.ToString().ToLowerInvariant() ?? "not closed") · successful caller refreshes: @_formModalRefreshCount</MudText>
+                <MudCheckBox T="bool" @bind-Value="_sampleCloseOnOutside" Label="Close when clicking outside" />
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Outlined.OpenInNew"
+                           OnClick="OpenFormModal">
+                    Open form modal
+                </MudButton>
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="MudBlazor Line Chart" Subtitle="Native MudChart">
+            <div class="sample-chart compact">
+                <MudChart T="double"
+                          ChartType="ChartType.Line"
+                          ChartSeries="@LineChartSeries"
+                          ChartLabels="@LineChartLabels"
+                          Width="100%"
+                          Height="190px"
+                          ChartOptions="@ChartOptions" />
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="MudBlazor Pie Chart" Subtitle="Native MudChart">
+            <div class="sample-chart compact">
+                <MudChart T="double"
+                          ChartType="ChartType.Pie"
+                          ChartSeries="@PieChartSeries"
+                          ChartLabels="@PieChartLabels"
+                          Width="100%"
+                          Height="190px"
+                          ChartOptions="@ChartOptions" />
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Multi Select" Subtitle="Reusable permission-style selector with labels">
+            <div class="detail-section-body">
+                <FlatMultiSelect T="string"
+                                 Label="Permission groups"
+                                 Dense="true"
+                                 Margin="global::MudBlazor.Margin.Dense"
+                                 SelectAll="true"
+                                 SelectAllText="All permission groups"
+                                 Clearable="true"
+                                 Items="@_samplePermissionGroups"
+                                 SelectedValues="@_samplePermissions"
+                                 SelectedValuesChanged="OnSamplePermissionsChanged" />
+                <MudText Typo="Typo.caption" Style="margin-top:8px">
+                    Selected: @(_samplePermissions.Count == 0 ? "None" : string.Join(", ", _samplePermissions))
+                </MudText>
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Search Combo Box" Subtitle="Search local or API-backed options">
+            <div class="detail-section-body">
+                <FlatSearchComboBox T="string"
+                                    Label="Department"
+                                    Placeholder="Type a department name"
+                                    HelperText="Searches name, description, and keywords."
+                                    Items="@_sampleDepartmentOptions"
+                                    @bind-Value="_sampleDepartment" />
+                <MudText Typo="Typo.caption" Style="margin-top:8px">
+                    Selected: @(_sampleDepartment ?? "None")
+                </MudText>
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Multi Select with leading visuals" Subtitle="Icon/avatar + description + meta">
+            <div class="detail-section-body">
+                <FlatMultiSelect T="string"
+                                 Label="Team recipients"
+                                 Dense="true"
+                                 Margin="global::MudBlazor.Margin.Dense"
+                                 HelperText="You can mix avatar, icon, or initials."
+                                 Placeholder="Select recipients"
+                                 SelectAll="true"
+                                 SelectAllText="All recipients"
+                                 Clearable="true"
+                                 Items="@_sampleRecipientOptions"
+                                 SelectedValues="@_sampleRecipients"
+                                 SelectedValuesChanged="OnSampleRecipientsChanged" />
+                <MudText Typo="Typo.caption" Style="margin-top:8px">
+                    Selected recipients: @(_sampleRecipients.Count == 0 ? "None" : string.Join(", ", _sampleRecipients))
+                </MudText>
+            </div>
+        </FlatPanel>
+    </div>
+
+    <div class="stat-grid" style="margin-top:16px">
+        <FlatStatCard Label="Flat Shell" Value="1" Icon="@Icons.Material.Outlined.WebAsset" />
+        <FlatStatCard Label="Grid" Value="2" Icon="@Icons.Material.Outlined.TableRows" Tone="green" />
+        <FlatStatCard Label="Overlay" Value="2" Icon="@Icons.Material.Outlined.Layers" Tone="amber" />
+        <FlatStatCard Label="Pages" Value="7" Icon="@Icons.Material.Outlined.AutoStories" Tone="sky" />
+    </div>
+
+    <FlatDetailSection Title="Usage snippet" Subtitle="Host app reference" Class="sample-code-card" >
+        <pre><code>&lt;link href="_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" rel="stylesheet" /&gt;
+&lt;script src="_content/Opx.MudBlazor.FlatUi/opx-flat-ui.js"&gt;&lt;/script&gt;
+
+&lt;FlatMudProviders&gt;
+    &lt;FlatAppShell Title="My App"&gt;
+        ...
+    &lt;/FlatAppShell&gt;
+&lt;/FlatMudProviders&gt;</code></pre>
+    </FlatDetailSection>
+</div>
+
+<FlatFormModal @bind-Open="_formModalOpen"
+               Title="Create sample record"
+               Mode="Create"
+               Size="@FlatFormModalSize.Small"
+               ProcessingMode="FlatProcessingMode.Backdrop"
+               CanSubmit="@CanSubmitSample"
+               IsDirty="@IsSampleDirty"
+               CloseOnOutsideClick="@_sampleCloseOnOutside"
+               ConfirmClose="ConfirmFormModalCloseAsync"
+               SubmitHandler="SaveFormModalAsync"
+               OnResult="HandleFormModalResult"
+               AutoRefreshOnSuccess="true"
+               OnRefreshRequested="RefreshFormModalCaller"
+               OnProcessingCompleted="FormProcessingCompleted"
+               OnProcessingCanceled="FormProcessingCanceled">
+    <MudTextField T="string"
+                  @bind-Value="_sampleName"
+                  Label="Name"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Required="true" />
+    <MudSelect T="string"
+               @bind-Value="_sampleCategory"
+               Label="Category"
+               Variant="Variant.Outlined"
+               Margin="Margin.Dense">
+        <MudSelectItem T="string" Value="@OperationsCategory">Operations</MudSelectItem>
+        <MudSelectItem T="string" Value="@FinanceCategory">Finance</MudSelectItem>
+        <MudSelectItem T="string" Value="@CommerceCategory">Commerce</MudSelectItem>
+    </MudSelect>
+    <MudTextField T="string"
+                  @bind-Value="_sampleNotes"
+                  Label="Notes"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Lines="3" />
+</FlatFormModal>
+
+@code {
+    private static readonly (string Label, Color Color)[] ButtonStateColors =
+    [
+        ("Standard", Color.Default),
+        ("Primary", Color.Primary),
+        ("Secondary", Color.Secondary),
+        ("Tertiary", Color.Tertiary),
+        ("Success", Color.Success),
+        ("Info", Color.Info),
+        ("Warning", Color.Warning),
+        ("Error", Color.Error),
+        ("Dark", Color.Dark)
+    ];
+
+    private bool _loadingPreview;
+    private FlatProcessingContainer? _pageProcessing;
+    private string? _pageProcessingResult;
+    private string? _messageBoxResult;
+    private FlatReconnectPreviewState _reconnectPreviewState = FlatReconnectPreviewState.Reconnecting;
+    private bool _formModalOpen;
+    private bool? _formModalResult;
+    private int _formModalRefreshCount;
+    private bool _sampleCloseOnOutside;
+    private const string OperationsCategory = "Operations";
+    private const string FinanceCategory = "Finance";
+    private const string CommerceCategory = "Commerce";
+    private string _sampleName = "";
+    private string _sampleCategory = "Operations";
+    private string _sampleNotes = "";
+    private bool CanSubmitSample => !string.IsNullOrWhiteSpace(_sampleName) && !string.IsNullOrWhiteSpace(_sampleCategory);
+    private bool IsSampleDirty => !string.IsNullOrWhiteSpace(_sampleName) || !string.IsNullOrWhiteSpace(_sampleNotes) || _sampleCategory != "Operations";
+
+    private readonly string[] LineChartLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+    private readonly List<ChartSeries<double>> LineChartSeries =
+    [
+        new() { Name = "Request", Data = new ChartData<double>([24, 31, 28, 42, 39, 48]) },
+        new() { Name = "Resolved", Data = new ChartData<double>([20, 26, 24, 36, 34, 44]) }
+    ];
+
+    private readonly string[] PieChartLabels = ["Online", "Pending", "Offline", "Maintenance"];
+    private readonly List<ChartSeries<double>> PieChartSeries =
+    [
+        new() { Name = "Status", Data = new ChartData<double>([55, 25, 12, 8]) }
+    ];
+    private static readonly IReadOnlyList<FlatMultiSelectOption<string>> _samplePermissionGroups =
+    [
+        new("read", "Read") { Description = "View records and read-only pages" },
+        new("write", "Write") { Description = "Create and update records" },
+        new("approve", "Approve") { Description = "Approve workflows and requests" },
+        new("deploy", "Deploy") { Description = "Publish environment and app updates" },
+        new("admin", "Admin") { Description = "Manage users and security settings" }
+    ];
+    private List<string> _samplePermissions = ["read", "write"];
+    private static readonly IReadOnlyList<FlatMultiSelectOption<string>> _sampleRecipientOptions =
+    [
+        new("ops", "Operations") { Icon = Icons.Material.Outlined.Group, Description = "Operations coordinator team", Initials = "OP", Meta = "3 online" },
+        new("sales", "Sales Group") { AvatarUrl = "/sample-profile.svg", Description = "Regional sales and channels", Meta = "12 members" },
+        new("admin", "Admin Team") { Description = "Compliance and access requests", Initials = "AT", Meta = "2 pending requests" }
+    ];
+    private List<string> _sampleRecipients = ["ops"];
+    private static readonly IReadOnlyList<FlatSearchComboOption<string>> _sampleDepartmentOptions =
+    [
+        new("finance", "Finance") { Description = "Accounting, treasury, and financial reporting", Keywords = "tax budget invoice" },
+        new("hr", "Human Resources") { Description = "People, attendance, and organization", Keywords = "employee payroll recruitment" },
+        new("it", "Information Technology") { Description = "Applications, infrastructure, and support", Keywords = "system network helpdesk" },
+        new("production", "Production") { Description = "Planning, work orders, and shop floor", Keywords = "manufacturing machine" },
+        new("sales", "Sales") { Description = "Customers, opportunities, and orders", Keywords = "crm commerce" },
+        new("legacy", "Legacy Department") { Description = "Disabled sample option", Disabled = true }
+    ];
+    private string? _sampleDepartment = "it";
+
+    private readonly ChartOptions ChartOptions = new()
+    {
+        ChartPalette = ["#0078d4", "#10b981", "#f59e0b", "#d13438", "#60a5fa"]
+    };
+
+    private async Task PreviewAppBarLoadingAsync()
+    {
+        if (_loadingPreview)
+        {
+            return;
+        }
+
+        _loadingPreview = true;
+        using var loading = PageLoading.Begin();
+        try
+        {
+            await Task.Delay(1200);
+        }
+        finally
+        {
+            _loadingPreview = false;
+        }
+    }
+
+    private async Task PreviewPageProcessingAsync()
+    {
+        if (_pageProcessing is null)
+        {
+            return;
+        }
+
+        await _pageProcessing.RunAsync(async cancellationToken =>
+        {
+            using var loading = PageLoading.Begin();
+            await Task.Delay(6000, cancellationToken);
+        });
+    }
+
+    private void PageProcessingCompleted() => _pageProcessingResult = "Page update completed.";
+    private void PageProcessingCanceled() => _pageProcessingResult = "Page update cancelled.";
+
+    private async Task PreviewQuestionAsync()
+    {
+        var confirmed = await MessageBox.QuestionAsync(
+            "Continue with this sample action?",
+            title: "Confirm action");
+        _messageBoxResult = confirmed ? "Question confirmed." : "Question cancelled.";
+    }
+
+    private async Task PreviewWarningAsync()
+    {
+        await MessageBox.WarningAsync(
+            "This is a static warning sample. No server-side action is performed.");
+        _messageBoxResult = "Warning acknowledged.";
+    }
+
+    private async Task PreviewInfoAsync()
+    {
+        await MessageBox.InfoAsync(
+            "This information prompt follows the active theme and palette.");
+        _messageBoxResult = "Information acknowledged.";
+    }
+
+    private async Task PreviewErrorAsync()
+    {
+        await MessageBox.ErrorAsync(
+            "The sample action could not be completed. No server-side error was generated.");
+        _messageBoxResult = "Error acknowledged.";
+    }
+
+    private void OpenFormModal()
+    {
+        _sampleName = "";
+        _sampleCategory = "Operations";
+        _sampleNotes = "";
+        _formModalResult = null;
+        _formModalOpen = true;
+    }
+
+    private static Task SaveFormModalAsync(CancellationToken cancellationToken) =>
+        Task.Delay(6000, cancellationToken);
+
+    private void FormProcessingCompleted()
+    {
+        Snackbar.Add("Sample record saved in page memory only.", Severity.Success);
+    }
+
+    private void HandleFormModalResult(bool result) => _formModalResult = result;
+
+    private void RefreshFormModalCaller() => _formModalRefreshCount++;
+
+    private void FormProcessingCanceled() =>
+        Snackbar.Add("Sample save was cancelled. The form remains editable.", Severity.Info);
+
+    private Task<bool> ConfirmFormModalCloseAsync() => MessageBox.QuestionAsync(
+        "Discard the unsaved sample changes?",
+        title: "Close form");
+
+    private void OnSamplePermissionsChanged(IReadOnlyCollection<string> values)
+    {
+        _samplePermissions = values.ToList();
+    }
+
+    private void OnSampleRecipientsChanged(IReadOnlyCollection<string> values)
+    {
+        _sampleRecipients = values.ToList();
+    }
+}

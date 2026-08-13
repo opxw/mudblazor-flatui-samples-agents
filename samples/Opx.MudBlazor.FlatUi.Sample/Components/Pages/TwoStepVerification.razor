@@ -1,0 +1,112 @@
+@page "/two-step-verification"
+@layout AuthLayout
+@inject NavigationManager Navigation
+
+<PageTitle>Two-step Verification - Opx MudBlazor Flat UI</PageTitle>
+
+<section class="verification-page">
+    <MudPaper Class="verification-card" Elevation="0">
+        <div class="verification-icon" aria-hidden="true">
+            <MudIcon Icon="@Icons.Material.Outlined.VerifiedUser" />
+        </div>
+
+        <div class="verification-heading">
+            <span class="login-eyebrow">Secure sign in</span>
+            <h1>Two-step verification</h1>
+            <p>Enter the six-digit code sent to <strong>o***@@example.com</strong>.</p>
+        </div>
+
+        @if (_verified)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">
+                Verification succeeded. A real application should continue through its authentication service.
+            </MudAlert>
+        }
+
+        <EditForm Model="this" OnValidSubmit="Verify">
+            <div class="verification-form">
+                <label for="verification-code">Verification code</label>
+                <div class="verification-code-shell">
+                    @for (var index = 0; index < 6; index++)
+                    {
+                        <span class="@(index == Code.Length ? "current" : "")">@CodeAt(index)</span>
+                    }
+                    <input id="verification-code"
+                           @bind="Code"
+                           @bind:event="oninput"
+                           maxlength="6"
+                           inputmode="numeric"
+                           pattern="[0-9]*"
+                           autocomplete="one-time-code"
+                           aria-describedby="verification-help"
+                           autofocus />
+                </div>
+                <small id="verification-help">Use the temporary code from your authenticator, email, or SMS provider.</small>
+
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           Disabled="@(Code.Length != 6)"
+                           StartIcon="@Icons.Material.Outlined.LockOpen">
+                    Verify code
+                </MudButton>
+            </div>
+        </EditForm>
+
+        <div class="verification-resend">
+            <span>Didn't receive a code?</span>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ResendCode">Resend code</MudButton>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <p class="verification-status" role="status">@_statusMessage</p>
+        }
+
+        <MudButton Variant="Variant.Text"
+                   FullWidth="true"
+                   StartIcon="@Icons.Material.Outlined.ArrowBack"
+                   OnClick="BackToLogin">
+            Back to login
+        </MudButton>
+
+        <div class="login-demo-note">
+            <strong>Sample only</strong>
+            <span>No code is sent or validated by a backend. The consumer must enforce expiry, retry limits, replay protection, and secure recovery.</span>
+        </div>
+    </MudPaper>
+</section>
+
+@code {
+    private string _code = "";
+    private string _statusMessage = "";
+    private bool _verified;
+
+    private string Code
+    {
+        get => _code;
+        set => _code = new string((value ?? "").Where(char.IsDigit).Take(6).ToArray());
+    }
+
+    private string CodeAt(int index) => index < Code.Length ? Code[index].ToString() : "";
+
+    private void Verify()
+    {
+        if (Code.Length != 6)
+        {
+            return;
+        }
+
+        _verified = true;
+        _statusMessage = "Sample verification completed.";
+    }
+
+    private void ResendCode()
+    {
+        _verified = false;
+        _statusMessage = "A new sample code was requested.";
+    }
+
+    private void BackToLogin() => Navigation.NavigateTo("/login");
+}

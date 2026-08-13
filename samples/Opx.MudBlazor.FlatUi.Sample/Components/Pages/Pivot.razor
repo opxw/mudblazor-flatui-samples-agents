@@ -1,0 +1,119 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/pivot"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="pivot-page no-mobile-fab">
+    <section class="flat-panel sample-pivot-config">
+        <MudSelect T="string" Value="@_rowDimension" ValueChanged="SetRowDimension" Label="Rows" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="@("department")">Department</MudSelectItem>
+            <MudSelectItem Value="@("region")">Region</MudSelectItem>
+            <MudSelectItem Value="@("product")">Product</MudSelectItem>
+        </MudSelect>
+        <MudSelect T="string" Value="@_columnDimension" ValueChanged="SetColumnDimension" Label="Columns" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="@("quarter")">Quarter</MudSelectItem>
+            <MudSelectItem Value="@("status")">Status</MudSelectItem>
+            <MudSelectItem Value="@("region")">Region</MudSelectItem>
+        </MudSelect>
+        <MudSelect T="string" Value="@_measure" ValueChanged="SetMeasure" Label="Measure" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="@("revenue")">Revenue</MudSelectItem>
+            <MudSelectItem Value="@("quantity")">Quantity</MudSelectItem>
+            <MudSelectItem Value="@("margin")">Margin</MudSelectItem>
+        </MudSelect>
+        <MudSelect T="FlatPivotAggregate" @bind-Value="_aggregate" Label="Aggregate" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="FlatPivotAggregate.Sum">Sum</MudSelectItem>
+            <MudSelectItem Value="FlatPivotAggregate.Count">Count</MudSelectItem>
+            <MudSelectItem Value="FlatPivotAggregate.Average">Average</MudSelectItem>
+            <MudSelectItem Value="FlatPivotAggregate.Minimum">Minimum</MudSelectItem>
+            <MudSelectItem Value="FlatPivotAggregate.Maximum">Maximum</MudSelectItem>
+        </MudSelect>
+    </section>
+
+    <section class="flat-panel module-panel sample-pivot-panel">
+        <div class="panel-header"><div><strong>Sales analysis</strong><span>@PivotSummary</span></div></div>
+        <FlatPivotGrid TItem="SalesRecord"
+                       Items="Records"
+                       RowKey="ResolveRowKey"
+                       ColumnKey="ResolveColumnKey"
+                       ValueSelector="ResolveValue"
+                       RowLabel="ResolveLabel"
+                       ColumnLabel="ResolveLabel"
+                       ValueFormatter="FormatValue"
+                       Aggregate="@_aggregate"
+                       RowHeader="@DimensionLabel(_rowDimension)"
+                       CellSelected="OpenCell" />
+        <ChartCode Code="@UsageCode" />
+    </section>
+</FlatPage>
+
+<FlatFormModal Open="@(_selectedCell is not null)"
+               OpenChanged="CellDetailOpenChanged"
+               Title="Pivot cell detail"
+               Mode="Read"
+               SubmitText="Close"
+               AutoRefreshOnSuccess="false"
+               OnSubmit="CloseCell">
+    @if (_selectedCell is not null)
+    {
+        <div class="flat-crud-form-grid">
+            <FlatInfoItem Label="Row" Value="@_selectedCell.RowLabel" />
+            <FlatInfoItem Label="Column" Value="@_selectedCell.ColumnLabel" />
+            <FlatInfoItem Label="Aggregate" Value="@FormatValue(_selectedCell.Value)" />
+            <FlatInfoItem Label="Records" Value="@_selectedCell.Items.Count.ToString("N0")" />
+        </div>
+    }
+</FlatFormModal>
+
+@code {
+    private const string UsageCode = """
+<FlatPivotGrid TItem="SalesRecord"
+               Items="Records"
+               RowKey="item => item.Department"
+               ColumnKey="item => item.Quarter"
+               ValueSelector="item => item.Revenue"
+               Aggregate="FlatPivotAggregate.Sum"
+               ValueFormatter='value => value.ToString("C0")'
+               CellSelected="OpenCell" />
+""";
+
+    private static readonly IReadOnlyList<SalesRecord> Records =
+    [
+        new("Finance", "West", "ERP Suite", "Q1", "Won", 12, 148_000_000m, 42_000_000m),
+        new("Finance", "West", "ERP Suite", "Q2", "Won", 9, 126_000_000m, 35_000_000m),
+        new("Finance", "East", "Analytics", "Q3", "Pipeline", 7, 94_000_000m, 22_000_000m),
+        new("Finance", "East", "ERP Suite", "Q4", "Won", 15, 181_000_000m, 51_000_000m),
+        new("Human Resources", "West", "People Hub", "Q1", "Won", 18, 117_000_000m, 33_000_000m),
+        new("Human Resources", "North", "People Hub", "Q2", "Pipeline", 11, 78_000_000m, 18_000_000m),
+        new("Human Resources", "East", "Analytics", "Q3", "Won", 8, 86_000_000m, 24_000_000m),
+        new("Human Resources", "North", "People Hub", "Q4", "Lost", 5, 39_000_000m, 8_000_000m),
+        new("Information Technology", "East", "Service Desk", "Q1", "Won", 21, 136_000_000m, 40_000_000m),
+        new("Information Technology", "West", "Service Desk", "Q2", "Won", 16, 108_000_000m, 31_000_000m),
+        new("Information Technology", "North", "Analytics", "Q3", "Pipeline", 13, 121_000_000m, 29_000_000m),
+        new("Information Technology", "West", "ERP Suite", "Q4", "Won", 10, 154_000_000m, 47_000_000m),
+        new("Production", "North", "Factory Control", "Q1", "Pipeline", 14, 172_000_000m, 38_000_000m),
+        new("Production", "East", "Factory Control", "Q2", "Won", 20, 228_000_000m, 61_000_000m),
+        new("Production", "West", "Analytics", "Q3", "Won", 6, 72_000_000m, 19_000_000m),
+        new("Production", "North", "Factory Control", "Q4", "Won", 17, 209_000_000m, 56_000_000m)
+    ];
+
+    private string _rowDimension = "department";
+    private string _columnDimension = "quarter";
+    private string _measure = "revenue";
+    private FlatPivotAggregate _aggregate = FlatPivotAggregate.Sum;
+    private FlatPivotCell<SalesRecord>? _selectedCell;
+
+    private string PivotSummary => $"{DimensionLabel(_rowDimension)} by {DimensionLabel(_columnDimension)} · {_aggregate} of {DimensionLabel(_measure)}";
+    private string ResolveRowKey(SalesRecord item) => ResolveDimension(item, _rowDimension);
+    private string ResolveColumnKey(SalesRecord item) => ResolveDimension(item, _columnDimension);
+    private decimal? ResolveValue(SalesRecord item) => _measure switch { "quantity" => item.Quantity, "margin" => item.Margin, _ => item.Revenue };
+    private string FormatValue(decimal value) => _aggregate == FlatPivotAggregate.Count ? value.ToString("N0") : _measure == "quantity" ? value.ToString("N1") : $"Rp {value / 1_000_000m:N1}M";
+    private static string ResolveDimension(SalesRecord item, string dimension) => dimension switch { "region" => item.Region, "product" => item.Product, "status" => item.Status, "quarter" => item.Quarter, _ => item.Department };
+    private static string DimensionLabel(string value) => value switch { "department" => "Department", "region" => "Region", "product" => "Product", "quarter" => "Quarter", "status" => "Status", "revenue" => "Revenue", "quantity" => "Quantity", "margin" => "Margin", _ => value };
+    private static string ResolveLabel(string value) => value;
+    private void SetRowDimension(string value) => _rowDimension = value;
+    private void SetColumnDimension(string value) => _columnDimension = value;
+    private void SetMeasure(string value) => _measure = value;
+    private void OpenCell(FlatPivotCell<SalesRecord> cell) => _selectedCell = cell;
+    private Task CloseCell() { _selectedCell = null; return Task.CompletedTask; }
+    private Task CellDetailOpenChanged(bool open) { if (!open) _selectedCell = null; return Task.CompletedTask; }
+
+    private sealed record SalesRecord(string Department, string Region, string Product, string Quarter, string Status, int Quantity, decimal Revenue, decimal Margin);
+}

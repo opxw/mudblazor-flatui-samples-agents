@@ -1,0 +1,394 @@
+@page "/jobs"
+@inject SampleCatalog Catalog
+@inject ISnackbar Snackbar
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="jobs-dashboard-page"
+          ShowMobilePrimaryAction="true"
+          RefreshEnabled="true"
+          OnRefresh="RefreshAsync"
+          ImportVisible="true"
+          ImportLabel="Import"
+          ImportAriaLabel="Import jobs"
+          OnImport="ImportJobsAsync"
+          DownloadVisible="true"
+          DownloadLabel="Export"
+          DownloadAriaLabel="Export jobs"
+          OnDownload="ExportJobsAsync"
+          ExportVisible="false"
+          OnExport="ExportJobsCsvAsync"
+          PullToRefreshEnabled="true">
+    <ToolbarContent>
+        <MudTextField T="string"
+                      @bind-Value="_search"
+                      Placeholder="Search job title, company, location"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search"
+                      Class="module-search jobs-search" />
+
+        <MudSelect T="string"
+                   @bind-Value="_companyFilter"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Class="jobs-filter"
+                   aria-label="Company filter">
+            <MudSelectItem Value="@("All")">All companies</MudSelectItem>
+            @foreach (var name in CompanyOptions)
+            {
+                <MudSelectItem Value="@name">@name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect T="string"
+                   @bind-Value="_typeFilter"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Class="jobs-filter"
+                   aria-label="Employment type filter">
+            <MudSelectItem Value="@("All")">All employment types</MudSelectItem>
+            <MudSelectItem Value="@("Full Time")">Full Time</MudSelectItem>
+            <MudSelectItem Value="@("Part Time")">Part Time</MudSelectItem>
+            <MudSelectItem Value="@("Contract")">Contract</MudSelectItem>
+        </MudSelect>
+
+        <MudSelect T="string"
+                   @bind-Value="_modeFilter"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Class="jobs-filter"
+                   aria-label="Work mode filter">
+            <MudSelectItem Value="@("All")">All work modes</MudSelectItem>
+            <MudSelectItem Value="@("Remote")">Remote</MudSelectItem>
+            <MudSelectItem Value="@("Hybrid")">Hybrid</MudSelectItem>
+            <MudSelectItem Value="@("On-site")">On-site</MudSelectItem>
+        </MudSelect>
+    </ToolbarContent>
+
+    <ChildContent>
+        <div class="sample-kpis jobs-kpis" role="list" aria-label="Job board summary">
+            <article role="listitem">
+                <span>Open positions</span>
+                <strong>@FilteredJobs.Count</strong>
+            </article>
+            <article role="listitem">
+                <span>Remote</span>
+                <strong>@RemoteCount</strong>
+            </article>
+            <article role="listitem">
+                <span>Hybrid</span>
+                <strong>@HybridCount</strong>
+            </article>
+            <article role="listitem">
+                <span>Part time</span>
+                <strong>@PartTimeCount</strong>
+            </article>
+            <article role="listitem">
+                <span>Avg salary</span>
+                <strong>@($"IDR {AverageSalaryRange:N0}")</strong>
+            </article>
+        </div>
+
+        <div class="jobs-dashboard-grid">
+            <FlatPanel Title="Hiring trend" Subtitle="Job board sample chart">
+                <div class="sample-chart compact jobs-chart-wrap" aria-label="Job hiring trend">
+                    <MudChart T="double"
+                              ChartType="ChartType.Bar"
+                              ChartSeries="@HiringTrendSeries"
+                              ChartLabels="@HiringTrendLabels"
+                              Width="100%"
+                              Height="228px"
+                              ChartOptions="@CompactChartOptions" />
+                </div>
+            </FlatPanel>
+
+            <FlatPanel Title="Recent activity" Subtitle="Latest workflow signals">
+                <div class="job-activity-list">
+                    @foreach (var eventItem in _activity)
+                    {
+                        <article>
+                            <strong>@eventItem.Title</strong>
+                            <small>@eventItem.Detail</small>
+                        </article>
+                    }
+                </div>
+            </FlatPanel>
+        </div>
+
+        <FlatPanel Title="Open roles" Subtitle="Compact card-driven job board">
+            <FlatCardGrid TItem="JobRecord"
+                         Items="FilteredJobs"
+                         ItemTemplate="JobTemplate"
+                         SearchText="_search"
+                         SearchTextChanged="SearchChangedAsync"
+                         ShowViewToggle="false"
+                         ShowOverflow="false"
+                         AddVisible="false"
+                         EmptyTitle="No jobs match your filters"
+                         EmptyMessage="Try other keywords or clear the company, type, or work mode filters.">
+            </FlatCardGrid>
+        </FlatPanel>
+    </ChildContent>
+
+    <MobilePrimaryAction>
+        <FlatFab Icon="@Icons.Material.Outlined.PostAdd" AriaLabel="Create job" OnClick="OpenCreateJob" />
+    </MobilePrimaryAction>
+</FlatPage>
+
+<FlatFormModal @bind-Open="_createOpen"
+               Title="Create job"
+               Mode="Create"
+               Size="@FlatFormModalSize.Small"
+               Saving="_createSaving"
+               CanSubmit="CanSubmitCreate"
+               IsDirty="IsCreateDirty"
+               OnSubmit="CreateJobAsync"
+               OnRefreshRequested="Reload"
+               CloseOnOutsideClick="false"
+               ConfirmClose="ConfirmCreateCloseAsync">
+    <MudTextField T="string"
+                  @bind-Value="_draft.Title"
+                  Label="Job title"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense" />
+    <MudTextField T="string"
+                  @bind-Value="_draft.Company"
+                  Label="Company"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense" />
+    <div class="jobs-form-grid">
+        <MudTextField T="string"
+                      @bind-Value="_draft.Location"
+                      Label="Location"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense" />
+        <MudSelect T="string"
+                   @bind-Value="_draft.EmploymentType"
+                   Label="Employment type"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense">
+            <MudSelectItem Value="@("Full Time")">Full Time</MudSelectItem>
+            <MudSelectItem Value="@("Part Time")">Part Time</MudSelectItem>
+            <MudSelectItem Value="@("Contract")">Contract</MudSelectItem>
+        </MudSelect>
+    </div>
+        <MudSelect T="string"
+                   @bind-Value="_draft.WorkMode"
+                   Label="Work mode"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense">
+            <MudSelectItem Value="@("Remote")">Remote</MudSelectItem>
+            <MudSelectItem Value="@("Hybrid")">Hybrid</MudSelectItem>
+            <MudSelectItem Value="@("On-site")">On-site</MudSelectItem>
+        </MudSelect>
+    <MudTextField T="string"
+                  @bind-Value="_draft.SalaryRange"
+                  Label="Salary range"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense" />
+    <MudTextField T="string"
+                  @bind-Value="_draft.Summary"
+                  Label="Short summary"
+                  Variant="Variant.Outlined"
+                  Lines="3"
+                  Margin="Margin.Dense" />
+    <MudTextField T="string"
+                  @bind-Value="_draft.Skills"
+                  Label="Required skills (comma separated)"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true" />
+</FlatFormModal>
+
+@code {
+    private string _search = string.Empty;
+    private string _companyFilter = "All";
+    private string _typeFilter = "All";
+    private string _modeFilter = "All";
+    private bool _createOpen;
+    private bool _createSaving;
+    private JobDraft _draft = new();
+    private IReadOnlyList<JobRecord> _jobs = [];
+
+    private static readonly (string Title, string Detail)[] _activity =
+    [
+        ("Open position validated", "Posting quality is ready for publishing after summary and requirement sanity checks."),
+        ("Recruiter alert", "The pipeline is ready; one role is waiting for first-screen review."),
+        ("Dashboard sync", "Sample data is refreshed from the same in-memory source.")
+    ];
+
+    private RenderFragment<JobRecord> JobTemplate => job => @<FlatJobCard Title="@job.Title"
+                                                                       Company="@job.Company"
+                                                                       Location="@job.Location"
+                                                                       EmploymentType="@job.EmploymentType"
+                                                                       WorkMode="@job.WorkMode"
+                                                                       SalaryRange="@job.SalaryRange"
+                                                                       PostedAgo="@job.PostedAgo"
+                                                                       CompanyInitials="@CompanyInitials(job.Company)"
+                                                                       Skills="@SkillTags(job)"
+                                                                       Tone="@(job.WorkMode.Contains("Remote", StringComparison.OrdinalIgnoreCase) ? "remote" : "neutral")"
+                                                                       OnApply="() => OpenApplyToast(job)"
+                                                                       OnSave="() => OpenSaveToast(job)" />;
+
+    private List<string> CompanyOptions => _jobs
+        .Select(x => x.Company)
+        .Where(x => !string.IsNullOrWhiteSpace(x))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(x => x)
+        .Prepend("All")
+        .ToList();
+
+    private List<JobRecord> FilteredJobs => [.. _jobs
+        .Where(j => (string.IsNullOrWhiteSpace(_search) ||
+                     j.Title.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                     j.Company.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                     j.Location.Contains(_search, StringComparison.OrdinalIgnoreCase))
+                    && (_companyFilter == "All" || j.Company.Equals(_companyFilter, StringComparison.OrdinalIgnoreCase))
+                    && (_typeFilter == "All" || j.EmploymentType == _typeFilter)
+                    && (_modeFilter == "All" || j.WorkMode.Contains(_modeFilter, StringComparison.OrdinalIgnoreCase)))];
+
+    private static readonly string[] HiringTrendLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    private List<ChartSeries<double>> HiringTrendSeries =>
+    [
+        new() { Name = "Applications", Data = new ChartData<double>([2.2, 3.9, 4.1, 5.8, 4.3, 5.0, 5.1]) },
+        new() { Name = "Interviews", Data = new ChartData<double>([0.8, 1.4, 1.6, 2.3, 1.9, 2.5, 2.0]) },
+    ];
+
+    private static readonly ChartOptions CompactChartOptions = new()
+    {
+        ChartPalette = ["#f59e0b", "#0ab39c", "#299cdb", "#f06548", "#405189"]
+    };
+
+    private int RemoteCount => _jobs.Count(x => x.WorkMode.Contains("Remote", StringComparison.OrdinalIgnoreCase));
+    private int HybridCount => _jobs.Count(x => x.WorkMode.Contains("Hybrid", StringComparison.OrdinalIgnoreCase));
+    private int PartTimeCount => _jobs.Count(x => x.EmploymentType.Contains("Part", StringComparison.OrdinalIgnoreCase));
+    private decimal AverageSalaryRange => Math.Round(
+        _jobs.Select(ParseSalaryMin).Where(v => v > 0m).DefaultIfEmpty(0m).Average(),
+        MidpointRounding.ToEven);
+
+    protected override void OnInitialized() => Reload();
+
+    private void Reload() => _jobs = Catalog.Jobs.ToList();
+
+    private IReadOnlyList<string> SkillTags(JobRecord job) => job.Title switch
+    {
+        "Senior .NET Developer" => ["MudBlazor", ".NET", "API", "UX"],
+        "UI/UX Analyst" => ["Design", "Research", "Product", "Accessibility"],
+        "Recruitment Officer" => ["Sourcing", "Interview", "Hiring", "Documentation"],
+        "Support Analyst" => ["Monitoring", "SLA", "Knowledge Base", "Incident"],
+        "QA Engineer" => ["Automation", "Testing", "Playwright", "Release"],
+        "Product Operations Associate" => ["Planning", "Reporting", "Coordination", "SOP"],
+        _ => ["Communication", "Execution", "Ownership"]
+    };
+
+    private static decimal ParseSalaryMin(JobRecord item)
+    {
+        var value = new string((item.SalaryRange ?? string.Empty).Where(char.IsDigit).ToArray());
+        if (decimal.TryParse(value, out var result))
+        {
+            return result;
+        }
+
+        return 0m;
+    }
+
+    private static string CompanyInitials(string company)
+    {
+        return string.Concat(company
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(word => word[0]));
+    }
+
+    private Task SearchChangedAsync(string value)
+    {
+        _search = value;
+        return Task.CompletedTask;
+    }
+
+    private async Task RefreshAsync()
+    {
+        await Task.Delay(350);
+        Reload();
+    }
+
+    private Task ImportJobsAsync() => Task.CompletedTask;
+
+    private Task ExportJobsAsync()
+    {
+        Snackbar.Add("Export action is available in API integrations.", Severity.Info);
+        return Task.CompletedTask;
+    }
+
+    private Task ExportJobsCsvAsync()
+    {
+        Snackbar.Add("CSV export action is available in API integrations.", Severity.Info);
+        return Task.CompletedTask;
+    }
+
+    private void OpenCreateJob()
+    {
+        _draft = new JobDraft
+        {
+            Title = string.Empty,
+            Company = string.Empty,
+            Location = "Jakarta",
+            EmploymentType = "Full Time",
+            WorkMode = "Hybrid",
+            SalaryRange = "IDR"
+        };
+        _createOpen = true;
+    }
+
+    private async Task CreateJobAsync()
+    {
+        _createSaving = true;
+        await Task.Delay(450);
+
+        var created = new JobRecord(
+            $"JK-{DateTime.UtcNow:yyMMddHHmmss}",
+            _draft.Title.Trim(),
+            _draft.Company.Trim(),
+            _draft.Location.Trim(),
+            _draft.EmploymentType,
+            _draft.WorkMode,
+            string.IsNullOrWhiteSpace(_draft.SalaryRange) ? "IDR 0" : _draft.SalaryRange.Trim(),
+            "Just now",
+            _draft.Summary?.Trim() ?? string.Empty);
+
+        var next = _jobs.ToList();
+        next.Insert(0, created);
+        _jobs = next;
+
+        _createSaving = false;
+        Snackbar.Add("Sample job created in page memory only.", Severity.Success);
+    }
+
+    private Task<bool> ConfirmCreateCloseAsync() => Task.FromResult(true);
+
+    private bool CanSubmitCreate => !string.IsNullOrWhiteSpace(_draft.Title) && !string.IsNullOrWhiteSpace(_draft.Company);
+
+    private bool IsCreateDirty => !string.IsNullOrWhiteSpace(_draft.Title) ||
+                                  !string.IsNullOrWhiteSpace(_draft.Company) ||
+                                  !string.IsNullOrWhiteSpace(_draft.Location) ||
+                                  !string.IsNullOrWhiteSpace(_draft.SalaryRange);
+
+    private void OpenApplyToast(JobRecord job) =>
+        Snackbar.Add($"Apply tapped for '{job.Title}' at {job.Company}.", Severity.Info);
+
+    private void OpenSaveToast(JobRecord job) =>
+        Snackbar.Add($"Saved '{job.Title}' into saved jobs.", Severity.Info);
+
+    private sealed class JobDraft
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Company { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public string EmploymentType { get; set; } = "Full Time";
+        public string WorkMode { get; set; } = "Hybrid";
+        public string SalaryRange { get; set; } = "IDR ";
+        public string Summary { get; set; } = string.Empty;
+        public string Skills { get; set; } = string.Empty;
+    }
+}

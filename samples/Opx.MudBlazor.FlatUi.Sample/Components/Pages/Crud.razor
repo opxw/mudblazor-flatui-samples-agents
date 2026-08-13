@@ -1,0 +1,209 @@
+@page "/crud"
+@inject SampleCatalog Catalog
+@inject FlatGridOptions GridOptions
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="crud-page"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Add"
+          PrimaryActionIcon="@Icons.Material.Outlined.Add"
+          PrimaryActionAriaLabel="Add new asset"
+          OnPrimaryAction="Create"
+          FilterEnabled="@Columns.Any(column => column.FilterEnabled)"
+          FilterActive="@GridState.HasActiveFilters"
+          OnFilter="() => _filterOpen = true"
+          RefreshEnabled="true"
+          ImportVisible="true"
+          ImportAriaLabel="Import asset"
+          ImportLabel="Import asset"
+          ExportVisible="true"
+          ExportAriaLabel="Export asset"
+          ExportLabel="Export asset"
+          PullToRefreshEnabled="true"
+          OnRefresh="Refresh">
+    <ToolbarContent>
+        <MudTextField T="string" @bind-Value="_search" Placeholder="Search assets..." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" />
+    </ToolbarContent>
+    <ChildContent>
+        <div class="table-scroll">
+            <FlatDataGrid TItem="AssetRecord"
+                          State="GridState"
+                          Columns="Columns"
+                          Items="PagedAssets"
+                          Changed="ReloadPage"
+                          ExtraColumnCount="1">
+                <RowTemplate Context="asset">
+                    <tr>
+                        <td><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Devices" /></span><div><strong>@asset.Name</strong><small>@asset.Code</small></div></div></td>
+                        <td>@asset.Department</td>
+                        <td>@asset.Owner</td>
+                        <td>@asset.Location</td>
+                        <td><span class="@StatusClass(asset.Status)"><i></i>@asset.Status</span></td>
+                        <td>@asset.Health%</td>
+                        <td class="row-actions"><MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" OnClick="() => Edit(asset)" /></td>
+                    </tr>
+                </RowTemplate>
+                <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="Asset not found" Message="Change the keyword or reset the filter." /></EmptyContent>
+            </FlatDataGrid>
+        </div>
+
+        <FlatMobileGrid TItem="AssetRecord" Items="PagedAssets">
+            <CardTemplate Context="asset">
+                <article class="mobile-card">
+                    <header>
+                        <div><strong>@asset.Name</strong><small>@asset.Code</small></div>
+                        <span class="@StatusClass(asset.Status)"><i></i>@asset.Status</span>
+                    </header>
+                    <div class="sample-mobile-facts">
+                        <FlatInfoItem Label="Department" Value="@asset.Department" />
+                        <FlatInfoItem Label="Owner" Value="@asset.Owner" />
+                        <FlatInfoItem Label="Location" Value="@asset.Location" />
+                        <FlatInfoItem Label="Health" Value="@($"{asset.Health}%")" />
+                    </div>
+                    <footer class="crud-card-footer">
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Edit" OnClick="() => Edit(asset)">Edit</MudButton>
+                    </footer>
+                </article>
+            </CardTemplate>
+            <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="Asset not found" /></EmptyContent>
+        </FlatMobileGrid>
+
+        <FlatPager State="GridState" Changed="ReloadPage" />
+    </ChildContent>
+</FlatPage>
+
+<MobileGridFilterSheet Open="_filterOpen" OpenChanged="value => _filterOpen = value" Columns="Columns" State="GridState" OnApplied="ReloadPage" />
+
+<FlatFormModal @bind-Open="_editorOpen"
+               Title="@_editorTitle"
+               Mode="@_editorMode"
+               Saving="_saving"
+               IsDirty="_dirty"
+               CloseOnOutsideClick="true"
+               CanSubmit="@(!string.IsNullOrWhiteSpace(_draft.Name))"
+               OnResult="HandleEditorResult"
+               AutoRefreshOnSuccess="true"
+               OnRefreshRequested="ReloadPage"
+               OnSubmit="Save"
+               ConfirmClose="ConfirmClose">
+        <div class="flat-crud-form-grid">
+            <MudTextField T="string" @bind-Value="_draft.Code" Label="Asset Code" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" />
+            <MudTextField T="string" @bind-Value="_draft.Name" Label="Asset Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Department" Label="Department" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Owner" Label="Owner" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudSelect T="string" @bind-Value="_draft.Status" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("Online")">Online</MudSelectItem>
+                <MudSelectItem Value="@("Pending")">Pending</MudSelectItem>
+                <MudSelectItem Value="@("Offline")">Offline</MudSelectItem>
+            </MudSelect>
+            <MudTextField T="string" @bind-Value="_draft.Location" Label="Location" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Notes" Label="Notes" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" Class="wide" />
+        </div>
+</FlatFormModal>
+
+@code {
+    private GridViewState GridState = default!;
+    private bool _filterOpen;
+    private bool _editorOpen;
+    private bool _saving;
+    private bool _dirty = true;
+    private string _search = "";
+    private string _editorTitle = "Add Asset";
+    private string _editorMode = "Create";
+    private AssetDraft _draft = new();
+    private IReadOnlyList<AssetRecord> PagedAssets = [];
+    private bool? _lastEditorResult;
+
+    private IReadOnlyList<GridColumnDefinition> Columns =>
+    [
+        new("name", "Asset"),
+        new("department", "Department", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Catalog.Assets.Select(x => x.Department))),
+        new("owner", "Owner"),
+        new("location", "Location", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Catalog.Assets.Select(x => x.Location))),
+        new("status", "Status", GridColumnFilterType.Category, true, [new("Online", "Online"), new("Pending", "Pending"), new("Offline", "Offline")]),
+        new("health", "Health", GridColumnFilterType.Number)
+    ];
+
+    protected override void OnInitialized()
+    {
+        GridState = new GridViewState(GridOptions);
+        ReloadPage();
+    }
+
+    private void ReloadPage()
+    {
+        var source = Catalog.Assets.Where(asset =>
+            string.IsNullOrWhiteSpace(_search)
+            || asset.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || asset.Code.Contains(_search, StringComparison.OrdinalIgnoreCase));
+        PagedAssets = GridState.ApplyPage(source, ValueFor);
+    }
+
+    private static string? ValueFor(AssetRecord asset, string key) => key switch
+    {
+        "name" => $"{asset.Name} {asset.Code}",
+        "department" => asset.Department,
+        "owner" => asset.Owner,
+        "location" => asset.Location,
+        "status" => asset.Status,
+        "health" => asset.Health.ToString(),
+        _ => ""
+    };
+
+    private void Refresh() => ReloadPage();
+
+    private void Create()
+    {
+        _editorMode = "Create";
+        _editorTitle = "Add Asset";
+        _draft = new AssetDraft { Code = $"NEW-{DateTime.Now:HHmm}", Status = "Online", Location = "Jakarta" };
+        _editorOpen = true;
+    }
+
+    private void Edit(AssetRecord asset)
+    {
+        _editorMode = "Edit";
+        _editorTitle = asset.Name;
+        _draft = new AssetDraft
+        {
+            Code = asset.Code,
+            Name = asset.Name,
+            Department = asset.Department,
+            Owner = asset.Owner,
+            Status = asset.Status,
+            Location = asset.Location,
+            Notes = "Sample form. Save only simulates state processing."
+        };
+        _editorOpen = true;
+    }
+
+    private async Task Save()
+    {
+        _saving = true;
+        await Task.Delay(450);
+        _saving = false;
+        _dirty = false;
+    }
+
+    private void HandleEditorResult(bool result) => _lastEditorResult = result;
+
+    private Task<bool> ConfirmClose() => Task.FromResult(true);
+
+    private static string StatusClass(string status) => status switch
+    {
+        "Online" => "status-chip online",
+        "Offline" => "status-chip offline",
+        _ => "status-chip pending"
+    };
+
+    private sealed class AssetDraft
+    {
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Department { get; set; } = "";
+        public string Owner { get; set; } = "";
+        public string Status { get; set; } = "Online";
+        public string Location { get; set; } = "";
+        public string Notes { get; set; } = "";
+    }
+}

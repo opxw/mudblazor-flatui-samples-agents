@@ -1,0 +1,83 @@
+@page "/widgets"
+@inject ISnackbar Snackbar
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Widgets - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="widgets-page">
+    <ChildContent>
+        <section class="widget-showcase-section" aria-labelledby="tile-boxes-title">
+            <h2 id="tile-boxes-title">Tile boxes</h2>
+            <div class="flat-widget-grid action-metrics">
+                <FlatActionMetricWidget Title="Total earnings" Value="$559.25k" Change="+16.24%" ActionLabel="View net earnings" Icon="@Icons.Material.Outlined.MonetizationOn" OnAction="@(() => ShowAction("Net earnings"))" />
+                <FlatActionMetricWidget Title="Orders" Value="36,894" Change="-3.57%" ChangeTone="negative" ActionLabel="View all orders" Icon="@Icons.Material.Outlined.ShoppingBag" Tone="featured" OnAction="@(() => ShowAction("Orders"))" />
+                <FlatActionMetricWidget Title="Customers" Value="183.35m" Change="+29.08%" ActionLabel="See details" Icon="@Icons.Material.Outlined.AccountCircle" Tone="warning" OnAction="@(() => ShowAction("Customers"))" />
+                <FlatActionMetricWidget Title="My balance" Value="$165.89k" Change="0.00%" ChangeTone="neutral" ActionLabel="Withdraw money" Icon="@Icons.Material.Outlined.AccountBalanceWallet" Tone="secondary" OnAction="@(() => ShowAction("Balance"))" />
+            </div>
+        </section>
+
+        <section class="widget-showcase-section" aria-labelledby="compact-metrics-title">
+            <h2 id="compact-metrics-title">Compact metrics</h2>
+            <div class="flat-compact-metric-strip">
+                <FlatCompactMetric Title="Campaign sent" Value="197" Change="+12.2%" Icon="@Icons.Material.Outlined.Send" />
+                <FlatCompactMetric Title="Annual profit" Value="$489.4k" Change="+8.4%" Icon="@Icons.Material.Outlined.Savings" />
+                <FlatCompactMetric Title="Lead conversion" Value="32.89%" Change="-1.1%" ChangeTone="negative" Icon="@Icons.Material.Outlined.MonitorHeart" />
+                <FlatCompactMetric Title="Daily income" Value="$1,596" Change="+4.6%" Icon="@Icons.Material.Outlined.EmojiEvents" />
+                <FlatCompactMetric Title="Annual deals" Value="2,659" Change="+7.0%" Icon="@Icons.Material.Outlined.Handshake" />
+            </div>
+        </section>
+
+        <section class="widget-showcase-section" aria-labelledby="statistics-title">
+            <h2 id="statistics-title">Statistics</h2>
+            <div class="flat-widget-grid metrics">
+                <FlatMetricWidget Title="Users" Value="28.05k" Caption="vs. previous month" Change="16.24%" Icon="@Icons.Material.Outlined.Groups" />
+                <FlatMetricWidget Title="Sessions" Value="97.66k" Caption="vs. previous month" Change="3.96%" ChangeTone="negative" ChangeIcon="@Icons.Material.Outlined.TrendingDown" Icon="@Icons.Material.Outlined.Timeline" Tone="success" />
+                <FlatMetricWidget Title="Avg. visit duration" Value="3m 40s" Caption="vs. previous month" Change="0.24%" Icon="@Icons.Material.Outlined.Schedule" Tone="warning" />
+                <FlatMetricWidget Title="Bounce rate" Value="33.48%" Caption="vs. previous month" Change="7.05%" Icon="@Icons.Material.Outlined.OpenInNew" Tone="info" />
+            </div>
+        </section>
+
+        <section class="widget-showcase-section" aria-labelledby="other-widgets-title">
+            <h2 id="other-widgets-title">Other widgets</h2>
+            <div class="flat-widget-grid projects">
+                <FlatSegmentProgressWidget Title="Brand identity refresh" Subtitle="Design work" Completed="65" InProgress="25" ToDo="10" />
+                <FlatSegmentProgressWidget Title="Storefront redesign" Subtitle="UI / UX" Completed="45" InProgress="35" ToDo="20" />
+                <FlatSegmentProgressWidget Title="Commerce application" Subtitle="Web project" Completed="72" InProgress="18" ToDo="10" />
+            </div>
+            <div class="flat-widget-grid content lower-widgets">
+                <FlatProgressWidget Title="Quarter target" Eyebrow="Performance" Value="72" Caption="18 days remaining" />
+
+                <FlatWidget Title="Upcoming activities" Eyebrow="Schedule" AriaLabel="Upcoming activities">
+                    <ChildContent><div class="flat-activity-list">
+                        <FlatActivityItem Title="Design review" Description="Landing page and storefront" Time="09:30" Icon="@Icons.Material.Outlined.DesignServices" />
+                        <FlatActivityItem Title="Production stand-up" Description="WO exception review" Time="11:00" Icon="@Icons.Material.Outlined.Factory" />
+                        <FlatActivityItem Title="Finance close" Description="Approval queue checkpoint" Time="16:00" Icon="@Icons.Material.Outlined.AccountBalance" />
+                    </div></ChildContent>
+                </FlatWidget>
+
+                <FlatWidget Title="My tasks" Eyebrow="3 of 4 remaining" AriaLabel="My tasks">
+                    <ChildContent><div class="flat-task-list">
+                        @foreach (var task in _tasks)
+                        {
+                            <FlatTaskItem Title="@task.Title" DueText="@task.Due" Completed="@task.Completed" CompletedChanged="@(value => task.Completed = value)" />
+                        }
+                    </div></ChildContent>
+                </FlatWidget>
+            </div>
+        </section>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private readonly List<WidgetTask> _tasks =
+    [
+        new("Review responsive widget layout", "Today · 11:00", true),
+        new("Confirm finance exceptions", "Today · 15:30", false),
+        new("Publish catalog changes", "Tomorrow · 09:00", false),
+        new("Prepare operations summary", "Friday · 16:00", false)
+    ];
+
+    private void ShowAction(string area) => Snackbar.Add($"{area} action is a consumer integration placeholder.", Severity.Info);
+    private sealed class WidgetTask(string title, string due, bool completed) { public string Title { get; } = title; public string Due { get; } = due; public bool Completed { get; set; } = completed; }
+}

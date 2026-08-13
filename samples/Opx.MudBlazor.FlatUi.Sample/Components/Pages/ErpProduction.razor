@@ -1,0 +1,58 @@
+@page "/erp/production"
+@page "/erp/production/work-orders"
+@page "/erp/production/quality"
+@inject ErpSampleCatalog Erp
+@inject NavigationManager Navigation
+
+@if (CurrentView == "work-orders")
+{
+    <FlatPage Kind="FlatPageKind.Module" PageCssClass="erp-page erp-list-page" RefreshEnabled="true" OnRefresh="() => StateHasChanged()" DownloadVisible="true" PullToRefreshEnabled="true">
+        <ToolbarContent><MudTextField @bind-Value="_search" Immediate="true" Placeholder="Search work order..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" Margin="Margin.Dense" Variant="Variant.Outlined" /></ToolbarContent>
+        <ChildContent>
+            <div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Work order</th><th>Item</th><th>Resource</th><th>Progress</th><th>Due date</th><th>Status</th></tr></thead><tbody>
+                @foreach (var order in FilteredWorkOrders)
+                {
+                    <tr><td><strong>@order.Number</strong><small>@order.ItemCode</small></td><td>@order.Item</td><td>@order.Resource</td><td><div class="erp-progress"><span><i style="width:@Progress(order)%"></i></span><strong>@Progress(order)%</strong></div></td><td>@order.DueDate</td><td><span class="@StatusClass(order.Status)">@order.Status</span></td></tr>
+                }
+            </tbody></table></div>
+            <div class="erp-mobile-list">
+                @foreach (var order in FilteredWorkOrders)
+                {
+                    <article class="mobile-card erp-mobile-card"><header><div><strong>@order.Number</strong><small>@order.ItemCode · @order.Item</small></div><span class="@StatusClass(order.Status)">@order.Status</span></header><div class="erp-card-progress"><div class="erp-progress"><span><i style="width:@Progress(order)%"></i></span><strong>@Progress(order)%</strong></div></div><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Resource" Value="@order.Resource" /><FlatInfoItem Label="Planned" Value="@order.Planned.ToString("N0")" /><FlatInfoItem Label="Completed" Value="@order.Completed.ToString("N0")" /><FlatInfoItem Label="Due" Value="@order.DueDate" /></div></article>
+                }
+            </div>
+        </ChildContent>
+    </FlatPage>
+}
+else if (CurrentView == "quality")
+{
+    <FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+        <div class="stat-grid erp-stat-grid"><FlatStatCard Label="First-pass yield" Value="96.2%" Icon="@Icons.Material.Outlined.Verified" Note="Target 95%" Tone="green" /><FlatStatCard Label="Checks today" Value="84" Icon="@Icons.Material.Outlined.FactCheck" Note="71 completed" Tone="blue" /><FlatStatCard Label="Quality holds" Value="3" Icon="@Icons.Material.Outlined.PauseCircle" Note="Requires review" Tone="amber" /><FlatStatCard Label="Rework rate" Value="1.8%" Icon="@Icons.Material.Outlined.Build" Note="Below 2.5% limit" Tone="sky" /></div>
+        <FlatPanel Title="Quality inspection queue" Subtitle="Production and incoming inspection" CssClass="flat-panel erp-section-panel">
+            <div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Inspection</th><th>Work order</th><th>Check</th><th>Inspector</th><th>Time</th><th>Result</th></tr></thead><tbody>@foreach (var check in Erp.QualityChecks){<tr><td><strong>@check.Number</strong></td><td>@check.WorkOrder</td><td>@check.Check</td><td>@check.Inspector</td><td>@check.Time</td><td><span class="@StatusClass(check.Result)">@check.Result</span></td></tr>}</tbody></table></div>
+            <div class="erp-mobile-list embedded">@foreach (var check in Erp.QualityChecks){<article class="mobile-card erp-mobile-card"><header><div><strong>@check.Check</strong><small>@check.Number · @check.WorkOrder</small></div><span class="@StatusClass(check.Result)">@check.Result</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Inspector" Value="@check.Inspector" /><FlatInfoItem Label="Time" Value="@check.Time" /></div></article>}</div>
+        </FlatPanel>
+    </FlatPage>
+}
+else
+{
+    <FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+        <div class="stat-grid erp-stat-grid"><FlatStatCard Label="OEE" Value="87.4%" Icon="@Icons.Material.Outlined.Factory" Note="2.4% above target" Tone="green" /><FlatStatCard Label="Plan attainment" Value="92.1%" Icon="@Icons.Material.Outlined.TrackChanges" Note="4,286 / 4,652 units" Tone="blue" /><FlatStatCard Label="Downtime" Value="38 min" Icon="@Icons.Material.Outlined.TimerOff" Note="Across 3 lines" Tone="amber" /><FlatStatCard Label="Scrap" Value="1.3%" Icon="@Icons.Material.Outlined.DeleteOutline" Note="Limit 2%" Tone="sky" /></div>
+        <div class="sample-two-col erp-dashboard-grid">
+            <FlatPanel Title="Output by production line" Subtitle="Planned versus completed units"><div class="sample-chart"><MudChart T="double" ChartType="ChartType.Bar" ChartSeries="@OutputSeries" ChartLabels="@LineLabels" Width="100%" Height="220px" ChartOptions="@ChartOptions" /></div></FlatPanel>
+            <FlatPanel Title="Shift performance" Subtitle="Current operating window"><div class="erp-metric-list"><article><span><strong>Line 1</strong><small>Industrial Pump · Shift A</small></span><div class="erp-progress"><span><i style="width:91%"></i></span><strong>91%</strong></div></article><article><span><strong>Line 2</strong><small>Control Valve · Shift A</small></span><div class="erp-progress"><span><i style="width:100%"></i></span><strong>100%</strong></div></article><article><span><strong>Line 3</strong><small>Motor Unit · Shift A</small></span><div class="erp-progress warning"><span><i style="width:64%"></i></span><strong>64%</strong></div></article></div></FlatPanel>
+        </div>
+        <FlatPanel Title="Active production orders" Subtitle="Shop-floor execution snapshot" CssClass="flat-panel erp-section-panel"><div class="erp-compact-list">@foreach (var order in Erp.WorkOrders.Take(4)){<article><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.PrecisionManufacturing" /></span><div><strong>@order.Number · @order.Item</strong><small>@order.Resource · @order.Completed.ToString("N0") / @order.Planned.ToString("N0") units</small></div><span class="@StatusClass(order.Status)">@order.Status</span></article>}</div></FlatPanel>
+    </FlatPage>
+}
+
+@code {
+    private string _search = "";
+    private string CurrentView => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Split('/').LastOrDefault() switch { "work-orders" => "work-orders", "quality" => "quality", _ => "dashboard" };
+    private IEnumerable<ErpWorkOrder> FilteredWorkOrders => string.IsNullOrWhiteSpace(_search) ? Erp.WorkOrders : Erp.WorkOrders.Where(x => $"{x.Number} {x.ItemCode} {x.Item} {x.Resource} {x.Status}".Contains(_search, StringComparison.OrdinalIgnoreCase));
+    private static int Progress(ErpWorkOrder order) => order.Planned == 0 ? 0 : (int)Math.Round(order.Completed * 100d / order.Planned);
+    private readonly string[] LineLabels = ["Line 1", "Line 2", "Line 3"];
+    private readonly List<ChartSeries<double>> OutputSeries = [new() { Name = "Planned", Data = new ChartData<double>([1800, 1600, 1252]) }, new() { Name = "Completed", Data = new ChartData<double>([1640, 1600, 1046]) }];
+    private readonly ChartOptions ChartOptions = new() { ChartPalette = ["#94a3b8", "#0078d4"] };
+    private static string StatusClass(string status) => status switch { "Completed" or "Passed" => "status-chip online", "In progress" or "Released" or "Pending" => "status-chip pending", "Planned" => "status-chip neutral", _ => "status-chip offline" };
+}

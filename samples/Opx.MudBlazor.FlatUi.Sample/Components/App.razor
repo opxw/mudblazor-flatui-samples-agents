@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="en"
+      data-opx-theme-mode="@DisplayOptions.DefaultThemeMode"
+      data-opx-theme-storage-key="@DisplayOptions.StorageKey">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="@ApplicationOptions.ResolvedAuthor" />
+    <title>@ApplicationOptions.ResolvedAppName</title>
+    <base href="/" />
+    <ResourcePreloader />
+    <script src="@Assets["_content/Opx.MudBlazor.FlatUi/opx-flat-ui-theme-bootstrap.js"]"></script>
+    <link rel="stylesheet" href="@Assets["_content/MudBlazor/MudBlazor.min.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css"]" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["Opx.MudBlazor.FlatUi.Sample.styles.css"]" />
+    <ImportMap />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes @rendermode="InteractiveServer" />
+    <FlatReconnectModal Options="ReconnectOptions" />
+    <script src="@Assets["_content/MudBlazor/MudBlazor.min.js"]"></script>
+    <script src="@Assets[FlatUiJavaScriptPath]"></script>
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+</body>
+
+</html>
+
+@code {
+    [Inject]
+    private FlatReconnectOptions ReconnectOptions { get; set; } = new();
+
+    [Inject]
+    private FlatApplicationOptions ApplicationOptions { get; set; } = new();
+
+    [Inject]
+    private FlatUiDisplayOptions DisplayOptions { get; set; } = new();
+
+    [Inject]
+    private FlatAssetOptions AssetOptions { get; set; } = new();
+
+#if DEBUG
+    private const bool IsDebugBuild = true;
+#else
+    private const bool IsDebugBuild = false;
+#endif
+
+    private string FlatUiJavaScriptPath => AssetOptions.ResolveJavaScriptPath(IsDebugBuild);
+}

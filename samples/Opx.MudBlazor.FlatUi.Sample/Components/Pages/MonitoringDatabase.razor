@@ -1,0 +1,138 @@
+@page "/monitoring-database"
+@inject SampleCatalog Catalog
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="monitoring-database-page"
+          FilterEnabled="true"
+          FilterActive="@GridState.HasActiveFilters"
+          OnFilter="() => _filterOpen = true"
+          RefreshEnabled="true"
+          PullToRefreshEnabled="true"
+          OnRefresh="Refresh"
+          ReadOnlySource="DB Cloud Config - PRODUCTION">
+    <ToolbarContent>
+        <MudTextField T="string"
+                      @bind-Value="_search"
+                      Placeholder="Search databases..."
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search"
+                      Class="module-search database-search" />
+        <div class="auto-refresh-note">
+            <i></i>
+            <span>Auto refresh 30 seconds</span>
+        </div>
+    </ToolbarContent>
+    <ChildContent>
+        <div class="table-scroll">
+            <table class="monitor-table module-table">
+                <thead>
+                    <tr>
+                        <th>Database</th>
+                        <th>Status</th>
+                        <th>Provider</th>
+                        <th>Reason</th>
+                        <th>Connect Time (ms)</th>
+                        <th>Checked</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Rows)
+                    {
+                        <tr>
+                            <td><div class="primary-cell"><span class="row-icon database-icon"><MudIcon Icon="@Icons.Material.Outlined.Dns" /></span><div><strong>@row.Name</strong><small>@row.Group</small></div></div></td>
+                            <td><span class="@StatusClass(row.Status)"><i></i>@row.Status</span></td>
+                            <td>@row.Provider</td>
+                            <td>@row.Reason</td>
+                            <td>@row.ConnectTimeMs</td>
+                            <td>@row.CheckedAt</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <FlatMobileGrid TItem="DatabaseMonitorRecord" Items="Rows">
+            <CardTemplate Context="row">
+                <article class="mobile-card database-monitor-card">
+                    <header>
+                        <div class="database-card-title">
+                            <span class="row-icon database-icon"><MudIcon Icon="@Icons.Material.Outlined.Dns" /></span>
+                            <div><strong>@row.Name</strong><small>@row.Group</small></div>
+                        </div>
+                        <span class="@StatusClass(row.Status)"><i></i>@row.Status</span>
+                    </header>
+                    <div class="mobile-card-body">
+                        <FlatInfoItem Label="Provider" Value="@row.Provider" />
+                        <FlatInfoItem Label="Reason" Value="@row.Reason" />
+                        <FlatInfoItem Label="Connect Time (ms)" Value="@row.ConnectTimeMs" />
+                        <FlatInfoItem Label="Checked" Value="@row.CheckedAt" />
+                    </div>
+                </article>
+            </CardTemplate>
+            <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="Database not found" /></EmptyContent>
+        </FlatMobileGrid>
+
+        <footer class="table-footer database-count-footer">
+            <span>Records @Rows.Count/@FilteredRows.Count</span>
+        </footer>
+    </ChildContent>
+</FlatPage>
+
+<MobileGridFilterSheet Open="_filterOpen" OpenChanged="value => _filterOpen = value" Columns="Columns" State="GridState" OnApplied="Refresh" />
+
+@code {
+    private readonly GridViewState GridState = new();
+    private bool _filterOpen;
+    private string _search = "";
+    private IReadOnlyList<DatabaseMonitorRecord> FilteredRows = [];
+    private IReadOnlyList<DatabaseMonitorRecord> Rows = [];
+
+    private static readonly IReadOnlyList<GridColumnDefinition> Columns =
+    [
+        new("name", "Database"),
+        new("group", "Group", GridColumnFilterType.Category),
+        new("status", "Status", GridColumnFilterType.Category, true, [new("Connected", "Connected"), new("Disconnected", "Disconnected")]),
+        new("provider", "Provider", GridColumnFilterType.Category),
+        new("reason", "Reason"),
+        new("checked", "Checked", GridColumnFilterType.Date, false)
+    ];
+
+    protected override void OnInitialized()
+    {
+        GridState.SetPageSize(12);
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        var source = Catalog.Databases.Where(row =>
+            string.IsNullOrWhiteSpace(_search)
+            || row.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Group.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Status.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Provider.Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+        FilteredRows = GridState.Apply(source, ValueFor).ToList();
+        Rows = FilteredRows.Take(GridState.PageSize).ToList();
+    }
+
+    private static string? ValueFor(DatabaseMonitorRecord row, string key) => key switch
+    {
+        "name" => row.Name,
+        "group" => row.Group,
+        "status" => row.Status,
+        "provider" => row.Provider,
+        "reason" => row.Reason,
+        "checked" => row.CheckedAt,
+        _ => ""
+    };
+
+    private static string StatusClass(string status) => status switch
+    {
+        "Connected" => "status-chip online",
+        "Disconnected" => "status-chip offline",
+        _ => "status-chip pending"
+    };
+}

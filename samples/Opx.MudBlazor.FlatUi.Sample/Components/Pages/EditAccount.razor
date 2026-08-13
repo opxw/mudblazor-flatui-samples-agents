@@ -1,0 +1,267 @@
+@* Copyright © 2026 opx. All rights reserved. *@
+@page "/account/edit"
+@inject ISnackbar Snackbar
+
+<FlatPage Kind="FlatPageKind.Settings"
+          UsePanel="false"
+          PageCssClass="account-edit-page">
+    <form class="account-edit-form"
+          @onsubmit="SaveAsync"
+          @onsubmit:preventDefault
+          @oninput="MarkDirty"
+          @onchange="MarkDirty">
+        <div class="account-edit-layout">
+            <FlatPanel Title="Profile picture" CssClass="flat-panel account-profile-panel">
+                <div class="account-profile-content">
+                    <FlatProfileAvatar Name="@_draft.DisplayName"
+                                       Initials="@_draft.Initials"
+                                       ImageUrl="@AvatarImageUrl"
+                                       ImageAlt="User profile picture"
+                                       Size="88"
+                                       Class="account-profile-avatar" />
+                    <div class="account-profile-summary">
+                        <strong>@_draft.DisplayName</strong>
+                        <span>@_draft.JobTitle</span>
+                        <small>@_draft.Department</small>
+                    </div>
+
+                    <MudCheckBox T="bool"
+                                 @bind-Value="_draft.UsePhoto"
+                                 Dense="true"
+                                 Label="Use profile picture" />
+                    <MudTextField T="string"
+                                  @bind-Value="_draft.PhotoUrl"
+                                  Label="Picture URL"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  Disabled="@(!_draft.UsePhoto)"
+                                  Placeholder="/sample-profile.svg" />
+                    <MudTextField T="string"
+                                  @bind-Value="_draft.Initials"
+                                  Label="Fallback initials"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  MaxLength="3"
+                                  HelperText="Used when the picture is disabled or unavailable." />
+                </div>
+            </FlatPanel>
+
+            <div class="account-details-stack">
+                <FlatPanel Title="Account details" CssClass="flat-panel account-edit-panel">
+                    <div class="account-form-grid">
+                        <MudTextField T="string" @bind-Value="_draft.Username" Label="Username" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="true" />
+                        <MudTextField T="string" @bind-Value="_draft.DisplayName" Label="Display name" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" Required="true" />
+                        <MudTextField T="string" @bind-Value="_draft.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Email" Required="true" />
+                        <MudTextField T="string" @bind-Value="_draft.Phone" Label="Phone" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Telephone" />
+                        <MudTextField T="string" @bind-Value="_draft.JobTitle" Label="Job title" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
+                        <MudTextField T="string" @bind-Value="_draft.Department" Label="Department" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
+                        <MudSelect T="string" @bind-Value="_draft.Language" Label="Language" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem Value="@("English")">English</MudSelectItem>
+                            <MudSelectItem Value="@("Bahasa Indonesia")">Bahasa Indonesia</MudSelectItem>
+                        </MudSelect>
+                        <MudSelect T="string" @bind-Value="_draft.TimeZone" Label="Time zone" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem Value="@("Asia/Jakarta")">Asia/Jakarta (UTC+7)</MudSelectItem>
+                            <MudSelectItem Value="@("Asia/Makassar")">Asia/Makassar (UTC+8)</MudSelectItem>
+                            <MudSelectItem Value="@("Asia/Jayapura")">Asia/Jayapura (UTC+9)</MudSelectItem>
+                        </MudSelect>
+                        <FlatMultiSelect T="string"
+                                         Label="Permission groups"
+                                         Dense="true"
+                                         Margin="Margin.Dense"
+                                         HelperText="Assign role permissions for this account."
+                                         Placeholder="Select permission groups"
+                                         MaxDisplayedSelectionItems="2"
+                                         SelectAll="true"
+                                         SelectAllText="All permission groups"
+                                         Clearable="true"
+                                         Items="@_permissionGroupOptions"
+                                         SelectedValues="_draft.PermissionGroups"
+                                         SelectedValuesChanged="OnPermissionGroupsChanged" />
+                        <div class="account-preference-field wide">
+                            <MudCheckBox T="bool"
+                                         @bind-Value="_draft.EmailNotifications"
+                                         Dense="true"
+                                         Label="Email notifications" />
+                            <span>Receive account and security notifications by email.</span>
+                        </div>
+                    </div>
+                </FlatPanel>
+
+                <FlatPanel Title="Security" CssClass="flat-panel account-edit-panel">
+                    <div class="account-security-summary">
+                        <div>
+                            <span>Role</span>
+                            <strong>Application User</strong>
+                        </div>
+                        <div>
+                            <span>Last sign-in</span>
+                            <strong>06 Aug 2026 · 14:42 WIB</strong>
+                        </div>
+                        <MudButton ButtonType="ButtonType.Button"
+                                   Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Outlined.Password"
+                                   OnClick="TogglePasswordChange">
+                            @(_changePassword ? "Cancel password change" : "Change password")
+                        </MudButton>
+                    </div>
+
+                    @if (_changePassword)
+                    {
+                        <div class="account-password-grid">
+                            <MudTextField T="string"
+                                          @bind-Value="_newPassword"
+                                          Label="New password"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          InputType="InputType.Password"
+                                          Required="true" />
+                            <MudTextField T="string"
+                                          @bind-Value="_confirmPassword"
+                                          Label="Confirm password"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          InputType="InputType.Password"
+                                          Required="true"
+                                          Error="@PasswordMismatch"
+                                          ErrorText="Passwords do not match." />
+                        </div>
+                    }
+                </FlatPanel>
+            </div>
+        </div>
+
+        <footer class="account-form-actions">
+            <span>@(_dirty ? "Unsaved changes" : "Account is up to date")</span>
+            <div>
+                <MudButton ButtonType="ButtonType.Button"
+                           Variant="Variant.Outlined"
+                           Disabled="@(_saving || !_dirty)"
+                           OnClick="ResetForm">Cancel</MudButton>
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Outlined.Save"
+                           Disabled="@(_saving || !_dirty || !CanSave)">
+                    @(_saving ? "Saving..." : "Save changes")
+                </MudButton>
+            </div>
+        </footer>
+    </form>
+</FlatPage>
+
+@code {
+    private AccountDraft _saved = AccountDraft.Sample();
+    private AccountDraft _draft = AccountDraft.Sample();
+    private bool _dirty;
+    private bool _saving;
+    private bool _changePassword;
+    private string _newPassword = string.Empty;
+    private string _confirmPassword = string.Empty;
+    private static readonly IReadOnlyList<FlatMultiSelectOption<string>> _permissionGroupOptions = [
+        new("finance", "Finance") { Icon = Icons.Material.Outlined.MonetizationOn, Description = "Read-only and operational finance access.", Meta = "Read only and reports" },
+        new("it-ops", "IT Operations") { Initials = "IT", Description = "Device, monitoring, and infrastructure support roles.", Meta = "Monitoring and incident" },
+        new("production", "Production") { AvatarUrl = "/sample-profile.svg", Description = "Work orders, planning dashboards, and shop floor KPIs.", Meta = "Critical workloads" },
+        new("hr", "Human Resources") { Initials = "HR", Description = "Employee records and organization workflow visibility.", Meta = "Sensitive data" },
+        new("sales", "Sales") { Description = "Customer and order handling, lead access, and status updates.", Meta = "CRM integration ready" },
+        new("support", "Customer Support") { Description = "Ticket tracking and internal customer assistance modules.", Meta = "SLA and response tracking" }
+    ];
+
+    private string? AvatarImageUrl => _draft.UsePhoto ? _draft.PhotoUrl : null;
+    private bool PasswordMismatch => _changePassword
+        && !string.IsNullOrEmpty(_confirmPassword)
+        && !string.Equals(_newPassword, _confirmPassword, StringComparison.Ordinal);
+    private bool CanSave => !string.IsNullOrWhiteSpace(_draft.DisplayName)
+        && !string.IsNullOrWhiteSpace(_draft.Email)
+        && (!_changePassword
+            || (!string.IsNullOrWhiteSpace(_newPassword)
+                && string.Equals(_newPassword, _confirmPassword, StringComparison.Ordinal)));
+
+    private void MarkDirty() => _dirty = true;
+
+    private void TogglePasswordChange()
+    {
+        _changePassword = !_changePassword;
+        _newPassword = string.Empty;
+        _confirmPassword = string.Empty;
+        _dirty = true;
+    }
+
+    private void ResetForm()
+    {
+        _draft = _saved.Clone();
+        _changePassword = false;
+        _newPassword = string.Empty;
+        _confirmPassword = string.Empty;
+        _dirty = false;
+        Snackbar.Add("Account changes were discarded.", Severity.Info);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_saving || !_dirty || !CanSave)
+        {
+            return;
+        }
+
+        _saving = true;
+        try
+        {
+            await Task.Delay(450);
+            _saved = _draft.Clone();
+            _changePassword = false;
+            _newPassword = string.Empty;
+            _confirmPassword = string.Empty;
+            _dirty = false;
+            Snackbar.Add("User account updated.", Severity.Success);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private void OnPermissionGroupsChanged(IReadOnlyCollection<string> values)
+    {
+        _draft.PermissionGroups = values.ToList();
+        MarkDirty();
+    }
+
+
+    private sealed class AccountDraft
+    {
+        public string Username { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string Initials { get; set; } = string.Empty;
+        public string PhotoUrl { get; set; } = string.Empty;
+        public bool UsePhoto { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string JobTitle { get; set; } = string.Empty;
+        public string Department { get; set; } = string.Empty;
+        public string Language { get; set; } = string.Empty;
+        public string TimeZone { get; set; } = string.Empty;
+        public bool EmailNotifications { get; set; }
+        public List<string> PermissionGroups { get; set; } = [];
+
+        public AccountDraft Clone() => (AccountDraft)MemberwiseClone();
+
+        public static AccountDraft Sample() => new()
+        {
+            Username = "noviyanto.wibowo",
+            DisplayName = "Noviyanto Wibowo",
+            Initials = "NW",
+            PhotoUrl = "/sample-profile.svg",
+            UsePhoto = true,
+            Email = "noviyanto@example.com",
+            Phone = "+62 812 0000 2026",
+            JobTitle = "Application Owner",
+            Department = "Information Technology",
+            Language = "English",
+            TimeZone = "Asia/Jakarta",
+            EmailNotifications = true,
+            PermissionGroups = ["finance", "it-ops"]
+        };
+    }
+}

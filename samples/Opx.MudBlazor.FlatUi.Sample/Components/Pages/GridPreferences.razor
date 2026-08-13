@@ -1,0 +1,43 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/grid-preferences"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="grid-preferences-page no-mobile-fab">
+    <FlatPanel Title="Advanced Grid Preferences" Subtitle="Saved presentation state and virtualization contracts">
+        <div class="grid-preferences-sample">
+            <FlatGridPreferencesPanel Columns="Columns" Value="_preferences" ValueChanged="PreferencesChanged" SaveRequested="SaveView" ResetRequested="Reset" GridKey="orders" SchemaVersion="2" />
+            <FlatDataGrid TItem="PreferenceOrder" State="_gridState" Columns="Columns" Items="Orders" Preferences="_preferences" CellTemplate="Cell">
+                <EmptyContent><span>No orders.</span></EmptyContent>
+            </FlatDataGrid>
+            <MudText Typo="Typo.caption" role="status">@_status</MudText>
+        </div>
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    private static readonly IReadOnlyList<GridColumnDefinition> Columns = [new("order", "Order"), new("customer", "Customer"), new("status", "Status"), new("total", "Total", GridColumnFilterType.Number), new("date", "Date", GridColumnFilterType.Date)];
+    private FlatGridPreferenceState _preferences = FlatGridPreferenceResolver.Normalize(null, "orders", 2, Columns.Select(value => value.Key));
+    private readonly GridViewState _gridState = new();
+    private static readonly IReadOnlyList<PreferenceOrder> Orders =
+    [
+        new("SO-1042", "Northwind", "Released", "$2,480", "2026-08-13"),
+        new("SO-1043", "Contoso", "Review", "$1,250", "2026-08-14")
+    ];
+    private string _status = "Changes are kept in this page only. A real host supplies IFlatGridPreferenceProvider per user.";
+    private void PreferencesChanged(FlatGridPreferenceState state) => _preferences = state;
+    private void SaveView(FlatGridPreferenceState state) => _status = $"Saved view '{state.ViewName}' through the sample callback.";
+    private void Reset() => _status = "Application defaults restored.";
+    private RenderFragment<FlatGridCellContext<PreferenceOrder>> Cell => context => builder =>
+    {
+        var value = context.Column.Key switch
+        {
+            "order" => context.Item.Order,
+            "customer" => context.Item.Customer,
+            "status" => context.Item.Status,
+            "total" => context.Item.Total,
+            "date" => context.Item.Date,
+            _ => ""
+        };
+        builder.AddContent(0, value);
+    };
+    private sealed record PreferenceOrder(string Order, string Customer, string Status, string Total, string Date);
+}

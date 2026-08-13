@@ -1,0 +1,41 @@
+@page "/blog"
+@layout WebsiteLayout
+
+<PageTitle>Blog - Opx MudBlazor Flat UI</PageTitle>
+
+<section class="website-page-title">
+    <span class="website-eyebrow">Content website</span>
+    <h1>Blog and article listing</h1>
+    <p>Use the public website shell for editorial content, company news, product stories, or documentation-style pages.</p>
+</section>
+
+<section class="blog-grid">
+    @foreach (var article in Articles)
+    {
+        <article class="blog-card">
+            <div class="blog-card-media">
+                <MudIcon Icon="@article.Icon" />
+            </div>
+            <div class="blog-card-body">
+                <span>@article.Category</span>
+                <h2>@article.Title</h2>
+                <p>@article.Summary</p>
+                <footer>
+                    <small>@article.Date</small>
+                    <a href="#">Read article</a>
+                </footer>
+            </div>
+        </article>
+    }
+</section>
+
+@code {
+    private static readonly IReadOnlyList<ArticlePreview> Articles =
+    [
+        new("Design", "Designing one template for admin and public websites", "A practical pattern for keeping layout contracts shared while letting each surface feel different.", "Aug 2026", Icons.Material.Outlined.AutoAwesome),
+        new("Commerce", "Catalog cards that work beyond ecommerce", "The same card structure can represent products, services, portfolio items, or featured content.", "Aug 2026", Icons.Material.Outlined.Storefront),
+        new("Frontend", "When to use a public website shell", "Use a website shell for landing pages, blogs, and storefronts so users do not see an admin dashboard frame.", "Aug 2026", Icons.Material.Outlined.Language)
+    ];
+
+    private sealed record ArticlePreview(string Category, string Title, string Summary, string Date, string Icon);
+}

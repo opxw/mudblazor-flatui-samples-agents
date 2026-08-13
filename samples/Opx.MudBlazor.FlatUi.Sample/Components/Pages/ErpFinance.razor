@@ -1,0 +1,51 @@
+@page "/erp/finance"
+@page "/erp/finance/general-ledger"
+@page "/erp/finance/payables"
+@page "/erp/finance/receivables"
+@inject ErpSampleCatalog Erp
+@inject NavigationManager Navigation
+
+@if (CurrentView == "general-ledger")
+{
+    <FlatPage Kind="FlatPageKind.Module" PageCssClass="erp-page erp-list-page" RefreshEnabled="true" OnRefresh="() => StateHasChanged()" ExportVisible="true" PrintVisible="true" PullToRefreshEnabled="true">
+        <ToolbarContent><MudTextField @bind-Value="_search" Immediate="true" Placeholder="Search journal or account..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" Margin="Margin.Dense" Variant="Variant.Outlined" /></ToolbarContent>
+        <ChildContent>
+            <div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Journal</th><th>Date</th><th>Account</th><th>Reference</th><th>Debit</th><th>Credit</th><th>Status</th></tr></thead><tbody>@foreach (var entry in FilteredLedger){<tr><td><strong>@entry.Number</strong></td><td>@entry.Date</td><td><strong>@entry.Account</strong><small>@entry.AccountName</small></td><td>@entry.Reference</td><td class="erp-money">@Money(entry.Debit)</td><td class="erp-money">@Money(entry.Credit)</td><td><span class="@StatusClass(entry.Status)">@entry.Status</span></td></tr>}</tbody></table></div>
+            <div class="erp-mobile-list">@foreach (var entry in FilteredLedger){<article class="mobile-card erp-mobile-card"><header><div><strong>@entry.Number</strong><small>@entry.Account · @entry.AccountName</small></div><span class="@StatusClass(entry.Status)">@entry.Status</span></header><div class="erp-card-reference">@entry.Reference</div><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Date" Value="@entry.Date" /><FlatInfoItem Label="Debit" Value="@Money(entry.Debit)" /><FlatInfoItem Label="Credit" Value="@Money(entry.Credit)" /></div></article>}</div>
+        </ChildContent>
+    </FlatPage>
+}
+else if (CurrentView is "payables" or "receivables")
+{
+    var items = CurrentView == "payables" ? Erp.Payables : Erp.Receivables;
+    var isPayable = CurrentView == "payables";
+    <FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+        <div class="stat-grid erp-stat-grid"><FlatStatCard Label="Open balance" Value="@(isPayable ? "IDR 176.05M" : "IDR 434.45M")" Icon="@(isPayable ? Icons.Material.Outlined.Payments : Icons.Material.Outlined.RequestQuote)" Note="@($"{items.Count} open items")" Tone="blue" /><FlatStatCard Label="Overdue" Value="@(isPayable ? "IDR 18.40M" : "IDR 44.20M")" Icon="@Icons.Material.Outlined.WarningAmber" Note="1 account" Tone="amber" /><FlatStatCard Label="Due this week" Value="@(isPayable ? "IDR 94.65M" : "IDR 223.75M")" Icon="@Icons.Material.Outlined.Event" Note="Requires cash planning" Tone="sky" /><FlatStatCard Label="Average days" Value="@(isPayable ? "24.6" : "31.2")" Icon="@Icons.Material.Outlined.Schedule" Note="Rolling 90 days" Tone="green" /></div>
+        <FlatPanel Title="@(isPayable ? "Supplier open items" : "Customer open items")" Subtitle="Aging and settlement status" CssClass="flat-panel erp-section-panel">
+            <div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Document</th><th>@(isPayable ? "Supplier" : "Customer")</th><th>Due date</th><th>Amount</th><th>Status</th></tr></thead><tbody>@foreach (var item in items){<tr><td><strong>@item.Number</strong></td><td>@item.Partner</td><td>@item.DueDate</td><td class="erp-money">@Money(item.Amount)</td><td><span class="@StatusClass(item.Status)">@item.Status</span></td></tr>}</tbody></table></div>
+            <div class="erp-mobile-list embedded">@foreach (var item in items){<article class="mobile-card erp-mobile-card"><header><div><strong>@item.Partner</strong><small>@item.Number</small></div><span class="@StatusClass(item.Status)">@item.Status</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Due date" Value="@item.DueDate" /><FlatInfoItem Label="Amount" Value="@Money(item.Amount)" /></div></article>}</div>
+        </FlatPanel>
+    </FlatPage>
+}
+else
+{
+    <FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+        <div class="stat-grid erp-stat-grid"><FlatStatCard Label="Revenue MTD" Value="IDR 1.28B" Icon="@Icons.Material.Outlined.TrendingUp" Note="108.4% of plan" Tone="green" /><FlatStatCard Label="Gross margin" Value="30.8%" Icon="@Icons.Material.Outlined.ShowChart" Note="+1.2 pt versus plan" Tone="blue" /><FlatStatCard Label="Cash position" Value="IDR 612M" Icon="@Icons.Material.Outlined.AccountBalanceWallet" Note="Across 4 banks" Tone="sky" /><FlatStatCard Label="Overdue AR" Value="IDR 44.2M" Icon="@Icons.Material.Outlined.WarningAmber" Note="10.2% of open AR" Tone="amber" /></div>
+        <div class="sample-two-col erp-dashboard-grid">
+            <FlatPanel Title="Profit and loss trend" Subtitle="Monthly revenue and gross profit"><div class="sample-chart"><MudChart T="double" ChartType="ChartType.Line" ChartSeries="@ProfitSeries" ChartLabels="@MonthLabels" Width="100%" Height="220px" ChartOptions="@ChartOptions" /></div></FlatPanel>
+            <FlatPanel Title="Period close" Subtitle="August closing checklist"><div class="erp-close-list"><article class="done"><MudIcon Icon="@Icons.Material.Outlined.CheckCircle" /><span><strong>Bank reconciliation</strong><small>4 of 4 accounts</small></span><b>Done</b></article><article class="done"><MudIcon Icon="@Icons.Material.Outlined.CheckCircle" /><span><strong>Inventory valuation</strong><small>All warehouses posted</small></span><b>Done</b></article><article><MudIcon Icon="@Icons.Material.Outlined.Schedule" /><span><strong>Production allocation</strong><small>2 journals in draft</small></span><b>Pending</b></article><article><MudIcon Icon="@Icons.Material.Outlined.RadioButtonUnchecked" /><span><strong>Management reporting</strong><small>Starts after ledger lock</small></span><b>Not started</b></article></div></FlatPanel>
+        </div>
+        <FlatPanel Title="Recent journal activity" Subtitle="Latest general-ledger postings" CssClass="flat-panel erp-section-panel"><div class="erp-compact-list">@foreach (var entry in Erp.LedgerEntries.Take(4)){<article><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.ReceiptLong" /></span><div><strong>@entry.Number · @entry.Reference</strong><small>@entry.Account · @entry.AccountName</small></div><span class="@StatusClass(entry.Status)">@entry.Status</span></article>}</div></FlatPanel>
+    </FlatPage>
+}
+
+@code {
+    private string _search = "";
+    private string CurrentView => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Split('/').LastOrDefault() switch { "general-ledger" => "general-ledger", "payables" => "payables", "receivables" => "receivables", _ => "dashboard" };
+    private IEnumerable<ErpLedgerEntry> FilteredLedger => string.IsNullOrWhiteSpace(_search) ? Erp.LedgerEntries : Erp.LedgerEntries.Where(x => $"{x.Number} {x.Account} {x.AccountName} {x.Reference} {x.Status}".Contains(_search, StringComparison.OrdinalIgnoreCase));
+    private static string Money(decimal value) => value == 0 ? "-" : $"IDR {value / 1_000_000m:N2}M";
+    private readonly string[] MonthLabels = ["Mar", "Apr", "May", "Jun", "Jul", "Aug"];
+    private readonly List<ChartSeries<double>> ProfitSeries = [new() { Name = "Revenue", Data = new ChartData<double>([940, 1020, 1085, 1110, 1195, 1280]) }, new() { Name = "Gross profit", Data = new ChartData<double>([276, 298, 321, 334, 361, 394]) }];
+    private readonly ChartOptions ChartOptions = new() { ChartPalette = ["#0078d4", "#10b981"] };
+    private static string StatusClass(string status) => status switch { "Posted" or "Current" => "status-chip online", "Draft" or "Due soon" or "Pending approval" => "status-chip pending", "Overdue" => "status-chip offline", _ => "status-chip neutral" };
+}

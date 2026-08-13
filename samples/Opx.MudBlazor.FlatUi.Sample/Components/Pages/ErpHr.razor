@@ -1,0 +1,137 @@
+@page "/erp/hr"
+@page "/erp/hr/employees"
+@page "/erp/hr/attendance"
+@inject ErpSampleCatalog Erp
+@inject NavigationManager Navigation
+
+@if (CurrentView == "employees")
+{
+    <FlatPage Kind="FlatPageKind.Module"
+              PageCssClass="erp-page erp-list-page"
+              RefreshEnabled="true"
+              OnRefresh="() => StateHasChanged()"
+              ExportVisible="true"
+              PullToRefreshEnabled="true">
+        <ToolbarContent>
+            <MudTextField @bind-Value="_employeeSearch"
+                          Immediate="true"
+                          Placeholder="Search employee..."
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Search"
+                          Class="module-search"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Outlined" />
+        </ToolbarContent>
+        <ChildContent>
+            <div class="table-scroll erp-desktop-table">
+                <table class="monitor-table erp-table">
+                    <thead><tr><th>Employee</th><th>Department</th><th>Role</th><th>Location</th><th>Employment</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var employee in FilteredEmployees)
+                        {
+                            <tr>
+                                <td><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Person" /></span><div><strong>@employee.Name</strong><small>@employee.Code</small></div></div></td>
+                                <td>@employee.Department</td><td>@employee.Role</td><td>@employee.Location</td><td>@employee.Employment</td>
+                                <td><span class="@StatusClass(employee.Status)">@employee.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="erp-mobile-list">
+                @foreach (var employee in FilteredEmployees)
+                {
+                    <article class="mobile-card erp-mobile-card">
+                        <header><div class="primary-cell"><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Person" /></span><div><strong>@employee.Name</strong><small>@employee.Code · @employee.Role</small></div></div><span class="@StatusClass(employee.Status)">@employee.Status</span></header>
+                        <div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Department" Value="@employee.Department" /><FlatInfoItem Label="Location" Value="@employee.Location" /><FlatInfoItem Label="Employment" Value="@employee.Employment" /></div>
+                    </article>
+                }
+            </div>
+        </ChildContent>
+    </FlatPage>
+}
+else if (CurrentView == "attendance")
+{
+    <FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+        <div class="stat-grid erp-stat-grid">
+            <FlatStatCard Label="Present" Value="401" Icon="@Icons.Material.Outlined.HowToReg" Note="94.8% workforce" Tone="green" />
+            <FlatStatCard Label="Late arrivals" Value="9" Icon="@Icons.Material.Outlined.Schedule" Note="2.1% workforce" Tone="amber" />
+            <FlatStatCard Label="On leave" Value="12" Icon="@Icons.Material.Outlined.EventAvailable" Note="All approved" Tone="sky" />
+            <FlatStatCard Label="Open requests" Value="7" Icon="@Icons.Material.Outlined.PendingActions" Note="Needs review" Tone="blue" />
+        </div>
+        <FlatPanel Title="Today's attendance" Subtitle="Current shift snapshot" CssClass="flat-panel erp-section-panel">
+            <div class="table-scroll erp-desktop-table">
+                <table class="monitor-table erp-table">
+                    <thead><tr><th>Employee</th><th>Department</th><th>Check in</th><th>Check out</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var record in Erp.Attendance)
+                        {
+                            <tr><td><strong>@record.Name</strong><small>@record.Code</small></td><td>@record.Department</td><td>@record.CheckIn</td><td>@record.CheckOut</td><td><span class="@StatusClass(record.Status)">@record.Status</span></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="erp-mobile-list embedded">
+                @foreach (var record in Erp.Attendance)
+                {
+                    <article class="mobile-card erp-mobile-card"><header><div><strong>@record.Name</strong><small>@record.Code · @record.Department</small></div><span class="@StatusClass(record.Status)">@record.Status</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Check in" Value="@record.CheckIn" /><FlatInfoItem Label="Check out" Value="@record.CheckOut" /></div></article>
+                }
+            </div>
+        </FlatPanel>
+    </FlatPage>
+}
+else
+{
+    <FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+        <div class="stat-grid erp-stat-grid">
+            <FlatStatCard Label="Headcount" Value="426" Icon="@Icons.Material.Outlined.Groups" Note="+8 this month" Tone="blue" />
+            <FlatStatCard Label="Attendance" Value="94.8%" Icon="@Icons.Material.Outlined.HowToReg" Note="Today" Tone="green" />
+            <FlatStatCard Label="Open positions" Value="18" Icon="@Icons.Material.Outlined.Work" Note="6 critical roles" Tone="amber" />
+            <FlatStatCard Label="Turnover YTD" Value="5.2%" Icon="@Icons.Material.Outlined.SyncAlt" Note="Target below 7%" Tone="sky" />
+        </div>
+        <div class="sample-two-col erp-dashboard-grid">
+            <FlatPanel Title="Workforce by department" Subtitle="Active employee distribution">
+                <div class="sample-chart"><MudChart T="double" ChartType="ChartType.Donut" ChartSeries="@DepartmentSeries" ChartLabels="@DepartmentLabels" Width="100%" Height="220px" ChartOptions="@ChartOptions" /></div>
+            </FlatPanel>
+            <FlatPanel Title="People actions" Subtitle="Items for HR follow-up">
+                <div class="erp-workflow-list">
+                    <article><span class="erp-workflow-icon amber"><MudIcon Icon="@Icons.Material.Outlined.PersonAdd" /></span><div><strong>6 candidates awaiting interview</strong><small>Engineering and Finance</small></div><span>Today</span></article>
+                    <article><span class="erp-workflow-icon blue"><MudIcon Icon="@Icons.Material.Outlined.AssignmentInd" /></span><div><strong>12 contracts expire this month</strong><small>Review renewal recommendations</small></div><span>31 Aug</span></article>
+                    <article><span class="erp-workflow-icon green"><MudIcon Icon="@Icons.Material.Outlined.School" /></span><div><strong>Safety training completion</strong><small>Plant A · 96% completed</small></div><span>96%</span></article>
+                    <article><span class="erp-workflow-icon red"><MudIcon Icon="@Icons.Material.Outlined.WarningAmber" /></span><div><strong>Night shift coverage gap</strong><small>2 operators below minimum</small></div><span>High</span></article>
+                </div>
+            </FlatPanel>
+        </div>
+        <FlatPanel Title="Recent employees" Subtitle="Latest workforce changes" CssClass="flat-panel erp-section-panel">
+            <div class="erp-compact-list">
+                @foreach (var employee in Erp.Employees.Take(5))
+                {
+                    <article><span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Person" /></span><div><strong>@employee.Name</strong><small>@employee.Role · @employee.Department</small></div><span class="@StatusClass(employee.Status)">@employee.Status</span></article>
+                }
+            </div>
+        </FlatPanel>
+    </FlatPage>
+}
+
+@code {
+    private string _employeeSearch = "";
+    private string CurrentView => Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/').Split('/').LastOrDefault() switch
+    {
+        "employees" => "employees",
+        "attendance" => "attendance",
+        _ => "dashboard"
+    };
+    private IEnumerable<ErpEmployee> FilteredEmployees => string.IsNullOrWhiteSpace(_employeeSearch)
+        ? Erp.Employees
+        : Erp.Employees.Where(x => $"{x.Code} {x.Name} {x.Department} {x.Role} {x.Location}".Contains(_employeeSearch, StringComparison.OrdinalIgnoreCase));
+    private readonly string[] DepartmentLabels = ["Production", "Sales", "Finance", "Supply Chain", "HR", "Other"];
+    private readonly List<ChartSeries<double>> DepartmentSeries = [new() { Name = "Employees", Data = new ChartData<double>([168, 74, 52, 61, 28, 43]) }];
+    private readonly ChartOptions ChartOptions = new() { ChartPalette = ["#0078d4", "#10b981", "#f59e0b", "#60a5fa", "#8b5cf6", "#64748b"] };
+    private static string StatusClass(string status) => status switch
+    {
+        "Active" or "Present" => "status-chip online",
+        "Late" or "Probation" or "Business trip" => "status-chip pending",
+        "Leave" or "Approved leave" => "status-chip neutral",
+        _ => "status-chip pending"
+    };
+}

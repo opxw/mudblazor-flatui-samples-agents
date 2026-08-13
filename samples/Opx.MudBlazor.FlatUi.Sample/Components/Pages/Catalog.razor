@@ -1,0 +1,186 @@
+@page "/catalog"
+@implements IDisposable
+@inject SampleCatalog SampleData
+@inject FlatSessionCartService<ProductRecord> Cart
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="catalog-page"
+          PanelClass="flat-panel module-panel catalog-panel"
+          RefreshEnabled="true"
+          RefreshAriaLabel="Refresh catalog"
+          OnRefresh="() => StateHasChanged()"
+          ReadOnlySource="Sample products">
+    <ToolbarContent>
+        <MudTextField T="string"
+                      @bind-Value="_search"
+                      Placeholder="Search products..."
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search"
+                      Class="module-search catalog-search" />
+        <MudSelect T="string"
+                   @bind-Value="_category"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Class="catalog-category-filter"
+                   aria-label="Product category">
+            <MudSelectItem Value="@("All")">All categories</MudSelectItem>
+            @foreach (var category in Categories)
+            {
+                <MudSelectItem Value="@category">@category</MudSelectItem>
+            }
+        </MudSelect>
+        <div class="catalog-price-filter" role="group" aria-label="Price range filter">
+            <MudNumericField T="decimal?"
+                             @bind-Value="_minPrice"
+                             Placeholder="Min price"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Adornment="Adornment.Start"
+                             AdornmentText="$"
+                             Min="0"
+                             Class="catalog-price-input" />
+            <span aria-hidden="true">to</span>
+            <MudNumericField T="decimal?"
+                             @bind-Value="_maxPrice"
+                             Placeholder="Max price"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Adornment="Adornment.Start"
+                             AdornmentText="$"
+                             Min="0"
+                             Class="catalog-price-input" />
+            @if (HasPriceFilter)
+            {
+                <MudIconButton Icon="@Icons.Material.Outlined.Close"
+                               Class="grid-action-button"
+                               aria-label="Clear price range"
+                               title="Clear price range"
+                               OnClick="ClearPriceRange" />
+            }
+        </div>
+    </ToolbarContent>
+
+    <ChildContent>
+        <FlatCatalogGrid TItem="ProductRecord" Items="Rows" EmptyTitle="No products found" EmptyMessage="Try another keyword or category.">
+            <CardTemplate Context="product">
+                <FlatCatalogCard Title="@product.Name"
+                                 Subtitle="@product.Description"
+                                 Category="@product.Category"
+                                 Price="@product.Price"
+                                 PreviousPrice="@product.PreviousPrice"
+                                 Badge="@product.Badge"
+                                 PlaceholderIcon="@Icons.Material.Outlined.Inventory2"
+                                 PrimaryActionText="Add"
+                                 OnPrimaryAction="@(() => AddToCart(product))">
+                    <ChildContent>
+                        <div class="catalog-meta">
+                            <span><MudIcon Icon="@Icons.Material.Outlined.Star" Size="Size.Small" /> @product.Rating.ToString("0.0")</span>
+                            <span><MudIcon Icon="@StockIcon(product.Availability)" Size="Size.Small" /> @product.Availability</span>
+                        </div>
+                    </ChildContent>
+                    <FooterActions>
+                        <MudIconButton Icon="@Icons.Material.Outlined.FavoriteBorder"
+                                       Class="grid-action-button"
+                                       aria-label="@($"Add {product.Name} to wishlist")"
+                                       title="Wishlist" />
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Outlined.AddShoppingCart"
+                                   OnClick="@(() => AddToCart(product))">
+                            @CartButtonText(product)
+                        </MudButton>
+                    </FooterActions>
+                </FlatCatalogCard>
+            </CardTemplate>
+        </FlatCatalogGrid>
+
+        <div class="catalog-summary">
+            <span>@Rows.Count products</span>
+            <span>@PriceRangeText</span>
+            <span>@Cart.TotalQuantity items in cart</span>
+            @if (!Cart.IsEmpty)
+            {
+                <button type="button" class="catalog-clear-cart" @onclick="Cart.Clear">Clear cart</button>
+            }
+        </div>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private string _search = "";
+    private string _category = "All";
+    private decimal? _minPrice;
+    private decimal? _maxPrice;
+
+    private bool HasPriceFilter => _minPrice.HasValue || _maxPrice.HasValue;
+
+    private string PriceRangeText => HasPriceFilter
+        ? $"Price {(_minPrice?.ToString("0.##") ?? "0")} - {(_maxPrice?.ToString("0.##") ?? "Any")}"
+        : "All prices";
+
+    private IReadOnlyList<string> Categories => SampleData.Products
+        .Select(product => product.Category)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(category => category)
+        .ToArray();
+
+    private IReadOnlyList<ProductRecord> Rows => SampleData.Products
+        .Where(product => _category == "All" || product.Category == _category)
+        .Where(product => PriceInRange(product))
+        .Where(product => string.IsNullOrWhiteSpace(_search)
+            || product.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || product.Description.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || product.Category.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .ToArray();
+
+    protected override void OnInitialized() => Cart.Changed += HandleCartChanged;
+
+    private void AddToCart(ProductRecord product) => Cart.Add(product.Code, product);
+
+    private string CartButtonText(ProductRecord product)
+    {
+        var quantity = Cart.QuantityFor(product.Code);
+        return quantity > 0 ? $"Add ({quantity})" : "Add";
+    }
+
+    private bool PriceInRange(ProductRecord product)
+    {
+        var price = ParsePrice(product.Price);
+        var minimum = _minPrice ?? 0m;
+        var maximum = _maxPrice ?? decimal.MaxValue;
+
+        if (minimum > maximum)
+        {
+            (minimum, maximum) = (maximum, minimum);
+        }
+
+        return price >= minimum && price <= maximum;
+    }
+
+    private void ClearPriceRange()
+    {
+        _minPrice = null;
+        _maxPrice = null;
+    }
+
+    private static decimal ParsePrice(string price)
+    {
+        var normalized = new string(price.Where(character => char.IsDigit(character) || character is '.' or ',').ToArray())
+            .Replace(',', '.');
+        return decimal.TryParse(normalized, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out var value)
+            ? value
+            : 0m;
+    }
+
+    private static string StockIcon(string availability) =>
+        availability.Contains("Low", StringComparison.OrdinalIgnoreCase)
+            ? Icons.Material.Outlined.Inventory
+            : Icons.Material.Outlined.CheckCircle;
+
+    private void HandleCartChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Cart.Changed -= HandleCartChanged;
+}

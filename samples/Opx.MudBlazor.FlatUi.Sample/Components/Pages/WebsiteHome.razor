@@ -1,0 +1,67 @@
+@page "/website"
+@layout WebsiteLayout
+@inject SampleCatalog SampleData
+
+<PageTitle>Website - Opx MudBlazor Flat UI</PageTitle>
+
+<section class="website-hero">
+    <div class="website-hero-copy">
+        <span class="website-eyebrow">Frontend website starter</span>
+        <h1>Build public websites with the same Flat UI foundation.</h1>
+        <p>Use the template for landing pages, storefronts, blogs, product showcases, and campaign pages without inheriting the admin dashboard shell.</p>
+        <div class="website-hero-actions">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/catalog" StartIcon="@Icons.Material.Outlined.ShoppingBag">View catalog</MudButton>
+            <MudButton Variant="Variant.Outlined" Href="/blog" StartIcon="@Icons.Material.Outlined.Article">Read blog</MudButton>
+        </div>
+    </div>
+    <div class="website-hero-card">
+        <span>Live preview</span>
+        <strong>Landing + commerce + content</strong>
+        <div class="website-metric-row">
+            <article><b>6</b><small>Products</small></article>
+            <article><b>3</b><small>Articles</small></article>
+            <article><b>100%</b><small>Responsive</small></article>
+        </div>
+    </div>
+</section>
+
+<section class="website-section">
+    <div class="website-section-header">
+        <span class="website-eyebrow">Featured products</span>
+        <a href="/catalog">Open catalog</a>
+    </div>
+    <FlatCatalogGrid TItem="ProductRecord" Items="FeaturedProducts" Dense="true" Class="website-catalog-strip">
+        <CardTemplate Context="product">
+            <FlatCatalogCard Title="@product.Name"
+                             Subtitle="@product.Description"
+                             Category="@product.Category"
+                             Price="@product.Price"
+                             PreviousPrice="@product.PreviousPrice"
+                             Badge="@product.Badge"
+                             PrimaryActionText="Add"
+                             OnPrimaryAction="@(() => { })" />
+        </CardTemplate>
+    </FlatCatalogGrid>
+</section>
+
+<section class="website-section website-feature-grid">
+    <article>
+        <MudIcon Icon="@Icons.Material.Outlined.Language" />
+        <strong>Public website layout</strong>
+        <p>Separate frontend shell with website navigation, hero sections, content blocks, and footer.</p>
+    </article>
+    <article>
+        <MudIcon Icon="@Icons.Material.Outlined.Storefront" />
+        <strong>Storefront ready</strong>
+        <p>Reusable catalog cards work for products, content cards, featured services, or portfolios.</p>
+    </article>
+    <article>
+        <MudIcon Icon="@Icons.Material.Outlined.PhoneIphone" />
+        <strong>Mobile-first</strong>
+        <p>Compact spacing, safe gutters, and responsive cards stay consistent with the Flat UI rule set.</p>
+    </article>
+</section>
+
+@code {
+    private IReadOnlyList<ProductRecord> FeaturedProducts => SampleData.Products.Take(3).ToArray();
+}

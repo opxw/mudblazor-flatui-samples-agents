@@ -1,0 +1,320 @@
+@page "/kanban"
+@inject ISnackbar Snackbar
+
+<PageTitle>Kanban - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="kanban-page"
+          PanelClass="flat-panel kanban-panel"
+          ShowMobilePrimaryAction="true">
+    <ToolbarContent>
+        <div class="kanban-toolbar-filters">
+            <MudTextField T="string"
+                          Value="@_search"
+                          ValueChanged="SetSearch"
+                          Immediate="true"
+                          Placeholder="Search cards..."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Search"
+                          Class="module-search" />
+            <MudSelect T="string" @bind-Value="_assigneeFilter" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@AllFilter">All</MudSelectItem>
+                @foreach (var assignee in Assignees)
+                {
+                    <MudSelectItem Value="@assignee">@assignee</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSelect T="string" @bind-Value="_priorityFilter" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@AllFilter">All</MudSelectItem>
+                @foreach (var priority in Priorities)
+                {
+                    <MudSelectItem Value="@priority">@priority</MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+    </ToolbarContent>
+    <ToolbarActions>
+        <MudIconButton Icon="@( _kanbanCardsHorizontal ? Icons.Material.Outlined.ViewModule : Icons.Material.Outlined.ViewStream )"
+                       Color="Color.Primary"
+                       Class="grid-action-button"
+                       OnClick="ToggleKanbanCardLayout"
+                       aria-label="Toggle kanban card layout"
+                       title="Toggle card layout" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Add"
+                       Class="grid-action-button kanban-add-desktop"
+                       OnClick="OpenCreate"
+                       aria-label="Add task"
+                       title="Add task" />
+    </ToolbarActions>
+    <MobilePrimaryAction>
+        <FlatFab Icon="@Icons.Material.Outlined.Add" Label="Add task" AriaLabel="Add task" OnClick="OpenCreate" />
+    </MobilePrimaryAction>
+    <ChildContent>
+        <FlatKanbanBoard TItem="KanbanTask"
+                          Columns="@Columns"
+                          Items="@_tasks"
+                          ColumnKey="@(task => task.ColumnKey)"
+                          ItemFilter="MatchesFilter"
+                          GetItemLabel="@(task => task.Title)"
+                          OnMove="MoveTask"
+                          OnLimitReached="ShowLimitWarning"
+                          AriaLabel="Sample delivery Kanban board">
+            <ItemTemplate Context="task">
+                <FlatKanbanCard Reference="@task.Reference"
+                                 Layout="@(_kanbanCardsHorizontal ? FlatKanbanCardLayout.Horizontal : FlatKanbanCardLayout.Vertical)"
+                                 Title="@task.Title"
+                                 Description="@task.Description"
+                                 Priority="@task.Priority"
+                                 PriorityTone="@task.Priority.ToLowerInvariant()"
+                                 Tags="@task.Tags"
+                                 Assignee="@task.Assignee"
+                                 AssigneeInitials="@Initials(task.Assignee)"
+                                 DueText="@task.DueText"
+                                 DueTone="@task.DueTone"
+                                 OnClick="@(() => OpenEdit(task))" />
+            </ItemTemplate>
+        </FlatKanbanBoard>
+    </ChildContent>
+</FlatPage>
+
+@if (_editorOpen)
+{
+    <CrudEditorShell Title="@(_editingTask is null ? "Add task" : "Edit task")"
+                     Mode="@(_editingTask is null ? "Create" : "Update")"
+                     SubmitText="@(_editingTask is null ? "Create task" : "Save task")"
+                     CanSubmit="@CanSave"
+                     IsDirty="@IsDirty"
+                     CloseOnOutsideClick="false"
+                     OnClose="CloseEditor"
+                     OnSubmit="SaveTask"
+                     ConfirmClose="ConfirmClose">
+        <MudTextField T="string" Label="Title" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.Title" Immediate="true" />
+        <MudTextField T="string" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" @bind-Value="_draft.Description" Immediate="true" />
+        <MudSelect T="string" Label="Column" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.ColumnKey">
+            @foreach (var column in Columns)
+            {
+                <MudSelectItem Value="@column.Key">@column.Title</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="string" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.Priority">
+            @foreach (var priority in Priorities)
+            {
+                <MudSelectItem Value="@priority">@priority</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="string" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.Assignee">
+            @foreach (var assignee in Assignees)
+            {
+                <MudSelectItem Value="@assignee">@assignee</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" Label="Due" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.DueText" Immediate="true" HelperText="Example: Aug 12 or Overdue" />
+        <MudTextField T="string" Label="Tags" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.TagsText" Immediate="true" HelperText="Comma-separated labels" />
+    </CrudEditorShell>
+}
+
+@code {
+    private const string AllFilter = "All";
+
+    private static readonly FlatKanbanColumn[] Columns =
+    [
+        new("backlog", "Backlog", "slate", Icon: Icons.Material.Outlined.Inventory2),
+        new("ready", "Ready", "blue", 4, Icons.Material.Outlined.PlaylistAddCheck),
+        new("progress", "In progress", "amber", 3, Icons.Material.Outlined.Autorenew),
+        new("done", "Done", "green", Icon: Icons.Material.Outlined.TaskAlt)
+    ];
+
+    private static readonly string[] Assignees = ["Alya", "Bayu", "Dimas", "Maya", "Rina"];
+    private static readonly string[] Priorities = ["High", "Medium", "Low"];
+
+    private readonly List<KanbanTask> _tasks =
+    [
+        new("KB-101", "Define checkout acceptance criteria", "Confirm payment, shipping, and recovery scenarios.", "backlog", "High", "Rina", "Aug 12", "warning", ["Commerce", "Scope"]),
+        new("KB-102", "Prepare inventory API contract", "Document paging, stock state, and failure envelope.", "backlog", "Medium", "Dimas", "Aug 14", "normal", ["API", "Inventory"]),
+        new("KB-103", "Review mobile empty states", "Check narrow screens and safe-area spacing.", "backlog", "Low", "Maya", "Aug 15", "normal", ["UX", "Mobile"]),
+        new("KB-104", "Create order summary component", "Reusable summary with tax, discount, and totals.", "ready", "High", "Alya", "Aug 10", "warning", ["UI", "Orders"]),
+        new("KB-105", "Map ERP approval roles", "Align approval steps with organization access policy.", "ready", "Medium", "Bayu", "Aug 13", "normal", ["ERP", "Security"]),
+        new("KB-106", "Implement catalog price filter", "Range filter with query-state preservation.", "progress", "High", "Maya", "Today", "warning", ["Catalog", "Filter"]),
+        new("KB-107", "Validate dark notification menu", "Verify portal surfaces and unread state colors.", "progress", "Medium", "Rina", "Overdue", "overdue", ["Theme", "QA"]),
+        new("KB-108", "Add server paging sample", "Connect board documentation to API loading guidance.", "progress", "Low", "Dimas", "Aug 11", "normal", ["Docs", "API"]),
+        new("KB-109", "Responsive ERP cards", "Validated two-column tablet and one-column mobile cards.", "done", "Medium", "Bayu", "Completed", "normal", ["ERP", "Responsive"]),
+        new("KB-110", "Account profile template", "Profile photo, initials, locale, and password settings.", "done", "Low", "Alya", "Completed", "normal", ["Account", "UI"])
+    ];
+
+    private string _search = "";
+    private string _assigneeFilter = AllFilter;
+    private string _priorityFilter = AllFilter;
+    private bool _kanbanCardsHorizontal;
+    private bool _editorOpen;
+    private KanbanTask? _editingTask;
+    private TaskDraft _draft = new();
+
+    private bool CanSave => !string.IsNullOrWhiteSpace(_draft.Title)
+                            && !string.IsNullOrWhiteSpace(_draft.Assignee)
+                            && Columns.Any(column => column.Key == _draft.ColumnKey);
+    private bool IsDirty => _editorOpen && (_editingTask is null
+        ? !string.IsNullOrWhiteSpace(_draft.Title) || !string.IsNullOrWhiteSpace(_draft.Description)
+        : !_draft.EqualsTask(_editingTask));
+
+    private void SetSearch(string value) => _search = value ?? "";
+
+    private bool MatchesFilter(KanbanTask task)
+    {
+        var matchesSearch = string.IsNullOrWhiteSpace(_search)
+                            || task.Reference.Contains(_search, StringComparison.OrdinalIgnoreCase)
+                            || task.Title.Contains(_search, StringComparison.OrdinalIgnoreCase)
+                            || task.Description.Contains(_search, StringComparison.OrdinalIgnoreCase)
+                            || task.Tags.Any(tag => tag.Contains(_search, StringComparison.OrdinalIgnoreCase));
+        return matchesSearch
+               && (_assigneeFilter == AllFilter || task.Assignee == _assigneeFilter)
+               && (_priorityFilter == AllFilter || task.Priority == _priorityFilter);
+    }
+
+    private void OpenCreate()
+    {
+        _editingTask = null;
+        _draft = new TaskDraft
+        {
+            ColumnKey = Columns[0].Key,
+            Priority = Priorities[1],
+            Assignee = Assignees[0]
+        };
+        _editorOpen = true;
+    }
+
+    private void OpenEdit(KanbanTask task)
+    {
+        _editingTask = task;
+        _draft = TaskDraft.FromTask(task);
+        _editorOpen = true;
+    }
+
+    private void ToggleKanbanCardLayout()
+    {
+        _kanbanCardsHorizontal = !_kanbanCardsHorizontal;
+    }
+
+    private void CloseEditor()
+    {
+        _editorOpen = false;
+        _editingTask = null;
+    }
+
+    private void SaveTask()
+    {
+        if (!CanSave)
+        {
+            return;
+        }
+
+        if (_editingTask is null)
+        {
+            _tasks.Add(_draft.ToTask($"KB-{111 + _tasks.Count - 10:000}"));
+            Snackbar.Add("Task created.", Severity.Success);
+        }
+        else
+        {
+            _draft.ApplyTo(_editingTask);
+            Snackbar.Add("Task updated.", Severity.Success);
+        }
+
+        CloseEditor();
+    }
+
+    private Task<bool> ConfirmClose() => Task.FromResult(true);
+
+    private void MoveTask(FlatKanbanMoveEventArgs<KanbanTask> move)
+    {
+        move.Item.ColumnKey = move.TargetColumnKey;
+        Snackbar.Add($"{move.Item.Reference} moved to {Columns.First(column => column.Key == move.TargetColumnKey).Title}.", Severity.Info);
+    }
+
+    private void ShowLimitWarning(FlatKanbanColumn column) =>
+        Snackbar.Add($"{column.Title} reached its WIP limit.", Severity.Warning);
+
+    private static string Initials(string name) => string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(value => char.ToUpperInvariant(value[0])));
+
+    private sealed class KanbanTask(
+        string reference,
+        string title,
+        string description,
+        string columnKey,
+        string priority,
+        string assignee,
+        string dueText,
+        string dueTone,
+        IReadOnlyList<string> tags)
+    {
+        public string Reference { get; } = reference;
+        public string Title { get; set; } = title;
+        public string Description { get; set; } = description;
+        public string ColumnKey { get; set; } = columnKey;
+        public string Priority { get; set; } = priority;
+        public string Assignee { get; set; } = assignee;
+        public string DueText { get; set; } = dueText;
+        public string DueTone { get; set; } = dueTone;
+        public IReadOnlyList<string> Tags { get; set; } = tags;
+    }
+
+    private sealed class TaskDraft
+    {
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string ColumnKey { get; set; } = "backlog";
+        public string Priority { get; set; } = "Medium";
+        public string Assignee { get; set; } = "Alya";
+        public string DueText { get; set; } = "";
+        public string TagsText { get; set; } = "";
+
+        public static TaskDraft FromTask(KanbanTask task) => new()
+        {
+            Title = task.Title,
+            Description = task.Description,
+            ColumnKey = task.ColumnKey,
+            Priority = task.Priority,
+            Assignee = task.Assignee,
+            DueText = task.DueText,
+            TagsText = string.Join(", ", task.Tags)
+        };
+
+        public bool EqualsTask(KanbanTask task) =>
+            Title == task.Title
+            && Description == task.Description
+            && ColumnKey == task.ColumnKey
+            && Priority == task.Priority
+            && Assignee == task.Assignee
+            && DueText == task.DueText
+            && TagsText == string.Join(", ", task.Tags);
+
+        public KanbanTask ToTask(string reference) => new(
+            reference,
+            Title.Trim(),
+            Description.Trim(),
+            ColumnKey,
+            Priority,
+            Assignee,
+            DueText.Trim(),
+            DueText.Contains("overdue", StringComparison.OrdinalIgnoreCase) ? "overdue" : "normal",
+            ParseTags());
+
+        public void ApplyTo(KanbanTask task)
+        {
+            task.Title = Title.Trim();
+            task.Description = Description.Trim();
+            task.ColumnKey = ColumnKey;
+            task.Priority = Priority;
+            task.Assignee = Assignee;
+            task.DueText = DueText.Trim();
+            task.DueTone = DueText.Contains("overdue", StringComparison.OrdinalIgnoreCase) ? "overdue" : "normal";
+            task.Tags = ParseTags();
+        }
+
+        private IReadOnlyList<string> ParseTags() => TagsText
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(5)
+            .ToArray();
+    }
+}

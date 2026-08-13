@@ -1,0 +1,23 @@
+@page "/erp/sales"
+@page "/erp/sales/orders"
+@inject ErpSampleCatalog Erp
+
+<FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="erp-page">
+    <div class="stat-grid erp-stat-grid"><FlatStatCard Label="Sales MTD" Value="IDR 1.28B" Icon="@Icons.Material.Outlined.PointOfSale" Note="108.4% of target" Tone="green" /><FlatStatCard Label="Open orders" Value="38" Icon="@Icons.Material.Outlined.ReceiptLong" Note="IDR 684.2M" Tone="blue" /><FlatStatCard Label="Ready to ship" Value="12" Icon="@Icons.Material.Outlined.LocalShipping" Note="Today and tomorrow" Tone="sky" /><FlatStatCard Label="Credit holds" Value="3" Icon="@Icons.Material.Outlined.GppBad" Note="IDR 208.4M" Tone="amber" /></div>
+    <div class="sample-two-col erp-dashboard-grid">
+        <FlatPanel Title="Sales versus target" Subtitle="Six-month order intake"><div class="sample-chart"><MudChart T="double" ChartType="ChartType.Bar" ChartSeries="@SalesSeries" ChartLabels="@MonthLabels" Width="100%" Height="220px" ChartOptions="@ChartOptions" /></div></FlatPanel>
+        <FlatPanel Title="Fulfillment pipeline" Subtitle="Open sales-order value"><div class="erp-pipeline"><article><span>Confirmed</span><strong>IDR 186.4M</strong><i style="width:27%"></i></article><article><span>In production</span><strong>IDR 224.6M</strong><i style="width:33%"></i></article><article><span>Ready to ship</span><strong>IDR 168.2M</strong><i style="width:25%"></i></article><article class="warning"><span>Credit hold</span><strong>IDR 105.0M</strong><i style="width:15%"></i></article></div></FlatPanel>
+    </div>
+    <FlatPanel Title="Sales orders" Subtitle="Order-to-cash execution status" CssClass="flat-panel erp-section-panel">
+        <div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Sales order</th><th>Customer</th><th>Item</th><th>Amount</th><th>Delivery</th><th>Status</th></tr></thead><tbody>@foreach (var order in Erp.SalesOrders){<tr><td><strong>@order.Number</strong></td><td>@order.Customer</td><td>@order.Item</td><td class="erp-money">@Money(order.Amount)</td><td>@order.DeliveryDate</td><td><span class="@StatusClass(order.Status)">@order.Status</span></td></tr>}</tbody></table></div>
+        <div class="erp-mobile-list embedded">@foreach (var order in Erp.SalesOrders){<article class="mobile-card erp-mobile-card"><header><div><strong>@order.Customer</strong><small>@order.Number · @order.Item</small></div><span class="@StatusClass(order.Status)">@order.Status</span></header><div class="mobile-card-body erp-mobile-facts"><FlatInfoItem Label="Amount" Value="@Money(order.Amount)" /><FlatInfoItem Label="Delivery" Value="@order.DeliveryDate" /></div></article>}</div>
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    private static string Money(decimal value) => $"IDR {value / 1_000_000m:N2}M";
+    private readonly string[] MonthLabels = ["Mar", "Apr", "May", "Jun", "Jul", "Aug"];
+    private readonly List<ChartSeries<double>> SalesSeries = [new() { Name = "Target", Data = new ChartData<double>([900, 950, 980, 1050, 1120, 1180]) }, new() { Name = "Actual", Data = new ChartData<double>([940, 1020, 1085, 1110, 1195, 1280]) }];
+    private readonly ChartOptions ChartOptions = new() { ChartPalette = ["#94a3b8", "#0078d4"] };
+    private static string StatusClass(string status) => status switch { "Ready to ship" or "Confirmed" => "status-chip online", "In production" => "status-chip pending", "Credit hold" => "status-chip offline", _ => "status-chip neutral" };
+}

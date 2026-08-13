@@ -1,0 +1,146 @@
+@page "/crud-simple"
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="simple-crud-page"
+          PanelClass="flat-panel simple-crud-panel"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Add"
+          PrimaryActionIcon="@Icons.Material.Outlined.Add"
+          PrimaryActionAriaLabel="Add simple data"
+          OnPrimaryAction="Create">
+    <ChildContent>
+        <div class="simple-crud-list">
+            @foreach (var item in _items)
+            {
+                <article class="simple-crud-card">
+                    <span class="@StatusClass(item.Status)"><i></i>@item.Status</span>
+                    <div>
+                        <strong>@item.Name</strong>
+                        <small>@item.Code · @item.Category</small>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Edit"
+                                   Size="Size.Small"
+                                   OnClick="() => Edit(item)"
+                                   aria-label="@($"Edit {item.Name}")" />
+                </article>
+            }
+        </div>
+    </ChildContent>
+</FlatPage>
+
+@if (_editorOpen)
+{
+    <CrudEditorShell Title="@_editorTitle"
+                     Mode="@_editorMode"
+                     Saving="_saving"
+                     IsDirty="true"
+                     CanSubmit="@(!string.IsNullOrWhiteSpace(_draft.Name))"
+                     OnClose="CloseEditor"
+                     OnSubmit="Save"
+                     ConfirmClose="ConfirmClose">
+        <div class="flat-crud-form-grid simple-crud-form">
+            <MudTextField T="string" @bind-Value="_draft.Code" Label="Code" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" />
+            <MudTextField T="string" @bind-Value="_draft.Name" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("Hardware")">Hardware</MudSelectItem>
+                <MudSelectItem Value="@("Software")">Software</MudSelectItem>
+                <MudSelectItem Value="@("Service")">Service</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string" @bind-Value="_draft.Status" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("Active")">Active</MudSelectItem>
+                <MudSelectItem Value="@("Draft")">Draft</MudSelectItem>
+                <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
+            </MudSelect>
+            <MudTextField T="string" @bind-Value="_draft.Notes" Label="Notes" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" Class="wide" />
+        </div>
+    </CrudEditorShell>
+}
+
+@code {
+    private readonly List<SimpleRecord> _items =
+    [
+        new("SMP-001", "Master Printer", "Hardware", "Active", "Simple sample data"),
+        new("SMP-002", "Antivirus License", "Software", "Active", "Annual renewal"),
+        new("SMP-003", "Installation Service", "Service", "Draft", "Not final yet")
+    ];
+
+    private bool _editorOpen;
+    private bool _saving;
+    private string _editorTitle = "Add Data";
+    private string _editorMode = "Create";
+    private SimpleDraft _draft = new();
+
+    private void Create()
+    {
+        _editorMode = "Create";
+        _editorTitle = "Add Data";
+        _draft = new SimpleDraft
+        {
+            Code = $"SMP-{_items.Count + 1:000}",
+            Category = "Hardware",
+            Status = "Active"
+        };
+        _editorOpen = true;
+    }
+
+    private void Edit(SimpleRecord item)
+    {
+        _editorMode = "Edit";
+        _editorTitle = item.Name;
+        _draft = new SimpleDraft
+        {
+            Code = item.Code,
+            Name = item.Name,
+            Category = item.Category,
+            Status = item.Status,
+            Notes = item.Notes
+        };
+        _editorOpen = true;
+    }
+
+    private Task CloseEditor()
+    {
+        _editorOpen = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task Save()
+    {
+        _saving = true;
+        await Task.Delay(350);
+
+        var existingIndex = _items.FindIndex(item => item.Code == _draft.Code);
+        var saved = new SimpleRecord(_draft.Code, _draft.Name, _draft.Category, _draft.Status, _draft.Notes);
+        if (existingIndex >= 0)
+        {
+            _items[existingIndex] = saved;
+        }
+        else
+        {
+            _items.Insert(0, saved);
+        }
+
+        _saving = false;
+        _editorOpen = false;
+    }
+
+    private Task<bool> ConfirmClose() => Task.FromResult(true);
+
+    private static string StatusClass(string status) => status switch
+    {
+        "Active" => "status-chip online",
+        "Inactive" => "status-chip offline",
+        _ => "status-chip pending"
+    };
+
+    private sealed record SimpleRecord(string Code, string Name, string Category, string Status, string Notes);
+
+    private sealed class SimpleDraft
+    {
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Category { get; set; } = "Hardware";
+        public string Status { get; set; } = "Active";
+        public string Notes { get; set; } = "";
+    }
+}

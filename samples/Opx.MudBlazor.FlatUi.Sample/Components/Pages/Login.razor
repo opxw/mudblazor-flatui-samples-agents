@@ -1,0 +1,166 @@
+@page "/login"
+@layout AuthLayout
+@inject NavigationManager Navigation
+@inject FlatApplicationOptions ApplicationOptions
+@inject FlatMessageBoxService MessageBox
+
+<PageTitle>Login - @ApplicationOptions.ResolvedAppName</PageTitle>
+
+<section class="login-page">
+    <div class="login-brand-panel" style="@LoginBrandStyle">
+        @if (ApplicationOptions.ResolvedLoginBrandBackgroundImageUrl is { } backgroundImageUrl)
+        {
+            <img class="login-brand-background-media" src="@backgroundImageUrl" alt="" />
+        }
+        <div class="login-brand-identity">
+            @if (ApplicationOptions.HasResolvedLogo)
+            {
+                <div class="brand-mark login-brand-mark">
+                    @if (ApplicationOptions.ResolvedLogoUrl is { } logoUrl)
+                    {
+                        <img src="@logoUrl" alt="" />
+                    }
+                    else if (ApplicationOptions.ResolvedLogoIcon is { } logoIcon)
+                    {
+                        <MudIcon Icon="@logoIcon" />
+                    }
+                </div>
+            }
+            <div>
+                <strong>@ApplicationOptions.ResolvedAppName</strong>
+                <span>@ApplicationOptions.ResolvedCompanyName</span>
+            </div>
+        </div>
+        <div class="login-pitch">
+            <div class="login-pitch-icon"><MudIcon Icon="@Icons.Material.Outlined.VerifiedUser" /></div>
+            <h1>One workspace for every operation.</h1>
+            <p>A responsive authentication shell for Blazor Web and MAUI Hybrid applications.</p>
+        </div>
+        <div class="login-brand-copyright">@ApplicationOptions.ResolvedCopyright</div>
+    </div>
+
+    <MudPaper Class="login-card" Elevation="0">
+        <div class="login-card-header">
+            <span class="login-eyebrow">Welcome back, @ApplicationOptions.ResolvedCompanyName</span>
+            <div class="login-card-title">
+                @if (ApplicationOptions.HasResolvedLogo)
+                {
+                    <div class="brand-mark login-card-logo">
+                        @if (ApplicationOptions.ResolvedLogoUrl is { } cardLogoUrl)
+                        {
+                            <img src="@cardLogoUrl" alt="" />
+                        }
+                        else if (ApplicationOptions.ResolvedLogoIcon is { } cardLogoIcon)
+                        {
+                            <MudIcon Icon="@cardLogoIcon" />
+                        }
+                    </div>
+                }
+                <h2>@ApplicationOptions.ResolvedAppName</h2>
+            </div>
+            <p>Sign in using your application account.</p>
+        </div>
+
+        <EditForm Model="_form" OnValidSubmit="SignIn">
+            <div class="login-form-grid">
+                <MudTextField T="string"
+                              Label="Username / Email"
+                              Variant="Variant.Outlined"
+                              @bind-Value="_form.Username"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Person"
+                              Disabled="@_busy"
+                              Immediate="true" />
+                <MudTextField T="string"
+                              Class="opx-password-visibility-field"
+                              Label="Password"
+                              Variant="Variant.Outlined"
+                              InputType="@(_showPassword ? InputType.Text : InputType.Password)"
+                              @bind-Value="_form.Password"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@(_showPassword ? Icons.Material.Outlined.VisibilityOff : Icons.Material.Outlined.Visibility)"
+                              AdornmentAriaLabel="@(_showPassword ? "Hide password" : "Show password")"
+                              Disabled="@_busy"
+                              Immediate="true"
+                              OnAdornmentClick="TogglePassword" />
+                <div class="login-options">
+                    <MudCheckBox T="bool" @bind-Value="_form.RememberMe" Dense="true" Disabled="@_busy" Label="Remember this device" />
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Disabled="@_busy" Href="/reset-password">Forgot password?</MudButton>
+                </div>
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           Disabled="@_busy"
+                           StartIcon="@(_busy ? Icons.Material.Outlined.HourglassTop : Icons.Material.Outlined.Login)">
+                    @(_busy ? "Signing in..." : "Sign in")
+                </MudButton>
+            </div>
+        </EditForm>
+
+        <div class="login-mobile-copyright">@ApplicationOptions.ResolvedCopyright</div>
+    </MudPaper>
+</section>
+
+@code {
+    private const string SampleUsername = "operator@opx.local";
+    private const string SamplePassword = "sample";
+
+    private readonly LoginForm _form = new()
+    {
+        Username = SampleUsername,
+        Password = SamplePassword
+    };
+
+    private bool _showPassword;
+    private bool _busy;
+    private string LoginBrandStyle =>
+        $"--login-brand-background:{ApplicationOptions.ResolvedLoginBrandBackgroundColor};" +
+        $"--login-brand-overlay:{ApplicationOptions.ResolvedLoginBrandOverlayColor};" +
+        "--login-brand-overlay-opacity:" +
+        ApplicationOptions.NormalizedLoginBrandOverlayOpacity.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+    private void TogglePassword() => _showPassword = !_showPassword;
+
+    private async Task SignIn()
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_form.Username) || string.IsNullOrWhiteSpace(_form.Password))
+        {
+            await MessageBox.ErrorAsync("Username / Email and Password are required.", "Sign-in failed");
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            await Task.Delay(350);
+
+            if (!string.Equals(_form.Username.Trim(), SampleUsername, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(_form.Password, SamplePassword, StringComparison.Ordinal))
+            {
+                await MessageBox.ErrorAsync(
+                    "The username or password is incorrect.",
+                    "Sign-in failed");
+                return;
+            }
+
+            Navigation.NavigateTo("/two-step-verification");
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private sealed class LoginForm
+    {
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+        public bool RememberMe { get; set; } = true;
+    }
+}

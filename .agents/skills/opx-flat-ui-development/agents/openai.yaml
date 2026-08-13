@@ -1,0 +1,4 @@
+interface:
+  display_name: "OPX Flat UI Development"
+  short_description: "Build OPX pages from repository samples"
+  default_prompt: "Use $opx-flat-ui-development to create or update an OPX Flat UI page from the repository sample source of truth."
