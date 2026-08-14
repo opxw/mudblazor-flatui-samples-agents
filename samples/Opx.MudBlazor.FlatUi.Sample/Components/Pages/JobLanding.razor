@@ -1,0 +1,217 @@
+@page "/job-landing"
+@layout WebsiteLayout
+@inject SampleCatalog Catalog
+@inject ISnackbar Snackbar
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Careers - Opx MudBlazor Flat UI</PageTitle>
+
+<section id="hero" class="job-landing-hero">
+    <div class="job-landing-hero-copy">
+        <span class="website-eyebrow">Find work that matters</span>
+        <h1>Build your next chapter with the right team.</h1>
+        <p>Explore curated opportunities across product, engineering, operations, and people teams. Search once and keep every result easy to compare.</p>
+        <div class="job-landing-search" role="search" aria-label="Search careers">
+            <MudTextField T="string"
+                          @bind-Value="_search"
+                          Immediate="true"
+                          Placeholder="Job title, skill, or company"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Search"
+                          aria-label="Job keyword" />
+            <MudSelect T="string"
+                       @bind-Value="_workMode"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       aria-label="Work arrangement">
+                <MudSelectItem Value="@("All")">All work modes</MudSelectItem>
+                <MudSelectItem Value="@("Remote")">Remote</MudSelectItem>
+                <MudSelectItem Value="@("Hybrid")">Hybrid</MudSelectItem>
+                <MudSelectItem Value="@("On-site")">On-site</MudSelectItem>
+            </MudSelect>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="#open-roles" StartIcon="@Icons.Material.Outlined.WorkOutline">Find jobs</MudButton>
+        </div>
+        <div class="job-landing-keywords" aria-label="Popular searches">
+            <span>Popular:</span>
+            @foreach (var keyword in PopularKeywords)
+            {
+                <button type="button" @onclick="() => _search = keyword">@keyword</button>
+            }
+        </div>
+        <div class="job-landing-proof" aria-label="Career platform summary">
+            <span><strong>120+</strong> active roles</span>
+            <span><strong>48</strong> hiring teams</span>
+            <span><strong>7 days</strong> average response</span>
+        </div>
+    </div>
+    <div class="job-landing-hero-visual" aria-label="Career collaboration illustration">
+        <img src="/sample-job-hero.svg" alt="People collaborating around a career opportunity board" />
+        <article class="job-landing-floating-card role-card">
+            <span>New opportunity</span>
+            <strong>Product Designer</strong>
+            <small>Hybrid · Jakarta</small>
+        </article>
+        <article class="job-landing-floating-card candidate-card">
+            <strong>2,400+</strong>
+            <small>candidate profiles</small>
+        </article>
+    </div>
+</section>
+
+<section class="job-landing-section job-process-section" aria-labelledby="process-title">
+    <header class="job-landing-section-heading centered">
+        <span class="website-eyebrow">Simple process</span>
+        <h2 id="process-title">Move from discovery to interview with clarity.</h2>
+        <p>The reusable composition supports a public career portal while recruitment workflows and applicant data remain host-owned.</p>
+    </header>
+    <div class="job-process-grid">
+        @foreach (var step in ProcessSteps)
+        {
+            <article>
+                <span class="job-process-number">@step.Number</span>
+                <MudIcon Icon="@step.Icon" />
+                <strong>@step.Title</strong>
+                <p>@step.Description</p>
+            </article>
+        }
+    </div>
+</section>
+
+<section id="categories" class="job-landing-section" aria-labelledby="categories-title">
+    <header class="job-landing-section-heading">
+        <div>
+            <span class="website-eyebrow">Explore categories</span>
+            <h2 id="categories-title">High-demand teams are hiring.</h2>
+        </div>
+        <a href="#open-roles">Browse all roles <MudIcon Icon="@Icons.Material.Outlined.ArrowForward" /></a>
+    </header>
+    <div class="job-category-grid">
+        @foreach (var category in Categories)
+        {
+            <button type="button" @onclick="() => _search = category.SearchTerm">
+                <span class="job-category-icon"><MudIcon Icon="@category.Icon" /></span>
+                <span><strong>@category.Title</strong><small>@category.Count open roles</small></span>
+                <MudIcon Icon="@Icons.Material.Outlined.ArrowForward" />
+            </button>
+        }
+    </div>
+</section>
+
+<section id="open-roles" class="job-landing-section" aria-labelledby="roles-title">
+    <header class="job-landing-section-heading">
+        <div>
+            <span class="website-eyebrow">Open opportunities</span>
+            <h2 id="roles-title">Find a role built for your strengths.</h2>
+            <p>@FilteredJobs.Count result@(FilteredJobs.Count == 1 ? "" : "s") for the current search.</p>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(_search) || _workMode != "All")
+        {
+            <button class="job-clear-search" type="button" @onclick="ClearSearch">Clear filters</button>
+        }
+    </header>
+    @if (FilteredJobs.Count > 0)
+    {
+        <div class="job-public-list">
+            @foreach (var job in FilteredJobs)
+            {
+                <article>
+                    <span class="job-company-mark" aria-hidden="true">@CompanyInitials(job.Company)</span>
+                    <div class="job-public-main">
+                        <span>@job.Company</span>
+                        <h3>@job.Title</h3>
+                        <p>@job.Summary</p>
+                        <div class="job-public-tags">
+                            <span>@job.EmploymentType</span><span>@job.WorkMode</span><span>@job.Location</span>
+                        </div>
+                    </div>
+                    <div class="job-public-side">
+                        <strong>@job.SalaryRange</strong>
+                        <small>@job.PostedAgo</small>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   OnClick="@(() => ViewRole(job))">View role</MudButton>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+    else
+    {
+        <FlatEmptyState Title="No matching roles" Message="Try another keyword or clear the selected work mode." CssClass="job-landing-empty">
+            <Actions><MudButton Variant="Variant.Outlined" OnClick="ClearSearch">Clear filters</MudButton></Actions>
+        </FlatEmptyState>
+    }
+</section>
+
+<section class="job-landing-section job-company-feature" aria-labelledby="company-title">
+    <div>
+        <span class="website-eyebrow">Featured employers</span>
+        <h2 id="company-title">Meet teams investing in meaningful work.</h2>
+        <p>Present employer stories, hiring signals, and current openings without coupling the public template to a recruitment provider.</p>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="#open-roles" EndIcon="@Icons.Material.Outlined.ArrowForward">Explore companies</MudButton>
+    </div>
+    <div class="job-company-grid" aria-label="Featured companies">
+        @foreach (var company in FeaturedCompanies)
+        {
+            <article><span>@company.Initials</span><div><strong>@company.Name</strong><small>@company.Summary</small></div></article>
+        }
+    </div>
+</section>
+
+<section class="job-landing-cta">
+    <div><span class="website-eyebrow">Stay informed</span><h2>Get relevant roles delivered to your inbox.</h2><p>Subscription transport, consent, frequency, and unsubscribe handling remain owned by the host application.</p></div>
+    <div class="job-subscribe-form">
+        <MudTextField T="string" @bind-Value="_email" Placeholder="you@example.com" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Email" aria-label="Email for job alerts" />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@string.IsNullOrWhiteSpace(_email)" OnClick="Subscribe">Subscribe</MudButton>
+    </div>
+    @if (_subscribed)
+    {
+        <p class="job-subscribe-result" role="status">Sample subscription captured in page memory only.</p>
+    }
+</section>
+
+@code {
+    private string _search = string.Empty;
+    private string _workMode = "All";
+    private string _email = string.Empty;
+    private bool _subscribed;
+
+    private static readonly string[] PopularKeywords = ["Design", ".NET", "Operations", "Remote"];
+    private static readonly (string Number, string Title, string Description, string Icon)[] ProcessSteps =
+    [
+        ("01", "Create a profile", "Capture only the information needed for the host recruitment process.", Icons.Material.Outlined.PersonAddAlt),
+        ("02", "Discover roles", "Search and compare opportunities by skill, team, location, and work mode.", Icons.Material.Outlined.TravelExplore),
+        ("03", "Apply with context", "Submit through a secure host-owned workflow with explicit consent.", Icons.Material.Outlined.Send),
+        ("04", "Track progress", "Expose truthful status from the recruitment backend and hiring team.", Icons.Material.Outlined.Timeline)
+    ];
+    private static readonly (string Title, string SearchTerm, int Count, string Icon)[] Categories =
+    [
+        ("Engineering", ".NET", 34, Icons.Material.Outlined.Code),
+        ("Product & Design", "Design", 18, Icons.Material.Outlined.DesignServices),
+        ("Operations", "Operations", 26, Icons.Material.Outlined.AccountTree),
+        ("People & Culture", "Recruitment", 12, Icons.Material.Outlined.Groups),
+        ("Quality", "QA", 15, Icons.Material.Outlined.FactCheck),
+        ("Customer Support", "Support", 21, Icons.Material.Outlined.SupportAgent)
+    ];
+    private static readonly (string Initials, string Name, string Summary)[] FeaturedCompanies =
+    [
+        ("NL", "Nova Labs", "Product engineering"),
+        ("NS", "North Studio", "Digital experience"),
+        ("IO", "Infra One", "Cloud operations"),
+        ("BL", "Bright Line", "Quality engineering")
+    ];
+
+    private List<JobRecord> FilteredJobs => Catalog.Jobs
+        .Where(job => (string.IsNullOrWhiteSpace(_search) || $"{job.Title} {job.Company} {job.Location} {job.Summary}".Contains(_search, StringComparison.OrdinalIgnoreCase))
+            && (_workMode == "All" || job.WorkMode.Contains(_workMode, StringComparison.OrdinalIgnoreCase)))
+        .ToList();
+
+    private void ClearSearch() { _search = string.Empty; _workMode = "All"; }
+    private void Subscribe() => _subscribed = true;
+    private void ViewRole(JobRecord job) => Snackbar.Add($"Opening the sample role: {job.Title}", Severity.Info);
+    private static string CompanyInitials(string company) => string.Concat(company.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(word => word[0]));
+}

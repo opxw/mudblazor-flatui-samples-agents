@@ -1,0 +1,50 @@
+@page "/development-rules"
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Development Rules - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="development-rules-page no-mobile-fab">
+    <ChildContent>
+        <section class="development-rules-intro" aria-labelledby="development-rules-heading">
+            <span class="eyebrow">Source of truth</span>
+            <h1 id="development-rules-heading">Build every page from the same contract</h1>
+            <p>This showroom summarizes the repository rules and development skill. Read the canonical files before implementation, then use the matching sample page as executable reference.</p>
+        </section>
+
+        <div class="development-rules-grid">
+            @RulePanel("1", "Resolve page identity", "Assign one unique PageId, route, PageTitle mapping, menu/search entry, and host-owned permission boundary. Use the canonical page registry before choosing an archetype.", "opx.page.<area>.<purpose>")
+            @RulePanel("2", "Keep the AppBar authoritative", "Row one is AppName and row two is PageTitle. Do not repeat the page title or description in content unless the description is explicitly required.", "AppName / PageTitle")
+            @RulePanel("3", "Use responsive navigation deliberately", "Sidebar is the default. Horizontal navigation is web-only; bottom navigation is mobile-only. Overlays close outside, lock page scroll, and preserve safe-area gutters.", "Sidebar · Horizontal · Bottom")
+            @RulePanel("4", "Compose grids from shared state", "Desktop tables and mobile cards share search, column filters, sort, paging, selection, and permissions. Filters open in a mobile sheet; bounded desktop grids own both scroll axes.", "One query state")
+            @RulePanel("5", "Expose one primary action", "Writable CRUD uses one desktop Add button and one icon-only mobile FAB generated from the same FlatPage action. Toolbar filter, refresh, import, export, and custom actions stay icon-only and configurable.", "FlatPage PrimaryAction")
+            @RulePanel("6", "Honor CRUD result contracts", "Mobile editors are fullscreen. Back or Cancel closes only the top modal and returns false without reload; successful Create, Update, or Delete returns the exact result and may refresh the caller.", "Cancel = no refresh")
+            @RulePanel("7", "Use theme-safe flat geometry", "All visual components use square corners and synchronized Light, Dark, Night, and Auto surfaces. Only semantic circles such as avatars, radio controls, state dots, spinners, and calendar markers stay circular.", "border-radius: 0")
+            @RulePanel("8", "Keep typography and spacing coherent", "Font size and density are independent settings. Mobile outer gutters are 16px; no-FAB pages keep a 16px bottom gutter while FAB pages reserve safe-area-aware clearance.", "Responsive tokens")
+            @RulePanel("9", "Leave business ownership to the host", "The library owns presentation and typed callbacks. The host owns API calls, authorization, persistence, validation, concurrency, audit, upload storage, realtime transport, and device integration.", "Host-owned effects")
+            @RulePanel("10", "Verify before release", "Run unit and component tests, responsive Playwright, accessibility checks, public API compatibility, Release build, package-content inspection, and fresh-consumer restore before publishing.", "Evidence before claims")
+        </div>
+
+        <FlatPanel Title="Canonical development path" Subtitle="Follow this order for every new or revised page" CssClass="flat-panel development-rules-flow">
+            <ol>
+                <li><strong>Read</strong><span><code>RULES.md</code>, <code>.agents/RULES.md</code>, and the development skill.</span></li>
+                <li><strong>Resolve</strong><span>Find the PageId and archetype in <code>page-registry.md</code>.</span></li>
+                <li><strong>Reuse</strong><span>Open only the relevant files listed by <code>sample-source-map.md</code>.</span></li>
+                <li><strong>Implement</strong><span>Prefer package components and shared state instead of page-local behavior.</span></li>
+                <li><strong>Verify</strong><span>Test Light/Dark/Auto, desktop/mobile, live resize, keyboard, overflow, and host callbacks.</span></li>
+                <li><strong>Synchronize</strong><span>Update rules, skill references, documentation, sample, tests, and handoff when the contract changes.</span></li>
+            </ol>
+        </FlatPanel>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private static RenderFragment RulePanel(string number, string title, string copy, string contract) => @<article class="development-rule-card">
+        <span class="development-rule-number">@number</span>
+        <div>
+            <h2>@title</h2>
+            <p>@copy</p>
+            <code>@contract</code>
+        </div>
+    </article>;
+}

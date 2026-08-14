@@ -2,20 +2,72 @@
 @page "/file-upload"
 
 <FlatPage Kind="FlatPageKind.Module" PageCssClass="file-upload-page no-mobile-fab">
-    <FlatPanel Title="Flat File Upload" Subtitle="Host-owned upload, validation, progress, cancel, and retry">
-        <div class="detail-section-body file-upload-sample">
-            <FlatFileUpload Options="UploadOptions" Upload="SimulateUploadAsync" FileCompleted="Completed" FileFailed="Failed" />
-            <div class="sample-code-card"><pre><code>@UploadCode</code></pre></div>
-            @if (!string.IsNullOrWhiteSpace(_result)) { <MudText Typo="Typo.caption" role="status">@_result</MudText> }
-        </div>
-    </FlatPanel>
+    <div class="showcase-grid">
+        <FlatPanel Title="Flat File Upload" Subtitle="Host-owned upload, validation, progress, cancel, and retry">
+            <div class="detail-section-body file-upload-sample">
+                <FlatFileUpload Options="UploadOptions" Upload="SimulateUploadAsync" FileCompleted="Completed" FileFailed="Failed" />
+                <div class="sample-code-card"><pre><code>@UploadCode</code></pre></div>
+                @if (!string.IsNullOrWhiteSpace(_result)) { <MudText Typo="Typo.caption" role="status">@_result</MudText> }
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Multiple Image Upload" Subtitle="Preview, high-resolution autoscale, and exact host callback metadata">
+            <div class="detail-section-body file-upload-sample">
+                <FlatImageUpload Options="ImageOptions"
+                                 Upload="SimulateImageUploadAsync"
+                                 ImageCompleted="ImageCompleted"
+                                 ImageFailed="ImageFailed" />
+                <div class="sample-code-card"><pre><code>@ImageUploadCode</code></pre></div>
+                @if (!string.IsNullOrWhiteSpace(_imageResult)) { <MudText Typo="Typo.caption" role="status">@_imageResult</MudText> }
+            </div>
+        </FlatPanel>
+    </div>
 </FlatPage>
 
 @code {
     private string? _result;
+    private string? _imageResult;
     private readonly FlatFileUploadOptions UploadOptions = new() { Multiple = true, MaximumFileCount = 5, MaximumFileSizeBytes = 5 * 1024 * 1024, AllowedExtensions = [".pdf", ".png", ".jpg", ".csv"], AllowedMimeTypes = ["application/pdf", "image/png", "image/jpeg", "text/csv"] };
+    private readonly FlatImageUploadOptions ImageOptions = new()
+    {
+        Multiple = true,
+        MaximumFileCount = 8,
+        AutoScaleEnabled = true,
+        AutoScaleThresholdLongEdgePx = 2560,
+        AutoScalePercent = 70,
+        MaximumOutputLongEdgePx = 3200
+    };
     private async Task<FlatFileUploadResult> SimulateUploadAsync(FlatFileUploadRequest request, CancellationToken token) { for (var progress = 10; progress <= 100; progress += 10) { await Task.Delay(120, token); request.Progress.Report(progress); } return FlatFileUploadResult.Success(); }
+    private async Task<FlatFileUploadResult> SimulateImageUploadAsync(FlatImageUploadRequest request, CancellationToken token)
+    {
+        for (var progress = 20; progress <= 100; progress += 20)
+        {
+            await Task.Delay(90, token);
+            request.Progress.Report(progress);
+        }
+        return FlatFileUploadResult.Success();
+    }
     private void Completed(FlatFileUploadItem item) => _result = $"{item.File.Name} completed in sample memory.";
     private void Failed(FlatFileUploadItem item) => _result = item.ErrorMessage;
+    private void ImageCompleted(FlatImageUploadItem item) => _imageResult = $"{item.OriginalFile.Name}: {item.OutputDimensions.Width}x{item.OutputDimensions.Height}, host callback completed in sample memory.";
+    private void ImageFailed(FlatImageUploadItem item) => _imageResult = item.ErrorMessage;
     private const string UploadCode = "<FlatFileUpload Options=\"uploadOptions\" Upload=\"UploadToHostAsync\" FileCompleted=\"OnCompleted\" />\n\n// UploadToHostAsync receives FlatFileUploadRequest and CancellationToken.\n// Host owns API/storage, authorization, scanning, and stream lifetime.";
+    private const string ImageUploadCode = """
+<FlatImageUpload Options="imageOptions"
+                 Upload="UploadImageToHostAsync"
+                 ImageCompleted="OnImageCompleted" />
+
+@code {
+    private readonly FlatImageUploadOptions imageOptions = new()
+    {
+        AutoScaleEnabled = true,
+        AutoScaleThresholdLongEdgePx = 2560,
+        AutoScalePercent = 70,
+        MaximumOutputLongEdgePx = 3200
+    };
+
+    // request.File is the prepared file; request.OriginalFile is retained for metadata.
+    // The host owns storage, authorization, content verification, scanning, and persistence.
+}
+""";
 }

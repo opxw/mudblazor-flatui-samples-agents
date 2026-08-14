@@ -1,0 +1,171 @@
+@page "/model-form-designer"
+@using System.ComponentModel.DataAnnotations
+
+<FlatPage Kind="FlatPageKind.Settings" PageCssClass="model-form-designer-page no-mobile-fab">
+    <ChildContent>
+        <FlatModelFormDesigner TItem="CatalogDraft"
+                               Model="@Draft"
+                               Fields="@Fields"
+                               Layout="@Layout"
+                               LayoutChanged="UpdateLayoutAsync"
+                               ModelChanged="PreviewModelChangedAsync"
+                               AriaLabel="Catalog form visual designer" />
+
+        <div class="model-form-designer-result" role="status">
+            <span>@LayoutStatus</span>
+            <code>@LayoutSummary</code>
+        </div>
+
+        <ChartCode Code="@UsageCode" />
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private readonly CatalogDraft Draft = new()
+    {
+        Code = "SKU-2026-08",
+        Name = "Industrial handheld scanner",
+        Category = ProductCategory.Hardware,
+        UnitPrice = 4250000,
+        Active = true,
+        Description = "Warehouse-ready sample item."
+    };
+
+    private static readonly IReadOnlyList<FlatModelFieldDefinition<CatalogDraft>> Fields =
+        FlatModelMetadata.CreateFields<CatalogDraft>()
+            .Where(field => field.Key != nameof(CatalogDraft.Category))
+            .Append(new FlatModelFieldDefinition<CatalogDraft>
+            {
+                Key = nameof(CatalogDraft.Category),
+                Label = "Category",
+                Kind = FlatModelFieldKind.SearchComboBox,
+                Required = true,
+                Order = 3,
+                Placeholder = "Search category",
+                Options =
+                [
+                    new(ProductCategory.Hardware, "Hardware") { Description = "Devices and infrastructure", Keywords = "scanner device computer" },
+                    new(ProductCategory.Software, "Software") { Description = "Applications and licenses", Keywords = "application license" },
+                    new(ProductCategory.Service, "Service") { Description = "Operational and professional services", Keywords = "support consulting" }
+                ],
+                GetValue = item => item.Category,
+                SetValue = (item, value) => item.Category = value is ProductCategory category
+                    ? category
+                    : Enum.TryParse<ProductCategory>(value?.ToString(), true, out var parsed) ? parsed : default
+            })
+            .OrderBy(field => field.Order)
+            .ToArray();
+
+    private FlatModelFormLayoutDefinition Layout = CreateInitialLayout();
+    private string LayoutStatus = "Layout changes are returned to the host immediately.";
+    private string LayoutSummary => $"{Layout.Fields.Count(candidate => candidate.Visible)} visible fields · {Layout.Fields.Count} total fields";
+
+    private Task UpdateLayoutAsync(FlatModelFormLayoutDefinition layout)
+    {
+        Layout = layout;
+        LayoutStatus = "The host received the normalized layout result.";
+        return Task.CompletedTask;
+    }
+
+    private Task PreviewModelChangedAsync(CatalogDraft model)
+    {
+        LayoutStatus = $"Preview value changed: {model.Name}";
+        return Task.CompletedTask;
+    }
+
+    private static FlatModelFormLayoutDefinition CreateInitialLayout()
+    {
+        var defaultLayout = FlatModelFormLayoutRules.CreateDefault(Fields);
+        return defaultLayout with
+        {
+            FormCssClass = "sample-designer-form",
+            FormPadding = FlatModelBoxSpacing.Uniform(8),
+            Fields = defaultLayout.Fields.Select(field => field.Key == nameof(CatalogDraft.Description)
+                ? field with
+                {
+                    ColumnSpan = 2,
+                    CssClass = "sample-designer-emphasis",
+                    Padding = FlatModelBoxSpacing.Uniform(4)
+                }
+                : field).ToArray()
+        };
+    }
+
+    private const string UsageCode = """
+@using System.ComponentModel.DataAnnotations
+
+<FlatModelFormDesigner TItem="ProductDraft"
+                       Model="Draft"
+                       Fields="Fields"
+                       Layout="Layout"
+                       LayoutChanged="SaveLayoutDraftAsync"
+                       ModelChanged="PreviewChangedAsync" />
+
+@code {
+    private ProductDraft Draft = new();
+    private IReadOnlyList<FlatModelFieldDefinition<ProductDraft>> Fields =
+        FlatModelMetadata.CreateFields<ProductDraft>()
+            .Where(field => field.Key != nameof(ProductDraft.Category))
+            .Append(new FlatModelFieldDefinition<ProductDraft>
+            {
+                Key = nameof(ProductDraft.Category),
+                Label = "Category",
+                Kind = FlatModelFieldKind.SearchComboBox,
+                Placeholder = "Search category",
+                Options =
+                [
+                    new("hardware", "Hardware") { Description = "Devices and infrastructure" },
+                    new("software", "Software") { Description = "Applications and licenses" }
+                ],
+                GetValue = item => item.Category,
+                SetValue = (item, value) => item.Category = value?.ToString() ?? string.Empty,
+                Order = 2
+            })
+            .OrderBy(field => field.Order)
+            .ToArray();
+    private FlatModelFormLayoutDefinition Layout = new();
+
+    private async Task SaveLayoutDraftAsync(FlatModelFormLayoutDefinition layout)
+    {
+        Layout = layout;
+        await LayoutApi.SaveForUserAsync(layout); // host-owned persistence
+    }
+
+    public sealed class ProductDraft
+    {
+        [Required, Display(Name = "Product name", Order = 1)]
+        public string Name { get; set; } = string.Empty;
+
+        [Display(Order = 2)]
+        public string Category { get; set; } = string.Empty;
+
+        [Range(0, 999999999), Display(Order = 3),
+         DisplayFormat(DataFormatString = "{0:N0}")]
+        public decimal Price { get; set; }
+    }
+}
+""";
+
+    public sealed class CatalogDraft
+    {
+        [Required, Display(Name = "Product code", Order = 1, Prompt = "Enter product code")]
+        public string Code { get; set; } = string.Empty;
+
+        [Required, StringLength(80), Display(Name = "Product name", Order = 2, Prompt = "Enter product name")]
+        public string Name { get; set; } = string.Empty;
+
+        [Display(Order = 3)]
+        public ProductCategory Category { get; set; }
+
+        [Range(0, 999999999), Display(Name = "Unit price", Order = 4), DisplayFormat(DataFormatString = "{0:N0}")]
+        public decimal UnitPrice { get; set; }
+
+        [Display(Order = 5)]
+        public bool Active { get; set; }
+
+        [DataType(DataType.MultilineText), Display(Order = 6, Prompt = "Optional product description")]
+        public string? Description { get; set; }
+    }
+
+    public enum ProductCategory { Hardware, Software, Service }
+}

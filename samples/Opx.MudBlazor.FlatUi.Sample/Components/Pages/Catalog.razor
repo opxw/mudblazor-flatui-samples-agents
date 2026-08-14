@@ -10,102 +10,143 @@
           RefreshAriaLabel="Refresh catalog"
           OnRefresh="() => StateHasChanged()"
           ReadOnlySource="Sample products">
-    <ToolbarContent>
-        <MudTextField T="string"
-                      @bind-Value="_search"
-                      Placeholder="Search products..."
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Outlined.Search"
-                      Class="module-search catalog-search" />
-        <MudSelect T="string"
-                   @bind-Value="_category"
-                   Variant="Variant.Outlined"
-                   Margin="Margin.Dense"
-                   Class="catalog-category-filter"
-                   aria-label="Product category">
-            <MudSelectItem Value="@("All")">All categories</MudSelectItem>
-            @foreach (var category in Categories)
-            {
-                <MudSelectItem Value="@category">@category</MudSelectItem>
-            }
-        </MudSelect>
-        <div class="catalog-price-filter" role="group" aria-label="Price range filter">
-            <MudNumericField T="decimal?"
-                             @bind-Value="_minPrice"
-                             Placeholder="Min price"
-                             Variant="Variant.Outlined"
-                             Margin="Margin.Dense"
-                             Adornment="Adornment.Start"
-                             AdornmentText="$"
-                             Min="0"
-                             Class="catalog-price-input" />
-            <span aria-hidden="true">to</span>
-            <MudNumericField T="decimal?"
-                             @bind-Value="_maxPrice"
-                             Placeholder="Max price"
-                             Variant="Variant.Outlined"
-                             Margin="Margin.Dense"
-                             Adornment="Adornment.Start"
-                             AdornmentText="$"
-                             Min="0"
-                             Class="catalog-price-input" />
-            @if (HasPriceFilter)
-            {
-                <MudIconButton Icon="@Icons.Material.Outlined.Close"
-                               Class="grid-action-button"
-                               aria-label="Clear price range"
-                               title="Clear price range"
-                               OnClick="ClearPriceRange" />
-            }
-        </div>
-    </ToolbarContent>
-
     <ChildContent>
-        <FlatCatalogGrid TItem="ProductRecord" Items="Rows" EmptyTitle="No products found" EmptyMessage="Try another keyword or category.">
-            <CardTemplate Context="product">
-                <FlatCatalogCard Title="@product.Name"
-                                 Subtitle="@product.Description"
-                                 Category="@product.Category"
-                                 Price="@product.Price"
-                                 PreviousPrice="@product.PreviousPrice"
-                                 Badge="@product.Badge"
-                                 PlaceholderIcon="@Icons.Material.Outlined.Inventory2"
-                                 PrimaryActionText="Add"
-                                 OnPrimaryAction="@(() => AddToCart(product))">
-                    <ChildContent>
-                        <div class="catalog-meta">
-                            <span><MudIcon Icon="@Icons.Material.Outlined.Star" Size="Size.Small" /> @product.Rating.ToString("0.0")</span>
-                            <span><MudIcon Icon="@StockIcon(product.Availability)" Size="Size.Small" /> @product.Availability</span>
-                        </div>
-                    </ChildContent>
-                    <FooterActions>
-                        <MudIconButton Icon="@Icons.Material.Outlined.FavoriteBorder"
-                                       Class="grid-action-button"
-                                       aria-label="@($"Add {product.Name} to wishlist")"
-                                       title="Wishlist" />
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   Size="Size.Small"
-                                   StartIcon="@Icons.Material.Outlined.AddShoppingCart"
-                                   OnClick="@(() => AddToCart(product))">
-                            @CartButtonText(product)
-                        </MudButton>
-                    </FooterActions>
-                </FlatCatalogCard>
-            </CardTemplate>
-        </FlatCatalogGrid>
+        <FlatFilterWorkspace FilterTitle="Catalog filters"
+                             FilterAriaLabel="Product catalog filters"
+                             ResultAriaLabel="Product catalog results"
+                             MobileFilterLabel="Filters"
+                             MobileFilterAriaLabel="Open catalog filters"
+                             FilterActive="@HasActiveFilters"
+                             OnFilterOpened="StageFilters"
+                             OnClear="ClearFilters"
+                             OnReset="ClearStagedFilters"
+                             OnDismiss="RestoreStagedFilters"
+                             OnApply="ApplyStagedFilters">
+            <FilterSummary>
+                @if (HasActiveFilters)
+                {
+                    @if (_category != "All")
+                    {
+                        <span class="catalog-filter-chip">@_category</span>
+                    }
+                    @if (HasPriceFilter)
+                    {
+                        <span class="catalog-filter-chip">@PriceRangeText</span>
+                    }
+                }
+                else
+                {
+                    <span class="catalog-filter-empty">All products</span>
+                }
+            </FilterSummary>
+            <FilterContent>
+                <section class="catalog-filter-group">
+                    <strong>Category</strong>
+                    <MudSelect T="string"
+                               @bind-Value="_category"
+                               Label="Product category"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="catalog-category-filter">
+                        <MudSelectItem Value="@("All")">All categories</MudSelectItem>
+                        @foreach (var category in Categories)
+                        {
+                            <MudSelectItem Value="@category">@category</MudSelectItem>
+                        }
+                    </MudSelect>
+                </section>
+                <section class="catalog-filter-group">
+                    <strong>Price range</strong>
+                    <div class="catalog-price-filter" role="group" aria-label="Price range filter">
+                        <MudNumericField T="decimal?" @bind-Value="_minPrice" Label="Minimum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                        <span aria-hidden="true">to</span>
+                        <MudNumericField T="decimal?" @bind-Value="_maxPrice" Label="Maximum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                    </div>
+                </section>
+            </FilterContent>
+            <MobileFilterContent>
+                <section class="catalog-filter-group">
+                    <strong>Category</strong>
+                    <MudSelect T="string"
+                               Value="_stagedCategory"
+                               ValueChanged="@(value => _stagedCategory = value)"
+                               Label="Product category"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="catalog-category-filter">
+                        <MudSelectItem Value="@("All")">All categories</MudSelectItem>
+                        @foreach (var category in Categories)
+                        {
+                            <MudSelectItem Value="@category">@category</MudSelectItem>
+                        }
+                    </MudSelect>
+                </section>
+                <section class="catalog-filter-group">
+                    <strong>Price range</strong>
+                    <div class="catalog-price-filter" role="group" aria-label="Price range filter">
+                        <MudNumericField T="decimal?" Value="_stagedMinPrice" ValueChanged="@(value => _stagedMinPrice = value)" Label="Minimum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                        <span aria-hidden="true">to</span>
+                        <MudNumericField T="decimal?" Value="_stagedMaxPrice" ValueChanged="@(value => _stagedMaxPrice = value)" Label="Maximum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                    </div>
+                </section>
+            </MobileFilterContent>
+            <ResultToolbar>
+                <MudTextField T="string"
+                              @bind-Value="_search"
+                              Immediate="true"
+                              Placeholder="Search products..."
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Search"
+                              Class="catalog-search" />
+            </ResultToolbar>
+            <ChildContent>
+                <FlatCatalogGrid TItem="ProductRecord" Items="Rows" EmptyTitle="No products found" EmptyMessage="Try another keyword or category.">
+                    <CardTemplate Context="product">
+                        <FlatCatalogCard Title="@product.Name"
+                                         Subtitle="@product.Description"
+                                         Category="@product.Category"
+                                         Price="@product.Price"
+                                         PreviousPrice="@product.PreviousPrice"
+                                         Badge="@product.Badge"
+                                         PlaceholderIcon="@Icons.Material.Outlined.Inventory2"
+                                         PrimaryActionText="Add"
+                                         OnPrimaryAction="@(() => AddToCart(product))">
+                            <ChildContent>
+                                <div class="catalog-meta">
+                                    <span><MudIcon Icon="@Icons.Material.Outlined.Star" Size="Size.Small" /> @product.Rating.ToString("0.0")</span>
+                                    <span><MudIcon Icon="@StockIcon(product.Availability)" Size="Size.Small" /> @product.Availability</span>
+                                </div>
+                            </ChildContent>
+                            <FooterActions>
+                                <MudIconButton Icon="@Icons.Material.Outlined.FavoriteBorder"
+                                               Class="grid-action-button"
+                                               aria-label="@($"Add {product.Name} to wishlist")"
+                                               title="Wishlist" />
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           StartIcon="@Icons.Material.Outlined.AddShoppingCart"
+                                           OnClick="@(() => AddToCart(product))">
+                                    @CartButtonText(product)
+                                </MudButton>
+                            </FooterActions>
+                        </FlatCatalogCard>
+                    </CardTemplate>
+                </FlatCatalogGrid>
 
-        <div class="catalog-summary">
-            <span>@Rows.Count products</span>
-            <span>@PriceRangeText</span>
-            <span>@Cart.TotalQuantity items in cart</span>
-            @if (!Cart.IsEmpty)
-            {
-                <button type="button" class="catalog-clear-cart" @onclick="Cart.Clear">Clear cart</button>
-            }
-        </div>
+                <div class="catalog-summary">
+                    <span>@Rows.Count products</span>
+                    <span>@PriceRangeText</span>
+                    <span>@Cart.TotalQuantity items in cart</span>
+                    @if (!Cart.IsEmpty)
+                    {
+                        <button type="button" class="catalog-clear-cart" @onclick="Cart.Clear">Clear cart</button>
+                    }
+                </div>
+            </ChildContent>
+        </FlatFilterWorkspace>
     </ChildContent>
 </FlatPage>
 
@@ -114,8 +155,12 @@
     private string _category = "All";
     private decimal? _minPrice;
     private decimal? _maxPrice;
+    private string _stagedCategory = "All";
+    private decimal? _stagedMinPrice;
+    private decimal? _stagedMaxPrice;
 
     private bool HasPriceFilter => _minPrice.HasValue || _maxPrice.HasValue;
+    private bool HasActiveFilters => _category != "All" || HasPriceFilter;
 
     private string PriceRangeText => HasPriceFilter
         ? $"Price {(_minPrice?.ToString("0.##") ?? "0")} - {(_maxPrice?.ToString("0.##") ?? "Any")}"
@@ -160,10 +205,35 @@
         return price >= minimum && price <= maximum;
     }
 
-    private void ClearPriceRange()
+    private void StageFilters()
     {
+        _stagedCategory = _category;
+        _stagedMinPrice = _minPrice;
+        _stagedMaxPrice = _maxPrice;
+    }
+
+    private void RestoreStagedFilters() => StageFilters();
+
+    private void ClearStagedFilters()
+    {
+        _stagedCategory = "All";
+        _stagedMinPrice = null;
+        _stagedMaxPrice = null;
+    }
+
+    private void ApplyStagedFilters()
+    {
+        _category = _stagedCategory;
+        _minPrice = _stagedMinPrice;
+        _maxPrice = _stagedMaxPrice;
+    }
+
+    private void ClearFilters()
+    {
+        _category = "All";
         _minPrice = null;
         _maxPrice = null;
+        StageFilters();
     }
 
     private static decimal ParsePrice(string price)

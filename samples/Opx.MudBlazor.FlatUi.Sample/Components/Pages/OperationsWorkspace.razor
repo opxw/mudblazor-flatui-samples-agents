@@ -1,0 +1,85 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/operations-workspace"
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="operations-workspace-page no-mobile-fab"
+          RefreshEnabled="true"
+          OnRefresh="Refresh">
+    <ToolbarContent>
+        <MudTextField T="string" @bind-Value="_search" Placeholder="Search operational work..." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" />
+    </ToolbarContent>
+    <ChildContent>
+        <section class="operations-summary" aria-label="Operational queue summary">
+            @foreach (var area in Areas)
+            {
+                var count = Items.Count(item => item.Area == area);
+                <button type="button" class="@(_activeArea == area ? "active" : null)" @onclick="() => _activeArea = area"><strong>@count</strong><span>@area</span></button>
+            }
+        </section>
+
+        <section class="operations-work-grid" aria-live="polite">
+            @foreach (var item in FilteredItems)
+            {
+                <article class="flat-panel operations-work-card">
+                    <header>
+                        <div><strong>@item.Title</strong><small>@item.Reference · @item.Area</small></div>
+                        <span class="@StatusClass(item.Status)">@item.Status</span>
+                    </header>
+                    <div class="operations-work-facts">
+                        <FlatInfoItem Label="Owner" Value="@item.Owner" />
+                        <FlatInfoItem Label="Updated" Value="@item.UpdatedAt.ToString("dd MMM HH:mm")" />
+                        @if (!string.IsNullOrWhiteSpace(item.Priority)){<FlatInfoItem Label="Priority" Value="@item.Priority" />}
+                        @if (item.Amount.HasValue){<FlatInfoItem Label="Amount" Value="@item.Amount.Value.ToString("N0")" />}
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.Detail)){<p>@item.Detail</p>}
+                    <footer>
+                        <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick='@(() => HandleAction(item, "open"))'>Open</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => HandleAction(item, PrimaryAction(item))">@PrimaryActionLabel(item)</MudButton>
+                    </footer>
+                </article>
+            }
+        </section>
+
+        @if (!FilteredItems.Any())
+        {
+            <FlatEmptyState Title="No operational work found" Message="Change the area or search keyword." />
+        }
+
+        <div class="operations-boundary-note" role="note">
+            <MudIcon Icon="@Icons.Material.Outlined.Info" />
+            <span><strong>Composition sample only.</strong> Authorization, business workflow, inventory/accounting mutation, payment, persistence, and realtime transport remain owned by the host.</span>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(_lastAction)){<div class="operations-action-result" role="status">@_lastAction</div>}
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private string _activeArea = "Service Desk";
+    private string _search = string.Empty;
+    private string? _lastAction;
+
+    private static readonly string[] Areas = ["Service Desk", "Approval Inbox", "Procurement", "Stock Transfer", "Timesheet", "POS / Cart"];
+    private static readonly IReadOnlyList<FlatOperationalWorkItem> Items =
+    [
+        new("SD-1042", "VPN access is unavailable", "INC-1042", "Open", "Service Desk", "Dimas", DateTimeOffset.Now.AddMinutes(-14), "High", "Device diagnostics are attached."),
+        new("SD-1038", "Replace warehouse scanner", "REQ-1038", "Assigned", "Service Desk", "Rina", DateTimeOffset.Now.AddHours(-2), "Medium", "Waiting for spare-unit confirmation."),
+        new("AP-208", "Travel request approval", "TRV-2026-208", "Pending", "Approval Inbox", "Maya", DateTimeOffset.Now.AddMinutes(-32), "Normal", "Manager and finance decisions remain host-owned.", 2_500_000),
+        new("PO-882", "Packaging material replenishment", "PR-882", "Draft", "Procurement", "Sari", DateTimeOffset.Now.AddHours(-3), "High", "Three quotations are available.", 48_750_000),
+        new("ST-331", "Move scanner stock to Plant B", "ST-331", "Ready", "Stock Transfer", "Bayu", DateTimeOffset.Now.AddMinutes(-48), "Normal", "12 units · Main warehouse to Plant B"),
+        new("TS-814", "Weekly engineering timesheet", "WK-33", "Incomplete", "Timesheet", "Dimas", DateTimeOffset.Now.AddDays(-1), "Normal", "32 of 40 hours recorded."),
+        new("POS-109", "Counter sale draft", "CART-109", "Draft", "POS / Cart", "Maya", DateTimeOffset.Now.AddMinutes(-7), "Normal", "4 items · customer not selected", 1_845_000)
+    ];
+
+    private IEnumerable<FlatOperationalWorkItem> FilteredItems => Items.Where(item =>
+        item.Area == _activeArea
+        && (string.IsNullOrWhiteSpace(_search)
+            || item.Title.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || item.Reference.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || item.Owner.Contains(_search, StringComparison.OrdinalIgnoreCase)));
+
+    private void Refresh() => _lastAction = $"Refresh callback emitted at {DateTime.Now:HH:mm:ss}; filters were preserved.";
+    private void HandleAction(FlatOperationalWorkItem item, string action) => _lastAction = $"{action} callback emitted for {item.Reference}; sample data was not persisted.";
+    private static string PrimaryAction(FlatOperationalWorkItem item) => item.Area switch { "Approval Inbox" => "review", "Timesheet" => "continue", "POS / Cart" => "checkout", _ => "process" };
+    private static string PrimaryActionLabel(FlatOperationalWorkItem item) => item.Area switch { "Approval Inbox" => "Review", "Timesheet" => "Continue", "POS / Cart" => "Checkout", _ => "Process" };
+    private static string StatusClass(string status) => $"operations-status {status.ToLowerInvariant().Replace(' ', '-')}";
+}

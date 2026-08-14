@@ -1,0 +1,11 @@
+<!-- Copyright (c) 2026 opx. All rights reserved. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560" role="img" aria-labelledby="title desc">
+  <title id="title">Career collaboration illustration</title><desc id="desc">Three people discussing opportunities around a digital job board.</desc>
+  <rect width="720" height="560" rx="32" fill="#eaf3ff"/><circle cx="580" cy="90" r="96" fill="#cfe2ff"/><circle cx="92" cy="460" r="108" fill="#dff5ef"/>
+  <rect x="176" y="90" width="368" height="260" rx="18" fill="#fff" stroke="#b9c8dc" stroke-width="4"/><rect x="205" y="124" width="160" height="18" rx="9" fill="#004a77"/><rect x="205" y="162" width="274" height="12" rx="6" fill="#c7d4e5"/><rect x="205" y="194" width="118" height="82" rx="10" fill="#e4efff"/><rect x="339" y="194" width="176" height="18" rx="9" fill="#6e8fc7"/><rect x="339" y="228" width="132" height="12" rx="6" fill="#c7d4e5"/><rect x="339" y="254" width="152" height="12" rx="6" fill="#c7d4e5"/><rect x="205" y="300" width="310" height="16" rx="8" fill="#d6e1ef"/>
+  <path d="M186 350h348l52 138H132z" fill="#9eb3cc"/><path d="M130 488h460" stroke="#56708f" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="154" cy="276" r="42" fill="#f2bc91"/><path d="M107 408c0-72 18-102 48-102s50 30 50 102v80h-98z" fill="#1d6fa3"/><path d="M137 318c15 14 26 15 40 0" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="566" cy="272" r="42" fill="#d89a71"/><path d="M518 488v-80c0-72 18-102 48-102s50 30 50 102v80z" fill="#0a9b78"/><path d="M545 318c15 14 27 15 42 0" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="360" cy="382" r="38" fill="#efb488"/><path d="M309 488c3-58 20-84 51-84s49 26 52 84z" fill="#405189"/><path d="M340 414c12 12 27 12 39 0" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="154" cy="266" r="44" fill="none" stroke="#24364d" stroke-width="15" stroke-dasharray="80 200"/><circle cx="566" cy="260" r="45" fill="none" stroke="#422918" stroke-width="16" stroke-dasharray="100 190"/><circle cx="360" cy="371" r="40" fill="none" stroke="#543423" stroke-width="14" stroke-dasharray="95 170"/>
+</svg>

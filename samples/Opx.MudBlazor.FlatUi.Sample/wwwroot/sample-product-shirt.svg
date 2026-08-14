@@ -1,0 +1,12 @@
+<!-- Copyright (c) 2026 opx. All rights reserved. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title desc">
+  <title id="title">Rose sweatshirt sample</title>
+  <desc id="desc">A simple rose colored sweatshirt illustration for the product detail showroom.</desc>
+  <rect width="640" height="640" fill="#eef2f6"/>
+  <path d="M300 80h40l15 35-35 28-35-28z" fill="#a66b35"/>
+  <path d="M320 85c-34 0-58 16-58 42 0 8 5 16 13 16 8 0 12-6 12-13 0-12 11-20 33-20 22 0 33 8 33 20 0 7 4 13 12 13 8 0 13-8 13-16 0-26-24-42-58-42z" fill="none" stroke="#5f6874" stroke-width="5"/>
+  <path d="M218 160l63-32c11 18 67 18 78 0l63 32 86 144-74 45-39-68 15 265H230l15-265-39 68-74-45z" fill="#d79aa8" stroke="#bd7b8b" stroke-width="5"/>
+  <path d="M260 145c10 38 110 38 120 0" fill="none" stroke="#b87484" stroke-width="12"/>
+  <path d="M234 516c52 18 120 18 172 0" fill="none" stroke="#bd7b8b" stroke-width="9"/>
+  <path d="M150 316l52 29M490 316l-52 29" stroke="#bd7b8b" stroke-width="8"/>
+</svg>

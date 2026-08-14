@@ -7,20 +7,28 @@ param(
 
 $requiredFiles = @(
     'ROADMAP.md',
+    '.github\workflows\ci.yml',
     'RULES.md',
     '.agents\AGENTS.md',
     '.agents\RULES.md',
     '.agents\skills\opx-flat-ui-development\SKILL.md',
+    '.agents\skills\opx-flat-ui-development\references\page-registry.md',
     '.agents\skills\opx-flat-ui-development\references\sample-source-map.md',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\Crud.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\DataGridLarge.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\GridEditor.razor',
+    'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\ModelCrud.razor',
+    'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\ModelFormDesigner.razor',
+    'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\DynamicMenu.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\AiChat.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\Email.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\Charts.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\FileUpload.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\GridPreferences.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\Pivot.razor',
+    'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\EnterpriseToolkit.razor',
+    'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\ExperienceToolkit.razor',
+    'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\OperationsWorkspace.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\ChartCode.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\Login.razor',
     'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages\NotFound.razor',
@@ -32,28 +40,63 @@ $requiredFiles = @(
     'src\Opx.MudBlazor.FlatUi\Components\FlatChatShell.razor',
     'src\Opx.MudBlazor.FlatUi\Components\FlatNavigationBadge.razor',
     'src\Opx.MudBlazor.FlatUi\Components\FlatFileUpload.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatImageUpload.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatModelFormDesigner.razor',
+    'src\Opx.MudBlazor.FlatUi\Models\FlatModelFormDesignerModels.cs',
     'src\Opx.MudBlazor.FlatUi\Components\Grid\FlatGridPreferencesPanel.razor',
     'src\Opx.MudBlazor.FlatUi\Components\Grid\FlatEditableGrid.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatModelCrud.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatModelForm.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatDynamicMenu.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatDynamicMenuNodeView.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatHorizontalNavigationNode.razor',
+    'src\Opx.MudBlazor.FlatUi\Models\FlatModelMetadata.cs',
+    'src\Opx.MudBlazor.FlatUi\Models\FlatDynamicMenuModels.cs',
     'src\Opx.MudBlazor.FlatUi\Components\Grid\FlatGridEditResult.cs',
     'src\Opx.MudBlazor.FlatUi\Components\Reporting\FlatPivotGrid.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\Reporting\FlatPivotFieldChooser.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatDataImport.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatMasterDetailWorkspace.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatAuditTrail.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatSchemaForm.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatWorkflowPanel.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatScheduler.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatDashboardComposer.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatNotificationCenter.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatOfflineSyncPanel.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatDocumentWorkspace.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatPrintLayout.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatCommandPalette.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatCollaborationPanel.razor',
+    'src\Opx.MudBlazor.FlatUi\Components\FlatConflictResolver.razor',
+    'src\Opx.MudBlazor.FlatUi\Models\FlatExperienceModels.cs',
     'src\Opx.MudBlazor.FlatUi\Models\FlatApplicationOptions.cs',
     'src\Opx.MudBlazor.FlatUi\Models\FlatAssetOptions.cs',
     'src\Opx.MudBlazor.FlatUi\Models\FlatFileUploadModels.cs',
+    'src\Opx.MudBlazor.FlatUi\Models\FlatImageUploadModels.cs',
     'src\Opx.MudBlazor.FlatUi\Models\FlatGridPreferences.cs',
     'src\Opx.MudBlazor.FlatUi\Models\FlatPivotModels.cs',
     'src\Opx.MudBlazor.FlatUi\wwwroot\opx-flat-ui.css',
     'src\Opx.MudBlazor.FlatUi\wwwroot\opx-flat-ui.js',
     'package.json',
     'package-lock.json',
+    'scripts\test-release-package.ps1',
     'docs\API-GRID-LOADING.md',
     'docs\ASSET-PIPELINE.md',
     'docs\EDITABLE-GRID.md',
+    'docs\MODEL-CRUD.md',
+    'docs\DYNAMIC-MENU.md',
     'docs\EMAIL-TEMPLATE.md',
     'docs\CHARTS.md',
     'docs\TESTING.md',
     'docs\FILE-UPLOAD.md',
     'docs\GRID-PREFERENCES.md',
     'docs\PIVOT-GRID.md',
+    'docs\MIGRATION-1.1.md',
+    'docs\MIGRATION-1.2-1.5.md',
+    'docs\ENTERPRISE-TOOLKIT.md',
+    'docs\APPLICATION-EXPERIENCE-2.0.md',
+    'docs\MIGRATION-2.0.md',
     'docs\AI-CHAT-TEMPLATE.md'
 )
 
@@ -79,13 +122,13 @@ if ((Test-Path -LiteralPath $sidebarSamplePath) -and (Test-Path -LiteralPath $na
 }
 
 $roadmapPath = Join-Path $Workspace 'ROADMAP.md'
+<# Legacy roadmap gate retained only as history; the active 1.5 gate follows.
 if (Test-Path -LiteralPath $roadmapPath) {
     $roadmap = Get-Content -LiteralPath $roadmapPath -Raw
     $requiredRoadmapMarkers = @(
-        'Target release: `1.1.0`',
-        'Phase 1 — Automated test foundation',
-        'Phase 2 — FlatFileUpload',
-        'Phase 3 — Advanced grid preferences',
+        'Current release objective: validate and pack `1.5.0`',
+        'Phase A — Advanced Pivot',
+        'Phase B — Data Import Wizard (`FlatDataImport`)',
         'public API compatibility'
     )
 
@@ -95,11 +138,27 @@ if (Test-Path -LiteralPath $roadmapPath) {
         }
     }
 
-    $phase1 = $roadmap.IndexOf('Phase 1 — Automated test foundation')
-    $phase2 = $roadmap.IndexOf('Phase 2 — FlatFileUpload')
-    $phase3 = $roadmap.IndexOf('Phase 3 — Advanced grid preferences')
-    if ($phase1 -lt 0 -or $phase2 -le $phase1 -or $phase3 -le $phase2) {
-        $violations.Add('ROADMAP.md must keep the approved phase order: automated tests, FlatFileUpload, advanced grid preferences')
+    $releaseGate = $roadmap.IndexOf('Immediate priority — `1.1.0` release hardening')
+    $pivot = $roadmap.IndexOf('Phase A — Advanced Pivot')
+    $dataImport = $roadmap.IndexOf('Phase B — Data Import Wizard (`FlatDataImport`)')
+    if ($releaseGate -lt 0 -or $pivot -le $releaseGate -or $dataImport -le $pivot) {
+        $violations.Add('ROADMAP.md must keep the approved order: 1.1.0 release gate, Advanced Pivot, Data Import Wizard')
+    }
+}
+
+#>
+if (Test-Path -LiteralPath $roadmapPath) {
+    $roadmap = Get-Content -LiteralPath $roadmapPath -Raw
+    $markers = @('Current release objective: validate 2.0.0', '### 1.2.0', '### 1.3.0', '### 1.4.0', '### 1.5.0', '### 1.6.0', '### 1.7.0', '### 1.8.0', '### 1.9.0', '### 2.0.0')
+    foreach ($marker in $markers) {
+        if (-not $roadmap.Contains($marker)) { $violations.Add("ROADMAP.md is missing the approved 2.0 marker: $marker") }
+    }
+    $positions = @($markers | Select-Object -Skip 1 | ForEach-Object { $roadmap.IndexOf($_) })
+    for ($index = 0; $index -lt $positions.Count; $index++) {
+        if ($positions[$index] -lt 0 -or ($index -gt 0 -and $positions[$index] -le $positions[$index - 1])) {
+            $violations.Add('ROADMAP.md must keep the approved release order from 1.2 through 2.0')
+            break
+        }
     }
 }
 
@@ -115,6 +174,7 @@ if (Test-Path -LiteralPath $agentRoot) {
 
 $pageRoot = Join-Path $Workspace 'samples\Opx.MudBlazor.FlatUi.Sample\Components\Pages'
 $pages = @()
+$pageRegistryPath = Join-Path $Workspace '.agents\skills\opx-flat-ui-development\references\page-registry.md'
 
 $displayOptionsPath = Join-Path $Workspace 'src\Opx.MudBlazor.FlatUi\Models\FlatUiDisplayPreferences.cs'
 $themePath = Join-Path $Workspace 'src\Opx.MudBlazor.FlatUi\Models\FlatUiTheme.cs'
@@ -158,6 +218,47 @@ if ((Test-Path -LiteralPath $displayOptionsPath) -and
 
 if (Test-Path -LiteralPath $pageRoot) {
     $pages = Get-ChildItem -LiteralPath $pageRoot -Filter '*.razor' -File
+
+    if (-not (Test-Path -LiteralPath $pageRegistryPath)) {
+        $violations.Add('Canonical page registry is missing')
+    }
+    else {
+        $registrySource = Get-Content -LiteralPath $pageRegistryPath -Raw
+        $registryPattern = '(?m)^\|\s*`(?<id>opx\.page\.[a-z0-9.-]+)`\s*\|[^\r\n]*?\|\s*`(?<route>/[^`]*)`\s*\|[^\r\n]*?\|[^\r\n]*?\|\s*`(?<source>[^`]+\.razor)`\s*\|\s*$'
+        $registryEntries = [regex]::Matches($registrySource, $registryPattern)
+        $registeredIds = @($registryEntries | ForEach-Object { $_.Groups['id'].Value })
+        $registeredRoutes = @($registryEntries | ForEach-Object { $_.Groups['route'].Value })
+
+        foreach ($duplicateId in $registeredIds | Group-Object | Where-Object Count -gt 1) {
+            $violations.Add("Canonical PageId is duplicated: $($duplicateId.Name)")
+        }
+        foreach ($duplicateRoute in $registeredRoutes | Group-Object | Where-Object Count -gt 1) {
+            $violations.Add("Canonical page route is duplicated: $($duplicateRoute.Name)")
+        }
+
+        $actualRoutes = [System.Collections.Generic.List[string]]::new()
+        foreach ($candidatePage in $pages) {
+            $candidateSource = Get-Content -LiteralPath $candidatePage.FullName -Raw
+            foreach ($routeMatch in [regex]::Matches($candidateSource, '(?m)^@page\s+"(?<route>[^"]+)"')) {
+                $route = $routeMatch.Groups['route'].Value
+                $actualRoutes.Add($route)
+                $matchingEntry = @($registryEntries | Where-Object { $_.Groups['route'].Value -ceq $route })
+                if ($matchingEntry.Count -eq 0) {
+                    $violations.Add("Page route is not registered with a canonical PageId: $route")
+                }
+                elseif ($matchingEntry[0].Groups['source'].Value -cne $candidatePage.Name) {
+                    $violations.Add("Page registry source mismatch for $route; expected $($candidatePage.Name)")
+                }
+            }
+        }
+
+        foreach ($registeredRoute in $registeredRoutes) {
+            if (-not $actualRoutes.Contains($registeredRoute)) {
+                $violations.Add("Canonical page registry contains a route not declared by a sample page: $registeredRoute")
+            }
+        }
+    }
+
     foreach ($page in $pages) {
         $content = Get-Content -LiteralPath $page.FullName -Raw
         $isOperational = $content -match '<FlatPage\b' -and $content -match '(FlatDataGrid|FlatMobileGrid|FlatCardGrid|module-table|erp-desktop-table|CrudEditorShell|FlatFormModal)'

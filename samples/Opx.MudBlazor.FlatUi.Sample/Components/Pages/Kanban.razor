@@ -6,7 +6,13 @@
 <FlatPage Kind="FlatPageKind.Module"
           PageCssClass="kanban-page"
           PanelClass="flat-panel kanban-panel"
-          ShowMobilePrimaryAction="true">
+          ShowMobilePrimaryAction="true"
+          FilterEnabled="true"
+          FilterActive="@KanbanFilterActive"
+          FilterLabel="Filter cards"
+          FilterAriaLabel="Open kanban filters"
+          OnFilter="OpenKanbanFilters"
+          MobileToolbarActionsCollapsible="false">
     <ToolbarContent>
         <div class="kanban-toolbar-filters">
             <MudTextField T="string"
@@ -19,14 +25,14 @@
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Outlined.Search"
                           Class="module-search" />
-            <MudSelect T="string" @bind-Value="_assigneeFilter" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" Class="kanban-desktop-filter" @bind-Value="_assigneeFilter" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense">
                 <MudSelectItem Value="@AllFilter">All</MudSelectItem>
                 @foreach (var assignee in Assignees)
                 {
                     <MudSelectItem Value="@assignee">@assignee</MudSelectItem>
                 }
             </MudSelect>
-            <MudSelect T="string" @bind-Value="_priorityFilter" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" Class="kanban-desktop-filter" @bind-Value="_priorityFilter" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense">
                 <MudSelectItem Value="@AllFilter">All</MudSelectItem>
                 @foreach (var priority in Priorities)
                 {
@@ -78,6 +84,35 @@
         </FlatKanbanBoard>
     </ChildContent>
 </FlatPage>
+
+<BottomSheet Open="@_filterSheetOpen"
+             OpenChanged="HandleFilterSheetOpenChanged"
+             Title="Kanban filters"
+             AriaLabel="Kanban filters"
+             Class="mobile-filter-sheet kanban-filter-sheet">
+    <ChildContent>
+        <div class="kanban-filter-sheet-fields">
+            <MudSelect T="string" @bind-Value="_pendingAssigneeFilter" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@AllFilter">All</MudSelectItem>
+                @foreach (var assignee in Assignees)
+                {
+                    <MudSelectItem Value="@assignee">@assignee</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSelect T="string" @bind-Value="_pendingPriorityFilter" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@AllFilter">All</MudSelectItem>
+                @foreach (var priority in Priorities)
+                {
+                    <MudSelectItem Value="@priority">@priority</MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <MudButton Variant="Variant.Outlined" OnClick="ResetKanbanFilters">Reset</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplyKanbanFilters">Apply</MudButton>
+    </FooterContent>
+</BottomSheet>
 
 @if (_editorOpen)
 {
@@ -146,6 +181,9 @@
     private string _search = "";
     private string _assigneeFilter = AllFilter;
     private string _priorityFilter = AllFilter;
+    private string _pendingAssigneeFilter = AllFilter;
+    private string _pendingPriorityFilter = AllFilter;
+    private bool _filterSheetOpen;
     private bool _kanbanCardsHorizontal;
     private bool _editorOpen;
     private KanbanTask? _editingTask;
@@ -159,6 +197,33 @@
         : !_draft.EqualsTask(_editingTask));
 
     private void SetSearch(string value) => _search = value ?? "";
+    private bool KanbanFilterActive => _assigneeFilter != AllFilter || _priorityFilter != AllFilter;
+
+    private void OpenKanbanFilters()
+    {
+        _pendingAssigneeFilter = _assigneeFilter;
+        _pendingPriorityFilter = _priorityFilter;
+        _filterSheetOpen = true;
+    }
+
+    private Task HandleFilterSheetOpenChanged(bool open)
+    {
+        _filterSheetOpen = open;
+        return Task.CompletedTask;
+    }
+
+    private void ResetKanbanFilters()
+    {
+        _pendingAssigneeFilter = AllFilter;
+        _pendingPriorityFilter = AllFilter;
+    }
+
+    private void ApplyKanbanFilters()
+    {
+        _assigneeFilter = _pendingAssigneeFilter;
+        _priorityFilter = _pendingPriorityFilter;
+        _filterSheetOpen = false;
+    }
 
     private bool MatchesFilter(KanbanTask task)
     {

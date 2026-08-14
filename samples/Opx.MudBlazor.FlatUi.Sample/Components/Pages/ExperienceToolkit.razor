@@ -1,0 +1,177 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/experience-toolkit"
+@inject NavigationManager Navigation
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="experience-toolkit-page no-mobile-fab">
+    <section class="experience-release-strip" aria-label="Application experience release train">
+        @foreach (var release in Releases)
+        {
+            <article><span>@release.Version</span><strong>@release.Title</strong><small>@release.Scope</small></article>
+        }
+    </section>
+
+    <section class="experience-toolkit-grid">
+        <article class="flat-panel">
+            <header class="panel-header"><strong>Command Palette</strong><small>1.7 · keyboard-first navigation and actions</small></header>
+            <div class="experience-panel-body">
+                <p>Press <kbd>Ctrl K</kbd> anywhere in the sample or open this isolated preview.</p>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Search" OnClick="OpenLocalPalette">Open palette</MudButton>
+            </div>
+        </article>
+
+        <article class="flat-panel experience-span-2">
+            <header class="panel-header"><strong>Advanced Schema Form</strong><small>1.8 · conditional, computed, validated, and draft-aware</small></header>
+            <div class="experience-panel-body">
+                <FlatSchemaForm Fields="SchemaFields"
+                                Steps="SchemaSteps"
+                                Values="_schemaValues"
+                                ValuesChanged="SetSchemaValues"
+                                FieldVisible="SchemaFieldVisible"
+                                ComputeValues="ComputeSchemaValues"
+                                Validate="ValidateSchema"
+                                AutoSaveDraft="AutoSaveSchemaDraft"
+                                Submit="SubmitSchema" />
+                <small class="experience-status">@_draftStatus</small>
+            </div>
+        </article>
+
+        <article class="flat-panel">
+            <header class="panel-header"><strong>Accessibility Gate</strong><small>1.6 · keyboard, contrast, motion, and RTL foundation</small></header>
+            <div class="experience-panel-body experience-accessibility-checks">
+                <span><MudIcon Icon="@Icons.Material.Outlined.Keyboard" />Visible focus for keyboard targets</span>
+                <span><MudIcon Icon="@Icons.Material.Outlined.Contrast" />Forced-colors compatible states</span>
+                <span><MudIcon Icon="@Icons.Material.Outlined.MotionPhotosOff" />Reduced-motion media support</span>
+                <span><MudIcon Icon="@Icons.Material.Outlined.FormatTextdirectionRToL" />Logical layout and shell direction</span>
+            </div>
+        </article>
+
+        <article class="flat-panel">
+            <header class="panel-header"><strong>Realtime Collaboration UI</strong><small>1.9 · transport remains host-owned</small></header>
+            <div class="experience-panel-body">
+                <FlatCollaborationPanel Presence="Presence"
+                                        Comments="_comments"
+                                        RecordLock="RecordLock"
+                                        TypingText="@_typingText"
+                                        CommentSubmitted="AddComment"
+                                        RequestUnlock="RequestUnlock" />
+            </div>
+        </article>
+
+        <article class="flat-panel">
+            <header class="panel-header"><strong>Offline Conflict Workspace</strong><small>1.9 · per-field resolution result</small></header>
+            <div class="experience-panel-body">
+                <FlatConflictResolver RecordKey="ASSET-1042"
+                                      Fields="Conflicts"
+                                      Apply="ApplyConflict"
+                                      Cancel="CancelConflict" />
+                <small class="experience-status">@_conflictStatus</small>
+            </div>
+        </article>
+    </section>
+</FlatPage>
+
+<FlatCommandPalette @ref="_localPalette"
+                    Commands="LocalCommands"
+                    GlobalShortcutEnabled="false"
+                    Selected="HandleCommand" />
+
+@code {
+    private FlatCommandPalette? _localPalette;
+    private string _draftStatus = "Draft has not changed.";
+    private string _conflictStatus = "Choose one source for every field.";
+    private string? _typingText = "Rina is typing";
+    private IReadOnlyDictionary<string, object?> _schemaValues = new Dictionary<string, object?>
+    {
+        ["requestType"] = "Travel",
+        ["amount"] = "2500000",
+        ["currency"] = "IDR"
+    };
+    private IReadOnlyList<FlatCollaborationComment> _comments =
+    [
+        new("C-1", "Maya Pratiwi", "MP", "Please verify the destination before approval.", DateTimeOffset.Now.AddMinutes(-12), ["Rina"]),
+        new("C-2", "Rina Kusuma", "RK", "The supporting document is now attached.", DateTimeOffset.Now.AddMinutes(-4))
+    ];
+
+    private static readonly (string Version, string Title, string Scope)[] Releases =
+    [
+        ("1.6", "Accessibility", "Quality and device gate"),
+        ("1.7", "Command Palette", "Keyboard productivity"),
+        ("1.8", "Schema Form", "Dynamic business forms"),
+        ("1.9", "Collaboration", "Presence and conflict UI"),
+        ("2.0", "Operations", "Composable workspaces")
+    ];
+
+    private static readonly IReadOnlyList<FlatFormStepDefinition> SchemaSteps =
+    [
+        new("request", "Request", "Choose the request type and enter the main facts."),
+        new("details", "Details", "Conditional fields follow the selected request type."),
+        new("review", "Review", "Computed values remain read-only through the field policy.")
+    ];
+
+    private static readonly IReadOnlyList<FlatFormFieldDefinition> SchemaFields =
+    [
+        new("requestType", "Request type", FlatFormFieldKind.Select, true, "Select request", ["Travel", "Purchase", "Access"], "request"),
+        new("amount", "Amount", FlatFormFieldKind.Number, true, "0", Section: "request"),
+        new("destination", "Destination", FlatFormFieldKind.Text, true, "City or site", Section: "details"),
+        new("vendor", "Vendor", FlatFormFieldKind.Text, true, "Vendor name", Section: "details"),
+        new("reason", "Business reason", FlatFormFieldKind.MultilineText, true, "Explain the request", Section: "details"),
+        new("summary", "Computed summary", FlatFormFieldKind.Text, Section: "review")
+    ];
+
+    private static readonly IReadOnlyList<FlatPresenceUser> Presence =
+    [
+        new("U-1", "Maya Pratiwi", "MP", FlatPresenceState.Online, Context: "Editing amount"),
+        new("U-2", "Rina Kusuma", "RK", FlatPresenceState.Online, Context: "Reviewing"),
+        new("U-3", "Dimas Putra", "DP", FlatPresenceState.Away)
+    ];
+
+    private static readonly FlatRecordLock RecordLock = new("REQ-1042", "Maya Pratiwi", DateTimeOffset.Now.AddMinutes(-6), true, "Your edit session is protected.");
+    private static readonly IReadOnlyList<FlatConflictField> Conflicts =
+    [
+        new("owner", "Owner", "Maya Pratiwi", "Rina Kusuma"),
+        new("location", "Location", "Jakarta", "Bandung"),
+        new("status", "Status", "Pending", "Approved")
+    ];
+
+    private static readonly IReadOnlyList<FlatCommandDefinition> LocalCommands =
+    [
+        new("open-operations", "Open operations workspace", "Navigation", "/operations-workspace", Icons.Material.Outlined.Workspaces, "G O", "service desk approval procurement"),
+        new("open-crud", "Open asset CRUD", "Navigation", "/crud", Icons.Material.Outlined.EditNote, "G C", "asset table grid"),
+        new("new-request", "Create sample request", "Quick actions", Icon: Icons.Material.Outlined.Add, Shortcut: "N", Keywords: "add create")
+    ];
+
+    private Task OpenLocalPalette() => _localPalette?.OpenAsync() ?? Task.CompletedTask;
+    private Task SetSchemaValues(IReadOnlyDictionary<string, object?> values) { _schemaValues = values; return Task.CompletedTask; }
+    private bool SchemaFieldVisible(FlatFormFieldDefinition field, IReadOnlyDictionary<string, object?> values) =>
+        field.Key switch
+        {
+            "destination" => values.GetValueOrDefault("requestType")?.ToString() == "Travel",
+            "vendor" => values.GetValueOrDefault("requestType")?.ToString() == "Purchase",
+            _ => true
+        };
+    private IReadOnlyDictionary<string, object?> ComputeSchemaValues(IReadOnlyDictionary<string, object?> values)
+    {
+        var result = values.ToDictionary(pair => pair.Key, pair => pair.Value);
+        result["summary"] = $"{values.GetValueOrDefault("requestType") ?? "Request"} · {values.GetValueOrDefault("amount") ?? "0"} {values.GetValueOrDefault("currency") ?? "IDR"}";
+        return result;
+    }
+    private IReadOnlyList<FlatFormValidationIssue> ValidateSchema(IReadOnlyDictionary<string, object?> values)
+    {
+        var issues = new List<FlatFormValidationIssue>();
+        if (string.IsNullOrWhiteSpace(values.GetValueOrDefault("requestType")?.ToString())) issues.Add(new("requestType", "Request type is required."));
+        if (!decimal.TryParse(values.GetValueOrDefault("amount")?.ToString(), out var amount) || amount <= 0) issues.Add(new("amount", "Amount must be greater than zero."));
+        if (values.GetValueOrDefault("requestType")?.ToString() == "Travel" && string.IsNullOrWhiteSpace(values.GetValueOrDefault("destination")?.ToString())) issues.Add(new("destination", "Destination is required for travel."));
+        return issues;
+    }
+    private Task AutoSaveSchemaDraft(FlatFormDraftChange change, CancellationToken cancellationToken) { _draftStatus = $"Draft callback: {change.ChangedKey} at {change.ChangedAt.ToLocalTime():HH:mm:ss}"; return InvokeAsync(StateHasChanged); }
+    private Task SubmitSchema(FlatFormSubmission submission) { _draftStatus = $"Submitted {submission.Values.Count} values to the host callback."; return Task.CompletedTask; }
+    private Task AddComment(FlatCommentSubmission submission) { _comments = [.. _comments, new($"C-{_comments.Count + 1}", "Current User", "CU", submission.Message, DateTimeOffset.Now, submission.Mentions)]; _typingText = null; return Task.CompletedTask; }
+    private Task RequestUnlock(FlatRecordLock recordLock) { _typingText = $"Access request callback emitted for {recordLock.LockedBy}."; return Task.CompletedTask; }
+    private Task ApplyConflict(FlatConflictResolution resolution) { _conflictStatus = $"Resolution callback emitted for {resolution.RecordKey} ({resolution.Choices.Count} fields)."; return Task.CompletedTask; }
+    private Task CancelConflict() { _conflictStatus = "Conflict resolution canceled; host state is unchanged."; return Task.CompletedTask; }
+    private void HandleCommand(FlatCommandSelection selection)
+    {
+        if (!string.IsNullOrWhiteSpace(selection.Command.NavigateTo)) Navigation.NavigateTo(selection.Command.NavigateTo);
+        else _draftStatus = $"Command callback: {selection.Command.Label}";
+    }
+}

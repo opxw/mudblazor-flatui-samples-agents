@@ -1,0 +1,314 @@
+@page "/model-crud"
+@using System.ComponentModel.DataAnnotations
+@inject FlatMessageBoxService MessageBox
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="model-crud-page"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Add product"
+          PrimaryActionIcon="@Icons.Material.Outlined.Add"
+          PrimaryActionAriaLabel="Add product"
+          OnPrimaryAction="BeginCreate">
+    <ChildContent>
+        <FlatModelCrud @ref="_crud"
+                       TItem="ProductMaster"
+                       Items="Products"
+                       Fields="ProductFields"
+                       ItemKey="product => product.Id"
+                       ItemAriaLabel="product => product.Name"
+                       AddVisible="false"
+                       CreateItem="CreateProduct"
+                       SaveRow="SaveProduct"
+                       DeleteItem="DeleteProduct"
+                       ConfirmDelete="ConfirmDelete"
+                       RowResult="HandleResult"
+                       Changed="RefreshView"
+                       State="GridState"
+                       SearchPlaceholder="Search products..."
+                       GridAriaLabel="Generated product grid"
+                       EditorAriaLabel="Generated product form"
+                       CreateTitle="Create product"
+                       EditTitle="Edit product">
+            <FieldTemplate Context="fieldContext">
+                @if (fieldContext.Field.Key == "SupplierCode")
+                {
+                    <FlatEntityLookup TItem="Supplier"
+                                      Items="Suppliers"
+                                      ItemKey="supplier => supplier.Code"
+                                      ItemText="supplier => supplier.Name"
+                                      ItemDescription="SupplierDescription"
+                                      SelectedItem="@FindSupplier(fieldContext.Model.SupplierCode)"
+                                      SelectedItemChanged="supplier => SetSupplierAsync(fieldContext, supplier)"
+                                      Disabled="fieldContext.Disabled"
+                                      Label="Supplier"
+                                      Title="Select supplier" />
+                }
+                else if (fieldContext.Field.Key == "ApprovalSupplierCodes")
+                {
+                    <FlatEntityLookup TItem="Supplier"
+                                      Items="Suppliers"
+                                      ItemKey="supplier => supplier.Code"
+                                      ItemText="supplier => supplier.Name"
+                                      ItemDescription="SupplierDescription"
+                                      MultiSelect="true"
+                                      SelectedItems="@FindSuppliers(fieldContext.Model.ApprovalSupplierCodes)"
+                                      SelectedItemsChanged="suppliers => SetApprovalSuppliersAsync(fieldContext, suppliers)"
+                                      Disabled="fieldContext.Disabled"
+                                      Label="Approval suppliers"
+                                      Title="Select approval suppliers" />
+                }
+                else if (fieldContext.Field.Key == "Images")
+                {
+                    <FlatImageUpload Options="ImageOptions"
+                                     Disabled="fieldContext.Disabled"
+                                     Upload="@((request, token) => SimulateProductImageUploadAsync(fieldContext, request, token))"
+                                     AriaLabel="Product image upload" />
+                }
+            </FieldTemplate>
+        </FlatModelCrud>
+
+        @if (_lastResult is not null)
+        {
+            <div class="flat-grid-row-result @(_lastResult.Succeeded ? "success" : _lastResult.Cancelled ? "cancelled" : "error")" role="status">
+                @ResultText(_lastResult)
+            </div>
+        }
+
+        <ChartCode Code="@UsageCode" />
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private const string UsageCode = """
+@using System.ComponentModel.DataAnnotations
+@inject IProductApi ProductApi
+
+<FlatPage Kind="FlatPageKind.Module"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Add product"
+          OnPrimaryAction="BeginCreate">
+    <ChildContent>
+        <FlatModelCrud @ref="_crud"
+                       TItem="Product"
+                       Items="Products"
+                       ItemKey="item => item.Id"
+                       AddVisible="false"
+                       CreateItem="CreateDraft"
+                       SaveRow="SaveRow"
+                       DeleteItem="DeleteRow"
+                       ConfirmDelete="ConfirmDelete"
+                       RowResult="HandleResult"
+                       Changed="ReloadAsync" />
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private FlatModelCrud<Product>? _crud;
+    private IReadOnlyList<Product> Products => _products;
+
+    private Task BeginCreate() =>
+        _crud?.BeginCreateAsync() ?? Task.CompletedTask;
+
+    private Product CreateDraft() =>
+        new() { Id = Guid.NewGuid().ToString("N"), Active = true };
+
+    private async Task<FlatGridEditResult<Product>> SaveRow(
+        Product draft,
+        bool creating,
+        CancellationToken cancellationToken)
+    {
+        var persisted = await ProductApi.SaveAsync(draft, creating, cancellationToken);
+        return FlatGridEditResult<Product>.Success(persisted);
+    }
+
+    private async Task<FlatGridEditResult> DeleteRow(
+        Product item,
+        CancellationToken cancellationToken)
+    {
+        await ProductApi.DeleteAsync(item.Id, cancellationToken);
+        return FlatGridEditResult.Success();
+    }
+
+    public sealed class Product
+    {
+        [Key, ScaffoldColumn(false)]
+        public string Id { get; set; } = string.Empty;
+
+        [Required, Display(Name = "Product name", Order = 1,
+            Prompt = "Enter product name")]
+        public string Name { get; set; } = string.Empty;
+
+        [Range(0, 999999999), Display(Name = "Unit price", Order = 2),
+            DisplayFormat(DataFormatString = "{0:N0}")]
+        public decimal UnitPrice { get; set; }
+
+        [Display(Order = 3)]
+        public bool Active { get; set; }
+    }
+}
+""";
+
+    private readonly GridViewState GridState = CreateGridState();
+    private static readonly FlatImageUploadOptions ImageOptions = new()
+    {
+        MaximumFileCount = 6,
+        AutoScaleEnabled = true,
+        AutoScaleThresholdLongEdgePx = 2560,
+        AutoScalePercent = 70,
+        MaximumOutputLongEdgePx = 3200
+    };
+    private static readonly IReadOnlyList<FlatModelFieldDefinition<ProductMaster>> ProductFields =
+    [
+        .. FlatModelMetadata.CreateFields<ProductMaster>(),
+        new()
+        {
+            Key = "SupplierCode",
+            Label = "Supplier",
+            Kind = FlatModelFieldKind.Custom,
+            GetValue = product => product.SupplierCode,
+            GridVisible = false,
+            FormVisible = true,
+            FilterEnabled = false,
+            Required = true,
+            Order = 8
+        },
+        new()
+        {
+            Key = "ApprovalSupplierCodes",
+            Label = "Approval suppliers",
+            Kind = FlatModelFieldKind.Custom,
+            GetValue = product => product.ApprovalSupplierCodes,
+            GridVisible = false,
+            FormVisible = true,
+            FilterEnabled = false,
+            Order = 9
+        },
+        new()
+        {
+            Key = "Images",
+            Label = "Product images",
+            Kind = FlatModelFieldKind.ImageUpload,
+            GetValue = product => product.ImageCount,
+            GridVisible = false,
+            FormVisible = true,
+            FilterEnabled = false,
+            Order = 10
+        }
+    ];
+    private static readonly IReadOnlyList<Supplier> Suppliers =
+    [
+        new("SUP-001", "PT Nusantara Supply", "Jakarta"),
+        new("SUP-002", "Global Industrial Parts", "Surabaya"),
+        new("SUP-003", "Prima Teknik", "Bandung")
+    ];
+    private readonly List<ProductMaster> _products =
+    [
+        new() { Id = "1", Code = "PRD-1001", Name = "Industrial Scanner", Category = ProductCategory.Hardware, UnitPrice = 4250000, Stock = 18, Active = true, RegisteredOn = new DateOnly(2026, 8, 1), SupplierCode = "SUP-001", ApprovalSupplierCodes = ["SUP-001", "SUP-003"], Notes = "Warehouse and production scanner." },
+        new() { Id = "2", Code = "PRD-1002", Name = "Support Subscription", Category = ProductCategory.Service, UnitPrice = 950000, Stock = 50, Active = true, RegisteredOn = new DateOnly(2026, 8, 4), SupplierCode = "SUP-002", ApprovalSupplierCodes = ["SUP-002"], Notes = "Monthly support allocation." },
+        new() { Id = "3", Code = "PRD-1003", Name = "ERP Connector", Category = ProductCategory.Software, UnitPrice = 2750000, Stock = 8, Active = false, RegisteredOn = new DateOnly(2026, 8, 8), SupplierCode = "SUP-003", Notes = "Sample integration license." }
+    ];
+    private IReadOnlyList<ProductMaster> Products => _products;
+    private FlatModelCrud<ProductMaster>? _crud;
+    private FlatGridRowResult<ProductMaster>? _lastResult;
+
+    private static GridViewState CreateGridState()
+    {
+        var state = new GridViewState();
+        state.SetPageSize(10);
+        return state;
+    }
+
+    private Task BeginCreate() => _crud?.BeginCreateAsync() ?? Task.CompletedTask;
+    private ProductMaster CreateProduct() => new() { Id = Guid.NewGuid().ToString("N"), Active = true, RegisteredOn = DateOnly.FromDateTime(DateTime.Today) };
+
+    private static async Task<FlatFileUploadResult> SimulateProductImageUploadAsync(
+        FlatModelFieldTemplateContext<ProductMaster> context,
+        FlatImageUploadRequest request,
+        CancellationToken cancellationToken)
+    {
+        for (var progress = 25; progress <= 100; progress += 25)
+        {
+            await Task.Delay(70, cancellationToken);
+            request.Progress.Report(progress);
+        }
+        context.Model.ImageCount++;
+        await context.NotifyChanged();
+        return FlatFileUploadResult.Success();
+    }
+
+    private static Supplier? FindSupplier(string? code) =>
+        Suppliers.FirstOrDefault(supplier => string.Equals(supplier.Code, code, StringComparison.Ordinal));
+
+    private static IEnumerable<Supplier> FindSuppliers(IEnumerable<string> codes)
+    {
+        var selected = codes.ToHashSet(StringComparer.Ordinal);
+        return Suppliers.Where(supplier => selected.Contains(supplier.Code));
+    }
+
+    private static string SupplierDescription(Supplier supplier) => $"{supplier.Code} · {supplier.City}";
+
+    private static async Task SetSupplierAsync(FlatModelFieldTemplateContext<ProductMaster> context, Supplier? supplier)
+    {
+        context.Model.SupplierCode = supplier?.Code;
+        await context.NotifyChanged();
+    }
+
+    private static async Task SetApprovalSuppliersAsync(FlatModelFieldTemplateContext<ProductMaster> context, IEnumerable<Supplier> suppliers)
+    {
+        context.Model.ApprovalSupplierCodes = suppliers.Select(supplier => supplier.Code).ToList();
+        await context.NotifyChanged();
+    }
+
+    private async Task<FlatGridEditResult<ProductMaster>> SaveProduct(ProductMaster draft, bool creating, CancellationToken cancellationToken)
+    {
+        await Task.Delay(250, cancellationToken);
+        if (creating)
+        {
+            var persisted = FlatModelMetadata.Clone(draft);
+            _products.Insert(0, persisted);
+            return FlatGridEditResult<ProductMaster>.Success(persisted);
+        }
+
+        var index = _products.FindIndex(product => product.Id == draft.Id);
+        if (index < 0) return FlatGridEditResult<ProductMaster>.Failure("The product no longer exists.");
+        var updated = FlatModelMetadata.Clone(draft);
+        _products[index] = updated;
+        return FlatGridEditResult<ProductMaster>.Success(updated);
+    }
+
+    private async Task<FlatGridEditResult> DeleteProduct(ProductMaster product, CancellationToken cancellationToken)
+    {
+        await Task.Delay(180, cancellationToken);
+        return _products.RemoveAll(candidate => candidate.Id == product.Id) > 0
+            ? FlatGridEditResult.Success()
+            : FlatGridEditResult.Failure("The product no longer exists.");
+    }
+
+    private Task<bool> ConfirmDelete(ProductMaster product) =>
+        MessageBox.QuestionAsync($"Delete {product.Name}?", "Delete product", "Delete", "Cancel");
+
+    private Task HandleResult(FlatGridRowResult<ProductMaster> result) { _lastResult = result; return Task.CompletedTask; }
+    private Task RefreshView() { StateHasChanged(); return Task.CompletedTask; }
+    private static string ResultText(FlatGridRowResult<ProductMaster> result) => result.Cancelled
+        ? $"{result.Operation} cancelled."
+        : result.Succeeded ? $"{result.Operation} completed for {result.Item.Code}." : result.ErrorMessage ?? "Operation failed.";
+
+    public sealed class ProductMaster
+    {
+        [Key, ScaffoldColumn(false)] public string Id { get; set; } = string.Empty;
+        [Required, Display(Name = "Product code", Order = 1, Prompt = "Enter product code")] public string Code { get; set; } = string.Empty;
+        [Required, StringLength(80), Display(Name = "Product name", Order = 2, Prompt = "Enter product name")] public string Name { get; set; } = string.Empty;
+        [Display(Order = 3)] public ProductCategory Category { get; set; }
+        [Range(0, 999999999), Display(Name = "Unit price", Order = 4), DisplayFormat(DataFormatString = "{0:N0}")] public decimal UnitPrice { get; set; }
+        [Range(0, 999999), Display(Order = 5)] public int Stock { get; set; }
+        [Display(Order = 6)] public bool Active { get; set; }
+        [DataType(DataType.Date), Display(Name = "Registered", Order = 7)] public DateOnly RegisteredOn { get; set; }
+        [DataType(DataType.MultilineText), Display(Order = 8, AutoGenerateField = false, Prompt = "Optional notes")] public string? Notes { get; set; }
+        [Required, ScaffoldColumn(false)] public string? SupplierCode { get; set; }
+        [ScaffoldColumn(false)] public List<string> ApprovalSupplierCodes { get; set; } = [];
+        [ScaffoldColumn(false)] public int ImageCount { get; set; }
+    }
+
+    private sealed record Supplier(string Code, string Name, string City);
+    public enum ProductCategory { Hardware, Software, Service }
+}

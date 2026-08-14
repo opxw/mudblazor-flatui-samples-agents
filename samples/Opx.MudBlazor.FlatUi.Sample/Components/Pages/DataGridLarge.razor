@@ -2,6 +2,7 @@
 @page "/data-grid-large"
 @inject FlatGridOptions GridOptions
 @inject FlatPageLoadingState PageLoading
+@inject FlatValueFormatter ValueFormatter
 
 <FlatPage Kind="FlatPageKind.Module"
           PageCssClass="large-data-grid-page"
@@ -44,24 +45,23 @@
                               State="GridState"
                               Columns="Columns"
                               Items="PagedRecords"
+                              ValueSelector="GridValue"
                               Changed="ReloadPage"
                               AriaLabel="Large data grid with vertical and horizontal scrolling">
-                    <RowTemplate Context="record">
-                        <tr>
-                            <td><div class="primary-cell"><strong>@record.OrderNumber</strong><small>@record.Reference</small></div></td>
-                            <td>@record.Customer</td>
-                            <td>@record.Channel</td>
-                            <td>@record.Region</td>
-                            <td>@record.SalesRepresentative</td>
-                            <td>@record.OrderDate.ToString("yyyy-MM-dd")</td>
-                            <td><span class="@StatusClass(record.Status)"><i></i>@record.Status</span></td>
-                            <td>@record.Warehouse</td>
-                            <td>@record.SkuCount</td>
-                            <td>@record.Quantity</td>
-                            <td>@record.Total.ToString("N0")</td>
-                            <td>@record.DeliveryAddress</td>
-                        </tr>
-                    </RowTemplate>
+                    <CellTemplate Context="cell">
+                        @if (cell.Column.Key == "order")
+                        {
+                            <div class="primary-cell"><strong>@cell.Item.OrderNumber</strong><small>@cell.Item.Reference</small></div>
+                        }
+                        else if (cell.Column.Key == "status")
+                        {
+                            <span class="@StatusClass(cell.Item.Status)"><i></i>@cell.FormattedValue</span>
+                        }
+                        else
+                        {
+                            @cell.FormattedValue
+                        }
+                    </CellTemplate>
                     <EmptyContent>
                         <FlatEmptyState CssClass="empty-state compact" Title="No orders found" Message="Change the search or filter criteria." />
                     </EmptyContent>
@@ -70,7 +70,7 @@
 
             <FlatMobileGrid TItem="LargeGridRecord" Items="PagedRecords">
                 <CardTemplate Context="record">
-                    <article class="mobile-card">
+                    <article class="mobile-card mobile-card-edge-tag">
                         <header>
                             <div><strong>@record.OrderNumber</strong><small>@record.Customer · @record.Reference</small></div>
                             <span class="@StatusClass(record.Status)"><i></i>@record.Status</span>
@@ -80,8 +80,8 @@
                             <FlatInfoItem Label="Channel" Value="@record.Channel" />
                             <FlatInfoItem Label="Sales rep" Value="@record.SalesRepresentative" />
                             <FlatInfoItem Label="Warehouse" Value="@record.Warehouse" />
-                            <FlatInfoItem Label="Quantity" Value="@record.Quantity.ToString()" />
-                            <FlatInfoItem Label="Total" Value="@record.Total.ToString("N0")" />
+                            <FlatInfoItem Label="Quantity" Value="@ValueFormatter.FormatValue(record.Quantity)" />
+                            <FlatInfoItem Label="Total" Value="@ValueFormatter.FormatValue(record.Total, "N0", currency: true)" />
                         </div>
                     </article>
                 </CardTemplate>
@@ -131,18 +131,18 @@
 
     private static readonly IReadOnlyList<GridColumnDefinition> Columns =
     [
-        new("order", "Order"),
-        new("customer", "Customer"),
-        new("channel", "Channel", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Channels)),
-        new("region", "Region", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Regions)),
-        new("representative", "Sales Representative"),
-        new("date", "Order Date", GridColumnFilterType.Date),
-        new("status", "Status", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Statuses)),
-        new("warehouse", "Warehouse", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Warehouses)),
-        new("sku", "SKU Count", GridColumnFilterType.Number),
-        new("quantity", "Quantity", GridColumnFilterType.Number),
-        new("total", "Order Total", GridColumnFilterType.Number),
-        new("address", "Delivery Address")
+        new("order", "Order", WidthPercent: 9),
+        new("customer", "Customer", WidthPercent: 12),
+        new("channel", "Channel", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Channels), WidthPercent: 7),
+        new("region", "Region", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Regions), WidthPercent: 7),
+        new("representative", "Sales Representative", WidthPercent: 10),
+        new("date", "Order Date", GridColumnFilterType.Date, WidthPercent: 7, ValueKind: FlatGridColumnValueKind.Date),
+        new("status", "Status", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Statuses), WidthPercent: 7),
+        new("warehouse", "Warehouse", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Warehouses), WidthPercent: 10),
+        new("sku", "SKU Count", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number),
+        new("quantity", "Quantity", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number),
+        new("total", "Order Total", GridColumnFilterType.Number, WidthPercent: 8, ValueKind: FlatGridColumnValueKind.Currency, Format: "N0"),
+        new("address", "Delivery Address", WidthPercent: 13)
     ];
 
     protected override void OnInitialized()
@@ -218,6 +218,23 @@
         "total" => record.Total.ToString(System.Globalization.CultureInfo.InvariantCulture),
         "address" => record.DeliveryAddress,
         _ => string.Empty
+    };
+
+    private static object? GridValue(LargeGridRecord record, string key) => key switch
+    {
+        "order" => record.OrderNumber,
+        "customer" => record.Customer,
+        "channel" => record.Channel,
+        "region" => record.Region,
+        "representative" => record.SalesRepresentative,
+        "date" => record.OrderDate,
+        "status" => record.Status,
+        "warehouse" => record.Warehouse,
+        "sku" => record.SkuCount,
+        "quantity" => record.Quantity,
+        "total" => record.Total,
+        "address" => record.DeliveryAddress,
+        _ => null
     };
 
     private static string StatusClass(string status) => status switch

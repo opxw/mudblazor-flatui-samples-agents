@@ -1,0 +1,90 @@
+@page "/accordions"
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Accordions - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="accordions-page no-mobile-fab">
+    <ChildContent>
+        <div class="accordion-sample-grid">
+            @AccordionPanel("Default accordion", "Standard bordered disclosure group.", 0, @<FlatAccordion AriaLabel="Default accordion sample">
+                <FlatAccordionItem Title="How do I create a group booking?" Expanded="true">
+                    Group related reservations under one booking reference, then let the host validate availability and save the result.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="Why use an accordion?">
+                    It progressively reveals secondary content while keeping a long operational page scannable.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="Where should the state be stored?">
+                    Bind <code>Expanded</code> when the host needs to retain disclosure state across navigation or resize.
+                </FlatAccordionItem>
+            </FlatAccordion>)
+
+            @AccordionPanel("Accordion flush", "Edge-to-edge rows without outer corners.", 1, @<FlatAccordion Flush="true" AriaLabel="Flush accordion sample">
+                <FlatAccordionItem Title="How do I configure my profile?" Expanded="true">
+                    Open Account settings, update host-owned values, validate them, and submit through the application service.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="What can I do with my project?">
+                    Use flush mode inside an existing bordered panel where an extra nested frame would be visually redundant.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="Where can I edit notification settings?">
+                    The host decides where preferences are persisted; this component owns only disclosure presentation.
+                </FlatAccordionItem>
+            </FlatAccordion>)
+
+            @AccordionPanel("Accordions with icons", "Optional leading icon for stronger information scent.", 2, @<FlatAccordion Multiple="true" AriaLabel="Accordion with icons sample">
+                <FlatAccordionItem Title="How does identity verification work?" LeadingIcon="@Icons.Material.Outlined.Language" Expanded="true">
+                    The icon provides a category cue. Authorization and verification remain responsibilities of the host.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="How does link tracking work?" LeadingIcon="@Icons.Material.Outlined.Share" Expanded="true">
+                    Multiple mode permits several items to remain open while users compare related guidance.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="How are alerts delivered?" LeadingIcon="@Icons.Material.Outlined.NotificationsNone">
+                    Delivery channels and device permissions are not inferred from the disclosure state.
+                </FlatAccordionItem>
+            </FlatAccordion>)
+
+            @AccordionPanel("Accordions without toggle icons", "Header-only disclosure for minimal layouts.", 3, @<FlatAccordion Multiple="true" AriaLabel="Accordion without toggle icons sample">
+                <FlatAccordionItem Title="How does identity verification work?" LeadingIcon="@Icons.Material.Outlined.Language" HideToggleIcon="true" Expanded="true">
+                    The whole header remains a keyboard and touch target even when the trailing chevron is hidden.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="How does link tracking work?" LeadingIcon="@Icons.Material.Outlined.Share" HideToggleIcon="true">
+                    Expanded state is still exposed through <code>aria-expanded</code> for assistive technology.
+                </FlatAccordionItem>
+                <FlatAccordionItem Title="Why is this option disabled?" LeadingIcon="@Icons.Material.Outlined.Lock" HideToggleIcon="true" Disabled="true">
+                    Disabled items remain visibly distinct and cannot be toggled.
+                </FlatAccordionItem>
+            </FlatAccordion>)
+        </div>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private readonly bool[] _showCode = new bool[4];
+
+    private RenderFragment AccordionPanel(string title, string subtitle, int index, RenderFragment content) => @<FlatPanel Title="@title" Subtitle="@subtitle" CssClass="flat-panel accordion-sample-panel">
+        <Actions>
+            <MudSwitch T="bool"
+                       Value="@_showCode[index]"
+                       ValueChanged="@((bool value) => _showCode[index] = value)"
+                       Label="Show code"
+                       Color="Color.Primary" />
+        </Actions>
+        <ChildContent>
+            <div class="accordion-sample-body">
+                @content
+                @if (_showCode[index])
+                {
+                    <pre class="accordion-code"><code>@CodeSamples[index]</code></pre>
+                }
+            </div>
+        </ChildContent>
+    </FlatPanel>;
+
+    private static readonly string[] CodeSamples =
+    [
+        """<FlatAccordion>\n    <FlatAccordionItem Title=\"Question\" Expanded=\"true\">\n        Answer content\n    </FlatAccordionItem>\n</FlatAccordion>""",
+        """<FlatAccordion Flush=\"true\">\n    <FlatAccordionItem Title=\"Flush item\">Content</FlatAccordionItem>\n</FlatAccordion>""",
+        """<FlatAccordion Multiple=\"true\">\n    <FlatAccordionItem Title=\"Identity\" LeadingIcon=\"@Icons.Material.Outlined.Language\">\n        Content\n    </FlatAccordionItem>\n</FlatAccordion>""",
+        """<FlatAccordionItem Title=\"Minimal item\" HideToggleIcon=\"true\">\n    Content\n</FlatAccordionItem>"""
+    ];
+}

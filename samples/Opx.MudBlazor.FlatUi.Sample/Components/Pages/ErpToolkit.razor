@@ -1,0 +1,87 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/erp-toolkit"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="erp-toolkit-page no-mobile-fab">
+    <FlatRecordLifecycleHeader Title="Purchase Order" Reference="PO-260814-018" Version="4" Steps="Lifecycle" />
+
+    <section class="erp-toolkit-grid">
+        <article class="flat-panel erp-toolkit-span-2"><header class="panel-header"><div><strong>Transaction Workspace</strong><small>Header, lines, totals, lifecycle actions</small></div></header><div class="erp-toolkit-body">
+            <FlatTransactionWorkspace THeader="PurchaseOrder" TLine="PurchaseLine" Header="Order" Lines="OrderLines" State="FlatTransactionState.Submitted" Actions="TransactionActions" ActionSelected="HandleTransaction" LineAction="HandleLineAction">
+                <HeaderTemplate Context="order"><div><strong>@order.Supplier</strong><small>@order.Reference &middot; @order.OrderDate.ToString("dd MMM yyyy")</small></div></HeaderTemplate>
+                <MetaContent Context="order"><FlatInfoItem Label="Warehouse" Value="@order.Warehouse"/><FlatInfoItem Label="Buyer" Value="@order.Buyer"/><FlatInfoItem Label="Currency" Value="@order.Currency"/></MetaContent>
+                <LineTemplate Context="line"><div class="erp-line-sample"><span><strong>@line.Item</strong><small>@line.Description</small></span><span>@line.Quantity @line.Unit</span><span>@line.UnitPrice.ToString("N0")</span><strong>@((line.Quantity * line.UnitPrice).ToString("N0"))</strong></div></LineTemplate>
+                <SummaryTemplate Context="order"><span>Subtotal</span><strong>@order.Currency @OrderLines.Sum(line => line.Quantity * line.UnitPrice).ToString("N0")</strong></SummaryTemplate>
+            </FlatTransactionWorkspace>
+        </div></article>
+
+        <article class="flat-panel"><header class="panel-header"><div><strong>Entity Lookup and Composite Inputs</strong><small>Large master selection, money, quantity/UOM</small></div></header><div class="erp-toolkit-body erp-input-sample">
+            <FlatEntityLookup TItem="Supplier" Items="Suppliers" ItemKey="supplier => supplier.Code" ItemText="supplier => supplier.Name" ItemDescription="SupplierDescription" ItemKeywords="supplier => supplier.City" @bind-SelectedItem="_selectedSupplier" Label="Supplier" Title="Select supplier" />
+            <FlatEntityLookup TItem="Supplier" Items="Suppliers" ItemKey="supplier => supplier.Code" ItemText="supplier => supplier.Name" ItemDescription="SupplierDescription" MultiSelect="true" @bind-SelectedItems="_approvalSuppliers" Label="Approval suppliers" Title="Select approval suppliers" />
+            <FlatMoneyInput @bind-Value="_amount" @bind-Currency="_currency" Currencies="Currencies" Label="Order amount" />
+            <FlatQuantityInput @bind-Value="_quantity" @bind-Unit="_unit" Units="Units" Label="Order quantity" />
+        </div></article>
+
+        <article class="flat-panel"><header class="panel-header"><div><strong>Background Operations</strong><small>Import, posting, recalculation, retry</small></div></header><div class="erp-toolkit-body"><FlatBackgroundOperationCenter Items="Operations" Retry="RetryOperation" Cancel="CancelOperation" /></div></article>
+
+        <article class="flat-panel erp-toolkit-span-2"><header class="panel-header"><div><strong>Journal Entry Grid</strong><small>Responsive lines and debit/credit balance</small></div></header><div class="erp-toolkit-body"><FlatJournalEntryGrid TLine="JournalLine" Lines="JournalLines" AccountText="line => line.Account" DescriptionText="line => line.Description" Debit="line => line.Debit" Credit="line => line.Credit" Currency="IDR" Edit="EditJournalLine" /></div></article>
+
+        <article class="flat-panel erp-toolkit-span-2"><header class="panel-header"><div><strong>Reconciliation Workspace</strong><small>Exact selected records returned to the host</small></div></header><div class="erp-toolkit-body"><FlatReconciliationWorkspace TLeft="Invoice" TRight="Payment" LeftItems="Invoices" RightItems="Payments" LeftTitle="Open invoices" RightTitle="Unallocated payments" Match="MatchRecords"><LeftTemplate Context="invoice"><span><strong>@invoice.Reference</strong><small>@invoice.Customer &middot; IDR @invoice.Amount.ToString("N0")</small></span></LeftTemplate><RightTemplate Context="payment"><span><strong>@payment.Reference</strong><small>@payment.Bank &middot; IDR @payment.Amount.ToString("N0")</small></span></RightTemplate></FlatReconciliationWorkspace></div></article>
+
+        <article class="flat-panel erp-toolkit-span-2"><header class="panel-header"><div><strong>Planning Board</strong><small>Resource capacity and time allocation</small></div></header><div class="erp-toolkit-body"><FlatPlanningBoard TItem="PlanItem" TResource="PlantResource" Items="PlanItems" Resources="Resources" ResourceKey="resource => resource.Key" ItemResource="item => item.ResourceKey" ItemTitle="item => item.Title" ItemStart="item => item.Start" ItemEnd="item => item.End" PeriodStart="_planningStart" PeriodStartChanged="SetPlanningStart" ItemSelected="SelectPlan"><ResourceTemplate Context="resource"><strong>@resource.Name</strong><small>@resource.Capacity</small></ResourceTemplate></FlatPlanningBoard></div></article>
+    </section>
+
+    <ChartCode Code="@UsageCode" />
+</FlatPage>
+
+@code {
+    private static readonly PurchaseOrder Order = new("PO-260814-018", "PT Nusantara Supply", new(2026, 8, 14), "Main Warehouse", "Maya", "IDR");
+    private static readonly IReadOnlyList<PurchaseLine> OrderLines = [new("RM-1001", "Steel plate 4mm", 20, "SHEET", 425000), new("RM-2031", "Industrial bearing", 12, "EA", 185000)];
+    private static readonly IReadOnlyList<FlatTransactionAction> TransactionActions = [new("approve", "Approve", Icons.Material.Outlined.Check, true), new("reject", "Reject", Icons.Material.Outlined.Close, Destructive: true), new("print", "Print", Icons.Material.Outlined.Print)];
+    private static readonly IReadOnlyList<FlatLifecycleStep> Lifecycle = [new("draft", "Draft", "Complete", "Maya"), new("review", "Manager review", "Current", "Rina"), new("post", "Posting", "Waiting")];
+    private static readonly IReadOnlyList<Supplier> Suppliers = [new("SUP-001", "PT Nusantara Supply", "Jakarta"), new("SUP-002", "Global Industrial Parts", "Surabaya"), new("SUP-003", "Prima Teknik", "Bandung")];
+    private Supplier? _selectedSupplier = Suppliers[0];
+    private IEnumerable<Supplier> _approvalSuppliers = [Suppliers[0], Suppliers[2]];
+    private static string SupplierDescription(Supplier supplier) => $"{supplier.Code} · {supplier.City}";
+    private decimal _amount = 10_720_000; private string _currency = "IDR"; private decimal _quantity = 20; private string _unit = "SHEET";
+    private static readonly IReadOnlyList<string> Currencies = ["IDR", "USD", "SGD"]; private static readonly IReadOnlyList<string> Units = ["EA", "BOX", "SHEET", "KG"];
+    private static readonly IReadOnlyList<JournalLine> JournalLines = [new("110100 - Inventory", "Raw material receipt", 10_720_000, 0), new("210100 - Accounts Payable", "Supplier liability", 0, 10_720_000)];
+    private static readonly IReadOnlyList<Invoice> Invoices = [new("INV-2608-101", "Karya Retail", 5_250_000), new("INV-2608-108", "Maju Bersama", 8_400_000)];
+    private static readonly IReadOnlyList<Payment> Payments = [new("BNK-88421", "BCA", 5_250_000), new("BNK-88452", "Mandiri", 8_000_000)];
+    private static readonly IReadOnlyList<PlantResource> Resources = [new("CUT", "Cutting Line", "8h/day"), new("ASM", "Assembly Line", "12h/day"), new("QC", "Quality Station", "8h/day")];
+    private static readonly DateTimeOffset PlanDay = new(new DateTime(2026, 8, 17));
+    private static readonly IReadOnlyList<PlanItem> PlanItems = [new("WO-4101", "CUT", "Frame cutting", PlanDay.AddHours(8), PlanDay.AddHours(16)), new("WO-4102", "ASM", "Motor assembly", PlanDay.AddDays(1).AddHours(7), PlanDay.AddDays(2).AddHours(15)), new("WO-4103", "QC", "Final inspection", PlanDay.AddDays(3).AddHours(9), PlanDay.AddDays(3).AddHours(14))];
+    private DateTimeOffset _planningStart = PlanDay;
+    private IReadOnlyList<FlatBackgroundOperation> Operations = [new("OP-1", "Post inventory receipt", FlatBackgroundOperationState.Running, 64, "128 of 200 lines"), new("OP-2", "Import opening balances", FlatBackgroundOperationState.Failed, 38, "Validation failed"), new("OP-3", "Generate monthly report", FlatBackgroundOperationState.Completed, 100)];
+    private Task HandleTransaction(FlatTransactionActionRequest<PurchaseOrder> request) => Task.CompletedTask;
+    private Task HandleLineAction(FlatTransactionLineActionRequest<PurchaseLine> request) => Task.CompletedTask;
+    private Task EditJournalLine(JournalLine line) => Task.CompletedTask;
+    private Task MatchRecords(FlatReconciliationRequest<Invoice, Payment> request) => Task.CompletedTask;
+    private Task SetPlanningStart(DateTimeOffset value) { _planningStart = value; return Task.CompletedTask; }
+    private Task SelectPlan(PlanItem item) => Task.CompletedTask;
+    private Task RetryOperation(string key) { Operations = Operations.Select(item => item.Key == key ? item with { State = FlatBackgroundOperationState.Running, Message = "Retrying" } : item).ToArray(); return Task.CompletedTask; }
+    private Task CancelOperation(string key) { Operations = Operations.Select(item => item.Key == key ? item with { State = FlatBackgroundOperationState.Cancelled, Message = "Cancelled by user" } : item).ToArray(); return Task.CompletedTask; }
+    private const string UsageCode = """
+<FlatTransactionWorkspace THeader="PurchaseOrder" TLine="PurchaseLine"
+                          Header="Order" Lines="Lines" State="FlatTransactionState.Draft"
+                          Actions="Actions" ActionSelected="HandleAction" LineAction="HandleLineAction">
+    <HeaderTemplate Context="order">@order.Reference</HeaderTemplate>
+    <LineTemplate Context="line">@line.ItemCode</LineTemplate>
+</FlatTransactionWorkspace>
+
+<FlatEntityLookup TItem="Supplier" Items="Suppliers"
+                  ItemKey="x => x.Code" ItemText="x => x.Name"
+                  @bind-SelectedItem="SelectedSupplier" />
+
+<FlatEntityLookup TItem="Supplier" Items="Suppliers"
+                  ItemKey="x => x.Code" ItemText="x => x.Name"
+                  MultiSelect="true" @bind-SelectedItems="ApprovalSuppliers" />
+""";
+    private sealed record PurchaseOrder(string Reference, string Supplier, DateOnly OrderDate, string Warehouse, string Buyer, string Currency);
+    private sealed record PurchaseLine(string Item, string Description, decimal Quantity, string Unit, decimal UnitPrice);
+    private sealed record Supplier(string Code, string Name, string City);
+    private sealed record JournalLine(string Account, string Description, decimal Debit, decimal Credit);
+    private sealed record Invoice(string Reference, string Customer, decimal Amount);
+    private sealed record Payment(string Reference, string Bank, decimal Amount);
+    private sealed record PlantResource(string Key, string Name, string Capacity);
+    private sealed record PlanItem(string Key, string ResourceKey, string Title, DateTimeOffset Start, DateTimeOffset End);
+}

@@ -1,0 +1,214 @@
+@page "/product-management"
+@using Microsoft.AspNetCore.Components.Rendering
+@inject FlatGridOptions GridOptions
+
+<FlatPage Kind="FlatPageKind.Module"
+          UsePanel="false"
+          PageCssClass="product-management-page"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Add product"
+          PrimaryActionIcon="@Icons.Material.Outlined.Add"
+          PrimaryActionAriaLabel="Add product"
+          OnPrimaryAction="AddProduct"
+          RefreshEnabled="true"
+          OnRefresh="Reload"
+          PullToRefreshEnabled="true">
+    <ChildContent>
+        <FlatFilterWorkspace FilterTitle="Filters"
+                             FilterAriaLabel="Product filters"
+                             ResultAriaLabel="Product management results"
+                             FilterActive="@HasActiveFilters"
+                             OnFilterOpened="StageMobileFilters"
+                             OnClear="ClearFilters"
+                             OnReset="ClearStagedFilters"
+                             OnDismiss="ResetStagedFilters"
+                             OnApply="ApplyStagedFilters">
+            <FilterSummary>
+                @foreach (var filter in ActiveFilterLabels)
+                {
+                    <span class="product-filter-chip">@filter</span>
+                }
+                @if (!HasActiveFilters)
+                {
+                    <span class="product-filter-empty">No active filters</span>
+                }
+            </FilterSummary>
+            <FilterContent>@DesktopFilters</FilterContent>
+            <MobileFilterContent>@MobileFilters</MobileFilterContent>
+            <ResultToolbar>
+                <div class="product-status-tabs" role="tablist" aria-label="Publication status">
+                    @foreach (var status in Statuses)
+                    {
+                        <button type="button" role="tab" aria-selected="@(_status == status)" class="@(_status == status ? "active" : null)" @onclick="() => SetStatus(status)">
+                            @status <span>@CountForStatus(status)</span>
+                        </button>
+                    }
+                </div>
+                <MudTextField T="string" Value="_search" ValueChanged="SetSearch" Immediate="true" Placeholder="Search products..." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="product-management-search" />
+            </ResultToolbar>
+            <ChildContent>
+                <FlatDataGrid TItem="ProductAdminRecord" State="GridState" Columns="Columns" Items="PagedRows" Changed="Reload" ExtraColumnCount="1" AriaLabel="Products">
+                    <RowTemplate Context="product">
+                        <tr>
+                            <td>
+                                <div class="product-grid-cell">
+                                    <span class="product-grid-thumb @product.Tone"><MudIcon Icon="@product.Icon" /></span>
+                                    <div><strong>@product.Name</strong><small>@product.Code · @product.Category</small></div>
+                                </div>
+                            </td>
+                            <td>@product.Stock</td>
+                            <td>@product.Price.ToString("C0", Currency)</td>
+                            <td>@product.Orders</td>
+                            <td><span class="product-rating"><MudIcon Icon="@Icons.Material.Filled.Star" /> @product.Rating.ToString("0.0")</span></td>
+                            <td><span class="product-published"><strong>@product.Published.ToString("dd MMM yyyy")</strong><small>@product.Published.ToString("HH:mm")</small></span></td>
+                            <td class="row-actions"><MudIconButton Icon="@Icons.Material.Outlined.MoreHoriz" Size="Size.Small" aria-label="@($"Actions for {product.Name}")" /></td>
+                        </tr>
+                    </RowTemplate>
+                    <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="No products found" Message="Change the keyword or filters." /></EmptyContent>
+                </FlatDataGrid>
+
+                <FlatMobileGrid TItem="ProductAdminRecord" Items="PagedRows">
+                    <CardTemplate Context="product">
+                        <article class="mobile-card product-mobile-card">
+                            <header>
+                                <div class="product-grid-cell"><span class="product-grid-thumb @product.Tone"><MudIcon Icon="@product.Icon" /></span><div><strong>@product.Name</strong><small>@product.Code · @product.Category</small></div></div>
+                                <MudIconButton Icon="@Icons.Material.Outlined.MoreHoriz" Size="Size.Small" aria-label="@($"Actions for {product.Name}")" />
+                            </header>
+                            <div class="product-mobile-facts">
+                                <FlatInfoItem Label="Stock" Value="@product.Stock.ToString()" />
+                                <FlatInfoItem Label="Price" Value="@product.Price.ToString("C0", Currency)" />
+                                <FlatInfoItem Label="Orders" Value="@product.Orders.ToString()" />
+                                <FlatInfoItem Label="Rating" Value="@product.Rating.ToString("0.0")" />
+                                <FlatInfoItem Label="Status" Value="@product.Status" />
+                                <FlatInfoItem Label="Published" Value="@product.Published.ToString("dd MMM yyyy")" />
+                            </div>
+                        </article>
+                    </CardTemplate>
+                    <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="No products found" /></EmptyContent>
+                </FlatMobileGrid>
+
+                <FlatPager State="GridState" Changed="Reload" />
+            </ChildContent>
+        </FlatFilterWorkspace>
+    </ChildContent>
+</FlatPage>
+
+<FlatFormModal @bind-Open="_editorOpen"
+               Title="Add product"
+               Mode="Create"
+               CanSubmit="@(!string.IsNullOrWhiteSpace(_draftName))"
+               OnSubmit="SaveProduct">
+    <div class="flat-crud-form-grid">
+        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudSelect T="string" @bind-Value="_draftCategory" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">
+            @foreach (var category in Categories) { <MudSelectItem Value="@category">@category</MudSelectItem> }
+        </MudSelect>
+        <MudNumericField T="decimal?" @bind-Value="_draftPrice" Label="Price" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+    </div>
+</FlatFormModal>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Currency = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+    private static readonly string[] Statuses = ["All", "Published", "Draft"];
+    private static readonly IReadOnlyList<ProductAdminRecord> Products =
+    [
+        new("PRD-101", "Everyday Backpack", "Bags", "Northstar", 12, 59m, 48, 4.8m, "Published", new(2026, 8, 12, 10, 5, 0), Icons.Material.Outlined.Backpack, "blue"),
+        new("PRD-102", "Minimal Desk Lamp", "Home Office", "Lumina", 6, 42m, 30, 4.6m, "Published", new(2026, 8, 11, 9, 31, 0), Icons.Material.Outlined.Lightbulb, "amber"),
+        new("PRD-103", "Wireless Travel Mouse", "Accessories", "Northstar", 18, 24m, 55, 4.4m, "Draft", new(2026, 8, 10, 14, 42, 0), Icons.Material.Outlined.Mouse, "green"),
+        new("PRD-104", "Ceramic Coffee Set", "Lifestyle", "Studio One", 9, 34m, 22, 4.7m, "Published", new(2026, 8, 9, 8, 12, 0), Icons.Material.Outlined.Coffee, "red"),
+        new("PRD-105", "Portable Monitor 14 inch", "Electronics", "Lumina", 15, 189m, 40, 4.5m, "Published", new(2026, 8, 8, 16, 20, 0), Icons.Material.Outlined.Monitor, "indigo"),
+        new("PRD-106", "Notebook Organizer", "Stationery", "Studio One", 20, 18m, 48, 4.3m, "Draft", new(2026, 8, 7, 11, 17, 0), Icons.Material.Outlined.Inventory2, "blue"),
+        new("PRD-107", "Noise Cancelling Headset", "Electronics", "Northstar", 8, 105m, 45, 4.6m, "Published", new(2026, 8, 6, 15, 40, 0), Icons.Material.Outlined.Headphones, "green"),
+        new("PRD-108", "Travel Tumbler", "Lifestyle", "Lumina", 24, 29m, 38, 4.2m, "Published", new(2026, 8, 5, 12, 18, 0), Icons.Material.Outlined.LocalCafe, "amber")
+    ];
+    private static readonly IReadOnlyList<GridColumnDefinition> Columns =
+    [
+        new("product", "Product", WidthPx: 310), new("stock", "Stock", WidthPx: 80), new("price", "Price", WidthPx: 100),
+        new("orders", "Orders", WidthPx: 90), new("rating", "Rating", WidthPx: 100), new("published", "Published", WidthPx: 165)
+    ];
+
+    private GridViewState GridState = default!;
+    private IReadOnlyList<ProductAdminRecord> PagedRows = [];
+    private string _search = "";
+    private string _status = "All";
+    private string _category = "All";
+    private string _brandSearch = "";
+    private HashSet<string> _brands = [];
+    private decimal? _minPrice;
+    private decimal? _maxPrice;
+    private string _stagedCategory = "All";
+    private string _stagedBrandSearch = "";
+    private HashSet<string> _stagedBrands = [];
+    private decimal? _stagedMinPrice;
+    private decimal? _stagedMaxPrice;
+    private bool _editorOpen;
+    private string _draftName = "";
+    private string _draftCategory = "Accessories";
+    private decimal? _draftPrice;
+
+    private IReadOnlyList<string> Categories => Products.Select(x => x.Category).Distinct().Order().ToArray();
+    private IReadOnlyList<string> Brands => Products.Select(x => x.Brand).Distinct().Order().ToArray();
+    private bool HasActiveFilters => _category != "All" || _brands.Count > 0 || _minPrice.HasValue || _maxPrice.HasValue;
+    private IEnumerable<string> ActiveFilterLabels => (_category == "All" ? [] : new[] { _category }).Concat(_brands).Concat(_minPrice.HasValue || _maxPrice.HasValue ? new[] { $"${_minPrice ?? 0:0}–${_maxPrice?.ToString("0") ?? "Any"}" } : []);
+
+    private RenderFragment DesktopFilters => builder => BuildFilters(builder, false);
+    private RenderFragment MobileFilters => builder => BuildFilters(builder, true);
+
+    protected override void OnInitialized() { GridState = new(GridOptions); Reload(); }
+
+    private void BuildFilters(RenderTreeBuilder builder, bool staged)
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "section"); builder.AddAttribute(sequence++, "class", "product-filter-section");
+        builder.OpenElement(sequence++, "strong"); builder.AddContent(sequence++, "Categories"); builder.CloseElement();
+        foreach (var category in new[] { "All" }.Concat(Categories))
+        {
+            var value = category;
+            builder.OpenElement(sequence++, "button"); builder.AddAttribute(sequence++, "type", "button"); builder.AddAttribute(sequence++, "class", (staged ? _stagedCategory : _category) == value ? "active" : null);
+            builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create(this, () => { if (staged) _stagedCategory = value; else { _category = value; Reload(); } }));
+            builder.AddContent(sequence++, value); builder.OpenElement(sequence++, "span"); builder.AddContent(sequence++, value == "All" ? Products.Count : Products.Count(x => x.Category == value)); builder.CloseElement(); builder.CloseElement();
+        }
+        builder.CloseElement();
+
+        builder.OpenElement(sequence++, "section"); builder.AddAttribute(sequence++, "class", "product-filter-section product-price-section");
+        builder.OpenElement(sequence++, "strong"); builder.AddContent(sequence++, "Price"); builder.CloseElement();
+        builder.OpenElement(sequence++, "div"); builder.AddAttribute(sequence++, "class", "product-price-fields");
+        BuildPriceField(builder, ref sequence, staged, true); builder.OpenElement(sequence++, "span"); builder.AddContent(sequence++, "to"); builder.CloseElement(); BuildPriceField(builder, ref sequence, staged, false);
+        builder.CloseElement(); builder.CloseElement();
+
+        builder.OpenElement(sequence++, "section"); builder.AddAttribute(sequence++, "class", "product-filter-section product-brand-section");
+        builder.OpenElement(sequence++, "strong"); builder.AddContent(sequence++, "Brands"); builder.CloseElement();
+        builder.OpenComponent<MudTextField<string>>(sequence++); builder.AddAttribute(sequence++, "Value", staged ? _stagedBrandSearch : _brandSearch); builder.AddAttribute(sequence++, "ValueChanged", EventCallback.Factory.Create<string>(this, value => { if (staged) _stagedBrandSearch = value; else _brandSearch = value; })); builder.AddAttribute(sequence++, "Immediate", true); builder.AddAttribute(sequence++, "Placeholder", "Search brands..."); builder.AddAttribute(sequence++, "Variant", Variant.Outlined); builder.AddAttribute(sequence++, "Margin", Margin.Dense); builder.AddAttribute(sequence++, "Adornment", Adornment.Start); builder.AddAttribute(sequence++, "AdornmentIcon", Icons.Material.Outlined.Search); builder.CloseComponent();
+        foreach (var brand in Brands.Where(value => string.IsNullOrWhiteSpace(staged ? _stagedBrandSearch : _brandSearch) || value.Contains(staged ? _stagedBrandSearch : _brandSearch, StringComparison.OrdinalIgnoreCase)))
+        {
+            var value = brand; var selected = (staged ? _stagedBrands : _brands).Contains(value);
+            builder.OpenElement(sequence++, "label"); builder.AddAttribute(sequence++, "class", "product-brand-option");
+            builder.OpenElement(sequence++, "input"); builder.AddAttribute(sequence++, "type", "checkbox"); builder.AddAttribute(sequence++, "checked", selected); builder.AddAttribute(sequence++, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, _ => ToggleBrand(value, staged))); builder.CloseElement(); builder.AddContent(sequence++, value); builder.CloseElement();
+        }
+        builder.CloseElement();
+    }
+
+    private void BuildPriceField(RenderTreeBuilder builder, ref int sequence, bool staged, bool minimum)
+    {
+        builder.OpenComponent<MudNumericField<decimal?>>(sequence++); builder.AddAttribute(sequence++, "Value", minimum ? (staged ? _stagedMinPrice : _minPrice) : (staged ? _stagedMaxPrice : _maxPrice));
+        builder.AddAttribute(sequence++, "ValueChanged", EventCallback.Factory.Create<decimal?>(this, value => { if (staged) { if (minimum) _stagedMinPrice = value; else _stagedMaxPrice = value; } else { if (minimum) _minPrice = value; else _maxPrice = value; Reload(); } }));
+        builder.AddAttribute(sequence++, "Placeholder", minimum ? "Min" : "Max"); builder.AddAttribute(sequence++, "Variant", Variant.Outlined); builder.AddAttribute(sequence++, "Margin", Margin.Dense); builder.AddAttribute(sequence++, "Min", 0m); builder.CloseComponent();
+    }
+
+    private void ToggleBrand(string brand, bool staged) { var set = staged ? _stagedBrands : _brands; if (!set.Add(brand)) set.Remove(brand); if (!staged) Reload(); }
+    private void SetSearch(string value) { _search = value; Reload(); }
+    private void SetStatus(string value) { _status = value; Reload(); }
+    private int CountForStatus(string status) => status == "All" ? Products.Count : Products.Count(x => x.Status == status);
+    private void Reload() { GridState.SetPage(0); var rows = FilteredRows(); PagedRows = GridState.ApplyPage(rows, ValueFor); }
+    private IEnumerable<ProductAdminRecord> FilteredRows() => Products.Where(x => _status == "All" || x.Status == _status).Where(x => _category == "All" || x.Category == _category).Where(x => _brands.Count == 0 || _brands.Contains(x.Brand)).Where(x => x.Price >= (_minPrice ?? 0) && x.Price <= (_maxPrice ?? decimal.MaxValue)).Where(x => string.IsNullOrWhiteSpace(_search) || $"{x.Name} {x.Code} {x.Category}".Contains(_search, StringComparison.OrdinalIgnoreCase));
+    private static string? ValueFor(ProductAdminRecord row, string key) => key switch { "product" => $"{row.Name} {row.Code} {row.Category}", "stock" => row.Stock.ToString(), "price" => row.Price.ToString(), "orders" => row.Orders.ToString(), "rating" => row.Rating.ToString(), "published" => row.Published.ToString("O"), _ => "" };
+    private void StageMobileFilters() { _stagedCategory = _category; _stagedBrands = [.. _brands]; _stagedMinPrice = _minPrice; _stagedMaxPrice = _maxPrice; _stagedBrandSearch = ""; }
+    private void ResetStagedFilters() { _stagedCategory = _category; _stagedBrands = [.. _brands]; _stagedMinPrice = _minPrice; _stagedMaxPrice = _maxPrice; _stagedBrandSearch = ""; }
+    private void ClearStagedFilters() { _stagedCategory = "All"; _stagedBrands.Clear(); _stagedMinPrice = null; _stagedMaxPrice = null; _stagedBrandSearch = ""; }
+    private void ApplyStagedFilters() { _category = _stagedCategory; _brands = [.. _stagedBrands]; _minPrice = _stagedMinPrice; _maxPrice = _stagedMaxPrice; Reload(); }
+    private void ClearFilters() { _category = "All"; _brands.Clear(); _minPrice = null; _maxPrice = null; StageMobileFilters(); Reload(); }
+    private void AddProduct() { _draftName = ""; _draftCategory = Categories.First(); _draftPrice = null; _editorOpen = true; }
+    private Task SaveProduct() => Task.CompletedTask;
+
+    private sealed record ProductAdminRecord(string Code, string Name, string Category, string Brand, int Stock, decimal Price, int Orders, decimal Rating, string Status, DateTime Published, string Icon, string Tone);
+}

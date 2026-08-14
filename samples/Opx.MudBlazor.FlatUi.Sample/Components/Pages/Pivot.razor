@@ -28,7 +28,14 @@
     </section>
 
     <section class="flat-panel module-panel sample-pivot-panel">
-        <div class="panel-header"><div><strong>Sales analysis</strong><span>@PivotSummary</span></div></div>
+        <div class="panel-header sample-pivot-header">
+            <div><strong>Sales analysis</strong><span>@PivotSummary</span></div>
+            <MudIconButton Icon="@Icons.Material.Outlined.FilterAlt"
+                           Class="sample-pivot-filter-button"
+                           aria-label="Open pivot filters"
+                           title="Open pivot filters"
+                           OnClick="OpenPivotFilters" />
+        </div>
         <FlatPivotGrid TItem="SalesRecord"
                        Items="Records"
                        RowKey="ResolveRowKey"
@@ -43,6 +50,43 @@
         <ChartCode Code="@UsageCode" />
     </section>
 </FlatPage>
+
+<BottomSheet Open="@_filterSheetOpen"
+             OpenChanged="HandleFilterSheetOpenChanged"
+             Title="Pivot filters"
+             AriaLabel="Pivot filters"
+             Class="mobile-filter-sheet sample-pivot-filter-sheet">
+    <ChildContent>
+        <div class="sample-pivot-filter-fields">
+            <MudSelect T="string" @bind-Value="_pendingRowDimension" Label="Rows" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("department")">Department</MudSelectItem>
+                <MudSelectItem Value="@("region")">Region</MudSelectItem>
+                <MudSelectItem Value="@("product")">Product</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string" @bind-Value="_pendingColumnDimension" Label="Columns" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("quarter")">Quarter</MudSelectItem>
+                <MudSelectItem Value="@("status")">Status</MudSelectItem>
+                <MudSelectItem Value="@("region")">Region</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string" @bind-Value="_pendingMeasure" Label="Measure" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@("revenue")">Revenue</MudSelectItem>
+                <MudSelectItem Value="@("quantity")">Quantity</MudSelectItem>
+                <MudSelectItem Value="@("margin")">Margin</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="FlatPivotAggregate" @bind-Value="_pendingAggregate" Label="Aggregate" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="FlatPivotAggregate.Sum">Sum</MudSelectItem>
+                <MudSelectItem Value="FlatPivotAggregate.Count">Count</MudSelectItem>
+                <MudSelectItem Value="FlatPivotAggregate.Average">Average</MudSelectItem>
+                <MudSelectItem Value="FlatPivotAggregate.Minimum">Minimum</MudSelectItem>
+                <MudSelectItem Value="FlatPivotAggregate.Maximum">Maximum</MudSelectItem>
+            </MudSelect>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <MudButton Variant="Variant.Outlined" OnClick="ResetPivotFilters">Reset</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplyPivotFilters">Apply</MudButton>
+    </FooterContent>
+</BottomSheet>
 
 <FlatFormModal Open="@(_selectedCell is not null)"
                OpenChanged="CellDetailOpenChanged"
@@ -98,6 +142,11 @@
     private string _columnDimension = "quarter";
     private string _measure = "revenue";
     private FlatPivotAggregate _aggregate = FlatPivotAggregate.Sum;
+    private bool _filterSheetOpen;
+    private string _pendingRowDimension = "department";
+    private string _pendingColumnDimension = "quarter";
+    private string _pendingMeasure = "revenue";
+    private FlatPivotAggregate _pendingAggregate = FlatPivotAggregate.Sum;
     private FlatPivotCell<SalesRecord>? _selectedCell;
 
     private string PivotSummary => $"{DimensionLabel(_rowDimension)} by {DimensionLabel(_columnDimension)} · {_aggregate} of {DimensionLabel(_measure)}";
@@ -111,6 +160,41 @@
     private void SetRowDimension(string value) => _rowDimension = value;
     private void SetColumnDimension(string value) => _columnDimension = value;
     private void SetMeasure(string value) => _measure = value;
+    private void OpenPivotFilters()
+    {
+        _pendingRowDimension = _rowDimension;
+        _pendingColumnDimension = _columnDimension;
+        _pendingMeasure = _measure;
+        _pendingAggregate = _aggregate;
+        _filterSheetOpen = true;
+    }
+
+    private Task HandleFilterSheetOpenChanged(bool open)
+    {
+        _filterSheetOpen = open;
+        return Task.CompletedTask;
+    }
+
+    private Task ApplyPivotFilters()
+    {
+        _rowDimension = _pendingRowDimension;
+        _columnDimension = _pendingColumnDimension;
+        _measure = _pendingMeasure;
+        _aggregate = _pendingAggregate;
+        _filterSheetOpen = false;
+        return Task.CompletedTask;
+    }
+
+    private Task ResetPivotFilters()
+    {
+        _rowDimension = "department";
+        _columnDimension = "quarter";
+        _measure = "revenue";
+        _aggregate = FlatPivotAggregate.Sum;
+        _filterSheetOpen = false;
+        return Task.CompletedTask;
+    }
+
     private void OpenCell(FlatPivotCell<SalesRecord> cell) => _selectedCell = cell;
     private Task CloseCell() { _selectedCell = null; return Task.CompletedTask; }
     private Task CellDetailOpenChanged(bool open) { if (!open) _selectedCell = null; return Task.CompletedTask; }

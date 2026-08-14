@@ -1,0 +1,94 @@
+@page "/product-detail"
+
+<FlatPage Kind="FlatPageKind.Detail" UsePanel="false" PageCssClass="product-detail-page no-mobile-fab">
+    <ChildContent>
+        <FlatProductDetail Title="Everyday Rose Sweatshirt">
+            <MediaContent>
+                <div class="product-detail-primary-media">
+                    <MudIconButton Icon="@Icons.Material.Outlined.ChevronLeft" aria-label="Previous image" OnClick="PreviousImage" />
+                    <img src="sample-product-shirt.svg" alt="Rose sweatshirt" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.ChevronRight" aria-label="Next image" OnClick="NextImage" />
+                </div>
+            </MediaContent>
+            <ThumbnailContent>
+                @for (var index = 0; index < 4; index++)
+                {
+                    var itemIndex = index;
+                    <button type="button" role="listitem" class="@(itemIndex == _activeImage ? "active" : null)" aria-label="@($"Select product image {itemIndex + 1}")" @onclick="() => _activeImage = itemIndex">
+                        <img src="sample-product-shirt.svg" alt="" />
+                    </button>
+                }
+            </ThumbnailContent>
+            <MetadataContent>
+                <span>Northstar Apparel</span><span>Seller: <strong>OPX Commerce</strong></span><span>Published: <strong>12 Aug 2026</strong></span>
+            </MetadataContent>
+            <HeaderActions>
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Class="grid-action-button" aria-label="Edit product" title="Edit product" OnClick="() => _editorOpen = true" />
+            </HeaderActions>
+            <RatingContent>
+                <span class="product-detail-stars" aria-label="4.8 out of 5 stars">★★★★★</span><span>4.8 (1,248 customer reviews)</span>
+            </RatingContent>
+            <MetricsContent>
+                <FlatProductMetric Label="Price" Value="$59.00" Icon="@Icons.Material.Outlined.Paid" />
+                <FlatProductMetric Label="Orders" Value="2,234" Icon="@Icons.Material.Outlined.ReceiptLong" />
+                <FlatProductMetric Label="Available stock" Value="1,230" Icon="@Icons.Material.Outlined.Inventory2" />
+                <FlatProductMetric Label="Total revenue" Value="$60,645" Icon="@Icons.Material.Outlined.AccountBalanceWallet" />
+            </MetricsContent>
+            <VariantsContent>
+                <section><strong>Sizes</strong><div class="product-size-options">@foreach (var size in Sizes) { <button type="button" class="@(size == _size ? "active" : null)" @onclick="() => _size = size">@size</button> }</div></section>
+                <section><strong>Colors</strong><div class="product-color-options">@foreach (var color in Colors) { <button type="button" class="@(color == _color ? "active" : null)" style="--product-color:@color" aria-label="@($"Select color {color}")" @onclick="() => _color = color"><span></span></button> }</div></section>
+            </VariantsContent>
+            <DescriptionContent>
+                <strong>Description</strong>
+                <p>A comfortable everyday sweatshirt with a durable cotton blend, relaxed fit, and clean finishing for work or casual use.</p>
+            </DescriptionContent>
+            <DetailContent>
+                <div class="product-detail-facts">
+                    <section><strong>Features</strong><ul><li>Soft cotton blend</li><li>Machine washable</li><li>Available in four sizes</li><li>Multiple color options</li></ul></section>
+                    <section><strong>Services</strong><ul><li>10-day replacement</li><li>Shipment tracking</li><li>Host-owned checkout integration</li></ul></section>
+                </div>
+                <div class="product-detail-tabs" role="tablist" aria-label="Product information">
+                    <button type="button" role="tab" aria-selected="@IsSpecificationTab" class="@SpecificationTabClass" @onclick="SelectSpecificationTab">Specification</button>
+                    <button type="button" role="tab" aria-selected="@IsDetailsTab" class="@DetailsTabClass" @onclick="SelectDetailsTab">Details</button>
+                </div>
+                <section class="product-detail-tab-panel" role="tabpanel">
+                    <strong>@_tab</strong>
+                    <p>@(_tab == "Specification" ? "SKU PRD-101 · Cotton blend · Regular fit · 0.62 kg shipping weight." : "Sample content only. Product data, reviews, inventory, pricing, checkout, and persistence remain owned by the host application.")</p>
+                </section>
+            </DetailContent>
+        </FlatProductDetail>
+    </ChildContent>
+</FlatPage>
+
+<FlatFormModal @bind-Open="_editorOpen" Title="Edit product" Mode="Edit" CanSubmit="true" OnSubmit="SaveProduct">
+    <div class="flat-crud-form-grid">
+        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudTextField T="string" @bind-Value="_draftBrand" Label="Brand" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudNumericField T="decimal" @bind-Value="_draftPrice" Label="Price" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+        <MudTextField T="string" @bind-Value="_draftDescription" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" Class="wide" />
+    </div>
+</FlatFormModal>
+
+@code {
+    private static readonly string[] Sizes = ["S", "M", "L", "XL"];
+    private static readonly string[] Colors = ["#8d98bd", "#3577f1", "#0ab39c", "#299cdb", "#f7b84b", "#f06548", "#212529"];
+    private int _activeImage;
+    private string _size = "M";
+    private string _color = "#f06548";
+    private string _tab = "Details";
+    private bool _editorOpen;
+    private string _draftName = "Everyday Rose Sweatshirt";
+    private string _draftBrand = "Northstar Apparel";
+    private decimal _draftPrice = 59m;
+    private string _draftDescription = "A comfortable everyday sweatshirt.";
+
+    private void PreviousImage() => _activeImage = (_activeImage + 3) % 4;
+    private void NextImage() => _activeImage = (_activeImage + 1) % 4;
+    private bool IsSpecificationTab => _tab == "Specification";
+    private bool IsDetailsTab => _tab == "Details";
+    private string? SpecificationTabClass => IsSpecificationTab ? "active" : null;
+    private string? DetailsTabClass => IsDetailsTab ? "active" : null;
+    private void SelectSpecificationTab() => _tab = "Specification";
+    private void SelectDetailsTab() => _tab = "Details";
+    private Task SaveProduct() => Task.CompletedTask;
+}

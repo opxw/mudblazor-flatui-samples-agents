@@ -1,0 +1,65 @@
+@page "/dynamic-menu"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="dynamic-menu-page no-mobile-fab">
+    <ChildContent>
+        <div class="dynamic-menu-sample-grid">
+            <section class="flat-editor-section">
+                <header><strong>Autoload navigation</strong><MudIconButton Icon="@Icons.Material.Outlined.Refresh" Size="Size.Small" OnClick="Reload" aria-label="Reload dynamic menu" /></header>
+                <div class="flat-editor-section-body dynamic-menu-preview">
+                    <FlatDynamicMenu @ref="_menu"
+                                     LoadItems="LoadMenuAsync"
+                                     Loaded="MenuLoaded"
+                                     Selected="MenuSelected"
+                                     AriaLabel="Sample dynamic menu" />
+                </div>
+            </section>
+            <section class="flat-editor-section">
+                <header><strong>Resolved contract</strong></header>
+                <div class="flat-editor-section-body">
+                    <div class="dynamic-menu-contract-grid">
+                        <code>MenuText</code><span>Visible English label</span>
+                        <code>Id</code><span>Stable unique key</span>
+                        <code>ParentId</code><span>Recursive parent relation</span>
+                        <code>Url</code><span>Internal or HTTP(S) target</span>
+                        <code>Icon</code><span>MudBlazor icon value</span>
+                    </div>
+                    <FlatInfoItem Label="Root menus" Value="@_rootCount.ToString()" />
+                    <FlatInfoItem Label="Last selection" Value="@(_selected ?? "None")" />
+                </div>
+            </section>
+        </div>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private FlatDynamicMenu? _menu;
+    private int _rootCount;
+    private string? _selected;
+
+    private Task Reload() => _menu?.ReloadAsync() ?? Task.CompletedTask;
+
+    private static async Task<IReadOnlyList<FlatDynamicMenuItem>> LoadMenuAsync(CancellationToken cancellationToken)
+    {
+        await Task.Delay(350, cancellationToken);
+        return
+        [
+            new("Workspace", "workspace", null, null, Icons.Material.Outlined.SpaceDashboard),
+            new("Dashboard", "dashboard", "workspace", "/", Icons.Material.Outlined.Dashboard),
+            new("Operations", "operations", null, null, Icons.Material.Outlined.AccountTree),
+            new("Master Data", "master", "operations", null, Icons.Material.Outlined.FolderOpen),
+            new("Asset Management", "asset-management", "master", null, Icons.Material.Outlined.Inventory2),
+            new("Asset Register", "asset-register", "asset-management", "/crud", Icons.Material.Outlined.Devices),
+            new("Model CRUD", "model-crud", "master", "/model-crud", Icons.Material.Outlined.DynamicForm),
+            new("Tree Grid", "tree-grid", "master", "/tree-grid", Icons.Material.Outlined.AccountTree),
+            new("Reporting", "reporting", "operations", null, Icons.Material.Outlined.Assessment),
+            new("Financial Reports", "financial-reports", "reporting", null, Icons.Material.Outlined.AccountBalance),
+            new("Monthly Report", "monthly-report", "financial-reports", "/reports", Icons.Material.Outlined.CalendarMonth),
+            new("Pivot", "pivot", "reporting", "/pivot", Icons.Material.Outlined.PivotTableChart),
+            new("Reference", "reference", null, null, Icons.Material.Outlined.Widgets),
+            new("Components", "components", "reference", "/components", Icons.Material.Outlined.Widgets)
+        ];
+    }
+
+    private Task MenuLoaded(IReadOnlyList<FlatNavigationMenuItem> items) { _rootCount = items.Count; return Task.CompletedTask; }
+    private Task MenuSelected(FlatDynamicMenuItem item) { _selected = $"{item.Id} · {item.MenuText}"; return Task.CompletedTask; }
+}

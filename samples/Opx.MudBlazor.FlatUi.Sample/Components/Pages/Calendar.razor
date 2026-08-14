@@ -1,0 +1,146 @@
+@page "/calendar"
+@inject ISnackbar Snackbar
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Calendar - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module"
+          UsePanel="false"
+          PageCssClass="calendar-page"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Create event"
+          PrimaryActionIcon="@Icons.Material.Outlined.Add"
+          PrimaryActionAriaLabel="Create calendar event"
+          OnPrimaryAction="OpenCreate">
+    <ChildContent>
+        <FlatCalendar Items="@_events"
+                      @bind-DisplayDate="_displayDate"
+                      @bind-View="_view"
+                      ItemSelected="SelectEvent"
+                      DaySelected="SelectDay"
+                      AriaLabel="Operations calendar">
+            <SidebarContent>
+                <section class="calendar-palette" aria-label="Event categories">
+                    <strong>Event categories</strong>
+                    <span class="tone-green"><i></i>Planning</span>
+                    <span class="tone-blue"><i></i>Meeting</span>
+                    <span class="tone-amber"><i></i>Reporting</span>
+                    <span class="tone-red"><i></i>Deadline</span>
+                </section>
+                <section class="calendar-upcoming" aria-label="Upcoming events">
+                    <header><strong>Upcoming events</strong><small>Next scheduled activity</small></header>
+                    @foreach (var item in UpcomingEvents)
+                    {
+                        <button type="button" @onclick="() => SelectEvent(item)">
+                            <span><i class="@($"tone-{Tone(item)}")"></i>@item.Start.ToString("d MMM yyyy")</span>
+                            <strong>@item.Title</strong>
+                            <small>@(item.AllDay ? "All day" : item.Start.ToString("t"))</small>
+                        </button>
+                    }
+                </section>
+            </SidebarContent>
+        </FlatCalendar>
+    </ChildContent>
+</FlatPage>
+
+<FlatFormModal Open="@_editorOpen"
+               OpenChanged="SetEditorOpen"
+               Title="Create event"
+               Mode="Create"
+               CanSubmit="@(!string.IsNullOrWhiteSpace(_draft.Title))"
+               IsDirty="@(!string.IsNullOrWhiteSpace(_draft.Title))"
+               OnSubmit="SaveEvent"
+               CloseOnOutsideClick="false"
+               AutoRefreshOnSuccess="false">
+    <div class="flat-crud-form-grid calendar-event-form">
+        <MudTextField T="string" @bind-Value="_draft.Title" Label="Event title" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+        <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem Value="@("Planning")">Planning</MudSelectItem>
+            <MudSelectItem Value="@("Meeting")">Meeting</MudSelectItem>
+            <MudSelectItem Value="@("Reporting")">Reporting</MudSelectItem>
+            <MudSelectItem Value="@("Deadline")">Deadline</MudSelectItem>
+        </MudSelect>
+        <MudDatePicker @bind-Date="_draft.Date" Label="Date" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudTimePicker @bind-Time="_draft.Time" Label="Start time" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="@_draft.AllDay" />
+        <MudCheckBox T="bool" @bind-Value="_draft.AllDay" Label="All-day event" Color="Color.Primary" />
+        <MudTextField T="string" @bind-Value="_draft.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" Class="wide" />
+    </div>
+</FlatFormModal>
+
+@code {
+    private readonly List<FlatSchedulerItem> _events =
+    [
+        Event("EV-001", "All-day maintenance", 8, 1, 0, 8, true, "IT operations", "indigo", "Maintenance window"),
+        Event("EV-002", "Visit online course", 8, 9, 9, 11, false, "Learning", "amber", "Quarterly professional development"),
+        Event("EV-003", "Design review", 8, 14, 9, 10, false, "Product team", "green", "Review the next release experience"),
+        Event("EV-004", "Customer workshop", 8, 15, 13, 15, false, "Sales", "green", "Solution planning workshop"),
+        Event("EV-005", "Finance close", 8, 18, 0, 8, true, "Finance", "indigo", "Monthly closing activities"),
+        Event("EV-006", "Weekly strategy planning", 8, 23, 10, 12, false, "Leadership", "red", "Review priorities and dependencies"),
+        Event("EV-007", "Release readiness", 8, 28, 15, 16, false, "Engineering", "blue", "Go-live checklist and ownership"),
+        Event("EV-008", "Annual planning kickoff", 1, 12, 9, 11, false, "Planning", "green", "Set annual priorities"),
+        Event("EV-009", "Inventory audit", 3, 18, 0, 8, true, "Operations", "amber", "Quarterly stock audit"),
+        Event("EV-010", "Customer summit", 11, 6, 10, 16, false, "Sales", "blue", "Annual customer event")
+    ];
+
+    private DateTimeOffset _displayDate = new(2026, 8, 14, 0, 0, 0, TimeSpan.FromHours(7));
+    private FlatCalendarView _view = FlatCalendarView.Year;
+    private bool _editorOpen;
+    private EventDraft _draft = NewDraft(new DateTime(2026, 8, 14));
+
+    private IEnumerable<FlatSchedulerItem> UpcomingEvents => _events.Where(item => item.End >= _displayDate.Date).OrderBy(item => item.Start).Take(4);
+
+    private void OpenCreate()
+    {
+        _draft = NewDraft(_displayDate.Date);
+        _editorOpen = true;
+    }
+
+    private Task SetEditorOpen(bool open)
+    {
+        _editorOpen = open;
+        return Task.CompletedTask;
+    }
+
+    private void SelectDay(DateTimeOffset day)
+    {
+        _draft = NewDraft(day.Date);
+    }
+
+    private void SelectEvent(FlatSchedulerItem item) => Snackbar.Add($"Selected: {item.Title}", Severity.Info);
+
+    private void SaveEvent()
+    {
+        var date = _draft.Date ?? _displayDate.Date;
+        var time = _draft.AllDay ? TimeSpan.Zero : _draft.Time ?? new TimeSpan(9, 0, 0);
+        var start = new DateTimeOffset(date.Date.Add(time), _displayDate.Offset);
+        _events.Add(new FlatSchedulerItem($"EV-{_events.Count + 1:000}", _draft.Title.Trim(), start, _draft.AllDay ? start.AddDays(1).AddTicks(-1) : start.AddHours(1), _draft.Category, CategoryTone(_draft.Category))
+        {
+            AllDay = _draft.AllDay,
+            Category = _draft.Category,
+            Description = _draft.Description.Trim()
+        });
+        Snackbar.Add("Event created in sample memory.", Severity.Success);
+    }
+
+    private static FlatSchedulerItem Event(string key, string title, int month, int day, int hour, int endHour, bool allDay, string resource, string tone, string description)
+    {
+        var start = new DateTimeOffset(2026, month, day, hour, 0, 0, TimeSpan.FromHours(7));
+        var end = allDay ? start.AddDays(1).AddTicks(-1) : new DateTimeOffset(2026, month, day, endHour, 0, 0, TimeSpan.FromHours(7));
+        return new(key, title, start, end, resource, tone) { AllDay = allDay, Category = resource, Description = description };
+    }
+
+    private static string Tone(FlatSchedulerItem item) => item.Color?.ToLowerInvariant() switch { "green" => "green", "amber" => "amber", "red" => "red", "indigo" => "indigo", _ => "blue" };
+    private static string CategoryTone(string category) => category switch { "Planning" => "green", "Reporting" => "amber", "Deadline" => "red", _ => "blue" };
+    private static EventDraft NewDraft(DateTime date) => new() { Date = date, Time = new TimeSpan(9, 0, 0), Category = "Meeting" };
+
+    private sealed class EventDraft
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Category { get; set; } = "Meeting";
+        public DateTime? Date { get; set; }
+        public TimeSpan? Time { get; set; }
+        public bool AllDay { get; set; }
+        public string Description { get; set; } = string.Empty;
+    }
+}

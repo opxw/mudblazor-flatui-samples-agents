@@ -25,6 +25,7 @@
         </TitleContent>
         <ChildContent>
         @if (ShowItem("ERP Overview", "ERP")) { <MudNavLink Href="/erp" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.SpaceDashboard">ERP Overview</MudNavLink> }
+        @if (ShowItem("ERP Toolkit", "ERP", "Transaction", "Reconciliation", "Planning")) { <MudNavLink Href="/erp-toolkit" Icon="@Icons.Material.Outlined.AccountTree">ERP Toolkit</MudNavLink> }
         @if (ShowGroup(HrTerms))
         {
             <MudNavGroup Title="Human Resources" Icon="@Icons.Material.Outlined.Groups" Expanded="@ExpandGroup(_erpHrExpanded)" ExpandedChanged="@((bool value) => _erpHrExpanded = value)" Class="sample-menu-tree erp-menu-subgroup">
@@ -83,9 +84,15 @@
         @if (ShowItem("CRUD Asset", "Operations")) { <MudNavLink Href="/crud" Icon="@Icons.Material.Outlined.EditNote">CRUD Asset</MudNavLink> }
         @if (ShowItem("CRUD Simple", "Operations")) { <MudNavLink Href="/crud-simple" Icon="@Icons.Material.Outlined.AddBox">CRUD Simple</MudNavLink> }
         @if (ShowItem("Grid Editor", "Operations")) { <MudNavLink Href="/grid-editor" Icon="@Icons.Material.Outlined.EditRoad">Grid Editor</MudNavLink> }
+        @if (ShowItem("Model CRUD", "Operations", "Generated Form")) { <MudNavLink Href="/model-crud" Icon="@Icons.Material.Outlined.DynamicForm">Model CRUD</MudNavLink> }
+        @if (ShowItem("Form Designer", "Operations", "WYSIWYG", "Live Preview")) { <MudNavLink Href="/model-form-designer" Icon="@Icons.Material.Outlined.DashboardCustomize">Form Designer</MudNavLink> }
+        @if (ShowItem("Dynamic Menu", "Operations", "Autoload")) { <MudNavLink Href="/dynamic-menu" Icon="@Icons.Material.Outlined.AccountTree">Dynamic Menu</MudNavLink> }
+        @if (ShowItem("Operations Workspace", "Operations", "Service Desk", "Approval")) { <MudNavLink Href="/operations-workspace" Icon="@Icons.Material.Outlined.Workspaces">Operations Workspace</MudNavLink> }
         @if (ShowItem("Tree Grid", "Operations")) { <MudNavLink Href="/tree-grid" Icon="@Icons.Material.Outlined.AccountTree">Tree Grid</MudNavLink> }
         @if (ShowItem("Jobs", "Operations", "Job Board")) { <MudNavLink Href="/jobs" Icon="@Icons.Material.Outlined.WorkHistory">Jobs</MudNavLink> }
         @if (ShowItem("Kanban", "Operations")) { <MudNavLink Href="/kanban" Icon="@Icons.Material.Outlined.ViewKanban">Kanban</MudNavLink> }
+        @if (ShowItem("Calendar", "Operations", "Schedule")) { <MudNavLink Href="/calendar" Icon="@Icons.Material.Outlined.CalendarMonth">Calendar</MudNavLink> }
+        @if (ShowItem("Sales Pipeline", "Operations")) { <MudNavLink Href="/sales-pipeline" Icon="@Icons.Material.Outlined.FilterAlt">Sales Pipeline</MudNavLink> }
         @if (ShowItem("Chat", "Operations")) { <MudNavLink Href="/chat" Icon="@Icons.Material.Outlined.Chat">Chat</MudNavLink> }
         @if (ShowItem("AI Chat", "Operations", "Assistant")) { <MudNavLink Href="/ai-chat" Icon="@Icons.Material.Outlined.AutoAwesome">AI Chat</MudNavLink> }
         @if (ShowItem("Email", "Operations"))
@@ -112,6 +119,8 @@
         @if (ShowItem("Large Data Grid", "Data & Reports")) { <MudNavLink Href="/data-grid-large" Icon="@Icons.Material.Outlined.TableRows">Large Data Grid</MudNavLink> }
         @if (ShowItem("Reports", "Data & Reports")) { <MudNavLink Href="/reports" Icon="@Icons.Material.Outlined.Assessment">Reports</MudNavLink> }
         @if (ShowItem("Pivot", "Data & Reports")) { <MudNavLink Href="/pivot" Icon="@Icons.Material.Outlined.PivotTableChart">Pivot</MudNavLink> }
+        @if (ShowItem("Enterprise Toolkit", "Data & Reports")) { <MudNavLink Href="/enterprise-toolkit" Icon="@Icons.Material.Outlined.DomainAdd">Enterprise Toolkit</MudNavLink> }
+        @if (ShowItem("Experience Toolkit", "Data & Reports", "Accessibility", "Command Palette")) { <MudNavLink Href="/experience-toolkit" Icon="@Icons.Material.Outlined.AccessibilityNew">Experience Toolkit</MudNavLink> }
     </MudNavGroup>
 }
 
@@ -123,7 +132,11 @@
                  ExpandedChanged="@((bool value) => _commerceExpanded = value)"
                  Class="sample-menu-tree">
         @if (ShowItem("Product Catalog", "Commerce & Content")) { <MudNavLink Href="/catalog" Icon="@Icons.Material.Outlined.ShoppingBag">Product Catalog</MudNavLink> }
+        @if (ShowItem("Product Management", "Commerce & Content")) { <MudNavLink Href="/product-management" Icon="@Icons.Material.Outlined.Inventory2">Product Management</MudNavLink> }
+        @if (ShowItem("Product Detail", "Commerce & Content")) { <MudNavLink Href="/product-detail" Icon="@Icons.Material.Outlined.Sell">Product Detail</MudNavLink> }
+        @if (ShowItem("Product Editor", "Commerce & Content")) { <MudNavLink Href="/product-editor" Icon="@Icons.Material.Outlined.EditNote">Product Editor</MudNavLink> }
         @if (ShowItem("Website Front", "Commerce & Content")) { <MudNavLink Href="/website" Icon="@Icons.Material.Outlined.Language">Website Front</MudNavLink> }
+        @if (ShowItem("Job Landing", "Commerce & Content")) { <MudNavLink Href="/job-landing" Icon="@Icons.Material.Outlined.WorkOutline">Job Landing</MudNavLink> }
         @if (ShowItem("Blog", "Commerce & Content")) { <MudNavLink Href="/blog" Icon="@Icons.Material.Outlined.Article">Blog</MudNavLink> }
     </MudNavGroup>
 }
@@ -151,6 +164,8 @@
                  ExpandedChanged="@((bool value) => _uiKitExpanded = value)"
                  Class="sample-menu-tree">
         @if (ShowItem("Components", "UI Kit")) { <MudNavLink Href="/components" Icon="@Icons.Material.Outlined.Widgets">Components</MudNavLink> }
+        @if (ShowItem("Development Rules", "UI Kit")) { <MudNavLink Href="/development-rules" Icon="@Icons.Material.Outlined.Rule">Development Rules</MudNavLink> }
+        @if (ShowItem("Accordions", "UI Kit")) { <MudNavLink Href="/accordions" Icon="@Icons.Material.Outlined.UnfoldMore">Accordions</MudNavLink> }
         @if (ShowItem("Charts", "UI Kit")) { <MudNavLink Href="/charts" Icon="@Icons.Material.Outlined.InsertChartOutlined">Charts</MudNavLink> }
         @if (ShowItem("File Upload", "UI Kit")) { <MudNavLink Href="/file-upload" Icon="@Icons.Material.Outlined.CloudUpload">File Upload</MudNavLink> }
         @if (ShowItem("Grid Preferences", "UI Kit")) { <MudNavLink Href="/grid-preferences" Icon="@Icons.Material.Outlined.ViewColumn">Grid Preferences</MudNavLink> }
@@ -171,11 +186,11 @@
 
 @code {
     private static readonly string[] OperationsTerms =
-        ["Operations", "CRUD Asset", "CRUD Simple", "Grid Editor", "Inline Edit", "Tree Grid", "Hierarchy", "Parent Key", "Drag Drop", "Jobs", "Job Board", "Kanban", "Task Board", "Workflow", "Chat", "AI Chat", "Assistant", "Prompt", "Messages", "Conversation", "Email", "Mailbox", "Inbox", "Compose", "Monitoring Service", "Monitoring Database"];
-    private static readonly string[] DataTerms = ["Data & Reports", "Static / Master", "Large Data Grid", "Table", "Scroll", "Reports", "Pivot", "Matrix", "Aggregate"];
-    private static readonly string[] CommerceTerms = ["Commerce & Content", "Product Catalog", "Catalog", "Ecommerce", "Website Front", "Blog", "Landing Page", "Front Page"];
+        ["Operations", "CRUD Asset", "CRUD Simple", "Grid Editor", "Inline Edit", "Model CRUD", "Generated Form", "Data Annotations", "Form Designer", "WYSIWYG", "Live Preview", "Padding", "Margin", "CSS Class", "Dynamic Menu", "Autoload", "MenuText", "ParentId", "Operations Workspace", "Service Desk", "Approval", "Procurement", "Stock Transfer", "Timesheet", "POS", "Tree Grid", "Hierarchy", "Parent Key", "Drag Drop", "Jobs", "Job Board", "Kanban", "Task Board", "Workflow", "Calendar", "Schedule", "Agenda", "Sales Pipeline", "CRM", "Deals", "Chat", "AI Chat", "Assistant", "Prompt", "Messages", "Conversation", "Email", "Mailbox", "Inbox", "Compose", "Monitoring Service", "Monitoring Database"];
+    private static readonly string[] DataTerms = ["Data & Reports", "Static / Master", "Large Data Grid", "Table", "Scroll", "Reports", "Pivot", "Matrix", "Aggregate", "Enterprise Toolkit", "Experience Toolkit", "Accessibility", "Command Palette", "Schema Form", "Collaboration", "Conflict", "Import", "Master Detail", "Audit", "Workflow", "Scheduler", "Offline Sync", "Documents"];
+    private static readonly string[] CommerceTerms = ["Commerce & Content", "Product Catalog", "Product Management", "Product Detail", "Product Editor", "Catalog", "Ecommerce", "Products", "Filters", "Gallery", "Publish", "Tags", "Website Front", "Job Landing", "Careers", "Recruitment", "Blog", "Landing Page", "Front Page"];
     private static readonly string[] AccountTerms = ["Account", "Edit Account", "User Profile", "Login Sample", "Two-step Verification", "2FA", "OTP", "Reset Password", "Forgot Password", "Recovery"];
-    private static readonly string[] UiKitTerms = ["UI Kit", "Components", "Charts", "MudBlazor Charts", "Line", "Bar", "Stacked Bar", "Pie", "Donut", "Timeseries", "Heat Map", "Rose", "Radar", "Sankey", "Scatter Plot", "File Upload", "Drag Drop", "Progress", "Grid Preferences", "Saved Views", "Virtualization", "Colors", "Palette", "Semantic", "Timeline", "Activity", "Widgets", "Metric", "Profile Card Grid", "Members", "Card Grid"];
+    private static readonly string[] UiKitTerms = ["UI Kit", "Components", "Development Rules", "Rules", "Skill", "Source of Truth", "PageId", "Accordions", "Accordion", "Collapse", "Expand", "Flush", "Charts", "MudBlazor Charts", "Line", "Bar", "Stacked Bar", "Pie", "Donut", "Timeseries", "Heat Map", "Rose", "Radar", "Sankey", "Scatter Plot", "File Upload", "Drag Drop", "Progress", "Grid Preferences", "Saved Views", "Virtualization", "Colors", "Palette", "Semantic", "Timeline", "Activity", "Widgets", "Metric", "Profile Card Grid", "Members", "Card Grid"];
     private static readonly string[] HrTerms = ["Human Resources", "HR Overview", "Employees", "Attendance & Leave"];
     private static readonly string[] ProductionTerms = ["Production", "Production Plan", "Work Orders", "Quality Control"];
     private static readonly string[] FinanceTerms = ["Finance", "Finance Overview", "General Ledger", "Accounts Payable", "Accounts Receivable"];
@@ -240,8 +255,14 @@
             case "/crud":
             case "/crud-simple":
             case "/grid-editor":
+            case "/model-crud":
+            case "/model-form-designer":
+            case "/dynamic-menu":
+            case "/operations-workspace":
             case "/jobs":
             case "/kanban":
+            case "/calendar":
+            case "/sales-pipeline":
             case "/chat":
             case "/email":
             case "/monitoring":
@@ -252,9 +273,12 @@
             case "/data-grid-large":
             case "/reports":
             case "/pivot":
+            case "/enterprise-toolkit":
+            case "/experience-toolkit":
                 _dataExpanded = true;
                 break;
             case "/catalog":
+            case "/job-landing":
             case "/website":
             case "/blog":
                 _commerceExpanded = true;
@@ -266,6 +290,7 @@
                 _accountExpanded = true;
                 break;
             case "/components":
+            case "/accordions":
             case "/charts":
             case "/file-upload":
             case "/grid-preferences":

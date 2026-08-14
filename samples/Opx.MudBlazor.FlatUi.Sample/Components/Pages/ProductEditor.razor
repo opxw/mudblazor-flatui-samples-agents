@@ -1,0 +1,104 @@
+@page "/product-editor"
+
+<FlatPage Kind="FlatPageKind.CrudForm"
+          UsePanel="false"
+          PageCssClass="product-editor-page no-mobile-fab"
+          HeaderActionsClass="page-actions-only product-editor-page-actions">
+    <HeaderActions>
+        <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save" OnClick="Save">Save product</MudButton>
+    </HeaderActions>
+    <ChildContent>
+        <FlatEditorWorkspace MainAriaLabel="Product content" SidebarAriaLabel="Product publishing settings">
+            <MainContent>
+                <FlatEditorSection>
+                    <MudTextField T="string" @bind-Value="_title" Label="Product title" Placeholder="Enter product title" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                    <div class="product-editor-rich-field">
+                        <label>Product description</label>
+                        <div class="product-editor-rich-toolbar" role="toolbar" aria-label="Description formatting">
+                            @foreach (var action in EditorActions)
+                            {
+                                <MudIconButton Icon="@action.Icon" Size="Size.Small" aria-label="@action.Label" title="@action.Label" />
+                            }
+                        </div>
+                        <textarea @bind="_description" aria-label="Product description"></textarea>
+                    </div>
+                </FlatEditorSection>
+
+                <FlatEditorSection Title="Product gallery">
+                    <div class="product-editor-featured">
+                        <div><strong>Featured image</strong><span>Main product image used by catalog and detail pages.</span></div>
+                        <img src="sample-product-shirt.svg" alt="Current featured product" />
+                    </div>
+                    <FlatFileUpload Options="UploadOptions"
+                                    AutoUpload="false"
+                                    DropLabel="Add product images"
+                                    Hint="Drag files here or browse. Upload is completed by the host when the product is saved."
+                                    FilesChanged="FilesChanged" />
+                </FlatEditorSection>
+
+                <FlatEditorSection Title="Inventory and pricing">
+                    <div class="product-editor-field-grid">
+                        <MudTextField T="string" @bind-Value="_sku" Label="SKU" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        <MudNumericField T="decimal" @bind-Value="_price" Label="Price" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+                        <MudNumericField T="int" @bind-Value="_stock" Label="Stock" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+                        <MudSelect T="string" @bind-Value="_taxClass" Label="Tax class" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem Value="@("Standard")">Standard</MudSelectItem><MudSelectItem Value="@("Reduced")">Reduced</MudSelectItem><MudSelectItem Value="@("Exempt")">Exempt</MudSelectItem>
+                        </MudSelect>
+                    </div>
+                </FlatEditorSection>
+            </MainContent>
+            <SidebarContent>
+                <FlatEditorSection Title="Publish">
+                    <MudSelect T="string" @bind-Value="_status" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense"><MudSelectItem Value="@("Published")">Published</MudSelectItem><MudSelectItem Value="@("Draft")">Draft</MudSelectItem></MudSelect>
+                    <MudSelect T="string" @bind-Value="_visibility" Label="Visibility" Variant="Variant.Outlined" Margin="Margin.Dense"><MudSelectItem Value="@("Public")">Public</MudSelectItem><MudSelectItem Value="@("Private")">Private</MudSelectItem></MudSelect>
+                </FlatEditorSection>
+                <FlatEditorSection Title="Publish schedule">
+                    <MudDatePicker @bind-Date="_publishDate" Label="Publish date" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </FlatEditorSection>
+                <FlatEditorSection Title="Product category">
+                    <MudSelect T="string" @bind-Value="_category" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">@foreach (var category in Categories) { <MudSelectItem Value="@category">@category</MudSelectItem> }</MudSelect>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Outlined.Add">Add category</MudButton>
+                </FlatEditorSection>
+                <FlatEditorSection Title="Product tags">
+                    <FlatMultiSelect T="string" Items="TagOptions" Label="Tags" Placeholder="Select tags" SelectedValues="_tags" SelectedValuesChanged="SetTags" ShowItemLeading="false" MaxDisplayedSelectionItems="3" />
+                </FlatEditorSection>
+                <FlatEditorSection Title="Short description">
+                    <MudTextField T="string" @bind-Value="_shortDescription" Placeholder="Catalog and search summary" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
+                </FlatEditorSection>
+            </SidebarContent>
+        </FlatEditorWorkspace>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private static readonly string[] Categories = ["Apparel", "Accessories", "Electronics", "Home Office", "Lifestyle"];
+    private static readonly IReadOnlyList<FlatMultiSelectOption<string>> TagOptions = [new("Cotton", "Cotton"), new("New", "New"), new("Featured", "Featured"), new("Sale", "Sale")];
+    private static readonly IReadOnlyList<EditorAction> EditorActions =
+    [
+        new("Undo", Icons.Material.Outlined.Undo), new("Redo", Icons.Material.Outlined.Redo), new("Bold", Icons.Material.Outlined.FormatBold),
+        new("Italic", Icons.Material.Outlined.FormatItalic), new("Link", Icons.Material.Outlined.Link), new("Image", Icons.Material.Outlined.Image),
+        new("Bulleted list", Icons.Material.Outlined.FormatListBulleted), new("Numbered list", Icons.Material.Outlined.FormatListNumbered)
+    ];
+    private static readonly FlatFileUploadOptions UploadOptions = new() { Multiple = true, MaximumFileCount = 6, MaximumFileSizeBytes = 5 * 1024 * 1024, AllowedExtensions = [".png", ".jpg", ".jpeg", ".webp"] };
+
+    private string _title = "Everyday Rose Sweatshirt";
+    private string _description = "A comfortable everyday sweatshirt with a durable cotton blend, relaxed fit, and clean finishing for work or casual use.";
+    private string _sku = "PRD-101";
+    private decimal _price = 59m;
+    private int _stock = 1230;
+    private string _taxClass = "Standard";
+    private string _status = "Published";
+    private string _visibility = "Public";
+    private DateTime? _publishDate = new DateTime(2026, 8, 12);
+    private string _category = "Apparel";
+    private IReadOnlyCollection<string> _tags = ["Cotton"];
+    private string _shortDescription = "Soft cotton-blend sweatshirt for everyday use.";
+    private IReadOnlyList<FlatFileUploadItem> _files = [];
+
+    private void SetTags(IReadOnlyCollection<string> values) => _tags = values;
+    private void FilesChanged(IReadOnlyList<FlatFileUploadItem> files) => _files = files;
+    private Task Save() => Task.CompletedTask;
+    private void Cancel() { }
+    private sealed record EditorAction(string Label, string Icon);
+}

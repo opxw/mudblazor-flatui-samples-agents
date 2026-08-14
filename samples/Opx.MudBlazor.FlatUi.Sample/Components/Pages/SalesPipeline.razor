@@ -1,0 +1,157 @@
+@page "/sales-pipeline"
+@inject ISnackbar Snackbar
+
+@* Copyright © 2026 opx. All rights reserved. *@
+
+<PageTitle>Sales Pipeline - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="sales-pipeline-page"
+          PanelClass="flat-panel pipeline-panel"
+          FilterEnabled="true"
+          FilterActive="@PipelineFilterActive"
+          FilterLabel="Filter deals"
+          FilterAriaLabel="Open pipeline filters"
+          OnFilter="OpenFilters"
+          MobileToolbarActionsCollapsible="false">
+    <ToolbarContent>
+        <div class="pipeline-toolbar-filters">
+            <MudTextField T="string" Value="@_search" ValueChanged="SetSearch" Immediate="true"
+                          Placeholder="Search deals..." Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" />
+            <MudSelect T="string" Class="pipeline-desktop-filter" @bind-Value="_ownerFilter" Label="Owner" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@AllFilter">All</MudSelectItem>
+                @foreach (var owner in Owners) { <MudSelectItem Value="@owner">@owner</MudSelectItem> }
+            </MudSelect>
+        </div>
+    </ToolbarContent>
+    <ChildContent>
+        <FlatKanbanBoard TItem="PipelineDeal"
+                          Columns="@Columns"
+                          Items="@_deals"
+                          ColumnKey="@(deal => deal.Stage)"
+                          ItemFilter="MatchesFilter"
+                          GetItemLabel="@(deal => deal.Title)"
+                          OnMove="MoveDeal"
+                          Variant="@FlatKanbanBoardVariant.Pipeline"
+                          AriaLabel="Sample sales pipeline">
+            <ColumnHeaderTemplate Context="stage">
+                <div class="flat-pipeline-column-heading">
+                    <strong>@stage.Column.Title</strong>
+                    <small>@Currency(stage.Items.Sum(item => item.Value)) · @stage.Items.Count @(stage.Items.Count == 1 ? "Deal" : "Deals")</small>
+                </div>
+            </ColumnHeaderTemplate>
+            <ItemTemplate Context="deal">
+                <FlatPipelineCard Title="@deal.Title"
+                                  ValueText="@CompactCurrency(deal.Value)"
+                                  DateText="@deal.DateText"
+                                  OwnerName="@deal.Owner"
+                                  OwnerInitials="@Initials(deal.Owner)"
+                                  LogoIcon="@deal.LogoIcon"
+                                  Pinned="@deal.Pinned"
+                                  Expanded="@(deal.Id == _expandedDealId)"
+                                  DetailTitle="@deal.Company"
+                                  BadgeText="@deal.AgeText"
+                                  Description="@deal.Description"
+                                  OnClick="@(() => ToggleDeal(deal))">
+                    <DetailContent>
+                        <div class="flat-pipeline-activity-list">
+                            @foreach (var activity in deal.Activities)
+                            {
+                                <span><MudIcon Icon="@activity.Icon" /><strong>@activity.Title</strong><small>@activity.When</small></span>
+                            }
+                        </div>
+                    </DetailContent>
+                    <ActionContent>
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@Icons.Material.Outlined.Call" OnClick="@(() => ShowAction("Call", deal))">Call</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Message" OnClick="@(() => ShowAction("Message", deal))">Message</MudButton>
+                    </ActionContent>
+                </FlatPipelineCard>
+            </ItemTemplate>
+        </FlatKanbanBoard>
+    </ChildContent>
+</FlatPage>
+
+<BottomSheet Open="@_filterOpen" OpenChanged="HandleFilterOpen" Title="Pipeline filters" AriaLabel="Pipeline filters" Class="mobile-filter-sheet">
+    <ChildContent>
+        <div class="kanban-filter-sheet-fields">
+            <MudSelect T="string" @bind-Value="_pendingOwnerFilter" Label="Owner" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="@AllFilter">All</MudSelectItem>
+                @foreach (var owner in Owners) { <MudSelectItem Value="@owner">@owner</MudSelectItem> }
+            </MudSelect>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <MudButton Variant="Variant.Outlined" OnClick="ResetFilters">Reset</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplyFilters">Apply</MudButton>
+    </FooterContent>
+</BottomSheet>
+
+@code {
+    private const string AllFilter = "All";
+    private static readonly FlatKanbanColumn[] Columns =
+    [
+        new("discovered", "Lead discovered", "red"),
+        new("contacted", "Contact initiated", "green"),
+        new("qualified", "Needs identified", "amber"),
+        new("meeting", "Meeting arranged", "blue"),
+        new("accepted", "Offer accepted", "indigo")
+    ];
+    private static readonly string[] Owners = ["Alya", "Bayu", "Dimas", "Maya", "Rina"];
+    private readonly List<PipelineDeal> _deals =
+    [
+        new("DL-101", "discovered", "Managing sales team meeting", "Trust Retail", 87000, "01 Jan, 2026", "Rina", false),
+        new("DL-102", "discovered", "Discovery Capital", "Discovery Capital", 124300, "29 Dec, 2025", "Bayu", true),
+        new("DL-103", "discovered", "Marketplace expansion", "North Commerce", 53900, "24 Dec, 2025", "Maya", false),
+        new("DL-201", "contacted", "Custom Mobile Apps", "Mobile Works", 28700, "13 Dec, 2025", "Alya", true),
+        new("DL-202", "contacted", "Investment Deal for Zoetic", "Zoetic Fashion", 32800, "10 Oct, 2025", "Dimas", false),
+        new("DL-203", "contacted", "Hotel Logo Design", "Aruna Hotel", 10900, "05 Jan, 2026", "Rina", false),
+        new("DL-301", "qualified", "Art Studio Design", "Artline Studio", 147500, "24 Sep, 2025", "Bayu", false),
+        new("DL-302", "qualified", "Food Selection Platform", "Foodlane", 72500, "04 Jan, 2026", "Maya", false),
+        new("DL-303", "qualified", "Storefront React Development", "Skote Retail", 89800, "21 Nov, 2025", "Alya", true),
+        new("DL-401", "meeting", "SaaS app workflow diagram", "Nesta Technologies", 17800, "01 Jan, 2026", "Dimas", false),
+        new("DL-402", "meeting", "TripAdvisor integration", "Tripwise", 2600, "12 Dec, 2025", "Rina", false,
+            "Map the approval workflow and prepare the product demonstration.", "4 days",
+            [new(Icons.Material.Outlined.ChatBubbleOutline, "Meeting with Thomas", "Yesterday at 09:12"), new(Icons.Material.Outlined.DesktopWindows, "Product demo", "Monday at 04:41"), new(Icons.Material.Outlined.Schedule, "Marketing team meeting", "Monday at 04:41")], Icons.Material.Outlined.Hexagon),
+        new("DL-501", "accepted", "Coupon Website", "Couponly", 27400, "07 Jan, 2026", "Maya", false),
+        new("DL-502", "accepted", "Marketing Automation Demo", "Automation Lab", 94800, "19 Nov, 2025", "Alya", true),
+        new("DL-503", "accepted", "New Email Design Templates", "Mailcraft", 136900, "05 Jan, 2026", "Bayu", false),
+        new("DL-504", "accepted", "GitHub SEO audit", "Developer Tools", 241200, "21 Sep, 2025", "Dimas", false, logoIcon: Icons.Custom.Brands.GitHub)
+    ];
+
+    private string _search = "";
+    private string _ownerFilter = AllFilter;
+    private string _pendingOwnerFilter = AllFilter;
+    private string _expandedDealId = "DL-402";
+    private bool _filterOpen;
+    private bool PipelineFilterActive => _ownerFilter != AllFilter;
+    private void SetSearch(string value) => _search = value ?? "";
+    private bool MatchesFilter(PipelineDeal deal) => (string.IsNullOrWhiteSpace(_search) || deal.Title.Contains(_search, StringComparison.OrdinalIgnoreCase) || deal.Company.Contains(_search, StringComparison.OrdinalIgnoreCase)) && (_ownerFilter == AllFilter || deal.Owner == _ownerFilter);
+    private void ToggleDeal(PipelineDeal deal) => _expandedDealId = _expandedDealId == deal.Id ? "" : deal.Id;
+    private void MoveDeal(FlatKanbanMoveEventArgs<PipelineDeal> move) { move.Item.Stage = move.TargetColumnKey; Snackbar.Add($"{move.Item.Title} moved to {Columns.First(column => column.Key == move.TargetColumnKey).Title}.", Severity.Info); }
+    private void ShowAction(string action, PipelineDeal deal) => Snackbar.Add($"{action}: {deal.Company} (sample only).", Severity.Info);
+    private void OpenFilters() { _pendingOwnerFilter = _ownerFilter; _filterOpen = true; }
+    private Task HandleFilterOpen(bool open) { _filterOpen = open; return Task.CompletedTask; }
+    private void ResetFilters() => _pendingOwnerFilter = AllFilter;
+    private void ApplyFilters() { _ownerFilter = _pendingOwnerFilter; _filterOpen = false; }
+    private static string Initials(string value) => string.Concat(value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(part => char.ToUpperInvariant(part[0])));
+    private static string CompactCurrency(decimal value) => value >= 1000 ? $"${value / 1000:0.#}k" : $"${value:0}";
+    private static string Currency(decimal value) => $"${value:N0}";
+
+    private sealed class PipelineDeal(string id, string stage, string title, string company, decimal value, string dateText, string owner, bool pinned, string description = "", string ageText = "", IReadOnlyList<PipelineActivity>? activities = null, string logoIcon = "")
+    {
+        public string Id { get; } = id;
+        public string Stage { get; set; } = stage;
+        public string Title { get; } = title;
+        public string Company { get; } = company;
+        public decimal Value { get; } = value;
+        public string DateText { get; } = dateText;
+        public string Owner { get; } = owner;
+        public bool Pinned { get; } = pinned;
+        public string Description { get; } = description;
+        public string AgeText { get; } = ageText;
+        public IReadOnlyList<PipelineActivity> Activities { get; } = activities ?? [];
+        public string LogoIcon { get; } = logoIcon;
+    }
+    private sealed record PipelineActivity(string Icon, string Title, string When);
+}

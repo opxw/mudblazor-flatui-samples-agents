@@ -60,6 +60,11 @@ var assetOptions = builder.Configuration
     .GetSection("OpxFlatUi:Assets")
     .Get<FlatAssetOptions>() ?? new FlatAssetOptions();
 builder.Services.AddSingleton(assetOptions);
+var localizationOptions = builder.Configuration
+    .GetSection("OpxFlatUi:Localization")
+    .Get<FlatLocalizationOptions>() ?? new FlatLocalizationOptions();
+builder.Services.AddSingleton(localizationOptions);
+builder.Services.AddSingleton(sp => new FlatValueFormatter(sp.GetRequiredService<FlatLocalizationOptions>()));
 builder.Services.AddScoped<FlatUiPreferencesService>();
 
 var app = builder.Build();
