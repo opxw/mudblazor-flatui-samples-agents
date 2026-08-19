@@ -1,6 +1,12 @@
 @* Copyright (c) 2026 opx. All rights reserved. *@
 @page "/experience-toolkit"
 @inject NavigationManager Navigation
+@inject FlatMessageBoxService MessageBox
+
+<FlatUnsavedChangesGuard HasUnsavedChanges="_globalDraftDirty"
+                         ConfirmDiscard="ConfirmDiscardGlobalDraft"
+                         CloseBlocked="OnGlobalCloseBlocked"
+                         DiscardConfirmed="OnGlobalDiscardConfirmed" />
 
 <FlatPage Kind="FlatPageKind.Module" PageCssClass="experience-toolkit-page no-mobile-fab">
     <section class="experience-release-strip" aria-label="Application experience release train">
@@ -67,6 +73,67 @@
                 <small class="experience-status">@_conflictStatus</small>
             </div>
         </article>
+
+        <article class="flat-panel experience-span-2">
+            <header class="panel-header"><strong>Global Application Foundation</strong><small>2.1 · unsaved state, permission intent, feature flags, and unified failures</small></header>
+            <div class="experience-panel-body global-foundation-grid">
+                <div class="global-foundation-card">
+                    <strong>Permission-aware UI</strong>
+                    <FlatPermissionView Permissions="DemoPermissions" Required="@(new[] { "asset.update" })">
+                        <Authorized><span class="global-contract-state success">Update action is available</span></Authorized>
+                        <Unauthorized><span class="global-contract-state muted">Update action is hidden</span></Unauthorized>
+                    </FlatPermissionView>
+                    <small>The host still authorizes the server operation.</small>
+                </div>
+                <div class="global-foundation-card">
+                    <strong>Feature flag</strong>
+                    <FlatFeatureView Feature="DemoFeature">
+                        <Enabled><span class="global-contract-state success">Advanced workspace enabled</span></Enabled>
+                        <Disabled><span class="global-contract-state muted">Feature unavailable</span></Disabled>
+                    </FlatFeatureView>
+                    <small>Flags control presentation, never route authorization.</small>
+                </div>
+                <div class="global-foundation-card global-foundation-wide">
+                    <MudTextField T="string" Label="Protected draft" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                  Value="_globalDraft" ValueChanged="ChangeGlobalDraft" />
+                    <small>@(_globalDraftDirty ? "Unsaved guard is active." : "Change the value to activate the guard.")</small>
+                </div>
+                <FlatOperationState Result="_operationFailure" Retry="RetryGlobalOperation" />
+            </div>
+        </article>
+
+        <article class="flat-panel">
+            <header class="panel-header"><strong>Workspace State & Server Data</strong><small>2.2 · one query contract and host-owned persistence</small></header>
+            <div class="experience-panel-body">
+                <dl class="global-contract-list">
+                    <div><dt>Query</dt><dd>Page 2 · 25 rows · status filter</dd></div>
+                    <div><dt>Workspace</dt><dd>Filter, sort, tab, selection, and paging state</dd></div>
+                    <div><dt>Provider</dt><dd>Per-user storage remains host-owned</dd></div>
+                </dl>
+                <small class="experience-status">@_globalStatus</small>
+            </div>
+        </article>
+
+        <article class="flat-panel">
+            <header class="panel-header"><strong>Undo, Redo & Observability</strong><small>2.3 · exact state history and host telemetry hooks</small></header>
+            <div class="experience-panel-body">
+                <div class="global-counter"><strong>@_undoValue</strong><span>Current sample value</span></div>
+                <div class="global-inline-actions">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="IncrementUndoValue">Change</MudButton>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Undo" Disabled="@(!_undoController.CanUndo)" OnClick="UndoValue" aria-label="Undo change" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.Redo" Disabled="@(!_undoController.CanRedo)" OnClick="RedoValue" aria-label="Redo change" />
+                </div>
+                <small>Observations are emitted to the host; the package sends no telemetry.</small>
+            </div>
+        </article>
+
+        <article class="flat-panel">
+            <header class="panel-header"><strong>Security & Accessibility UX</strong><small>2.3 · session intent and global accessibility preferences</small></header>
+            <div class="experience-panel-body">
+                <FlatAccessibilitySettings Value="_accessibility" ValueChanged="SetAccessibility" />
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.LockClock" OnClick="PreviewSessionWarning">Preview session warning</MudButton>
+            </div>
+        </article>
     </section>
 </FlatPage>
 
@@ -75,10 +142,26 @@
                     GlobalShortcutEnabled="false"
                     Selected="HandleCommand" />
 
+<FlatSessionTimeout Snapshot="_sessionSnapshot"
+                    Extend="ExtendSession"
+                    SignOut="CloseSessionPreview" />
+
 @code {
     private FlatCommandPalette? _localPalette;
     private string _draftStatus = "Draft has not changed.";
     private string _conflictStatus = "Choose one source for every field.";
+    private string _globalDraft = "Draft value";
+    private string _globalStatus = "Global callbacks have not run.";
+    private bool _globalDraftDirty;
+    private int _undoValue;
+    private FlatAccessibilityPreferences _accessibility = new();
+    private FlatSessionSnapshot _sessionSnapshot = new(FlatSessionStatus.Active);
+    private FlatOperationResult _operationFailure = FlatOperationResult.Failure(
+        FlatOperationFailureKind.Timeout,
+        "The sample data source exceeded its response window.",
+        "OPX-DEMO-204",
+        canRetry: true);
+    private readonly FlatUndoRedoController<int> _undoController = new();
     private string? _typingText = "Rina is typing";
     private IReadOnlyDictionary<string, object?> _schemaValues = new Dictionary<string, object?>
     {
@@ -98,7 +181,10 @@
         ("1.7", "Command Palette", "Keyboard productivity"),
         ("1.8", "Schema Form", "Dynamic business forms"),
         ("1.9", "Collaboration", "Presence and conflict UI"),
-        ("2.0", "Operations", "Composable workspaces")
+        ("2.0", "Operations", "Composable workspaces"),
+        ("2.1", "Application Safety", "Guard, permission, flags, and failures"),
+        ("2.2", "Data State", "Server query and workspace persistence"),
+        ("2.3", "Global UX", "History, session, telemetry, accessibility")
     ];
 
     private static readonly IReadOnlyList<FlatFormStepDefinition> SchemaSteps =
@@ -174,4 +260,36 @@
         if (!string.IsNullOrWhiteSpace(selection.Command.NavigateTo)) Navigation.NavigateTo(selection.Command.NavigateTo);
         else _draftStatus = $"Command callback: {selection.Command.Label}";
     }
+
+    private static readonly FlatPermissionSnapshot DemoPermissions = FlatPermissionSnapshot.Create(["asset.read", "asset.update"], "sample-user");
+    private static readonly FlatFeatureFlag DemoFeature = new("advanced-workspace", true);
+    private void ChangeGlobalDraft(string value) { _globalDraft = value; _globalDraftDirty = true; }
+    private async Task<bool> ConfirmDiscardGlobalDraft(FlatUnsavedCloseRequest request)
+    {
+        var confirmed = await MessageBox.QuestionAsync("Discard the unsaved sample draft?", "Unsaved changes", "Discard", "Stay");
+        if (confirmed) _globalDraftDirty = false;
+        return confirmed;
+    }
+    private Task SetGlobalStatus(string status) { _globalStatus = status; return Task.CompletedTask; }
+    private Task OnGlobalCloseBlocked(FlatUnsavedCloseRequest request) => SetGlobalStatus($"Close blocked: {request.Reason}");
+    private Task OnGlobalDiscardConfirmed(FlatUnsavedCloseRequest request) => SetGlobalStatus($"Draft discarded: {request.Reason}");
+    private Task RetryGlobalOperation()
+    {
+        _operationFailure = FlatOperationResult.Success("Sample retry completed.");
+        _globalStatus = "Retry intent completed through the host callback.";
+        return Task.CompletedTask;
+    }
+    private void IncrementUndoValue()
+    {
+        var before = _undoValue;
+        _undoValue++;
+        _undoController.Record("Increment sample value", before, _undoValue);
+        _globalStatus = "Operation observation prepared for the host observer.";
+    }
+    private void UndoValue() { var entry = _undoController.Undo(); if (entry is not null) _undoValue = entry.Before; }
+    private void RedoValue() { var entry = _undoController.Redo(); if (entry is not null) _undoValue = entry.After; }
+    private Task SetAccessibility(FlatAccessibilityPreferences value) { _accessibility = value; _globalStatus = "Accessibility preference intent changed."; return Task.CompletedTask; }
+    private void PreviewSessionWarning() => _sessionSnapshot = new(FlatSessionStatus.Expiring, DateTimeOffset.Now.AddMinutes(2), "Continue or sign out through host-owned session callbacks.");
+    private Task ExtendSession() { _sessionSnapshot = new(FlatSessionStatus.Active); _globalStatus = "Session extension intent returned success."; return Task.CompletedTask; }
+    private Task CloseSessionPreview() { _sessionSnapshot = new(FlatSessionStatus.Active); _globalStatus = "Sign-out intent emitted; demo session remains local."; return Task.CompletedTask; }
 }

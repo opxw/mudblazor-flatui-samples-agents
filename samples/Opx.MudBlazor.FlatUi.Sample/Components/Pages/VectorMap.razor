@@ -1,0 +1,184 @@
+@page "/vector-map"
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Vector Map - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module"
+          UsePanel="false"
+          PageCssClass="vector-map-page no-mobile-fab">
+    <ChildContent>
+        <div class="vector-map-showroom">
+            <FlatVectorMap CanvasWidth="720"
+                           CanvasHeight="420"
+                           Regions="@ActiveRegions"
+                           Routes="@ActiveRoutes"
+                           Markers="@ActiveMarkers"
+                           @bind-Viewport="_viewport"
+                           SelectedRegionKey="@_selectedRegionKey"
+                           SelectedRouteKey="@_selectedRouteKey"
+                           SelectedMarkerKey="@_selectedMarkerKey"
+                           RegionSelected="SelectRegion"
+                           RouteSelected="SelectRoute"
+                           MarkerSelected="SelectMarker"
+                           Title="@MapTitle"
+                           Subtitle="@MapSubtitle"
+                           AriaLabel="@MapTitle"
+                           Description="@MapDescription">
+                <ToolbarContent>
+                    <div class="vector-map-mode-switch" role="group" aria-label="Vector map sample mode">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Domain" Color="@(_mode == "floor" ? Color.Primary : Color.Default)" OnClick='() => ChangeMode("floor")' aria-label="Floor plan" title="Floor plan" aria-pressed="@(_mode == "floor")" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.MyLocation" Color="@(_mode == "tracking" ? Color.Primary : Color.Default)" OnClick='() => ChangeMode("tracking")' aria-label="Tracking" title="Tracking" aria-pressed="@(_mode == "tracking")" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.Route" Color="@(_mode == "route" ? Color.Primary : Color.Default)" OnClick='() => ChangeMode("route")' aria-label="Route" title="Route" aria-pressed="@(_mode == "route")" />
+                    </div>
+                </ToolbarContent>
+                <OverlayContent>
+                    <strong>@_selectionTitle</strong>
+                    <span>@_selectionDetail</span>
+                </OverlayContent>
+            </FlatVectorMap>
+
+            <section class="vector-map-notes" aria-label="Vector map integration notes">
+                <header><strong>Host integration</strong><small>Presentation and callbacks only</small></header>
+                <dl>
+                    <div><dt>Floor plan</dt><dd>SVG path regions in the component coordinate system.</dd></div>
+                    <div><dt>Live location</dt><dd>Host projects GPS coordinates and replaces marker snapshots.</dd></div>
+                    <div><dt>Route</dt><dd>Host routing engine supplies ordered points and business status.</dd></div>
+                    <div><dt>Realtime</dt><dd>SignalR/WebSocket/device location remains outside the library.</dd></div>
+                </dl>
+            </section>
+
+            <details class="vector-map-usage">
+                <summary>Sample code</summary>
+                <pre><code>@UsageCode</code></pre>
+            </details>
+        </div>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private static readonly FlatGeoBounds JakartaBounds = new(-6.15, 106.86, -6.25, 106.74);
+
+    private static readonly IReadOnlyList<FlatVectorMapRegion> FloorRegions =
+    [
+        new("receiving", "Receiving", "M35 35 H245 V155 H35 Z", FlatVectorMapTone.Info, "Inbound inspection and staging"),
+        new("storage-a", "Storage A", "M265 35 H475 V155 H265 Z", FlatVectorMapTone.Standard, "Rack rows A01-A08"),
+        new("packing", "Packing", "M495 35 H685 V155 H495 Z", FlatVectorMapTone.Success, "Packing and dispatch preparation"),
+        new("storage-b", "Storage B", "M35 180 H350 V380 H35 Z", FlatVectorMapTone.Standard, "Bulk inventory"),
+        new("production", "Production", "M370 180 H685 V300 H370 Z", FlatVectorMapTone.Warning, "Assembly line and quality gate"),
+        new("restricted", "Restricted", "M370 320 H685 V380 H370 Z", FlatVectorMapTone.Danger, "Authorized personnel only")
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapRoute> FloorRoutes =
+    [
+        new("forklift-route", "Forklift route", [new(75, 105), new(210, 105), new(310, 210), new(430, 240), new(610, 240)], FlatVectorMapTone.Primary, "Active material movement", Animated: true)
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapMarker> FloorMarkers =
+    [
+        new("dock-1", "Dock 01", new(75, 105), FlatVectorMarkerKind.Location, FlatVectorMapTone.Info, "Inbound truck dock"),
+        new("forklift-7", "Forklift 07", new(430, 240), FlatVectorMarkerKind.Vehicle, FlatVectorMapTone.Primary, "Moving to Production", IsCurrent: true),
+        new("scanner-gate", "Scanner gate", new(610, 240), FlatVectorMarkerKind.Asset, FlatVectorMapTone.Success, "Online"),
+        new("safety-alert", "Safety alert", new(600, 350), FlatVectorMarkerKind.Alert, FlatVectorMapTone.Danger, "Restricted area")
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapRoute> TrackingRoutes =
+    [
+        new("vehicle-history", "Vehicle history", GeoPoints((-6.2142, 106.7708), (-6.2050, 106.7832), (-6.1971, 106.7980), (-6.1862, 106.8126), (-6.1754, 106.8270)), FlatVectorMapTone.Info, "Last 18 minutes", Dashed: true),
+        new("vehicle-live", "Current movement", GeoPoints((-6.1754, 106.8270), (-6.1690, 106.8360), (-6.1628, 106.8450)), FlatVectorMapTone.Primary, "Live projected route", Animated: true)
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapMarker> TrackingMarkers =
+    [
+        GeoMarker("origin", "Warehouse", -6.2142, 106.7708, FlatVectorMarkerKind.Asset, FlatVectorMapTone.Info, "Route origin"),
+        GeoMarker("truck-18", "Truck 18", -6.1754, 106.8270, FlatVectorMarkerKind.Vehicle, FlatVectorMapTone.Primary, "Updated 12 seconds ago", true),
+        GeoMarker("destination", "Customer site", -6.1628, 106.8450, FlatVectorMarkerKind.Location, FlatVectorMapTone.Success, "Estimated arrival 14:35")
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapRoute> PlannedRoutes =
+    [
+        new("preferred", "Preferred route", [new(70, 330), new(150, 260), new(270, 275), new(390, 185), new(520, 205), new(655, 95)], FlatVectorMapTone.Success, "28 km · 42 min", Animated: true),
+        new("alternative", "Alternative route", [new(70, 330), new(190, 345), new(320, 320), new(480, 260), new(655, 95)], FlatVectorMapTone.Warning, "31 km · 49 min", Dashed: true)
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapMarker> PlannedMarkers =
+    [
+        new("route-start", "Distribution center", new(70, 330), FlatVectorMarkerKind.Asset, FlatVectorMapTone.Info, "Departure point"),
+        new("stop-1", "Delivery stop 01", new(390, 185), FlatVectorMarkerKind.Waypoint, FlatVectorMapTone.Primary, "12 packages"),
+        new("route-end", "Delivery stop 02", new(655, 95), FlatVectorMarkerKind.Location, FlatVectorMapTone.Success, "8 packages")
+    ];
+
+    private string _mode = "floor";
+    private FlatVectorMapViewport _viewport = new(360, 210, 1);
+    private string? _selectedRegionKey;
+    private string? _selectedRouteKey = "forklift-route";
+    private string? _selectedMarkerKey = "forklift-7";
+    private string _selectionTitle = "Forklift 07";
+    private string _selectionDetail = "Moving to Production";
+
+    private IReadOnlyList<FlatVectorMapRegion> ActiveRegions => _mode == "floor" ? FloorRegions : [];
+    private IReadOnlyList<FlatVectorMapRoute> ActiveRoutes => _mode switch { "tracking" => TrackingRoutes, "route" => PlannedRoutes, _ => FloorRoutes };
+    private IReadOnlyList<FlatVectorMapMarker> ActiveMarkers => _mode switch { "tracking" => TrackingMarkers, "route" => PlannedMarkers, _ => FloorMarkers };
+    private string MapTitle => _mode switch { "tracking" => "Live location tracking", "route" => "Route planning", _ => "Warehouse floor plan" };
+    private string MapSubtitle => _mode switch { "tracking" => "Projected GPS snapshots and movement trail", "route" => "Preferred and alternative host-owned routes", _ => "Interactive vector regions, assets, and movement" };
+    private string MapDescription => _mode switch { "tracking" => "Vehicle tracking sample using projected geographic coordinates.", "route" => "Route comparison sample using ordered vector points.", _ => "Warehouse floor plan sample with selectable rooms and assets." };
+
+    private void ChangeMode(string mode)
+    {
+        _mode = mode;
+        _viewport = new(360, 210, 1);
+        _selectedRegionKey = null;
+        _selectedRouteKey = ActiveRoutes.FirstOrDefault()?.Key;
+        _selectedMarkerKey = ActiveMarkers.FirstOrDefault(marker => marker.IsCurrent)?.Key ?? ActiveMarkers.FirstOrDefault()?.Key;
+        var selected = ActiveMarkers.FirstOrDefault(marker => marker.Key == _selectedMarkerKey);
+        _selectionTitle = selected?.Label ?? MapTitle;
+        _selectionDetail = selected?.Description ?? MapSubtitle;
+    }
+
+    private void SelectRegion(FlatVectorMapRegion region)
+    {
+        _selectedRegionKey = region.Key;
+        _selectionTitle = region.Label;
+        _selectionDetail = region.Description ?? "Floor-plan region";
+    }
+
+    private void SelectRoute(FlatVectorMapRoute route)
+    {
+        _selectedRouteKey = route.Key;
+        _selectionTitle = route.Label;
+        _selectionDetail = route.Description ?? "Vector route";
+    }
+
+    private void SelectMarker(FlatVectorMapMarker marker)
+    {
+        _selectedMarkerKey = marker.Key;
+        _selectionTitle = marker.Label;
+        _selectionDetail = marker.Description ?? marker.Kind.ToString();
+    }
+
+    private static IReadOnlyList<FlatMapPoint> GeoPoints(params (double Latitude, double Longitude)[] coordinates) =>
+        coordinates.Select(point => JakartaBounds.Project(point.Latitude, point.Longitude, 720, 420)).ToArray();
+
+    private static FlatVectorMapMarker GeoMarker(string key, string label, double latitude, double longitude, FlatVectorMarkerKind kind, FlatVectorMapTone tone, string description, bool current = false) =>
+        new(key, label, JakartaBounds.Project(latitude, longitude, 720, 420), kind, tone, description, current);
+
+    private const string UsageCode = """
+<FlatVectorMap CanvasWidth="720"
+               CanvasHeight="420"
+               Regions="@floorRegions"
+               Routes="@routes"
+               Markers="@locations"
+               @bind-Viewport="viewport"
+               MarkerSelected="HandleMarker" />
+
+@code {
+    private readonly FlatGeoBounds bounds =
+        new(North: -6.15, East: 106.86, South: -6.25, West: 106.74);
+
+    private FlatMapPoint Project(double latitude, double longitude) =>
+        bounds.Project(latitude, longitude, 720, 420);
+
+    // GPS, routing, realtime transport, authorization, and persistence remain host-owned.
+}
+""";
+}

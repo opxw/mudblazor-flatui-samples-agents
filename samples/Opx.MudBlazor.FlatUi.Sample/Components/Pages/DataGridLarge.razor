@@ -55,7 +55,7 @@
                         }
                         else if (cell.Column.Key == "status")
                         {
-                            <span class="@StatusClass(cell.Item.Status)"><i></i>@cell.FormattedValue</span>
+                            <FlatStatusChip Text="@cell.FormattedValue" Color="@StatusColor(cell.Item.Status)" />
                         }
                         else
                         {
@@ -73,7 +73,7 @@
                     <article class="mobile-card mobile-card-edge-tag">
                         <header>
                             <div><strong>@record.OrderNumber</strong><small>@record.Customer · @record.Reference</small></div>
-                            <span class="@StatusClass(record.Status)"><i></i>@record.Status</span>
+                            <FlatStatusChip Text="@record.Status" Color="@StatusColor(record.Status)" />
                         </header>
                         <div class="mobile-card-body">
                             <FlatInfoItem Label="Region" Value="@record.Region" />
@@ -142,7 +142,7 @@
         new("sku", "SKU Count", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number),
         new("quantity", "Quantity", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number),
         new("total", "Order Total", GridColumnFilterType.Number, WidthPercent: 8, ValueKind: FlatGridColumnValueKind.Currency, Format: "N0"),
-        new("address", "Delivery Address", WidthPercent: 13)
+        new("address", "Delivery Address", WidthPercent: 13, WordWrap: true)
     ];
 
     protected override void OnInitialized()
@@ -237,11 +237,12 @@
         _ => null
     };
 
-    private static string StatusClass(string status) => status switch
+    private static Color StatusColor(string status) => status switch
     {
-        "Shipped" => "status-chip online",
-        "On Hold" => "status-chip offline",
-        _ => "status-chip pending"
+        "Shipped" => Color.Success,
+        "On Hold" => Color.Error,
+        "Ready" => Color.Info,
+        _ => Color.Warning
     };
 
     private sealed record LargeGridRecord(

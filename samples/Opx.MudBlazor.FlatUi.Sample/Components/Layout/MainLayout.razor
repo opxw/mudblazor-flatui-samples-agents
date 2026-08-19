@@ -17,6 +17,7 @@
                   ThemeMode="@EffectiveThemeMode"
                   Density="@EffectiveDisplayDensity"
                   FontSizePx="@EffectiveDisplayFontSizePx"
+                  RoundedSizePx="@DisplayPreferences.Current.RoundedSizePx"
                   HostKind="@DisplayPreferences.Options.HostKind"
                   AutoScaleHighDensityTouchButtons="@DisplayPreferences.Options.AutoScaleHighDensityTouchButtons"
                   HighDensityTouchButtonHeightPx="@DisplayPreferences.Options.NormalizedHighDensityTouchButtonHeightPx"
@@ -29,6 +30,7 @@
                   DarkSidebarForeground="@DisplayPreferences.Options.NormalizedDarkSidebarForeground"
                   RightToLeft="@LocalizationOptions.RightToLeft"
                   NavigationLayout="@EffectiveNavigationLayout"
+                  BottomNavigationChildPresentation="@EffectiveBottomNavigationChildPresentation"
                   NavigationItems="@HorizontalNavigationItems">
         <AppBarActions>
             <FlatDeviceNotification Title="@DeviceNotificationOptions.SampleTitle"
@@ -79,6 +81,7 @@
 
         <ChildContent>
             @Body
+            <SamplePageUsage />
         </ChildContent>
     </FlatAppShell>
 
@@ -158,6 +161,8 @@
                                          HostKind="@DisplayPreferences.Options.HostKind"
                                          NavigationLayout="@_draftNavigationLayout"
                                          NavigationLayoutChanged="SetDraftNavigationLayout"
+                                         BottomNavigationChildPresentation="@_draftBottomNavigationChildPresentation"
+                                         BottomNavigationChildPresentationChanged="SetDraftBottomNavigationChildPresentation"
                                          FontSizePx="@_draftFontSizePx"
                                          FontSizePxChanged="SetDraftFontSize"
                                          MinimumFontSizePx="@DisplayPreferences.Options.MinimumFontSizePx"
@@ -165,7 +170,9 @@
                                          BackdropOpacity="@_draftBackdropOpacity"
                                          BackdropOpacityChanged="SetDraftBackdropOpacity"
                                          MinimumBackdropOpacity="@DisplayPreferences.Options.MinimumBackdropOpacity"
-                                         MaximumBackdropOpacity="@DisplayPreferences.Options.MaximumBackdropOpacity" />
+                                         MaximumBackdropOpacity="@DisplayPreferences.Options.MaximumBackdropOpacity"
+                                         RoundedSizePx="@_draftRoundedSizePx"
+                                         RoundedSizePxChanged="SetDraftRoundedSize" />
                     <button type="button" class="settings-menu-item display-reset-button" @onclick="RestoreDisplayDefaultsAsync">
                         <MudIcon Icon="@Icons.Material.Outlined.RestartAlt" Size="Size.Small" />
                         <span>
@@ -268,10 +275,12 @@
             new("CRUD Asset", "/crud", Icons.Material.Outlined.EditNote),
             new("CRUD Simple", "/crud-simple", Icons.Material.Outlined.AddBox),
             new("Grid Editor", "/grid-editor", Icons.Material.Outlined.EditRoad),
+            new("Advanced Editable Grid", "/advanced-editable-grid", Icons.Material.Outlined.TableView),
             new("Model CRUD", "/model-crud", Icons.Material.Outlined.DynamicForm),
             new("Form Designer", "/model-form-designer", Icons.Material.Outlined.DashboardCustomize),
             new("Dynamic Menu", "/dynamic-menu", Icons.Material.Outlined.AccountTree),
             new("Operations Workspace", "/operations-workspace", Icons.Material.Outlined.Workspaces),
+            new("Spatial Operations", "/spatial-operations", Icons.Material.Outlined.Explore),
             new("Tree Grid", "/tree-grid", Icons.Material.Outlined.AccountTree),
             new("Kanban", "/kanban", Icons.Material.Outlined.ViewKanban),
             new("Calendar", "/calendar", Icons.Material.Outlined.CalendarMonth),
@@ -290,6 +299,8 @@
             new("Pivot", "/pivot", Icons.Material.Outlined.PivotTableChart),
             new("Enterprise Toolkit", "/enterprise-toolkit", Icons.Material.Outlined.DomainAdd)
             ,new("Experience Toolkit", "/experience-toolkit", Icons.Material.Outlined.AccessibilityNew)
+            ,new("Business Toolkit", "/business-toolkit", Icons.Material.Outlined.AccountTree)
+            ,new("ERP Release Train", "/erp-release-train", Icons.Material.Outlined.Factory)
         ]),
         new("Commerce", Icon: Icons.Material.Outlined.Storefront, Children:
         [
@@ -316,6 +327,7 @@
             new("Charts", "/charts", Icons.Material.Outlined.InsertChartOutlined),
             new("File Upload", "/file-upload", Icons.Material.Outlined.CloudUpload),
             new("Grid Preferences", "/grid-preferences", Icons.Material.Outlined.ViewColumn),
+            new("Vector Map", "/vector-map", Icons.Material.Outlined.Map),
             new("Colors", "/colors", Icons.Material.Outlined.Palette),
             new("Timeline", "/timeline", Icons.Material.Outlined.Timeline),
             new("Widgets", "/widgets", Icons.Material.Outlined.ViewQuilt),
@@ -345,10 +357,12 @@
         new("CRUD Asset", "/crud", "Operations", "grid table sort filter paging editor", Icons.Material.Outlined.EditNote),
         new("CRUD Simple", "/crud-simple", "Operations", "simple form add", Icons.Material.Outlined.AddBox),
         new("Grid Editor", "/grid-editor", "Operations", "inline add edit save cancel delete row value", Icons.Material.Outlined.EditRoad),
+        new("Advanced Editable Grid", "/advanced-editable-grid", "Operations", "advanced inline add edit save cancel copy fill down undo redo spreadsheet", Icons.Material.Outlined.TableView),
         new("Model CRUD", "/model-crud", "Operations", "automatic model metadata data annotations generated list grid form create update delete", Icons.Material.Outlined.DynamicForm),
         new("Form Designer", "/model-form-designer", "Operations", "visual WYSIWYG form designer drag drop spacing padding margin CSS class live preview", Icons.Material.Outlined.DashboardCustomize),
         new("Dynamic Menu", "/dynamic-menu", "Operations", "autoload navigation MenuText Id ParentId Url Icon recursive API", Icons.Material.Outlined.AccountTree),
         new("Operations Workspace", "/operations-workspace", "Operations", "service desk approval procurement stock transfer timesheet POS cart", Icons.Material.Outlined.Workspaces),
+        new("Spatial Operations", "/spatial-operations", "Operations", "map floor layer geofence location tracking route playback fleet warehouse", Icons.Material.Outlined.Explore),
         new("Tree Grid", "/tree-grid", "Operations", "hierarchy parent key drag drop expand collapse tree table", Icons.Material.Outlined.AccountTree),
         new("Kanban", "/kanban", "Operations", "task board workflow cards columns drag drop WIP", Icons.Material.Outlined.ViewKanban),
         new("Calendar", "/calendar", "Operations", "month week day list agenda events schedule", Icons.Material.Outlined.CalendarMonth),
@@ -364,6 +378,8 @@
         new("Pivot", "/pivot", "Data & Reports", "pivot matrix row column aggregate subtotal drill down", Icons.Material.Outlined.PivotTableChart),
         new("Enterprise Toolkit", "/enterprise-toolkit", "Data & Reports", "import master detail audit schema workflow bulk scheduler dashboard notifications offline sync documents print", Icons.Material.Outlined.DomainAdd),
         new("Experience Toolkit", "/experience-toolkit", "Data & Reports", "accessibility command palette schema form collaboration conflict realtime", Icons.Material.Outlined.AccessibilityNew),
+        new("Business Toolkit", "/business-toolkit", "Data & Reports", "traceability BOM routing rules approval attachments recurrence query comparison", Icons.Material.Outlined.AccountTree),
+        new("ERP Release Train", "/erp-release-train", "Data & Reports", "transaction engine spreadsheet inventory allocation finance workflow approval integration MRP capacity governance", Icons.Material.Outlined.Factory),
         new("Product Catalog", "/catalog", "Commerce & Content", "ecommerce products price range cart", Icons.Material.Outlined.ShoppingBag),
         new("Product Management", "/product-management", "Commerce & Content", "admin product list filter rail price brand status grid", Icons.Material.Outlined.Inventory2),
         new("Product Detail", "/product-detail", "Commerce & Content", "product gallery metrics variants specification details", Icons.Material.Outlined.Sell),
@@ -381,6 +397,7 @@
         new("Charts", "/charts", "UI Kit", "MudBlazor line bar stacked pie donut timeseries heatmap rose radar sankey scatter plot sample code", Icons.Material.Outlined.InsertChartOutlined),
         new("File Upload", "/file-upload", "UI Kit", "multiple files picker drag drop progress cancel retry validation camera gallery adapter", Icons.Material.Outlined.CloudUpload),
         new("Grid Preferences", "/grid-preferences", "UI Kit", "column visibility order width pinning saved view reset virtualization", Icons.Material.Outlined.ViewColumn),
+        new("Vector Map", "/vector-map", "UI Kit", "SVG vector map floor plan denah location tracking GPS route waypoint vehicle asset", Icons.Material.Outlined.Map),
         new("Colors", "/colors", "UI Kit", "palette semantic primary secondary success info warning danger surface border opacity", Icons.Material.Outlined.Palette),
         new("Timeline", "/timeline", "UI Kit", "center left activity event history social attachments project", Icons.Material.Outlined.Timeline),
         new("Widgets", "/widgets", "UI Kit", "metric statistics tile progress activity schedule reference", Icons.Material.Outlined.ViewQuilt),
@@ -393,12 +410,15 @@
     private bool _systemPrefersDark;
     private bool _settingsOpen;
     private bool _aboutOpen;
+    private bool _bottomMainViewPreview;
     private string _draftDensity = FlatUiDensity.Default;
     private string _draftThemeMode = FlatUiThemeMode.Auto;
     private string _draftNavigationLayout = FlatUiNavigationLayout.Vertical;
+    private string _draftBottomNavigationChildPresentation = FlatBottomNavigationChildPresentation.Sheet;
     private string _draftColorPalette = "blue";
     private double _draftFontSizePx = 14.5;
     private double _draftBackdropOpacity = 0.48;
+    private double _draftRoundedSizePx;
     private bool _restoreDisplayDefaults;
     private string EffectiveDisplayDensity => _settingsOpen
         ? _draftDensity
@@ -406,9 +426,21 @@
     private double EffectiveDisplayFontSizePx => _settingsOpen
         ? _draftFontSizePx
         : DisplayPreferences.Current.FontSizePx;
-    private string EffectiveNavigationLayout => _settingsOpen
-        ? _draftNavigationLayout
-        : DisplayPreferences.Current.NavigationLayout;
+    private static bool IsBottomMainViewPreviewUri(string uri) =>
+        Microsoft.AspNetCore.WebUtilities.QueryHelpers
+            .ParseQuery(new Uri(uri, UriKind.Absolute).Query)
+            .TryGetValue("preview", out var previewValues)
+        && previewValues.Any(value => string.Equals(value, "bottom-main-view", StringComparison.OrdinalIgnoreCase));
+    private string EffectiveNavigationLayout => _bottomMainViewPreview
+        ? FlatUiNavigationLayout.Bottom
+        : _settingsOpen
+            ? _draftNavigationLayout
+            : DisplayPreferences.Current.NavigationLayout;
+    private string EffectiveBottomNavigationChildPresentation => _bottomMainViewPreview
+        ? FlatBottomNavigationChildPresentation.MainView
+        : _settingsOpen
+            ? _draftBottomNavigationChildPresentation
+            : DisplayPreferences.Current.BottomNavigationChildPresentation;
     private string CurrentPageTitle => PageTitleFor(Navigation.Uri);
     private string CurrentBrandTitle => "OPX FLAT UI";
     private string SettingsModalClass => $"settings-modal-overlay {(IsDarkMode ? "theme-dark" : "theme-light")}";
@@ -424,6 +456,7 @@
 
     protected override void OnInitialized()
     {
+        _bottomMainViewPreview = IsBottomMainViewPreviewUri(Navigation.Uri);
         Navigation.LocationChanged += HandleLocationChanged;
         DisplayPreferences.Changed += HandleDisplayPreferencesChanged;
     }
@@ -453,6 +486,7 @@
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
     {
+        _bottomMainViewPreview |= IsBottomMainViewPreviewUri(args.Location);
         StateHasChanged();
     }
 
@@ -469,6 +503,7 @@
             "/model-form-designer" => "Operations-Form Designer",
             "/dynamic-menu" => "Operations-Dynamic Menu",
             "/operations-workspace" => "Operations-Workspace",
+            "/advanced-editable-grid" => "Operations-Advanced Editable Grid",
             "/tree-grid" => "Operations-Tree Grid",
             "/kanban" => "Operations-Kanban",
             "/calendar" => "Operations-Calendar",
@@ -484,6 +519,8 @@
             "/pivot" => "Data & Reports-Pivot",
             "/enterprise-toolkit" => "Data & Reports-Enterprise Toolkit",
             "/experience-toolkit" => "Data & Reports-Experience Toolkit",
+            "/business-toolkit" => "Data & Reports-Business Toolkit",
+            "/erp-release-train" => "ERP-Release Train",
             "/catalog" => "Ecommerce-Catalog",
             "/product-management" => "Ecommerce-Product Management",
             "/product-detail" => "Ecommerce-Product Detail",
@@ -513,6 +550,8 @@
             "/charts" => "UI Kit-Charts",
             "/file-upload" => "UI Kit-File Upload",
             "/grid-preferences" => "UI Kit-Grid Preferences",
+            "/vector-map" => "UI Kit-Vector Map",
+            "/spatial-operations" => "Operations-Spatial Operations",
             "/colors" => "UI Kit-Colors",
             "/timeline" => "UI Kit-Timeline",
             "/widgets" => "UI Kit-Widgets",
@@ -548,9 +587,11 @@
         _draftThemeMode = DisplayPreferences.Current.ThemeMode;
         _draftDensity = DisplayPreferences.Current.Density;
         _draftNavigationLayout = DisplayPreferences.Current.NavigationLayout;
+        _draftBottomNavigationChildPresentation = DisplayPreferences.Current.BottomNavigationChildPresentation;
         _draftColorPalette = DisplayPreferences.Current.ColorPalette;
         _draftFontSizePx = DisplayPreferences.Current.FontSizePx;
         _draftBackdropOpacity = DisplayPreferences.Current.BackdropOpacity;
+        _draftRoundedSizePx = DisplayPreferences.Current.RoundedSizePx;
         _restoreDisplayDefaults = false;
         _settingsOpen = true;
     }
@@ -575,6 +616,13 @@
         await PreviewDisplayDraftAsync();
     }
 
+    private async Task SetDraftBottomNavigationChildPresentation(string presentation)
+    {
+        _draftBottomNavigationChildPresentation = FlatBottomNavigationChildPresentation.Normalize(presentation);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
     private async Task SetDraftFontSize(double fontSizePx)
     {
         _draftFontSizePx = fontSizePx;
@@ -585,6 +633,13 @@
     private async Task SetDraftBackdropOpacity(double backdropOpacity)
     {
         _draftBackdropOpacity = backdropOpacity;
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftRoundedSize(double roundedSizePx)
+    {
+        _draftRoundedSizePx = roundedSizePx;
         _restoreDisplayDefaults = false;
         await PreviewDisplayDraftAsync();
     }
@@ -602,9 +657,11 @@
         _draftThemeMode = defaults.ThemeMode;
         _draftDensity = defaults.Density;
         _draftNavigationLayout = defaults.NavigationLayout;
+        _draftBottomNavigationChildPresentation = defaults.BottomNavigationChildPresentation;
         _draftColorPalette = defaults.ColorPalette;
         _draftFontSizePx = defaults.FontSizePx;
         _draftBackdropOpacity = defaults.BackdropOpacity;
+        _draftRoundedSizePx = defaults.RoundedSizePx;
         _restoreDisplayDefaults = true;
         await PreviewDisplayDraftAsync();
     }
@@ -615,8 +672,10 @@
             ThemeMode = _draftThemeMode,
             Density = _draftDensity,
             NavigationLayout = _draftNavigationLayout,
+            BottomNavigationChildPresentation = _draftBottomNavigationChildPresentation,
             ColorPalette = _draftColorPalette,
             FontSizePx = _draftFontSizePx,
+            RoundedSizePx = _draftRoundedSizePx,
             BackdropOpacity = _draftBackdropOpacity
         });
 
@@ -633,8 +692,10 @@
                 ThemeMode = _draftThemeMode,
                 Density = _draftDensity,
                 NavigationLayout = _draftNavigationLayout,
+                BottomNavigationChildPresentation = _draftBottomNavigationChildPresentation,
                 ColorPalette = _draftColorPalette,
                 FontSizePx = _draftFontSizePx,
+                RoundedSizePx = _draftRoundedSizePx,
                 BackdropOpacity = _draftBackdropOpacity
             });
         }

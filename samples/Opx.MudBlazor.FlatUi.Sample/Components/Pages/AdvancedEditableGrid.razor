@@ -1,0 +1,246 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/advanced-editable-grid"
+@inject IJSRuntime JS
+@inject FlatMessageBoxService MessageBox
+<PageTitle>Advanced Editable Grid - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="advanced-editable-grid-page no-mobile-fab">
+    <article class="flat-panel">
+        <FlatAdvancedEditableGrid TItem="GridLine"
+                                  Items="Lines"
+                                  ItemKey="x => x.Key"
+                                  @bind-SelectedItems="SelectedLines"
+                                  CloneItem="CloneLine"
+                                  CreateItem="CreateLine"
+                                  SaveRow="SaveLine"
+                                  ConfirmDelete="ConfirmDeleteLine"
+                                  DeleteRow="DeleteLine"
+                                  RowDeleted="OnRowDeleted"
+                                  Commands="GridCommands"
+                                  CommandSelected="HandleCommand">
+            <HeaderTemplate>
+                <tr><th>Item</th><th class="flat-advanced-grid-number">Quantity</th><th class="flat-advanced-grid-number">Price</th><th class="flat-advanced-grid-number">Total</th><th>Actions</th></tr>
+            </HeaderTemplate>
+            <RowTemplate Context="line">
+                <td>@line.Item</td>
+                <td class="flat-advanced-grid-number"><FlatNumberText Value="line.Quantity" Format="#,##0" /></td>
+                <td class="flat-advanced-grid-number"><FlatNumberText Value="line.Price" Format="#,##0.00" /></td>
+                <td class="flat-advanced-grid-number"><FlatNumberText Value="@(line.Quantity * line.Price)" Format="#,##0.00" /></td>
+            </RowTemplate>
+            <EditorTemplate Context="line">
+                <td><input aria-label="Item" @bind="line.Item" @bind:event="oninput" /></td>
+                <td class="flat-advanced-grid-number"><FlatNumberInput Value="line.Quantity" ValueChanged="value => line.Quantity = ToInteger(value)" Label="Quantity" Format="#,##0" Min="0" Max="int.MaxValue" /></td>
+                <td class="flat-advanced-grid-number"><FlatNumberInput Value="line.Price" ValueChanged="value => line.Price = value ?? 0" Label="Price" Format="#,##0.00" Min="0" /></td>
+                <td class="flat-advanced-grid-number"><FlatNumberText Value="@(line.Quantity * line.Price)" Format="#,##0.00" /></td>
+            </EditorTemplate>
+            <FooterTemplate>
+                <tr class="flat-advanced-grid-subtotal">
+                    <th>Subtotal</th>
+                    <td class="flat-advanced-grid-number"><FlatNumberText Value="@Lines.Sum(line => line.Quantity)" Format="#,##0" /></td>
+                    <td></td>
+                    <td class="flat-advanced-grid-number"><FlatNumberText Value="@Lines.Sum(line => line.Quantity * line.Price)" Format="#,##0.00" /></td>
+                    <td></td>
+                </tr>
+            </FooterTemplate>
+        </FlatAdvancedEditableGrid>
+        @if (!string.IsNullOrWhiteSpace(CommandStatus))
+        {
+            <div class="flat-advanced-grid-command-status" role="status" aria-live="polite">@CommandStatus</div>
+        }
+    </article>
+</FlatPage>
+
+@code {
+    private List<GridLine> Lines =
+    [
+        new("1", "Industrial scanner", 2, 4_250_000),
+        new("2", "Support subscription", 1, 950_000)
+    ];
+    private IReadOnlyList<GridLine> SelectedLines = [];
+    private readonly IReadOnlyList<FlatAdvancedGridCommandKind> GridCommands =
+    [
+        FlatAdvancedGridCommandKind.Copy,
+        FlatAdvancedGridCommandKind.Paste,
+        FlatAdvancedGridCommandKind.FillDown,
+        FlatAdvancedGridCommandKind.FillUp
+    ];
+    private string? CommandStatus;
+    private string? _lastCopiedText;
+    private int _pasteSequence;
+
+    private GridLine CreateLine() => new($"N{Lines.Count + 1}", "New item", 1, 0);
+    private static GridLine CloneLine(GridLine line) => new(line.Key, line.Item, line.Quantity, line.Price);
+
+    private Task<bool> SaveLine(GridLine line, bool creating)
+    {
+        if (creating)
+            Lines.Add(line);
+        else
+        {
+            var index = Lines.FindIndex(x => x.Key == line.Key);
+            if (index >= 0)
+                Lines[index] = line;
+        }
+
+        Lines = [.. Lines];
+        return Task.FromResult(true);
+    }
+
+    private Task<bool> ConfirmDeleteLine(GridLine line) =>
+        MessageBox.QuestionAsync($"Delete {line.Item}?", "Delete row", "Delete", "Cancel");
+
+    private Task<bool> DeleteLine(GridLine line)
+    {
+        var deleted = Lines.RemoveAll(item => item.Key == line.Key) > 0;
+        Lines = [.. Lines];
+        return Task.FromResult(deleted);
+    }
+
+    private Task OnRowDeleted(GridLine line)
+    {
+        CommandStatus = $"Deleted {line.Item}.";
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleCommand(FlatAdvancedGridCommand<GridLine> command)
+    {
+        if (command.Kind == FlatAdvancedGridCommandKind.Paste)
+        {
+            await PasteRowsAsync();
+            return;
+        }
+
+        if (command.Kind == FlatAdvancedGridCommandKind.FillDown)
+        {
+            FillDown(command.Items);
+            return;
+        }
+
+        if (command.Kind == FlatAdvancedGridCommandKind.FillUp)
+        {
+            FillUp(command.Items);
+            return;
+        }
+
+        if (command.Kind != FlatAdvancedGridCommandKind.Copy)
+        {
+            CommandStatus = $"{command.Kind} was returned to the host.";
+            return;
+        }
+
+        var text = string.Join(Environment.NewLine, command.Items.Select(line =>
+            string.Join('\t', line.Item,
+                line.Quantity.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                line.Price.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture),
+                (line.Quantity * line.Price).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))));
+        _lastCopiedText = text;
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            CommandStatus = $"Copied {command.Items.Count} selected row(s) to the clipboard.";
+        }
+        catch (JSException)
+        {
+            CommandStatus = "Clipboard access was blocked by the browser.";
+        }
+    }
+
+    private async Task PasteRowsAsync()
+    {
+        string text;
+        try
+        {
+            text = await JS.InvokeAsync<string>("navigator.clipboard.readText");
+        }
+        catch (JSException)
+        {
+            if (string.IsNullOrWhiteSpace(_lastCopiedText))
+            {
+                CommandStatus = "Clipboard read access was blocked by the browser.";
+                return;
+            }
+            text = _lastCopiedText;
+        }
+
+        var accepted = new List<GridLine>();
+        var rejected = 0;
+        foreach (var rawLine in text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var values = rawLine.TrimEnd('\r').Split('\t');
+            if (values.Length < 3 || string.IsNullOrWhiteSpace(values[0])
+                || !int.TryParse(values[1], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var quantity)
+                || !decimal.TryParse(values[2], System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out var price))
+            {
+                rejected++;
+                continue;
+            }
+
+            accepted.Add(new($"P{++_pasteSequence}", values[0].Trim(), quantity, price));
+        }
+
+        if (accepted.Count > 0)
+        {
+            Lines.AddRange(accepted);
+            Lines = [.. Lines];
+        }
+        CommandStatus = accepted.Count == 0
+            ? "No valid rows were found on the clipboard. Expected Item, Quantity, and Price columns."
+            : $"Pasted {accepted.Count} row(s){(rejected > 0 ? $"; rejected {rejected}." : ".")}";
+    }
+
+    private void FillDown(IReadOnlyList<GridLine> selected)
+    {
+        if (selected.Count < 2)
+        {
+            CommandStatus = "Select at least two rows. The first selected row is the Fill Down source.";
+            return;
+        }
+
+        var source = selected[0];
+        var targetKeys = selected.Skip(1).Select(line => line.Key).ToHashSet(StringComparer.Ordinal);
+        foreach (var target in Lines.Where(line => targetKeys.Contains(line.Key)))
+        {
+            target.Item = source.Item;
+            target.Quantity = source.Quantity;
+            target.Price = source.Price;
+        }
+        Lines = [.. Lines];
+        CommandStatus = $"Filled {targetKeys.Count} row(s) from {source.Item}.";
+    }
+
+    private void FillUp(IReadOnlyList<GridLine> selected)
+    {
+        if (selected.Count < 2)
+        {
+            CommandStatus = "Select at least two rows. The last selected row is the Fill Up source.";
+            return;
+        }
+
+        var source = selected[^1];
+        var targetKeys = selected.Take(selected.Count - 1).Select(line => line.Key).ToHashSet(StringComparer.Ordinal);
+        foreach (var target in Lines.Where(line => targetKeys.Contains(line.Key)))
+        {
+            target.Item = source.Item;
+            target.Quantity = source.Quantity;
+            target.Price = source.Price;
+        }
+        Lines = [.. Lines];
+        CommandStatus = $"Filled {targetKeys.Count} row(s) upward from {source.Item}.";
+    }
+
+    private static int ToInteger(decimal? value)
+    {
+        if (!value.HasValue)
+            return 0;
+
+        return (int)decimal.Clamp(decimal.Truncate(value.Value), 0, int.MaxValue);
+    }
+
+    private sealed class GridLine(string key, string item, int quantity, decimal price)
+    {
+        public string Key { get; set; } = key;
+        public string Item { get; set; } = item;
+        public int Quantity { get; set; } = quantity;
+        public decimal Price { get; set; } = price;
+    }
+}

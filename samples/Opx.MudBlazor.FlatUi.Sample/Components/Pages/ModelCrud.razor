@@ -34,6 +34,8 @@
                 {
                     <FlatEntityLookup TItem="Supplier"
                                       Items="Suppliers"
+                                      Columns="SupplierLookupColumns"
+                                      DefaultSortColumnKey="Name"
                                       ItemKey="supplier => supplier.Code"
                                       ItemText="supplier => supplier.Name"
                                       ItemDescription="SupplierDescription"
@@ -47,6 +49,8 @@
                 {
                     <FlatEntityLookup TItem="Supplier"
                                       Items="Suppliers"
+                                      Columns="SupplierLookupColumns"
+                                      DefaultSortColumnKey="Name"
                                       ItemKey="supplier => supplier.Code"
                                       ItemText="supplier => supplier.Name"
                                       ItemDescription="SupplierDescription"
@@ -200,6 +204,12 @@
         new("SUP-001", "PT Nusantara Supply", "Jakarta"),
         new("SUP-002", "Global Industrial Parts", "Surabaya"),
         new("SUP-003", "Prima Teknik", "Bandung")
+    ];
+    private static readonly IReadOnlyList<GridColumnDefinition> SupplierLookupColumns =
+    [
+        new(nameof(Supplier.Code), "Code", FilterEnabled: false, WidthPercent: 24),
+        new(nameof(Supplier.Name), "Supplier", FilterEnabled: false, WidthPercent: 48),
+        new(nameof(Supplier.City), "City", FilterEnabled: false, WidthPercent: 28)
     ];
     private readonly List<ProductMaster> _products =
     [

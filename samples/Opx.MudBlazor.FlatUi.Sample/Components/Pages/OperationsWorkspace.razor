@@ -3,12 +3,14 @@
 
 <FlatPage Kind="FlatPageKind.Module"
           PageCssClass="operations-workspace-page no-mobile-fab"
+          PanelClass="flat-panel operations-workspace-panel"
           RefreshEnabled="true"
           OnRefresh="Refresh">
     <ToolbarContent>
         <MudTextField T="string" @bind-Value="_search" Placeholder="Search operational work..." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" />
     </ToolbarContent>
     <ChildContent>
+        <div class="operations-workspace-content">
         <section class="operations-summary" aria-label="Operational queue summary">
             @foreach (var area in Areas)
             {
@@ -23,7 +25,7 @@
                 <article class="flat-panel operations-work-card">
                     <header>
                         <div><strong>@item.Title</strong><small>@item.Reference · @item.Area</small></div>
-                        <span class="@StatusClass(item.Status)">@item.Status</span>
+                        <FlatStatusChip Text="@item.Status" Color="@StatusColor(item.Status)" />
                     </header>
                     <div class="operations-work-facts">
                         <FlatInfoItem Label="Owner" Value="@item.Owner" />
@@ -50,6 +52,7 @@
             <span><strong>Composition sample only.</strong> Authorization, business workflow, inventory/accounting mutation, payment, persistence, and realtime transport remain owned by the host.</span>
         </div>
         @if (!string.IsNullOrWhiteSpace(_lastAction)){<div class="operations-action-result" role="status">@_lastAction</div>}
+        </div>
     </ChildContent>
 </FlatPage>
 
@@ -81,5 +84,11 @@
     private void HandleAction(FlatOperationalWorkItem item, string action) => _lastAction = $"{action} callback emitted for {item.Reference}; sample data was not persisted.";
     private static string PrimaryAction(FlatOperationalWorkItem item) => item.Area switch { "Approval Inbox" => "review", "Timesheet" => "continue", "POS / Cart" => "checkout", _ => "process" };
     private static string PrimaryActionLabel(FlatOperationalWorkItem item) => item.Area switch { "Approval Inbox" => "Review", "Timesheet" => "Continue", "POS / Cart" => "Checkout", _ => "Process" };
-    private static string StatusClass(string status) => $"operations-status {status.ToLowerInvariant().Replace(' ', '-')}";
+    private static Color StatusColor(string status) => status switch
+    {
+        "Ready" => Color.Success,
+        "Assigned" => Color.Info,
+        "Open" => Color.Error,
+        _ => Color.Warning
+    };
 }

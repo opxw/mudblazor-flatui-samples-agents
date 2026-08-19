@@ -15,8 +15,8 @@
         </div></article>
 
         <article class="flat-panel"><header class="panel-header"><div><strong>Entity Lookup and Composite Inputs</strong><small>Large master selection, money, quantity/UOM</small></div></header><div class="erp-toolkit-body erp-input-sample">
-            <FlatEntityLookup TItem="Supplier" Items="Suppliers" ItemKey="supplier => supplier.Code" ItemText="supplier => supplier.Name" ItemDescription="SupplierDescription" ItemKeywords="supplier => supplier.City" @bind-SelectedItem="_selectedSupplier" Label="Supplier" Title="Select supplier" />
-            <FlatEntityLookup TItem="Supplier" Items="Suppliers" ItemKey="supplier => supplier.Code" ItemText="supplier => supplier.Name" ItemDescription="SupplierDescription" MultiSelect="true" @bind-SelectedItems="_approvalSuppliers" Label="Approval suppliers" Title="Select approval suppliers" />
+            <FlatEntityLookup TItem="Supplier" Items="Suppliers" Columns="SupplierLookupColumns" DefaultSortColumnKey="Name" ItemKey="supplier => supplier.Code" ItemText="supplier => supplier.Name" ItemDescription="SupplierDescription" ItemKeywords="supplier => supplier.City" @bind-SelectedItem="_selectedSupplier" Label="Supplier" Title="Select supplier" />
+            <FlatEntityLookup TItem="Supplier" Items="Suppliers" Columns="SupplierLookupColumns" DefaultSortColumnKey="Name" ItemKey="supplier => supplier.Code" ItemText="supplier => supplier.Name" ItemDescription="SupplierDescription" MultiSelect="true" @bind-SelectedItems="_approvalSuppliers" Label="Approval suppliers" Title="Select approval suppliers" />
             <FlatMoneyInput @bind-Value="_amount" @bind-Currency="_currency" Currencies="Currencies" Label="Order amount" />
             <FlatQuantityInput @bind-Value="_quantity" @bind-Unit="_unit" Units="Units" Label="Order quantity" />
         </div></article>
@@ -39,6 +39,12 @@
     private static readonly IReadOnlyList<FlatTransactionAction> TransactionActions = [new("approve", "Approve", Icons.Material.Outlined.Check, true), new("reject", "Reject", Icons.Material.Outlined.Close, Destructive: true), new("print", "Print", Icons.Material.Outlined.Print)];
     private static readonly IReadOnlyList<FlatLifecycleStep> Lifecycle = [new("draft", "Draft", "Complete", "Maya"), new("review", "Manager review", "Current", "Rina"), new("post", "Posting", "Waiting")];
     private static readonly IReadOnlyList<Supplier> Suppliers = [new("SUP-001", "PT Nusantara Supply", "Jakarta"), new("SUP-002", "Global Industrial Parts", "Surabaya"), new("SUP-003", "Prima Teknik", "Bandung")];
+    private static readonly IReadOnlyList<GridColumnDefinition> SupplierLookupColumns =
+    [
+        new(nameof(Supplier.Code), "Code", FilterEnabled: false, WidthPercent: 24),
+        new(nameof(Supplier.Name), "Supplier", FilterEnabled: false, WidthPercent: 48),
+        new(nameof(Supplier.City), "City", FilterEnabled: false, WidthPercent: 28)
+    ];
     private Supplier? _selectedSupplier = Suppliers[0];
     private IEnumerable<Supplier> _approvalSuppliers = [Suppliers[0], Suppliers[2]];
     private static string SupplierDescription(Supplier supplier) => $"{supplier.Code} · {supplier.City}";
@@ -69,10 +75,12 @@
 </FlatTransactionWorkspace>
 
 <FlatEntityLookup TItem="Supplier" Items="Suppliers"
+                  Columns="SupplierColumns" DefaultSortColumnKey="Name"
                   ItemKey="x => x.Code" ItemText="x => x.Name"
                   @bind-SelectedItem="SelectedSupplier" />
 
 <FlatEntityLookup TItem="Supplier" Items="Suppliers"
+                  Columns="SupplierColumns" DefaultSortColumnKey="Name"
                   ItemKey="x => x.Code" ItemText="x => x.Name"
                   MultiSelect="true" @bind-SelectedItems="ApprovalSuppliers" />
 """;

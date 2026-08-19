@@ -1,0 +1,211 @@
+@page "/spatial-operations"
+@implements IAsyncDisposable
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Spatial Operations - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="spatial-operations-page no-mobile-fab">
+    <ChildContent>
+        <FlatSpatialWorkspace TItem="SpatialWorkItem"
+                              Items="@WorkItems"
+                              ItemKey="item => item.Key"
+                              ItemTitle="item => item.Title"
+                              ItemDescription="item => item.Description"
+                              ItemMeta="item => item.Meta"
+                              ItemSearchText="SearchWorkItem"
+                              ItemIcon="item => item.Icon"
+                              Layers="@Layers"
+                              VisibleLayerKeys="@_visibleLayerKeys"
+                              LayerVisibilityChanged="HandleLayerChange"
+                              Playback="@Playback"
+                              PlaybackRequested="HandlePlaybackRequest"
+                              SelectedItemKey="@_selectedItemKey"
+                              SelectedItemKeyChanged="SelectWorkItemByKey"
+                              Title="Spatial operations"
+                              Subtitle="Layered floor plan, work list, geofences, and route playback">
+            <MapContent>
+                <FlatVectorMap CanvasWidth="900" CanvasHeight="520"
+                               Regions="@VisibleRegions" Routes="@VisibleRoutes"
+                               Markers="@VisibleMarkers" Geofences="@VisibleGeofences"
+                               @bind-Viewport="_viewport"
+                               SelectedMarkerKey="@_selectedItemKey"
+                               SelectedGeofenceKey="@_selectedGeofenceKey"
+                               MarkerSelected="SelectMarker" GeofenceSelected="SelectGeofence"
+                               ShowLegend="false" ShowMarkerLabels="true"
+                               AriaLabel="Warehouse spatial operations map"
+                               Description="Interactive warehouse floors, work items, safety zones, and vehicle route playback">
+                    <OverlayContent>
+                        <strong>@SelectionTitle</strong>
+                        <span>@SelectionDetail</span>
+                    </OverlayContent>
+                </FlatVectorMap>
+            </MapContent>
+            <DetailTemplate Context="item">
+                <section class="spatial-detail-card">
+                    <header><MudIcon Icon="@item.Icon" Size="Size.Small" /><div><strong>@item.Title</strong><small>@item.Status</small></div></header>
+                    <dl>
+                        <div><dt>Reference</dt><dd>@item.Key</dd></div>
+                        <div><dt>Assignment</dt><dd>@item.Description</dd></div>
+                        <div><dt>Update</dt><dd>@item.Meta</dd></div>
+                    </dl>
+                </section>
+            </DetailTemplate>
+        </FlatSpatialWorkspace>
+
+        <details class="spatial-usage"><summary>Sample code</summary><pre><code>@UsageCode</code></pre></details>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private const string GroundLayer = "floor-ground";
+    private const string MezzanineLayer = "floor-mezzanine";
+    private const string FleetLayer = "fleet";
+    private const string SafetyLayer = "safety";
+
+    private static readonly IReadOnlyList<FlatSpatialLayer> Layers =
+    [
+        new(GroundLayer, "Ground", Icons.Material.Outlined.Layers, "Ground-floor base plan", FlatSpatialLayerKind.Base, "floor"),
+        new(MezzanineLayer, "Mezzanine", Icons.Material.Outlined.Layers, "Mezzanine base plan", FlatSpatialLayerKind.Base, "floor"),
+        new(FleetLayer, "Fleet", Icons.Material.Outlined.LocalShipping, "Vehicles, routes, and dispatch points"),
+        new(SafetyLayer, "Safety", Icons.Material.Outlined.HealthAndSafety, "Restricted and controlled zones")
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapRegion> GroundRegions =
+    [
+        new("receiving", "Receiving", "M25 25 H285 V180 H25 Z", FlatVectorMapTone.Info, "Inbound inspection"),
+        new("storage", "Storage", "M310 25 H610 V180 H310 Z", FlatVectorMapTone.Standard, "Rack rows A01-A12"),
+        new("dispatch", "Dispatch", "M635 25 H875 V180 H635 Z", FlatVectorMapTone.Success, "Outbound staging"),
+        new("production", "Production", "M25 205 H530 V495 H25 Z", FlatVectorMapTone.Warning, "Assembly and quality"),
+        new("utilities", "Utilities", "M555 205 H875 V495 H555 Z", FlatVectorMapTone.Standard, "Plant services")
+    ];
+
+    private static readonly IReadOnlyList<FlatVectorMapRegion> MezzanineRegions =
+    [
+        new("office", "Operations office", "M75 70 H425 V240 H75 Z", FlatVectorMapTone.Info, "Dispatch control room"),
+        new("parts", "Parts buffer", "M475 70 H825 V240 H475 Z", FlatVectorMapTone.Standard, "Fast-moving parts"),
+        new("bridge", "Service bridge", "M180 300 H720 V400 H180 Z", FlatVectorMapTone.Warning, "Elevated access")
+    ];
+
+    private static readonly IReadOnlyList<FlatMapPoint> ForkliftPath =
+    [new(90, 130), new(210, 130), new(335, 245), new(455, 350), new(610, 360), new(755, 125)];
+
+    private static readonly IReadOnlyList<FlatSpatialGeofence> SafetyGeofences =
+    [
+        FlatSpatialGeofence.Polygon("loading-zone", "Loading exclusion zone", [new(620, 20), new(880, 20), new(880, 190), new(620, 190)], FlatVectorMapTone.Warning, "Pedestrian access requires clearance"),
+        FlatSpatialGeofence.Circle("utility-zone", "High-voltage safety zone", new(715, 350), 92, FlatVectorMapTone.Danger, "Authorized maintenance personnel only")
+    ];
+
+    private static readonly IReadOnlyList<SpatialWorkItem> WorkItems =
+    [
+        new("forklift-07", "Forklift 07", "Move pallet PLT-2048 to Dispatch", "In transit", "12 sec ago", Icons.Material.Outlined.PrecisionManufacturing),
+        new("technician-12", "Technician 12", "Inspect compressor UTL-04", "Assigned", "2 min ago", Icons.Material.Outlined.Engineering),
+        new("truck-18", "Truck 18", "Dock appointment DO-260819", "Arriving", "ETA 8 min", Icons.Material.Outlined.LocalShipping),
+        new("scanner-04", "Scanner Gate 04", "Outbound validation station", "Online", "Now", Icons.Material.Outlined.QrCodeScanner)
+    ];
+
+    private IReadOnlyList<string> _visibleLayerKeys = [GroundLayer, FleetLayer, SafetyLayer];
+    private FlatVectorMapViewport _viewport = new(450, 260, 1);
+    private string? _selectedItemKey = "forklift-07";
+    private string? _selectedGeofenceKey;
+    private FlatSpatialPlaybackState Playback { get; set; } = new("forklift-route", 0, ForkliftPath.Count);
+    private CancellationTokenSource? _playbackCancellation;
+
+    private bool LayerVisible(string key) => _visibleLayerKeys.Contains(key, StringComparer.Ordinal);
+    private static string SearchWorkItem(SpatialWorkItem item) => $"{item.Title} {item.Description} {item.Status} {item.Meta}";
+    private IReadOnlyList<FlatVectorMapRegion> VisibleRegions => LayerVisible(MezzanineLayer) ? MezzanineRegions : GroundRegions;
+    private IReadOnlyList<FlatVectorMapRoute> VisibleRoutes => LayerVisible(FleetLayer)
+        ? [new("forklift-route", "Forklift dispatch route", ForkliftPath, FlatVectorMapTone.Primary, "Routing remains host-owned", Animated: Playback.IsPlaying)] : [];
+    private IReadOnlyList<FlatSpatialGeofence> VisibleGeofences => LayerVisible(SafetyLayer) ? SafetyGeofences : [];
+    private IReadOnlyList<FlatVectorMapMarker> VisibleMarkers
+    {
+        get
+        {
+            var markers = new List<FlatVectorMapMarker>();
+            if (LayerVisible(FleetLayer))
+            {
+                markers.Add(new("forklift-07", "Forklift 07", ForkliftPath[Playback.NormalizedPosition], FlatVectorMarkerKind.Vehicle, FlatVectorMapTone.Primary, "Move pallet PLT-2048", true));
+                markers.Add(new("truck-18", "Truck 18", new(760, 125), FlatVectorMarkerKind.Vehicle, FlatVectorMapTone.Info, "ETA 8 minutes"));
+                markers.Add(new("scanner-04", "Scanner Gate 04", new(825, 145), FlatVectorMarkerKind.Asset, FlatVectorMapTone.Success, "Online"));
+            }
+            if (LayerVisible(SafetyLayer))
+                markers.Add(new("technician-12", "Technician 12", new(700, 345), FlatVectorMarkerKind.Person, FlatVectorMapTone.Warning, "Inspect compressor UTL-04"));
+            return markers;
+        }
+    }
+
+    private SpatialWorkItem? SelectedWorkItem => WorkItems.FirstOrDefault(item => item.Key == _selectedItemKey);
+    private FlatSpatialGeofence? SelectedFence => SafetyGeofences.FirstOrDefault(fence => fence.Key == _selectedGeofenceKey);
+    private string SelectionTitle => SelectedFence?.Label ?? SelectedWorkItem?.Title ?? "Spatial operations";
+    private string SelectionDetail => SelectedFence?.Description ?? SelectedWorkItem?.Description ?? "Select a map marker or work item";
+
+    private void HandleLayerChange(FlatSpatialLayerChange change)
+    {
+        _visibleLayerKeys = change.VisibleLayerKeys;
+        if (_selectedGeofenceKey is not null && !LayerVisible(SafetyLayer)) _selectedGeofenceKey = null;
+    }
+
+    private Task SelectWorkItemByKey(string? key) { _selectedItemKey = key; _selectedGeofenceKey = null; return Task.CompletedTask; }
+    private Task SelectMarker(FlatVectorMapMarker marker) => SelectWorkItemByKey(marker.Key);
+    private void SelectGeofence(FlatSpatialGeofence geofence) { _selectedGeofenceKey = geofence.Key; _selectedItemKey = null; }
+
+    private async Task HandlePlaybackRequest(FlatSpatialPlaybackRequest request)
+    {
+        switch (request.Action)
+        {
+            case FlatSpatialPlaybackAction.Toggle:
+                if (Playback.IsPlaying) StopPlayback(); else { Playback = Playback with { IsPlaying = true }; StartPlayback(); }
+                break;
+            case FlatSpatialPlaybackAction.Previous:
+                StopPlayback(); Playback = Playback with { Position = Math.Max(0, Playback.NormalizedPosition - 1) }; break;
+            case FlatSpatialPlaybackAction.Next:
+                StopPlayback(); Playback = Playback with { Position = Math.Min(Playback.PointCount - 1, Playback.NormalizedPosition + 1) }; break;
+            case FlatSpatialPlaybackAction.Seek:
+                StopPlayback(); Playback = Playback with { Position = request.Position }; break;
+            case FlatSpatialPlaybackAction.ChangeSpeed:
+                Playback = Playback with { Speed = request.Speed }; break;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void StartPlayback() { StopPlayback(true); _playbackCancellation = new(); _ = RunPlayback(_playbackCancellation.Token); }
+    private async Task RunPlayback(CancellationToken token)
+    {
+        try
+        {
+            while (!token.IsCancellationRequested && Playback.IsPlaying)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(900 / Playback.NormalizedSpeed), token);
+                if (Playback.NormalizedPosition >= Playback.PointCount - 1) { Playback = Playback with { Position = 0, IsPlaying = false }; break; }
+                Playback = Playback with { Position = Playback.NormalizedPosition + 1 };
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void StopPlayback(bool cancelOnly = false)
+    {
+        _playbackCancellation?.Cancel(); _playbackCancellation?.Dispose(); _playbackCancellation = null;
+        if (!cancelOnly) Playback = Playback with { IsPlaying = false };
+    }
+
+    public ValueTask DisposeAsync() { StopPlayback(); return ValueTask.CompletedTask; }
+    private const string UsageCode = """
+<FlatSpatialWorkspace TItem="WorkItem" Items="@items"
+                      ItemKey="item => item.Id" ItemTitle="item => item.Title"
+                      Layers="@layers" VisibleLayerKeys="@visibleLayers"
+                      LayerVisibilityChanged="HandleLayerChange"
+                      Playback="@playback" PlaybackRequested="HandlePlayback"
+                      @bind-SelectedItemKey="selectedKey">
+    <MapContent>
+        <FlatVectorMap Regions="@regions" Routes="@routes" Markers="@markers"
+                       Geofences="@geofences"
+                       MarkerSelected="marker => selectedKey = marker.Key" />
+    </MapContent>
+</FlatSpatialWorkspace>
+
+// GPS, tile provider, routing, geofence evaluation, realtime, and persistence are host-owned.
+""";
+}

@@ -88,6 +88,7 @@
         @if (ShowItem("Form Designer", "Operations", "WYSIWYG", "Live Preview")) { <MudNavLink Href="/model-form-designer" Icon="@Icons.Material.Outlined.DashboardCustomize">Form Designer</MudNavLink> }
         @if (ShowItem("Dynamic Menu", "Operations", "Autoload")) { <MudNavLink Href="/dynamic-menu" Icon="@Icons.Material.Outlined.AccountTree">Dynamic Menu</MudNavLink> }
         @if (ShowItem("Operations Workspace", "Operations", "Service Desk", "Approval")) { <MudNavLink Href="/operations-workspace" Icon="@Icons.Material.Outlined.Workspaces">Operations Workspace</MudNavLink> }
+        @if (ShowItem("Spatial Operations", "Operations", "Map", "Geofence", "Route Playback")) { <MudNavLink Href="/spatial-operations" Icon="@Icons.Material.Outlined.Explore">Spatial Operations</MudNavLink> }
         @if (ShowItem("Tree Grid", "Operations")) { <MudNavLink Href="/tree-grid" Icon="@Icons.Material.Outlined.AccountTree">Tree Grid</MudNavLink> }
         @if (ShowItem("Jobs", "Operations", "Job Board")) { <MudNavLink Href="/jobs" Icon="@Icons.Material.Outlined.WorkHistory">Jobs</MudNavLink> }
         @if (ShowItem("Kanban", "Operations")) { <MudNavLink Href="/kanban" Icon="@Icons.Material.Outlined.ViewKanban">Kanban</MudNavLink> }
@@ -121,6 +122,9 @@
         @if (ShowItem("Pivot", "Data & Reports")) { <MudNavLink Href="/pivot" Icon="@Icons.Material.Outlined.PivotTableChart">Pivot</MudNavLink> }
         @if (ShowItem("Enterprise Toolkit", "Data & Reports")) { <MudNavLink Href="/enterprise-toolkit" Icon="@Icons.Material.Outlined.DomainAdd">Enterprise Toolkit</MudNavLink> }
         @if (ShowItem("Experience Toolkit", "Data & Reports", "Accessibility", "Command Palette")) { <MudNavLink Href="/experience-toolkit" Icon="@Icons.Material.Outlined.AccessibilityNew">Experience Toolkit</MudNavLink> }
+        @if (ShowItem("Business Toolkit", "Data & Reports", "Traceability", "BOM", "Rules", "Approval")) { <MudNavLink Href="/business-toolkit" Icon="@Icons.Material.Outlined.AccountTree">Business Toolkit</MudNavLink> }
+        @if (ShowItem("ERP Release Train", "Data & Reports", "Transaction", "Inventory", "Finance", "Workflow", "MRP")) { <MudNavLink Href="/erp-release-train" Icon="@Icons.Material.Outlined.Factory">ERP Release Train</MudNavLink> }
+        @if (ShowItem("Advanced Editable Grid", "Data & Reports", "Grid", "Spreadsheet", "Add", "Edit")) { <MudNavLink Href="/advanced-editable-grid" Icon="@Icons.Material.Outlined.TableView">Advanced Editable Grid</MudNavLink> }
     </MudNavGroup>
 }
 
@@ -169,6 +173,7 @@
         @if (ShowItem("Charts", "UI Kit")) { <MudNavLink Href="/charts" Icon="@Icons.Material.Outlined.InsertChartOutlined">Charts</MudNavLink> }
         @if (ShowItem("File Upload", "UI Kit")) { <MudNavLink Href="/file-upload" Icon="@Icons.Material.Outlined.CloudUpload">File Upload</MudNavLink> }
         @if (ShowItem("Grid Preferences", "UI Kit")) { <MudNavLink Href="/grid-preferences" Icon="@Icons.Material.Outlined.ViewColumn">Grid Preferences</MudNavLink> }
+        @if (ShowItem("Vector Map", "UI Kit", "Floor Plan", "Location", "Route")) { <MudNavLink Href="/vector-map" Icon="@Icons.Material.Outlined.Map">Vector Map</MudNavLink> }
         @if (ShowItem("Colors", "UI Kit")) { <MudNavLink Href="/colors" Icon="@Icons.Material.Outlined.Palette">Colors</MudNavLink> }
         @if (ShowItem("Timeline", "UI Kit")) { <MudNavLink Href="/timeline" Icon="@Icons.Material.Outlined.Timeline">Timeline</MudNavLink> }
         @if (ShowItem("Widgets", "UI Kit")) { <MudNavLink Href="/widgets" Icon="@Icons.Material.Outlined.ViewQuilt">Widgets</MudNavLink> }
@@ -186,11 +191,11 @@
 
 @code {
     private static readonly string[] OperationsTerms =
-        ["Operations", "CRUD Asset", "CRUD Simple", "Grid Editor", "Inline Edit", "Model CRUD", "Generated Form", "Data Annotations", "Form Designer", "WYSIWYG", "Live Preview", "Padding", "Margin", "CSS Class", "Dynamic Menu", "Autoload", "MenuText", "ParentId", "Operations Workspace", "Service Desk", "Approval", "Procurement", "Stock Transfer", "Timesheet", "POS", "Tree Grid", "Hierarchy", "Parent Key", "Drag Drop", "Jobs", "Job Board", "Kanban", "Task Board", "Workflow", "Calendar", "Schedule", "Agenda", "Sales Pipeline", "CRM", "Deals", "Chat", "AI Chat", "Assistant", "Prompt", "Messages", "Conversation", "Email", "Mailbox", "Inbox", "Compose", "Monitoring Service", "Monitoring Database"];
+        ["Operations", "CRUD Asset", "CRUD Simple", "Grid Editor", "Inline Edit", "Model CRUD", "Generated Form", "Data Annotations", "Form Designer", "WYSIWYG", "Live Preview", "Padding", "Margin", "CSS Class", "Dynamic Menu", "Autoload", "MenuText", "ParentId", "Operations Workspace", "Spatial Operations", "Map", "Geofence", "Route Playback", "Fleet", "Service Desk", "Approval", "Procurement", "Stock Transfer", "Timesheet", "POS", "Tree Grid", "Hierarchy", "Parent Key", "Drag Drop", "Jobs", "Job Board", "Kanban", "Task Board", "Workflow", "Calendar", "Schedule", "Agenda", "Sales Pipeline", "CRM", "Deals", "Chat", "AI Chat", "Assistant", "Prompt", "Messages", "Conversation", "Email", "Mailbox", "Inbox", "Compose", "Monitoring Service", "Monitoring Database"];
     private static readonly string[] DataTerms = ["Data & Reports", "Static / Master", "Large Data Grid", "Table", "Scroll", "Reports", "Pivot", "Matrix", "Aggregate", "Enterprise Toolkit", "Experience Toolkit", "Accessibility", "Command Palette", "Schema Form", "Collaboration", "Conflict", "Import", "Master Detail", "Audit", "Workflow", "Scheduler", "Offline Sync", "Documents"];
     private static readonly string[] CommerceTerms = ["Commerce & Content", "Product Catalog", "Product Management", "Product Detail", "Product Editor", "Catalog", "Ecommerce", "Products", "Filters", "Gallery", "Publish", "Tags", "Website Front", "Job Landing", "Careers", "Recruitment", "Blog", "Landing Page", "Front Page"];
     private static readonly string[] AccountTerms = ["Account", "Edit Account", "User Profile", "Login Sample", "Two-step Verification", "2FA", "OTP", "Reset Password", "Forgot Password", "Recovery"];
-    private static readonly string[] UiKitTerms = ["UI Kit", "Components", "Development Rules", "Rules", "Skill", "Source of Truth", "PageId", "Accordions", "Accordion", "Collapse", "Expand", "Flush", "Charts", "MudBlazor Charts", "Line", "Bar", "Stacked Bar", "Pie", "Donut", "Timeseries", "Heat Map", "Rose", "Radar", "Sankey", "Scatter Plot", "File Upload", "Drag Drop", "Progress", "Grid Preferences", "Saved Views", "Virtualization", "Colors", "Palette", "Semantic", "Timeline", "Activity", "Widgets", "Metric", "Profile Card Grid", "Members", "Card Grid"];
+    private static readonly string[] UiKitTerms = ["UI Kit", "Components", "Development Rules", "Rules", "Skill", "Source of Truth", "PageId", "Accordions", "Accordion", "Collapse", "Expand", "Flush", "Charts", "MudBlazor Charts", "Line", "Bar", "Stacked Bar", "Pie", "Donut", "Timeseries", "Heat Map", "Rose", "Radar", "Sankey", "Scatter Plot", "File Upload", "Drag Drop", "Progress", "Grid Preferences", "Saved Views", "Virtualization", "Vector Map", "Floor Plan", "Denah", "Location", "Tracking", "GPS", "Route", "Waypoint", "Colors", "Palette", "Semantic", "Timeline", "Activity", "Widgets", "Metric", "Profile Card Grid", "Members", "Card Grid"];
     private static readonly string[] HrTerms = ["Human Resources", "HR Overview", "Employees", "Attendance & Leave"];
     private static readonly string[] ProductionTerms = ["Production", "Production Plan", "Work Orders", "Quality Control"];
     private static readonly string[] FinanceTerms = ["Finance", "Finance Overview", "General Ledger", "Accounts Payable", "Accounts Receivable"];
@@ -259,6 +264,7 @@
             case "/model-form-designer":
             case "/dynamic-menu":
             case "/operations-workspace":
+            case "/spatial-operations":
             case "/jobs":
             case "/kanban":
             case "/calendar":
@@ -294,6 +300,7 @@
             case "/charts":
             case "/file-upload":
             case "/grid-preferences":
+            case "/vector-map":
             case "/colors":
             case "/timeline":
             case "/widgets":

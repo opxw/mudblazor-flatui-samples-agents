@@ -1,0 +1,176 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+
+<section class="sample-page-usage" aria-label="Sample code usage">
+    <details>
+        <summary>
+            <span><strong>Sample code</strong><small>@Route</small></span>
+            <MudIcon Icon="@Icons.Material.Outlined.Code" aria-hidden="true" />
+        </summary>
+        <pre><code>@Snippet</code></pre>
+    </details>
+</section>
+
+@code {
+    private string Route => "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+    private string NormalizedRoute => Route == "/" ? "/" : Route.TrimEnd('/').ToLowerInvariant();
+    private string Snippet => ResolveSnippet(NormalizedRoute);
+
+    protected override void OnInitialized() => Navigation.LocationChanged += LocationChanged;
+    private void LocationChanged(object? sender, LocationChangedEventArgs args) => InvokeAsync(StateHasChanged);
+    public void Dispose() => Navigation.LocationChanged -= LocationChanged;
+
+    private static string ResolveSnippet(string route) => route switch
+    {
+        "/crud" or "/crud-simple" or "/static-data" => """
+            <FlatPage Kind="FlatPageKind.Module"
+                      PrimaryActionVisible="true"
+                      OnPrimaryAction="BeginCreateAsync">
+                <FlatDataGrid TItem="Record"
+                              State="GridState"
+                              Columns="Columns"
+                              Items="PagedItems" />
+                <FlatPager State="GridState" Changed="ReloadAsync" />
+            </FlatPage>
+            """,
+        "/data-grid-large" => """
+            <FlatDataGrid TItem="Order"
+                          State="GridState"
+                          Columns="Columns"
+                          Items="PagedOrders" />
+
+            new GridColumnDefinition("total", "Total",
+                GridColumnFilterType.Number,
+                ValueKind: FlatGridColumnValueKind.Currency,
+                Format: "#,##0.00");
+            """,
+        "/model-crud" => """
+            <FlatModelCrud TItem="Product"
+                           Items="Products"
+                           Fields="Fields"
+                           SaveItem="SaveProductAsync"
+                           DeleteItem="DeleteProductAsync" />
+            """,
+        "/grid-editor" => """
+            <FlatEditableGrid TItem="OrderLine"
+                              Items="Lines"
+                              Columns="Columns"
+                              SaveRow="SaveLineAsync"
+                              DeleteRow="DeleteLineAsync" />
+            """,
+        "/tree-grid" => """
+            <FlatTreeGrid TItem="Node" TKey="string"
+                          Items="Nodes"
+                          ItemKey="node => node.Id"
+                          ParentKey="node => node.ParentId"
+                          MoveItem="MoveNodeAsync" />
+            """,
+        "/pivot" => """
+            <FlatPivotGrid TItem="Sale"
+                           Items="Sales"
+                           RowKey="sale => sale.Department"
+                           ColumnKey="sale => sale.Quarter"
+                           ValueSelector="sale => sale.Revenue" />
+            """,
+        "/file-upload" => """
+            <FlatFileUpload Multiple="true"
+                            UploadFiles="UploadAsync"
+                            UploadCompleted="HandleCompleted" />
+            """,
+        "/operations-workspace" => """
+            <FlatPage Kind="FlatPageKind.Module"
+                      PanelClass="flat-panel operations-workspace-panel">
+                <!-- Compose Service Desk, Approval, Procurement,
+                     Stock Transfer, Timesheet, or POS cards here. -->
+            </FlatPage>
+            """,
+        "/erp-toolkit" => """
+            <FlatMoneyInput @bind-Value="Amount" @bind-Currency="Currency" />
+            <FlatQuantityInput @bind-Value="Quantity" @bind-Unit="Unit" />
+            <FlatEntityLookup TItem="Supplier" Items="Suppliers" ItemText="s => s.Name" />
+            """,
+        "/business-toolkit" => """
+            <FlatInventoryTraceabilityWorkspace Items="Traceability" Selected="SelectNode" />
+            <FlatBomRoutingEditor Items="Bom" Changed="HandleBomIntent" />
+            <FlatRuleBuilder Fields="Fields" @bind-Value="Rule" />
+            <FlatApprovalMatrixDesigner Levels="Levels" Changed="HandleApprovalIntent" />
+            <FlatDocumentAttachmentManager Items="Attachments" ActionSelected="HandleAttachment" />
+            <FlatRecurrenceEditor @bind-Value="Recurrence" />
+            <FlatQueryBuilder Fields="QueryFields" @bind-Value="Query" RunRequested="RunQuery" />
+            <FlatDataComparisonGrid Rows="Changes" DecisionSelected="ResolveField" />
+            """,
+        "/erp-release-train" => """
+            <FlatTransactionEngine THeader="Order" TLine="OrderLine"
+                                   Header="Order" Lines="Lines"
+                                   Context="TransactionContext"
+                                   CommandSelected="HandleTransaction" />
+            <FlatAdvancedEditableGrid TItem="OrderLine"
+                                      Items="Lines"
+                                      CommandSelected="HandleGridCommand" />
+            <FlatInventoryAllocationWorkspace Items="Allocations" ActionSelected="HandleAllocation" />
+            <FlatWorkflowDesigner Nodes="Workflow" Changed="HandleWorkflowChange" />
+            <FlatApprovalInbox Items="Inbox" ActionSelected="HandleApproval" />
+            <FlatIntegrationCenter Runs="Runs" ActionSelected="HandleIntegration" />
+            <FlatMrpCapacityWorkspace Requirements="Requirements" Capacity="Capacity" />
+            <FlatGovernancePanel Checks="Checks" ActionSelected="InspectGovernance" />
+            """,
+        "/advanced-editable-grid" => """
+            <FlatAdvancedEditableGrid TItem="OrderLine"
+                                      Items="Lines"
+                                      ItemKey="line => line.Key"
+                                      CreateItem="CreateLine"
+                                      CloneItem="CloneLine"
+                                      SaveRow="SaveLine"
+                                      CommandSelected="HandleCommand">
+                <HeaderTemplate>...</HeaderTemplate>
+                <RowTemplate Context="line">...</RowTemplate>
+                <EditorTemplate Context="line">...</EditorTemplate>
+            </FlatAdvancedEditableGrid>
+            """,
+        "/components" => """
+            <FlatNumberInput @bind-Value="Price" Label="Unit price" Format="#,##0.00" />
+            <FlatStatusChip Text="Ready" Color="Color.Success" />
+            <FlatMessageBoxDialog />
+            """,
+        "/login" or "/reset-password" or "/two-step-verification" => """
+            @layout AuthLayout
+
+            <EditForm Model="Model" OnValidSubmit="SubmitAsync">
+                <!-- Use theme-safe outlined fields and shared MessageBox feedback. -->
+            </EditForm>
+            """,
+        "/website" or "/job-landing" or "/catalog" or "/blog" => """
+            @layout WebsiteLayout
+
+            <main class="website-page">
+                <!-- Compose public, responsive sections from reusable components. -->
+            </main>
+            """,
+        "/charts" => """
+            <MudChart ChartType="ChartType.Line"
+                      ChartSeries="Series"
+                      XAxisLabels="Labels" />
+            """,
+        "/calendar" => """
+            <FlatCalendar Items="Events"
+                          EventSelected="HandleEvent"
+                          RangeChanged="LoadRangeAsync" />
+            """,
+        "/chat" or "/ai-chat" or "/email" => """
+            <FlatChatShell>
+                <!-- Host owns messages, realtime transport, authorization, and persistence. -->
+            </FlatChatShell>
+            """,
+        "/vector-map" or "/spatial-operations" => """
+            <FlatVectorMap Features="Features"
+                           SelectedFeatureChanged="HandleSelection" />
+            """,
+        _ => $"""
+            @page "{route}"
+
+            <FlatPage Kind="FlatPageKind.Module">
+                <!-- Compose the reusable components demonstrated on this page. -->
+            </FlatPage>
+            """
+    };
+}

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.0.2" />
+    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.0.4" />
     <PackageReference Include="MudBlazor" Version="9.7.0" />
   </ItemGroup>
 

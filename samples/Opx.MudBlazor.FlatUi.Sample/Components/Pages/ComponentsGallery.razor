@@ -65,6 +65,13 @@
             </div>
         </FlatPanel>
 
+        <FlatPanel Title="Formatted Number Input" Subtitle="Localized mono numeric field">
+            <div class="detail-section-body sample-form-grid">
+                <FlatNumberInput @bind-Value="_sampleWholeNumber" Label="Quantity" Format="#,##0" Min="0" />
+                <FlatNumberInput @bind-Value="_sampleDecimalNumber" Label="Unit price" Format="#,##0.00" Min="0" />
+            </div>
+        </FlatPanel>
+
         <FlatPanel Title="Profile Avatar" Subtitle="Photo or configurable initials">
             <div class="profile-avatar-demo">
                 <FlatProfileAvatar ImageUrl="/sample-profile.svg" Name="Sample Operator" Initials="SO" Size="44" />
@@ -342,6 +349,8 @@
     private FlatProcessingContainer? _pageProcessing;
     private string? _pageProcessingResult;
     private string? _messageBoxResult;
+    private decimal? _sampleWholeNumber = 1250m;
+    private decimal? _sampleDecimalNumber = 4250000.5m;
     private FlatReconnectPreviewState _reconnectPreviewState = FlatReconnectPreviewState.Reconnecting;
     private bool _formModalOpen;
     private bool? _formModalResult;

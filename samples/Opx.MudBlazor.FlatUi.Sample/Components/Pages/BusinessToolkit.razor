@@ -1,0 +1,29 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/business-toolkit"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="business-toolkit-page no-mobile-fab">
+    <section class="business-toolkit-grid">
+        <article class="flat-panel"><header><strong>Inventory Traceability</strong><small>Lot, serial, bin, movement, and document lineage</small></header><FlatInventoryTraceabilityWorkspace Items="Traceability" Selected="Remember" /></article>
+        <article class="flat-panel"><header><strong>BOM and Routing</strong><small>Host-owned structure mutation intents</small></header><FlatBomRoutingEditor Items="Bom" Changed="Remember" /></article>
+        <article class="flat-panel"><header><strong>Rule Builder</strong><small>Typed conditions and exact result</small></header><FlatRuleBuilder Fields="RuleFields" @bind-Value="Rule" /></article>
+        <article class="flat-panel"><header><strong>Approval Matrix</strong><small>Ordered approval levels and amount ranges</small></header><FlatApprovalMatrixDesigner Levels="Approvals" Changed="Remember" /></article>
+        <article class="flat-panel"><header><strong>Document Attachments</strong><small>Version-aware actions; storage remains host-owned</small></header><FlatDocumentAttachmentManager Items="Attachments" ActionSelected="Remember"><UploadContent><button type="button"><MudIcon Icon="@Icons.Material.Outlined.UploadFile"/> Upload</button></UploadContent></FlatDocumentAttachmentManager></article>
+        <article class="flat-panel"><header><strong>Recurrence Editor</strong><small>Reusable schedule pattern without a scheduler backend</small></header><FlatRecurrenceEditor @bind-Value="Recurrence" /></article>
+        <article class="flat-panel"><header><strong>Query Builder</strong><small>Filter, grouping, and sort contract</small></header><FlatQueryBuilder Fields="QueryFields" @bind-Value="Query" RunRequested="Remember" /></article>
+        <article class="flat-panel"><header><strong>Data Comparison</strong><small>Before/after and field-level resolution</small></header><FlatDataComparisonGrid Rows="Comparison" DecisionSelected="Remember" /></article>
+    </section>
+</FlatPage>
+
+@code {
+    private Task Remember<T>(T value) => Task.CompletedTask;
+    private static readonly IReadOnlyList<FlatTraceabilityNode> Traceability=[new("lot","LOT-260819",FlatTraceabilityKind.Lot,Reference:"Finished goods"),new("serial","SN-10882",FlatTraceabilityKind.Serial,"lot",Detail:"Quality released"),new("move","MOVE-441",FlatTraceabilityKind.Movement,"serial",Detail:"Production to warehouse")];
+    private static readonly IReadOnlyList<FlatBomNode> Bom=[new("a",null,"FG-100","Control assembly",FlatBomNodeKind.Assembly,1,"EA",1),new("b","a","RM-210","Steel housing",FlatBomNodeKind.Material,2,"EA",2),new("c","a","OP-030","Final inspection",FlatBomNodeKind.Operation,15,"MIN",3)];
+    private static readonly IReadOnlyList<FlatRuleField> RuleFields=[new("amount","Document amount"),new("department","Department")];
+    private FlatRuleDefinition Rule {get;set;}=new(FlatLogicalOperator.And,[new("r1","amount",FlatRuleOperator.GreaterThan,"10000000")]);
+    private static readonly IReadOnlyList<FlatApprovalLevel> Approvals=[new("l1",1,"Department Manager",0,10_000_000),new("l2",2,"Finance Controller",10_000_001,100_000_000),new("l3",3,"Director",100_000_001,null)];
+    private static readonly IReadOnlyList<FlatDocumentAttachment> Attachments=[new("d1","purchase-request.pdf","application/pdf",245760,"v3",DateTimeOffset.Now,"Rina"),new("d2","quotation.xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",98304,"v1",DateTimeOffset.Now,"Dimas")];
+    private FlatRecurrencePattern Recurrence {get;set;}=new(FlatRecurrenceFrequency.Weekly,1,[DayOfWeek.Monday,DayOfWeek.Thursday]);
+    private static readonly IReadOnlyList<FlatQueryField> QueryFields=[new("warehouse","Warehouse"),new("status","Status"),new("total","Total")];
+    private FlatQueryDefinition Query {get;set;}=new([],[],[]);
+    private static readonly IReadOnlyList<FlatDataComparisonRow> Comparison=[new("c1","Supplier","PT Nusantara","PT Prima Teknik"),new("c2","Amount","10,000,000","10,250,000"),new("c3","Currency","IDR","IDR",FlatComparisonState.Unchanged)];
+}
