@@ -32,6 +32,9 @@ Naming rules:
 | `opx.page.collaboration.email` | Email Workspace | `/email` | email, inbox, compose | Admin / email | `Email.razor` |
 | `opx.page.reference.enterprise-toolkit` | Enterprise Toolkit | `/enterprise-toolkit` | enterprise components, workflow, audit, import | Admin / enterprise showroom | `EnterpriseToolkit.razor` |
 | `opx.page.reference.experience-toolkit` | Experience Toolkit | `/experience-toolkit` | accessibility, command palette, schema form, collaboration, conflict | Admin / application experience showroom | `ExperienceToolkit.razor` |
+| `opx.page.reference.business-toolkit` | Business Toolkit | `/business-toolkit` | traceability, BOM, routing, rules, approval, attachments, recurrence, query, compare | Admin / business component showroom | `BusinessToolkit.razor` |
+| `opx.page.erp.release-train` | ERP Release Train | `/erp-release-train` | transaction engine, inventory allocation, finance, workflow, integration, MRP, governance | Admin / ERP release showroom | `ErpReleaseTrain.razor` |
+| `opx.page.operations.advanced-editable-grid` | Advanced Editable Grid | `/advanced-editable-grid` | advanced grid, inline add/edit/save/cancel, spreadsheet commands | Admin / editable grid showroom | `AdvancedEditableGrid.razor` |
 | `opx.page.erp.overview` | ERP Overview | `/erp` | ERP dashboard, modules | Admin / ERP dashboard | `ErpOverview.razor` |
 | `opx.page.erp.toolkit` | ERP Application Toolkit | `/erp-toolkit` | ERP transaction workspace, lookup, journal, reconciliation, planning | Admin / ERP component showroom | `ErpToolkit.razor` |
 | `opx.page.erp.finance.overview` | ERP Finance Overview | `/erp/finance` | finance overview | Admin / ERP module | `ErpFinance.razor` |
@@ -74,6 +77,8 @@ Naming rules:
 | `opx.page.reference.static-data` | Static Data Management | `/static-data` | master data, static CRUD | Admin / static responsive list | `StaticData.razor` |
 | `opx.page.reference.timeline` | Timeline Showcase | `/timeline` | timeline, audit activity | Admin / timeline | `Timeline.razor` |
 | `opx.page.reference.tree-grid` | Tree Grid Showcase | `/tree-grid` | hierarchy, parent key, drag drop tree | Admin / tree grid | `TreeGrid.razor` |
+| `opx.page.reference.vector-map` | Vector Map Showcase | `/vector-map` | vector map, floor plan, denah, location tracking, route | Admin / component showroom | `VectorMap.razor` |
+| `opx.page.operations.spatial-workspace` | Spatial Operations | `/spatial-operations` | layered floor, geofence, work list map, route playback, fleet tracking | Admin / spatial operations workspace | `SpatialOperations.razor` |
 | `opx.page.auth.two-step-verification` | Two-Step Verification | `/two-step-verification` | OTP, 2FA, verification code | Auth / verification | `TwoStepVerification.razor` |
 | `opx.page.public.website-home` | Website Home | `/website` | frontend, website home, landing page | Website / public home | `WebsiteHome.razor` |
 | `opx.page.reference.widgets` | Widget Showcase | `/widgets` | widgets, KPI cards | Admin / widget showroom | `Widgets.razor` |
