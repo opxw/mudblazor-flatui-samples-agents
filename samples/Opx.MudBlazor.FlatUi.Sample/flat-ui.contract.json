@@ -1,0 +1,89 @@
+{
+  "$schema": "flat-ui.contract.schema.json",
+  "schemaVersion": "1.2",
+  "contractVersion": "2.0.4",
+  "source": {
+    "repository": "mudblazor-flat-ui",
+    "samplePath": "samples/Opx.MudBlazor.FlatUi.Sample"
+  },
+  "packages": {
+    "Opx.MudBlazor.FlatUi": "2.0.4",
+    "MudBlazor": "9.7.0"
+  },
+  "baseline": {
+    "pageId": "opx.page.dashboard.overview",
+    "route": "/",
+    "archetype": "Home.razor",
+    "baseFontSizePx": 14.5,
+    "responsiveBreakpointPx": 900,
+    "defaultThemeMode": "Light",
+    "mandatoryShell": {
+      "layoutSource": "Components/Layout/MainLayout.razor",
+      "settings": {
+        "required": true,
+        "triggerIcon": "MoreVert",
+        "menuLabel": "Settings",
+        "modalTitle": "Application preferences",
+        "themeModes": ["Light", "Dark / Night", "Auto"]
+      },
+      "sidebar": {
+        "required": true,
+        "componentSource": "Components/Layout/SampleSidebarMenu.razor",
+        "caption": "Showcase",
+        "homeLabel": "Dashboard",
+        "homeRoute": "/",
+        "initialGroups": ["ERP", "Operations", "Data & Reports", "Commerce & Content", "Account", "UI Kit"],
+        "searchEnabled": true,
+        "activeRouteExpansion": true
+      }
+    },
+    "consumerOwnedSurfaces": [
+      "dashboard-domain-content",
+      "domain-widgets-and-metrics",
+      "domain-summary-lists",
+      "quick-access-actions",
+      "current-user-identity",
+      "role-and-account-copy",
+      "logout-and-session-behavior",
+      "business-menu-labels-routes-and-permissions"
+    ],
+    "widgetSpacing": {
+      "outerMarginPx": 0,
+      "gridGapPx": {
+        "desktop": 12,
+        "mobile": 10
+      },
+      "bodyPaddingPx": 12,
+      "headerPaddingPx": {
+        "block": 9,
+        "inline": 12
+      },
+      "footerPaddingPx": {
+        "block": 8,
+        "inline": 12
+      },
+      "sectionGapPx": {
+        "desktop": 18,
+        "mobile": 16
+      },
+      "sectionHeadingBottomMarginPx": 8,
+      "actionMetricPaddingPx": {
+        "desktop": 13,
+        "mobile": 12
+      },
+      "compactMetricPaddingPx": 13,
+      "lowerGridTopMarginPx": {
+        "desktop": 12,
+        "mobile": 10
+      },
+      "mobileBreakpointPx": 600
+    },
+    "allowedAdaptations": [
+      "branding",
+      "wording",
+      "data",
+      "authorization",
+      "domain-integration"
+    ]
+  }
+}

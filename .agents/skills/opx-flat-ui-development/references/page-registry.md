@@ -81,7 +81,7 @@ Naming rules:
 | `opx.page.operations.spatial-workspace` | Spatial Operations | `/spatial-operations` | layered floor, geofence, work list map, route playback, fleet tracking | Admin / spatial operations workspace | `SpatialOperations.razor` |
 | `opx.page.auth.two-step-verification` | Two-Step Verification | `/two-step-verification` | OTP, 2FA, verification code | Auth / verification | `TwoStepVerification.razor` |
 | `opx.page.public.website-home` | Website Home | `/website` | frontend, website home, landing page | Website / public home | `WebsiteHome.razor` |
-| `opx.page.reference.widgets` | Widget Showcase | `/widgets` | widgets, KPI cards | Admin / widget showroom | `Widgets.razor` |
+| `opx.page.reference.widgets` | Widget Showcase | `/widgets` | widgets, KPI cards, widget padding, margin, spacing | Admin / widget showroom | `Widgets.razor` |
 
 ## Prompt resolution contract
 

@@ -5,6 +5,25 @@ param(
     [string]$Workspace = (Get-Location).Path
 )
 
+$Workspace = (Resolve-Path -LiteralPath $Workspace).Path
+$sourceProjectPath = Join-Path $Workspace 'src\Opx.MudBlazor.FlatUi\Opx.MudBlazor.FlatUi.csproj'
+if (-not (Test-Path -LiteralPath $sourceProjectPath)) {
+    $consumerAuditPath = Join-Path $Workspace '.agents\skills\opx-flat-ui-development\scripts\audit_flat_ui_consumer.ps1'
+    $consumerProject = @(Get-ChildItem -LiteralPath $Workspace -Filter '*.csproj' -File)
+    if ($consumerProject.Count -eq 0) {
+        $sampleProjectPath = Join-Path $Workspace 'samples\Opx.MudBlazor.FlatUi.Sample\Opx.MudBlazor.FlatUi.Sample.csproj'
+        if (Test-Path -LiteralPath $sampleProjectPath) {
+            $consumerProject = @(Get-Item -LiteralPath $sampleProjectPath)
+        }
+    }
+
+    if ((Test-Path -LiteralPath $consumerAuditPath) -and $consumerProject.Count -eq 1) {
+        Write-Output 'Package-only checkout detected; delegating to the OPX Flat UI consumer audit.'
+        & $consumerAuditPath -ProjectPath $consumerProject[0].FullName
+        exit $LASTEXITCODE
+    }
+}
+
 $requiredFiles = @(
     'ROADMAP.md',
     '.github\workflows\ci.yml',

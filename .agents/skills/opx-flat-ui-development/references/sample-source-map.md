@@ -22,7 +22,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Static responsive data list: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Pages/StaticData.razor`
 - Large two-axis scrolling DataGrid with responsive cards: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Pages/DataGridLarge.razor`
 - Inline Add/Edit/Delete grid with responsive editor cards: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Pages/GridEditor.razor`
-- Dashboard/widgets/charts: `Home.razor`, `Widgets.razor`, and ERP overview pages under `Components/Pages`
+- Dashboard/widgets/charts: `Home.razor`, `Widgets.razor`, `docs/WIDGETS.md`, and ERP overview pages under `Components/Pages`. Widget grids own inter-card gaps; individual widgets keep zero outer margin and package-defined internal padding.
 - Complete MudBlazor chart gallery with copy-ready code: `Charts.razor` and `Components/ChartCode.razor`
 - Host-owned file/image upload with preview, autoscale, progress/cancel/retry: `FileUpload.razor`, `Components/FlatFileUpload.razor`, and `Components/FlatImageUpload.razor`
 - Versioned grid presentation state and saved views: `GridPreferences.razor`, `Components/Grid/FlatGridPreferencesPanel.razor`, and `Models/FlatGridPreferences.cs`
@@ -37,6 +37,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Standalone Advanced Editable Grid showroom: `AdvancedEditableGrid.razor` and `Grid/FlatAdvancedEditableGrid.razor`; use PageId `opx.page.operations.advanced-editable-grid`.
 - Reusable controls and modal/message-box/reconnect previews: `ComponentsGallery.razor`; disclosure variants and usage: `Accordions.razor`, `Components/FlatAccordion.razor`, and `FlatAccordionItem.razor`
 - Concise executable summary of repository rules and development workflow: `DevelopmentRules.razor`; canonical details remain in root `RULES.md`, `.agents/RULES.md`, this skill, `page-registry.md`, and this source map.
+- Deterministic NuGet consumer bootstrap and validation: root `.template.config/template.json`, sample `flat-ui.contract.json`, `flat-ui.contract.schema.json`, `docs/CONSUMER-CONTRACT.md`, and `scripts/audit_flat_ui_consumer.ps1`. Initialized admin consumers must retain the `MainLayout.razor` Settings menu/modal and the searchable, active-route-aware `SampleSidebarMenu.razor` default scaffold.
 - Route-wide sample-code disclosure: `samples/Opx.MudBlazor.FlatUi.Sample/Components/SamplePageUsage.razor`, mounted once by `MainLayout`, `AuthLayout`, and `WebsiteLayout`; detailed component-specific examples remain page-local.
 - Account editor and multi-select: `EditAccount.razor`
 - Kanban, calendar, chat, AI chat, email, jobs, timeline: `Kanban.razor`, `Calendar.razor`, `Components/FlatCalendar.razor`, `Chat.razor`, `AiChat.razor`, `Email.razor`, `Jobs.razor`, and `Timeline.razor`

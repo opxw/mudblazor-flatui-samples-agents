@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "opx",
+  "classifications": ["Web", "Blazor", "MudBlazor", "OPX"],
+  "identity": "Opx.MudBlazor.FlatUi.Web.Template.2.0.4.Shell1",
+  "name": "OPX MudBlazor Flat UI Web",
+  "shortName": "opx-flatui-web",
+  "sourceName": "Opx.MudBlazor.FlatUi.Sample",
+  "defaultName": "Opx.FlatUi.App",
+  "preferNameDirectory": true,
+  "description": "Creates an OPX Flat UI Blazor Web app pinned to the verified 2.0.4 consumer contract, including Settings, the default sidebar, and canonical widget spacing.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sources": [
+    {
+      "source": "samples/Opx.MudBlazor.FlatUi.Sample",
+      "target": "./",
+      "exclude": ["**/bin/**", "**/obj/**", ".vs/**"]
+    },
+    {
+      "source": ".agents",
+      "target": ".agents"
+    },
+    {
+      "source": ".",
+      "target": "./",
+      "include": ["RULES.md", "NuGet.Config", "Directory.Build.props", ".gitignore"]
+    },
+    {
+      "source": "docs",
+      "target": "docs",
+      "include": ["CONSUMER-CONTRACT.md", "WIDGETS.md"]
+    }
+  ],
+  "primaryOutputs": [
+    {
+      "path": "Opx.MudBlazor.FlatUi.Sample.csproj"
+    }
+  ]
+}

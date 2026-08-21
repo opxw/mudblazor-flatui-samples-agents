@@ -22,6 +22,7 @@ Before creating or changing a page, layout, reusable component, CSS rule, naviga
 - Root `RULES.md` is the normative product/UI contract.
 - `.agents/RULES.md` defines the repository development workflow.
 - `samples/Opx.MudBlazor.FlatUi.Sample` is the behavioral and composition source of truth for page development.
+- For initialized admin consumers, `MainLayout.razor` and `SampleSidebarMenu.razor` are the source of truth for the mandatory Settings menu/modal and default searchable sidebar scaffold.
 - `src/Opx.MudBlazor.FlatUi` is the API and implementation source of truth for reusable components.
 - `docs` and `README.md` explain the implemented contract but do not override compiled source.
 

@@ -15,6 +15,16 @@ Use the repository's compiled sample as the behavioral source of truth and the R
 4. Inspect nearby repository instructions and the current worktree before editing.
 5. State the selected `PageId`; state any assumption that materially changes page type, permissions, data ownership, or responsive behavior.
 
+## Consumer contract gate
+
+- Create new Blazor Web consumers with the repository `opx-flatui-web` `dotnet new` template instead of reconstructing the host manually.
+- Keep `flat-ui.contract.json` and `flat-ui.contract.schema.json` in the consumer root. Treat their exact package versions, baseline `PageId`, archetype, Light default theme, font baseline, and responsive breakpoint as a versioned contract.
+- Keep the initialized admin shell complete. `MainLayout.razor` must mount a functional sidebar and expose Settings from the AppBar `MoreVert` menu; Settings opens the dedicated Application preferences modal with Light, Dark / Night, and Auto. Start the sidebar from `SampleSidebarMenu.razor` with Dashboard `/`, the default sample groups, search, and active-route expansion. Domain menu records may be adapted later, but neither Settings nor functional sidebar navigation may be removed.
+- Treat dashboard status/quick-access content, user-summary rows, current-user identity/avatar/role, logout/session behavior, and final business menu labels/routes/permissions as consumer-owned. They may appear as explicit sample data but are not contract requirements and must not be copied as real domain or identity state.
+- Keep consumers on public NuGet `PackageReference`; reject a source `ProjectReference` to Opx.MudBlazor.FlatUi.
+- Before accepting consumer work, run `scripts/audit_flat_ui_consumer.ps1 -ProjectPath <project-or-directory>`, then restore/build Release and verify representative desktop/mobile Light/Dark rendering.
+- Adapt branding, wording, data, authorization, and domain integration. Do not silently replace the mapped composition, responsive behavior, theme tokens, loading, modal, toolbar, grid, or FAB contracts.
+
 ## Roadmap gate
 
 - Read repository `ROADMAP.md` before work that changes tests, uploads, grid preferences, virtualization, public APIs, versions, or packaging.
@@ -64,6 +74,7 @@ Use the repository's compiled sample as the behavioral source of truth and the R
 - Size reusable data-grid columns with `WidthPercent` for proportional layouts or `WidthPx` for fixed geometry; pixels win when both are set. Enable `WordWrap` only for columns with long text; keep its default false, and top-align all cells when any column wraps so short values align to the wrapped first line. Let `FlatDataGrid` infer numeric public properties or declare `ValueKind`/`Format`, use `ValueSelector` for non-property keys, and consume `FlatGridCellContext.FormattedValue` in custom cells. Numeric headers/cells stay right-aligned; numeric cell values use the shared monospace numeric stack with tabular digits and registered `FlatLocalizationOptions`, while header labels retain the normal UI font. Infer default precision from the CLR type: integral types and nullable integral types use `#,##0`; decimal/floating-point types use the configured decimal format. Never add synthetic decimal digits to an integer field unless explicitly configured by the host. Equivalent mobile cards reuse `FlatValueFormatter`.
 - Render reusable grid/card statuses with `FlatStatusChip`: use a solid semantic flat background, readable foreground, square corners, no border/shadow, and no decorative bullet. Keep visible status text or an accessible label so state is not encoded by color alone. For an edge-attached mobile status label, add the opt-in `mobile-card-edge-tag` modifier to `mobile-card` and keep the chip as the direct header child; preserve reserved title space, compact two-line wrapping, exact right-border attachment, and zero document overflow.
 - Enforce flat geometry by default. Cards, panels, inputs, dialogs, popovers, snackbars, menus, grids, toolbars, and reusable workspaces stay square. Buttons and bottom sheets alone consume `DefaultRoundedSizePx` (`0-12`, default `0`) through the shared display preference; reject page-local rounded overrides. Semantic circles and FAB shape are separate contracts.
+- For widgets, select PageId `opx.page.reference.widgets`, read `Widgets.razor` and `docs/WIDGETS.md`, and keep spacing container-owned. Use `12px` grid gap on desktop and `10px` at `<=600px`; keep each widget at `margin:0`. Preserve body `12px`, header `9px 12px`, footer `8px 12px`, section `18px` desktop/`16px` mobile, heading-bottom `8px`, action metric `13px` desktop/`12px` mobile, compact metric `13px`, and lower-grid top `12px` desktop/`10px` mobile. Do not stack widget margin on parent gap or duplicate padding across the same boundary.
 - When an accepted UI or development contract changes, keep the executable `/development-rules` sample summary synchronized with the canonical rules, this skill, page registry, and source map.
 - Keep one default-collapsed responsive `Sample code` disclosure available on every sample route through shared layout-level `SamplePageUsage`. Add an archetype-specific copy-ready snippet for reusable concepts and retain the exact route-aware `FlatPage` fallback; do not paste duplicate panels into every Razor page or remove richer local usage examples.
 - Bind reusable paging defaults from `OpxFlatUi:Grid` into `FlatGridOptions`, register the options with the host, and initialize each page's `GridViewState` from them before the first local/API load. Preserve `SetPageSize(...)` and `FlatPager.PageSizes` for intentional page-specific overrides. Keep the native page-size select focus as exactly one softened-Primary one-pixel border, with no outer outline, shadow, or double box.
@@ -189,6 +200,8 @@ Run:
 dotnet build .\samples\Opx.MudBlazor.FlatUi.Sample\Opx.MudBlazor.FlatUi.Sample.csproj -c Release --nologo
 git diff --check
 ```
+
+`audit_flat_ui_repo.ps1` runs the complete library/source gate when `src` exists and delegates to `audit_flat_ui_consumer.ps1` for a NuGet-only checkout or generated consumer. In a generated consumer, build its root `.csproj` instead of the repository sample path shown above.
 
 Verify recursive Release/package PDB count is zero. For asset changes, additionally prove Debug did not generate/select the minified script, Release generated/selected it, and the NuGet package contains both source and minified assets. For visible changes, validate the affected interaction and representative desktop/mobile geometry. Report unverified external/native boundaries explicitly.
 

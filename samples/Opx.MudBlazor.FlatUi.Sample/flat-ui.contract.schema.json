@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opx.local/schemas/flat-ui.contract.schema.json",
+  "title": "OPX Flat UI consumer contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contractVersion",
+    "source",
+    "packages",
+    "baseline"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.2"
+    },
+    "contractVersion": {
+      "const": "2.0.4"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "samplePath"],
+      "properties": {
+        "repository": {
+          "const": "mudblazor-flat-ui"
+        },
+        "samplePath": {
+          "const": "samples/Opx.MudBlazor.FlatUi.Sample"
+        }
+      }
+    },
+    "packages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
+      "properties": {
+        "Opx.MudBlazor.FlatUi": {
+          "const": "2.0.4"
+        },
+        "MudBlazor": {
+          "const": "9.7.0"
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pageId",
+        "route",
+        "archetype",
+        "baseFontSizePx",
+        "responsiveBreakpointPx",
+        "defaultThemeMode",
+        "mandatoryShell",
+        "consumerOwnedSurfaces",
+        "widgetSpacing",
+        "allowedAdaptations"
+      ],
+      "properties": {
+        "pageId": {
+          "pattern": "^opx\\.page\\.[a-z0-9-]+(?:\\.[a-z0-9-]+)+$"
+        },
+        "route": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "archetype": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.razor$"
+        },
+        "baseFontSizePx": {
+          "const": 14.5
+        },
+        "responsiveBreakpointPx": {
+          "const": 900
+        },
+        "defaultThemeMode": {
+          "const": "Light"
+        },
+        "mandatoryShell": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["layoutSource", "settings", "sidebar"],
+          "properties": {
+            "layoutSource": { "const": "Components/Layout/MainLayout.razor" },
+            "settings": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["required", "triggerIcon", "menuLabel", "modalTitle", "themeModes"],
+              "properties": {
+                "required": { "const": true },
+                "triggerIcon": { "const": "MoreVert" },
+                "menuLabel": { "const": "Settings" },
+                "modalTitle": { "const": "Application preferences" },
+                "themeModes": { "const": ["Light", "Dark / Night", "Auto"] }
+              }
+            },
+            "sidebar": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["required", "componentSource", "caption", "homeLabel", "homeRoute", "initialGroups", "searchEnabled", "activeRouteExpansion"],
+              "properties": {
+                "required": { "const": true },
+                "componentSource": { "const": "Components/Layout/SampleSidebarMenu.razor" },
+                "caption": { "const": "Showcase" },
+                "homeLabel": { "const": "Dashboard" },
+                "homeRoute": { "const": "/" },
+                "initialGroups": { "const": ["ERP", "Operations", "Data & Reports", "Commerce & Content", "Account", "UI Kit"] },
+                "searchEnabled": { "const": true },
+                "activeRouteExpansion": { "const": true }
+              }
+            }
+          }
+        },
+        "consumerOwnedSurfaces": {
+          "const": [
+            "dashboard-domain-content",
+            "domain-widgets-and-metrics",
+            "domain-summary-lists",
+            "quick-access-actions",
+            "current-user-identity",
+            "role-and-account-copy",
+            "logout-and-session-behavior",
+            "business-menu-labels-routes-and-permissions"
+          ]
+        },
+        "widgetSpacing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outerMarginPx",
+            "gridGapPx",
+            "bodyPaddingPx",
+            "headerPaddingPx",
+            "footerPaddingPx",
+            "sectionGapPx",
+            "sectionHeadingBottomMarginPx",
+            "actionMetricPaddingPx",
+            "compactMetricPaddingPx",
+            "lowerGridTopMarginPx",
+            "mobileBreakpointPx"
+          ],
+          "properties": {
+            "outerMarginPx": { "const": 0 },
+            "gridGapPx": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["desktop", "mobile"],
+              "properties": {
+                "desktop": { "const": 12 },
+                "mobile": { "const": 10 }
+              }
+            },
+            "bodyPaddingPx": { "const": 12 },
+            "headerPaddingPx": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["block", "inline"],
+              "properties": {
+                "block": { "const": 9 },
+                "inline": { "const": 12 }
+              }
+            },
+            "footerPaddingPx": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["block", "inline"],
+              "properties": {
+                "block": { "const": 8 },
+                "inline": { "const": 12 }
+              }
+            },
+            "sectionGapPx": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["desktop", "mobile"],
+              "properties": {
+                "desktop": { "const": 18 },
+                "mobile": { "const": 16 }
+              }
+            },
+            "sectionHeadingBottomMarginPx": { "const": 8 },
+            "actionMetricPaddingPx": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["desktop", "mobile"],
+              "properties": {
+                "desktop": { "const": 13 },
+                "mobile": { "const": 12 }
+              }
+            },
+            "compactMetricPaddingPx": { "const": 13 },
+            "lowerGridTopMarginPx": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["desktop", "mobile"],
+              "properties": {
+                "desktop": { "const": 12 },
+                "mobile": { "const": 10 }
+              }
+            },
+            "mobileBreakpointPx": { "const": 600 }
+          }
+        },
+        "allowedAdaptations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": ["branding", "wording", "data", "authorization", "domain-integration"]
+          }
+        }
+      }
+    }
+  }
+}
