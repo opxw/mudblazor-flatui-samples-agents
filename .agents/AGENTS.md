@@ -9,12 +9,14 @@ These instructions apply to every file in this repository.
 Before creating or changing a page, layout, reusable component, CSS rule, navigation item, or host configuration:
 
 1. Read the user request and preserve its explicit decisions.
-2. Read the repository root `RULES.md` completely.
-3. Read `.agents/RULES.md` completely.
-4. Use `.agents/skills/opx-flat-ui-development/SKILL.md`.
-5. Resolve the request to one stable `PageId` using `.agents/skills/opx-flat-ui-development/references/page-registry.md`.
-6. Open the closest matching page under `samples/Opx.MudBlazor.FlatUi.Sample` from the skill's sample source map.
-7. Open every reusable component under `src/Opx.MudBlazor.FlatUi` used by that sample before changing its API or behavior.
+2. Translate it into the user or role, primary job, information hierarchy, action/risk/permission needs, device/input context, required states, accessibility, localization/RTL, and responsive behavior.
+3. For a layout request, state the chosen shell, regions/hierarchy, desktop and tablet/phone composition, action placement, states, and UX rationale; infer ordinary OPX layout details when the intent is sufficient.
+4. Read the repository root `RULES.md` completely.
+5. Read `.agents/RULES.md` completely.
+6. Use `.agents/skills/opx-flat-ui-development/SKILL.md`.
+7. Resolve the request to one stable `PageId` using `.agents/skills/opx-flat-ui-development/references/page-registry.md`.
+8. Open the closest matching page under `samples/Opx.MudBlazor.FlatUi.Sample` from the skill's sample source map.
+9. Open every reusable component under `src/Opx.MudBlazor.FlatUi` used by that sample before changing its API or behavior.
 
 ## Authority and source of truth
 

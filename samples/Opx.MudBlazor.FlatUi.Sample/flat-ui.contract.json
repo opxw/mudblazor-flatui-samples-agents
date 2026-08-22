@@ -1,13 +1,13 @@
 {
   "$schema": "flat-ui.contract.schema.json",
-  "schemaVersion": "1.2",
-  "contractVersion": "2.0.4",
+  "schemaVersion": "1.7",
+  "contractVersion": "2.0.8",
   "source": {
     "repository": "mudblazor-flat-ui",
     "samplePath": "samples/Opx.MudBlazor.FlatUi.Sample"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.0.4",
+    "Opx.MudBlazor.FlatUi": "2.0.8",
     "MudBlazor": "9.7.0"
   },
   "baseline": {
@@ -16,7 +16,38 @@
     "archetype": "Home.razor",
     "baseFontSizePx": 14.5,
     "responsiveBreakpointPx": 900,
+    "adaptiveResponsive": {
+      "desktopTableAbovePx": 900,
+      "responsiveCardMaxPx": 900,
+      "twoColumnCardMinPx": 601,
+      "twoColumnCardMaxPx": 900,
+      "phoneSingleColumnMaxPx": 600,
+      "liveResizeRequired": true,
+      "platformUserAgentLayoutForbidden": true
+    },
     "defaultThemeMode": "Light",
+    "crudTerminology": {
+      "editActionLabel": "Edit"
+    },
+    "runtimeHtml": {
+      "poweredByComment": "Powered by opx (github.com/opxw)"
+    },
+    "initialRun": {
+      "script": "run-clean.ps1",
+      "cleanDirectories": ["bin", "obj"],
+      "restoreBeforeRun": true
+    },
+    "stylesheetOwnership": {
+      "reusableCssSource": "package-only",
+      "packageStylesheet": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css",
+      "packageStylesheetSha256": "A73EA0C87B1FBA90401543C5A5C6CD35DF8936813E4CC8AEBB8CDF4809C16159",
+      "mudBlazorStylesheet": "_content/MudBlazor/MudBlazor.min.css",
+      "hostStylesheet": "wwwroot/app.css",
+      "hostStylesheetPurpose": "sample-and-domain-composition-only",
+      "hostStylesheetSha256": "F62454A693C20C446ECDCDF563C6F0A6DF1AABB5604C352558D7CB54CFA9CE82",
+      "localPackageCssCopyForbidden": true,
+      "additionalUiFrameworkCssForbidden": true
+    },
     "mandatoryShell": {
       "layoutSource": "Components/Layout/MainLayout.razor",
       "settings": {

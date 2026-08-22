@@ -6,7 +6,7 @@
 @inject FlatDeviceNotificationOptions DeviceNotificationOptions
 @inject FlatLocalizationOptions LocalizationOptions
 
-<FlatMudProviders IsDarkMode="@IsDarkMode">
+<FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentThemePalette">
     <FlatAppShell AppName="OPX FLAT UI"
                   PageTitle="@CurrentPageTitle"
                   SidebarSubtitle="Multi-purpose UI Reference"
@@ -453,6 +453,26 @@
         FlatUiThemeMode.Light => false,
         _ => _systemPrefersDark
     };
+
+    private FlatUiPalette CurrentThemePalette
+    {
+        get
+        {
+            var paletteId = _settingsOpen ? _draftColorPalette : DisplayPreferences.Current.ColorPalette;
+            var palette = DisplayPreferences.Options.ResolveColorPalette(paletteId);
+            return new FlatUiPalette(
+                Accent: palette.Accent,
+                AccentHover: palette.AccentHover,
+                AccentSubtle: palette.AccentSubtle,
+                AccentDark: palette.AccentDark,
+                DarkAccent: palette.DarkAccent,
+                DarkAccentHover: palette.DarkAccentHover,
+                Secondary: palette.Secondary,
+                Success: palette.Success,
+                Warning: palette.Warning,
+                Danger: palette.Danger);
+        }
+    }
 
     protected override void OnInitialized()
     {

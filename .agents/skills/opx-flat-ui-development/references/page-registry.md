@@ -86,7 +86,8 @@ Naming rules:
 ## Prompt resolution contract
 
 1. Match explicit route or canonical name first.
-2. Otherwise match prompt cues and business intent.
-3. If one archetype clearly fits, select it and state the chosen `PageId` in the working update.
+2. Otherwise analyze the user or role, primary job, information hierarchy, data/action risk, permissions, device/input context, required states, accessibility, localization/RTL, and responsive needs; then match prompt cues and business intent.
+3. If one archetype clearly fits, select the simplest composition that completes the job and state the chosen `PageId` plus the relevant assumptions in the working update.
 4. If two choices would materially change shell or interaction—for example public Careers Landing versus admin Job Management—ask or infer only from explicit context.
 5. For a new concept, create a new unique `PageId`, choose the nearest archetype, and update this registry, navigation, title mapping, docs/rules when relevant, and audit coverage in the same change.
+6. For a layout request, state the layout blueprint defined in [layout-decision.md](layout-decision.md) before implementation; infer standard OPX visual structure instead of returning the design decision to the user.

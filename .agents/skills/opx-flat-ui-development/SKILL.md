@@ -1,6 +1,6 @@
 ---
 name: opx-flat-ui-development
-description: Create or update Razor pages, layouts, navigation, responsive grids, CRUD editors, reusable MudBlazor components, theme behavior, and host configuration in Opx.MudBlazor.FlatUi. Use for development in this repository or when deriving a consumer implementation from its sample source of truth.
+description: Analyze UI/UX, business, and data needs and create or update Razor pages, dashboards, transaction layouts, navigation, responsive grids, CRUD editors, reusable MudBlazor components, theme behavior, and host configuration in Opx.MudBlazor.FlatUi. Selects the appropriate PageId and sample archetype before implementation in this repository or a derived consumer.
 ---
 
 # OPX Flat UI development
@@ -15,13 +15,43 @@ Use the repository's compiled sample as the behavioral source of truth and the R
 4. Inspect nearby repository instructions and the current worktree before editing.
 5. State the selected `PageId`; state any assumption that materially changes page type, permissions, data ownership, or responsive behavior.
 
+## UI/UX requirements analysis
+
+Act as the UI/UX specialist, business analyst, and data analyst for every UI request. Before selecting a component or writing markup, translate the request into:
+
+- the user or role and their primary job-to-be-done;
+- information hierarchy, data density, and the most frequent or critical action;
+- read-only versus mutation flows, destructive risk, permissions, and confirmation needs;
+- host and device context (desktop Web, responsive Web, or MAUI Hybrid), input method, and likely interruption or offline constraints;
+- loading, empty, error, disabled, success, unsaved, and recovery states;
+- accessibility, keyboard/touch, localization/RTL, and responsive requirements.
+- the business objective, decision or transaction the page supports, source and grain of data, dimensions/measures, freshness, comparison period, exception thresholds, and drill-down path when relevant.
+
+Use that analysis to select one canonical `PageId`, the nearest sample archetype, shell, navigation pattern, shared components, and interaction/state model. For dashboards, include only KPIs that support a named decision, show units/time scope, prioritize exceptions and trends, and provide a path to underlying records. For transactions, preserve lifecycle, validation, authorization, totals, review/confirmation, concurrency, reversal/recovery, and audit boundaries. Prefer the simplest composition that completes the user's job. Do not add dashboards, filters, CRUD, FABs, dialogs, or visualizations merely because the sample offers them. Never invent business formulas, thresholds, statuses, permissions, or live data; state assumptions and keep domain data, authorization, persistence, calculation authority, and integration host-owned.
+
+When two choices would materially change the workflow, data ownership, permissions, or mobile behavior, ask one focused question. Otherwise state the assumptions and briefly explain why the selected archetype and components fit before implementation.
+
+For a layout request, read [layout-decision.md](references/layout-decision.md). Before implementation, provide a concise layout blueprint containing the user/job, selected `PageId` and archetype, shell/navigation, desktop regions and hierarchy, tablet/phone transformation, primary and secondary action placement, essential states, and the UX reason for the choice. When the request supplies enough business intent, decide these details as the UI/UX expert instead of asking the user to design the screen. Ask only when missing information would materially change workflow, ownership, permissions, or platform behavior.
+
+## Adaptive responsive principle
+
+- Treat responsive design as a change in composition and priority, never as uniform desktop scaling. Keep one Blazor codebase/design system while adapting navigation, hierarchy, forms, actions, tables/cards, and secondary information.
+- Preserve the established OPX responsive contract: table/desktop above `900px`, responsive/card at `900px` and below, two-column cards at `601-900px`, phone/single-column refinement at `600px` and below, plus documented component-specific boundaries. Preserve the appsettings-backed `14.5px` baseline, density independence, and high-density touch settings; do not replace them with generic breakpoints or page-local hardcoded type/control scales.
+- Use viewport/container CSS for layout and typography. Do not detect Android/iOS to choose font size or composition; native capability checks are only for platform-owned camera, notifications, safe area, keyboard/IME, lifecycle, and system Back.
+- Keep primary mobile content readable and touchable, defer secondary facts, stack long forms, and place critical actions within easy reach. Keep desktop compact, multi-column, and data-oriented. Convert unsuitable tables to equivalent shared-state cards/lists rather than compressing columns into unreadable content.
+- Prefer one Razor composition when semantics remain equivalent; use dedicated desktop/mobile templates only when hierarchy changes, with one query, selection, permission, loading, validation, and mutation state.
+- For every page change, verify representative desktop, tablet/responsive, and phone widths plus no-reload desktop -> responsive -> desktop resize. Include Light/Dark/Auto, browser text scaling, keyboard focus, touch geometry, scroll ownership, and horizontal-overflow checks. Native MAUI claims still require emulator/device evidence.
+
 ## Consumer contract gate
 
 - Create new Blazor Web consumers with the repository `opx-flatui-web` `dotnet new` template instead of reconstructing the host manually.
-- Keep `flat-ui.contract.json` and `flat-ui.contract.schema.json` in the consumer root. Treat their exact package versions, baseline `PageId`, archetype, Light default theme, font baseline, and responsive breakpoint as a versioned contract.
+- Keep `flat-ui.contract.json` and `flat-ui.contract.schema.json` in the consumer root. The current schema `1.7` pins `Opx.MudBlazor.FlatUi` `2.0.8` and `MudBlazor` `9.7.0`; treat these versions, baseline `PageId`, archetype, Light default theme, CRUD terminology, font baseline, and responsive breakpoint as one versioned contract.
+- Emit exactly one `<!-- Powered by opx (github.com/opxw) -->` immediately inside the host document `<body>` before `Routes` through an explicit `MarkupString`. A literal HTML comment in a Razor file is removed during compilation, and a Razor comment is also absent from runtime output; verify the initial HTTP response for more than one route.
 - Keep the initialized admin shell complete. `MainLayout.razor` must mount a functional sidebar and expose Settings from the AppBar `MoreVert` menu; Settings opens the dedicated Application preferences modal with Light, Dark / Night, and Auto. Start the sidebar from `SampleSidebarMenu.razor` with Dashboard `/`, the default sample groups, search, and active-route expansion. Domain menu records may be adapted later, but neither Settings nor functional sidebar navigation may be removed.
 - Treat dashboard status/quick-access content, user-summary rows, current-user identity/avatar/role, logout/session behavior, and final business menu labels/routes/permissions as consumer-owned. They may appear as explicit sample data but are not contract requirements and must not be copied as real domain or identity state.
 - Keep consumers on public NuGet `PackageReference`; reject a source `ProjectReference` to Opx.MudBlazor.FlatUi.
+- Start each generated consumer through `run-clean.ps1`. It must resolve its own single project, remove only exact project-local `bin` and `obj`, restore through `NuGet.Config`, and run with `--no-restore`; use `-PrepareOnly` for non-running validation.
+- Load reusable CSS only from `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css` and MudBlazor CSS only from its `_content` asset. Reject local copies of either package stylesheet, additional UI-framework CSS, and Bootstrap files in generated output. Keep the initial `wwwroot/app.css` byte-identical to the source sample and limited to sample/domain composition, not reusable-component overrides.
 - Before accepting consumer work, run `scripts/audit_flat_ui_consumer.ps1 -ProjectPath <project-or-directory>`, then restore/build Release and verify representative desktop/mobile Light/Dark rendering.
 - Adapt branding, wording, data, authorization, and domain integration. Do not silently replace the mapped composition, responsive behavior, theme tokens, loading, modal, toolbar, grid, or FAB contracts.
 
@@ -67,6 +97,7 @@ Use the repository's compiled sample as the behavioral source of truth and the R
 
 ## CRUD and data rules
 
+- Use `Edit` as the canonical visible label, editor-title verb, tooltip, and accessible action name for CRUD edit operations. Do not use `Ubah` for this action in the template or generated consumer.
 - Configure the standard CRUD create action once through `FlatPage.PrimaryActionVisible`, `PrimaryActionLabel`, `PrimaryActionIcon`, `PrimaryActionAriaLabel`, and `OnPrimaryAction`. Let `FlatPage` render the Filled desktop button above `900px` and the icon-only FAB at `900px` and below; do not pair the automatic API with manual `HeaderActions` or `MobilePrimaryAction` markup.
 - Resolve every mobile FAB from typed `OpxFlatUi:Display:DefaultFabShape`: `Circle` is the default/fallback and `Square` is zero-radius. Use `FlatFab.Shape` only for a deliberate local override, while preserving icon-only dimensions, safe-area/bottom-nav offset, no shadow, disabled contrast, and accessible text.
 - Render button labels at global normal `400` weight in administrative, auth, website, dialog, popover, snackbar, and FAB surfaces. Preserve action hierarchy through semantic color, border, surface, icon, and disabled contrast rather than bold text.

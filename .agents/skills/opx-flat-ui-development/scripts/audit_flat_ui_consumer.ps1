@@ -8,11 +8,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.0.4"
+$expectedContractVersion = "2.0.8"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.0.4"
+    "Opx.MudBlazor.FlatUi" = "2.0.8"
     "MudBlazor" = "9.7.0"
 }
+$expectedHostCssSha256 = "F62454A693C20C446ECDCDF563C6F0A6DF1AABB5604C352558D7CB54CFA9CE82"
+$expectedPackageCssSha256 = "A73EA0C87B1FBA90401543C5A5C6CD35DF8936813E4CC8AEBB8CDF4809C16159"
 $violations = [System.Collections.Generic.List[string]]::new()
 
 function Add-Violation([string] $Message) {
@@ -80,6 +82,12 @@ function Get-PackageVersion($Node) {
     return $null
 }
 
+function Get-NormalizedTextSha256([string] $Path) {
+    $text = (Get-Content -LiteralPath $Path -Raw).Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
+    return [System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($bytes))
+}
+
 $project = Resolve-ProjectFile $ProjectPath
 $projectRoot = $project.Directory.FullName
 $contractRoot = Resolve-ContractRoot $projectRoot
@@ -107,8 +115,8 @@ if (Test-Path -LiteralPath $manifestPath) {
 }
 
 if ($null -ne $manifest) {
-    if ((Get-JsonProperty $manifest "schemaVersion") -cne "1.2") {
-        Add-Violation "Contract schemaVersion must be 1.2."
+    if ((Get-JsonProperty $manifest "schemaVersion") -cne "1.7") {
+        Add-Violation "Contract schemaVersion must be 1.7."
     }
     if ((Get-JsonProperty $manifest "contractVersion") -cne $expectedContractVersion) {
         Add-Violation "Contract version must be $expectedContractVersion."
@@ -146,8 +154,64 @@ if ($null -ne $manifest) {
     if ([int](Get-JsonProperty $baseline "responsiveBreakpointPx") -ne 900) {
         Add-Violation "Baseline responsiveBreakpointPx must be 900."
     }
+    $adaptiveResponsive = Get-JsonProperty $baseline "adaptiveResponsive"
+    $responsiveChecks = @(
+        @("desktopTableAbovePx", (Get-JsonProperty $adaptiveResponsive "desktopTableAbovePx"), 900),
+        @("responsiveCardMaxPx", (Get-JsonProperty $adaptiveResponsive "responsiveCardMaxPx"), 900),
+        @("twoColumnCardMinPx", (Get-JsonProperty $adaptiveResponsive "twoColumnCardMinPx"), 601),
+        @("twoColumnCardMaxPx", (Get-JsonProperty $adaptiveResponsive "twoColumnCardMaxPx"), 900),
+        @("phoneSingleColumnMaxPx", (Get-JsonProperty $adaptiveResponsive "phoneSingleColumnMaxPx"), 600)
+    )
+    foreach ($check in $responsiveChecks) {
+        if ($null -eq $check[1] -or [int]$check[1] -ne [int]$check[2]) {
+            Add-Violation "Baseline adaptiveResponsive.$($check[0]) must be $($check[2])."
+        }
+    }
+    foreach ($flag in @("liveResizeRequired", "platformUserAgentLayoutForbidden")) {
+        if ((Get-JsonProperty $adaptiveResponsive $flag) -ne $true) {
+            Add-Violation "Baseline adaptiveResponsive.$flag must be true."
+        }
+    }
     if ((Get-JsonProperty $baseline "defaultThemeMode") -cne "Light") {
         Add-Violation "Baseline defaultThemeMode must be Light."
+    }
+    $crudTerminology = Get-JsonProperty $baseline "crudTerminology"
+    if ((Get-JsonProperty $crudTerminology "editActionLabel") -cne "Edit") {
+        Add-Violation "Baseline CRUD edit action label must be 'Edit'."
+    }
+
+    $runtimeHtml = Get-JsonProperty $baseline "runtimeHtml"
+    if ((Get-JsonProperty $runtimeHtml "poweredByComment") -cne "Powered by opx (github.com/opxw)") {
+        Add-Violation "Baseline runtimeHtml.poweredByComment must be 'Powered by opx (github.com/opxw)'."
+    }
+
+    $initialRun = Get-JsonProperty $baseline "initialRun"
+    if ((Get-JsonProperty $initialRun "script") -cne "run-clean.ps1") {
+        Add-Violation "Baseline initialRun.script must be run-clean.ps1."
+    }
+    if ((@((Get-JsonProperty $initialRun "cleanDirectories")) -join "|") -cne "bin|obj") {
+        Add-Violation "Baseline initialRun.cleanDirectories must be bin and obj in canonical order."
+    }
+    if ((Get-JsonProperty $initialRun "restoreBeforeRun") -ne $true) {
+        Add-Violation "Baseline initialRun.restoreBeforeRun must be true."
+    }
+
+    $stylesheetOwnership = Get-JsonProperty $baseline "stylesheetOwnership"
+    $stylesheetChecks = @(
+        @("reusableCssSource", (Get-JsonProperty $stylesheetOwnership "reusableCssSource"), "package-only"),
+        @("packageStylesheet", (Get-JsonProperty $stylesheetOwnership "packageStylesheet"), "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css"),
+        @("packageStylesheetSha256", (Get-JsonProperty $stylesheetOwnership "packageStylesheetSha256"), $expectedPackageCssSha256),
+        @("mudBlazorStylesheet", (Get-JsonProperty $stylesheetOwnership "mudBlazorStylesheet"), "_content/MudBlazor/MudBlazor.min.css"),
+        @("hostStylesheet", (Get-JsonProperty $stylesheetOwnership "hostStylesheet"), "wwwroot/app.css"),
+        @("hostStylesheetPurpose", (Get-JsonProperty $stylesheetOwnership "hostStylesheetPurpose"), "sample-and-domain-composition-only"),
+        @("hostStylesheetSha256", (Get-JsonProperty $stylesheetOwnership "hostStylesheetSha256"), $expectedHostCssSha256),
+        @("localPackageCssCopyForbidden", (Get-JsonProperty $stylesheetOwnership "localPackageCssCopyForbidden"), $true),
+        @("additionalUiFrameworkCssForbidden", (Get-JsonProperty $stylesheetOwnership "additionalUiFrameworkCssForbidden"), $true)
+    )
+    foreach ($check in $stylesheetChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline stylesheetOwnership.$($check[0]) must be '$($check[2])'."
+        }
     }
 
     $mandatoryShell = Get-JsonProperty $baseline "mandatoryShell"
@@ -256,6 +320,40 @@ foreach ($reference in $projectReferences) {
     }
 }
 
+$nugetPackagesRoot = $null
+$assetsPath = Join-Path $projectRoot "obj\project.assets.json"
+if (Test-Path -LiteralPath $assetsPath) {
+    try {
+        $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json
+        $packageFolders = @($assets.packageFolders.PSObject.Properties.Name)
+        if ($packageFolders.Count -eq 1) {
+            $nugetPackagesRoot = $packageFolders[0]
+        }
+        elseif ($packageFolders.Count -gt 1) {
+            Add-Violation "Restore produced multiple package folders; the OPX package asset source is ambiguous."
+        }
+    }
+    catch {
+        Add-Violation "obj/project.assets.json could not be read: $($_.Exception.Message)"
+    }
+}
+if ([string]::IsNullOrWhiteSpace($nugetPackagesRoot)) {
+    $nugetPackagesRoot = $env:NUGET_PACKAGES
+}
+if ([string]::IsNullOrWhiteSpace($nugetPackagesRoot)) {
+    $nugetPackagesRoot = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile)) ".nuget\packages"
+}
+$packageCssPath = Join-Path $nugetPackagesRoot "opx.mudblazor.flatui\$($expectedPackages['Opx.MudBlazor.FlatUi'])\staticwebassets\opx-flat-ui.css"
+if (-not (Test-Path -LiteralPath $packageCssPath)) {
+    Add-Violation "Restored OPX package stylesheet was not found at '$packageCssPath'; restore the project before auditing."
+}
+else {
+    $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
+    if ($packageCssHash -cne $expectedPackageCssSha256) {
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.8; found $packageCssHash."
+    }
+}
+
 $disallowedPackages = "Radzen", "Syncfusion", "Telerik", "Blazorise", "AntDesign"
 foreach ($packageNode in $packageNodes) {
     foreach ($disallowed in $disallowedPackages) {
@@ -273,6 +371,7 @@ $requiredFiles = @(
     "Components\Layout\SampleSidebarMenu.razor",
     "Components\Pages\Home.razor",
     "appsettings.json",
+    "run-clean.ps1",
     "wwwroot\app.css"
 )
 foreach ($relativePath in $requiredFiles) {
@@ -335,6 +434,31 @@ if (Test-Path -LiteralPath $appPath) {
 
     if ($appSource -notmatch '<FlatReconnectModal\s+Options="ReconnectOptions"') {
         Add-Violation "Components/App.razor must render the package-owned FlatReconnectModal."
+    }
+
+    $poweredByComment = '<!-- Powered by opx (github.com/opxw) -->'
+    $commentMatches = [regex]::Matches($appSource, [regex]::Escape($poweredByComment)).Count
+    $bodyIndex = $appSource.IndexOf('<body>', [StringComparison]::Ordinal)
+    $commentIndex = $appSource.IndexOf($poweredByComment, [StringComparison]::Ordinal)
+    $routesIndex = $appSource.IndexOf('<Routes', [StringComparison]::Ordinal)
+    if ($commentMatches -ne 1 -or $bodyIndex -lt 0 -or $commentIndex -le $bodyIndex -or $routesIndex -le $commentIndex) {
+        Add-Violation "Components/App.razor must emit exactly one '$poweredByComment' through MarkupString immediately inside the body before Routes. A literal Razor HTML comment is removed during compilation."
+    }
+}
+
+$cleanRunPath = Join-Path $projectRoot "run-clean.ps1"
+if (Test-Path -LiteralPath $cleanRunPath) {
+    $cleanRunSource = Get-Content -LiteralPath $cleanRunPath -Raw
+    foreach ($token in @(
+        '@("bin", "obj")',
+        '[System.IO.Directory]::Delete($target, $true)',
+        'dotnet restore',
+        'dotnet run --project',
+        '--no-restore'
+    )) {
+        if (-not $cleanRunSource.Contains($token, [StringComparison]::Ordinal)) {
+            Add-Violation "run-clean.ps1 is missing required initial-run behavior '$token'."
+        }
     }
 }
 
@@ -417,8 +541,29 @@ if (Test-Path -LiteralPath $settingsPath) {
 $appCssPath = Join-Path $projectRoot "wwwroot\app.css"
 if (Test-Path -LiteralPath $appCssPath) {
     $appCss = Get-Content -LiteralPath $appCssPath -Raw
+    $appCssHash = Get-NormalizedTextSha256 $appCssPath
+    if ($appCssHash -cne $expectedHostCssSha256) {
+        Add-Violation "wwwroot/app.css must be the untouched canonical host/sample stylesheet with SHA-256 $expectedHostCssSha256; found $appCssHash."
+    }
     if ($appCss -match "(?im)@import\s+[^;]*(bootstrap|tailwind|radzen|syncfusion|telerik|blazorise|antdesign)") {
         Add-Violation "wwwroot/app.css imports another UI framework and may override the Flat UI baseline."
+    }
+}
+
+$localPackageCssCopies = @(Get-ChildItem -LiteralPath $projectRoot -Recurse -File -Include "opx-flat-ui.css", "MudBlazor.min.css" | Where-Object {
+    $_.FullName -notmatch "[\\/](bin|obj|[.]nuget)[\\/]"
+})
+foreach ($copy in $localPackageCssCopies) {
+    Add-Violation "Reusable CSS must come from NuGet static web assets; remove local package CSS copy '$($copy.FullName)'."
+}
+
+$localCssFiles = @(Get-ChildItem -LiteralPath $projectRoot -Recurse -File -Filter "*.css" | Where-Object {
+    $_.FullName -notmatch "[\\/](bin|obj|[.]nuget)[\\/]"
+})
+foreach ($cssFile in $localCssFiles) {
+    $cssSource = Get-Content -LiteralPath $cssFile.FullName -Raw
+    if ($cssSource -match "(?im)@import\s+[^;]*(bootstrap|tailwind|radzen|syncfusion|telerik|blazorise|antdesign)") {
+        Add-Violation "Local stylesheet '$($cssFile.FullName)' imports an additional UI framework."
     }
 }
 
@@ -429,6 +574,7 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         ".agents\RULES.md",
         ".agents\skills\opx-flat-ui-development\SKILL.md",
         ".agents\skills\opx-flat-ui-development\references\page-registry.md",
+        ".agents\skills\opx-flat-ui-development\references\layout-decision.md",
         ".agents\skills\opx-flat-ui-development\references\sample-source-map.md",
         "docs\WIDGETS.md"
     )

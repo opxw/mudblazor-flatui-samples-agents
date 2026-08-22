@@ -16,10 +16,10 @@
       "type": "string"
     },
     "schemaVersion": {
-      "const": "1.2"
+      "const": "1.7"
     },
     "contractVersion": {
-      "const": "2.0.4"
+      "const": "2.0.8"
     },
     "source": {
       "type": "object",
@@ -40,7 +40,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.0.4"
+          "const": "2.0.8"
         },
         "MudBlazor": {
           "const": "9.7.0"
@@ -56,7 +56,12 @@
         "archetype",
         "baseFontSizePx",
         "responsiveBreakpointPx",
+        "adaptiveResponsive",
         "defaultThemeMode",
+        "crudTerminology",
+        "runtimeHtml",
+        "initialRun",
+        "stylesheetOwnership",
         "mandatoryShell",
         "consumerOwnedSurfaces",
         "widgetSpacing",
@@ -80,8 +85,82 @@
         "responsiveBreakpointPx": {
           "const": 900
         },
+        "adaptiveResponsive": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "desktopTableAbovePx",
+            "responsiveCardMaxPx",
+            "twoColumnCardMinPx",
+            "twoColumnCardMaxPx",
+            "phoneSingleColumnMaxPx",
+            "liveResizeRequired",
+            "platformUserAgentLayoutForbidden"
+          ],
+          "properties": {
+            "desktopTableAbovePx": { "const": 900 },
+            "responsiveCardMaxPx": { "const": 900 },
+            "twoColumnCardMinPx": { "const": 601 },
+            "twoColumnCardMaxPx": { "const": 900 },
+            "phoneSingleColumnMaxPx": { "const": 600 },
+            "liveResizeRequired": { "const": true },
+            "platformUserAgentLayoutForbidden": { "const": true }
+          }
+        },
         "defaultThemeMode": {
           "const": "Light"
+        },
+        "crudTerminology": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["editActionLabel"],
+          "properties": {
+            "editActionLabel": { "const": "Edit" }
+          }
+        },
+        "runtimeHtml": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["poweredByComment"],
+          "properties": {
+            "poweredByComment": { "const": "Powered by opx (github.com/opxw)" }
+          }
+        },
+        "initialRun": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["script", "cleanDirectories", "restoreBeforeRun"],
+          "properties": {
+            "script": { "const": "run-clean.ps1" },
+            "cleanDirectories": { "const": ["bin", "obj"] },
+            "restoreBeforeRun": { "const": true }
+          }
+        },
+        "stylesheetOwnership": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reusableCssSource",
+            "packageStylesheet",
+            "packageStylesheetSha256",
+            "mudBlazorStylesheet",
+            "hostStylesheet",
+            "hostStylesheetPurpose",
+            "hostStylesheetSha256",
+            "localPackageCssCopyForbidden",
+            "additionalUiFrameworkCssForbidden"
+          ],
+          "properties": {
+            "reusableCssSource": { "const": "package-only" },
+            "packageStylesheet": { "const": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" },
+            "packageStylesheetSha256": { "const": "A73EA0C87B1FBA90401543C5A5C6CD35DF8936813E4CC8AEBB8CDF4809C16159" },
+            "mudBlazorStylesheet": { "const": "_content/MudBlazor/MudBlazor.min.css" },
+            "hostStylesheet": { "const": "wwwroot/app.css" },
+            "hostStylesheetPurpose": { "const": "sample-and-domain-composition-only" },
+            "hostStylesheetSha256": { "const": "F62454A693C20C446ECDCDF563C6F0A6DF1AABB5604C352558D7CB54CFA9CE82" },
+            "localPackageCssCopyForbidden": { "const": true },
+            "additionalUiFrameworkCssForbidden": { "const": true }
+          }
         },
         "mandatoryShell": {
           "type": "object",
