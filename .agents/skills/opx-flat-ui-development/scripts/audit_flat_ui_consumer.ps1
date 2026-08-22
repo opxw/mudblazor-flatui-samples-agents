@@ -8,13 +8,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.0.8"
+$expectedContractVersion = "2.0.10"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.0.8"
+    "Opx.MudBlazor.FlatUi" = "2.0.10"
     "MudBlazor" = "9.7.0"
 }
 $expectedHostCssSha256 = "F62454A693C20C446ECDCDF563C6F0A6DF1AABB5604C352558D7CB54CFA9CE82"
-$expectedPackageCssSha256 = "A73EA0C87B1FBA90401543C5A5C6CD35DF8936813E4CC8AEBB8CDF4809C16159"
+$expectedPackageCssSha256 = "947B1552B674240931BF08B4450414020F61390D611FDC7B09CA0DD3A5255C02"
 $violations = [System.Collections.Generic.List[string]]::new()
 
 function Add-Violation([string] $Message) {
@@ -115,8 +115,8 @@ if (Test-Path -LiteralPath $manifestPath) {
 }
 
 if ($null -ne $manifest) {
-    if ((Get-JsonProperty $manifest "schemaVersion") -cne "1.7") {
-        Add-Violation "Contract schemaVersion must be 1.7."
+    if ((Get-JsonProperty $manifest "schemaVersion") -cne "1.8") {
+        Add-Violation "Contract schemaVersion must be 1.8."
     }
     if ((Get-JsonProperty $manifest "contractVersion") -cne $expectedContractVersion) {
         Add-Violation "Contract version must be $expectedContractVersion."
@@ -350,7 +350,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.8; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.10; found $packageCssHash."
     }
 }
 
@@ -476,6 +476,9 @@ if (Test-Path -LiteralPath $mainLayoutPath) {
         "Auto theme choice" = "FlatUiThemeMode.Auto"
         "Display settings editor" = "<FlatDisplaySettings"
         "Default sidebar mount" = "<SampleSidebarMenu />"
+        "Logout action icon" = "Icons.Material.Outlined.Logout"
+        "Logout action class" = 'Class="logout-action"'
+        "Logout accessible name" = 'aria-label="Logout"'
     }
     foreach ($requirement in $requiredLayoutTokens.GetEnumerator()) {
         if (-not $mainLayoutSource.Contains($requirement.Value, [StringComparison]::Ordinal)) {
@@ -544,6 +547,9 @@ if (Test-Path -LiteralPath $appCssPath) {
     $appCssHash = Get-NormalizedTextSha256 $appCssPath
     if ($appCssHash -cne $expectedHostCssSha256) {
         Add-Violation "wwwroot/app.css must be the untouched canonical host/sample stylesheet with SHA-256 $expectedHostCssSha256; found $appCssHash."
+    }
+    if (-not $appCss.Contains('.logout-action{margin-left:auto!important;', [StringComparison]::Ordinal)) {
+        Add-Violation "wwwroot/app.css must keep the initialized admin Logout action aligned to the right edge."
     }
     if ($appCss -match "(?im)@import\s+[^;]*(bootstrap|tailwind|radzen|syncfusion|telerik|blazorise|antdesign)") {
         Add-Violation "wwwroot/app.css imports another UI framework and may override the Flat UI baseline."

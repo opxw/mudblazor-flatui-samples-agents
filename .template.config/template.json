@@ -2,13 +2,13 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "opx",
   "classifications": ["Web", "Blazor", "MudBlazor", "OPX"],
-  "identity": "Opx.MudBlazor.FlatUi.Web.Template.2.0.8.Responsive1",
+  "identity": "Opx.MudBlazor.FlatUi.Web.Template.2.0.10.SessionIcon1",
   "name": "OPX MudBlazor Flat UI Web",
   "shortName": "opx-flatui-web",
   "sourceName": "Opx.MudBlazor.FlatUi.Sample",
   "defaultName": "Opx.FlatUi.App",
   "preferNameDirectory": true,
-  "description": "Creates an OPX Flat UI Blazor Web app pinned to the verified 2.0.8 consumer contract, including adaptive responsive rules, clean initial run, package-owned reusable CSS, runtime OPX attribution, Settings, the default sidebar, and canonical widget spacing.",
+  "description": "Creates an OPX Flat UI Blazor Web app pinned to the verified 2.0.10 consumer contract, including adaptive responsive rules, session-restore and Material-icon-picker guidance, clean initial run, package-owned reusable CSS, runtime OPX attribution, Settings, the default sidebar, and canonical widget spacing.",
   "tags": {
     "language": "C#",
     "type": "project"

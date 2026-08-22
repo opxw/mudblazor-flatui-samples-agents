@@ -26,7 +26,7 @@ The generated project remains in public NuGet package mode. Do not replace `Opx.
 2. Read `flat-ui.contract.json` and keep its package, clean initial-run, stylesheet ownership, runtime HTML attribution, theme, adaptive responsive boundaries, mandatory shell, and widget-spacing baseline values aligned with the installed contract.
 3. Resolve the requested UI to one canonical `PageId` in `page-registry.md`.
 4. Open the mapped archetype and every shared component it directly uses.
-5. Keep the initialized admin shell complete: `MainLayout.razor` must expose the AppBar three-dot menu with `Settings`, its dedicated Application preferences modal, and Light/Dark/Auto choices; it must mount `SampleSidebarMenu.razor` with Dashboard `/`, the initial sample groups, search, and active-route expansion. The initial groups are seed content, not permanent business-menu records; labels, routes, permissions, and grouping may be replaced by the consumer while the functional sidebar remains.
+5. Keep the initialized admin shell complete: `MainLayout.razor` must expose the AppBar three-dot menu with `Settings`, its dedicated Application preferences modal, and Light/Dark/Auto choices; it must mount `SampleSidebarMenu.razor` with Dashboard `/`, the initial sample groups, search, and active-route expansion. In the seeded user block, keep the Logout icon last and aligned to the right edge on desktop and responsive drawers, while the avatar and identity copy remain on the left. The initial groups are seed content, not permanent business-menu records; labels, routes, permissions, grouping, identity data, and actual logout/session behavior may be replaced by the consumer while the functional shell geometry remains.
 6. Adapt only branding, wording, data, authorization, and domain integration. Start with the Light default theme and preserve composition, responsive behavior, theme tokens, widget padding/margins/gaps, loading, modal, toolbar, grid, and FAB contracts. For widgets, use the parent grid gap and do not add outer margins to individual cards; follow `docs/WIDGETS.md`.
 7. Run the consumer audit, Release build, and representative desktop/mobile Light/Dark browser validation.
 
@@ -44,7 +44,7 @@ Use `run-clean.ps1` for the first application start. It resolves the single proj
 
 ## Stylesheet ownership
 
-- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.8` pins its SHA-256 so a stale or substituted package asset fails audit.
+- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.10` pins its SHA-256 so a stale or substituted package asset fails audit.
 - MudBlazor styling comes only from `_content/MudBlazor/MudBlazor.min.css`. Never copy either package stylesheet into `wwwroot`.
 - `wwwroot/app.css` is the canonical source-sample host/domain composition layer, not a fork of reusable package CSS. A newly generated project receives its normalized-LF source-of-truth hash so Windows/Linux line endings do not create false drift. Change it only when implementing deliberate consumer composition, and do not redefine reusable OPX component behavior there.
 - The template excludes the unused local Bootstrap distribution. Additional UI-framework packages, stylesheet links, and CSS imports are forbidden.

@@ -213,13 +213,14 @@ if ((Test-Path -LiteralPath $displayOptionsPath) -and
     $sharedCss = Get-Content -LiteralPath $sharedCssPath -Raw
     $sharedJs = Get-Content -LiteralPath $sharedJsPath -Raw
     if ($displayOptionsSource -notmatch 'Accent\s*\{[^}]*\}\s*=\s*"#004a77"' -or
-        $displayOptionsSource -notmatch 'DarkAccent\s*\{[^}]*\}\s*=\s*"#004a77"' -or
+        $displayOptionsSource -notmatch 'DarkAccent\s*\{[^}]*\}\s*=\s*"#005f91"' -or
         $themeSource -notmatch 'string\s+Accent\s*=\s*"#004a77"' -or
+        $themeSource -notmatch 'string\s+DarkAccent\s*=\s*"#005f91"' -or
         $sharedCss -notmatch '--opx-accent-light:#004a77' -or
-        $sharedCss -notmatch '--opx-accent-night:#004a77' -or
+        $sharedCss -notmatch '--opx-accent-night:#005f91' -or
         $sharedJs -notmatch 'accent:\s*colorOr\(sourcePalette\.accent,\s*"#004a77"\)' -or
-        $sharedJs -notmatch 'darkAccent:\s*colorOr\(sourcePalette\.darkAccent,\s*"#004a77"\)') {
-        $violations.Add('The built-in blue palette must keep the reference #004a77 Primary surface in Light and Dark/Night')
+        $sharedJs -notmatch 'darkAccent:\s*colorOr\(sourcePalette\.darkAccent,\s*"#005f91"\)') {
+        $violations.Add('The built-in blue palette must keep #004a77 Primary in Light and #005f91 Primary in Dark/Night')
     }
 
     if ($sharedJs -notmatch 'resistedDistance' -or
