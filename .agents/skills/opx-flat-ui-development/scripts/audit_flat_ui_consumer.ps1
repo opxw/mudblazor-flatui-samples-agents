@@ -8,13 +8,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.0.10"
+$expectedContractVersion = "2.0.11"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.0.10"
+    "Opx.MudBlazor.FlatUi" = "2.0.11"
     "MudBlazor" = "9.7.0"
 }
-$expectedHostCssSha256 = "F62454A693C20C446ECDCDF563C6F0A6DF1AABB5604C352558D7CB54CFA9CE82"
-$expectedPackageCssSha256 = "947B1552B674240931BF08B4450414020F61390D611FDC7B09CA0DD3A5255C02"
+$expectedHostCssSha256 = "2857DD00F01305D6A573717A5793D272B882EE320752DD0207A562C41722D988"
+$expectedPackageCssSha256 = "7B710961C2B1C9E978003A5A88735B24A2CB7A68FFA4EC12AC17655183EC7026"
 $violations = [System.Collections.Generic.List[string]]::new()
 
 function Add-Violation([string] $Message) {
@@ -115,8 +115,8 @@ if (Test-Path -LiteralPath $manifestPath) {
 }
 
 if ($null -ne $manifest) {
-    if ((Get-JsonProperty $manifest "schemaVersion") -cne "1.8") {
-        Add-Violation "Contract schemaVersion must be 1.8."
+    if ((Get-JsonProperty $manifest "schemaVersion") -cne "2.0") {
+        Add-Violation "Contract schemaVersion must be 2.0."
     }
     if ((Get-JsonProperty $manifest "contractVersion") -cne $expectedContractVersion) {
         Add-Violation "Contract version must be $expectedContractVersion."
@@ -148,8 +148,11 @@ if ($null -ne $manifest) {
     if ((Get-JsonProperty $baseline "archetype") -cne "Home.razor") {
         Add-Violation "Baseline archetype must be Home.razor."
     }
-    if ([double](Get-JsonProperty $baseline "baseFontSizePx") -ne 14.5) {
-        Add-Violation "Baseline baseFontSizePx must be 14.5."
+    if ((Get-JsonProperty $baseline "useAppFontSize") -ne $false) {
+        Add-Violation "Baseline useAppFontSize must be false so Device/browser font ownership is the default."
+    }
+    if ([double](Get-JsonProperty $baseline "baseFontSizePx") -ne 16) {
+        Add-Violation "Baseline baseFontSizePx must be 16 for Manual font mode."
     }
     if ([int](Get-JsonProperty $baseline "responsiveBreakpointPx") -ne 900) {
         Add-Violation "Baseline responsiveBreakpointPx must be 900."
@@ -171,6 +174,54 @@ if ($null -ne $manifest) {
         if ((Get-JsonProperty $adaptiveResponsive $flag) -ne $true) {
             Add-Violation "Baseline adaptiveResponsive.$flag must be true."
         }
+    }
+    $nativeMobileDeployment = Get-JsonProperty $baseline "nativeMobileDeployment"
+    $nativeDeploymentChecks = @(
+        @("appliesWhen", (Get-JsonProperty $nativeMobileDeployment "appliesWhen"), "maui-android-ios-host-present"),
+        @("toolkitPackage", (Get-JsonProperty $nativeMobileDeployment "toolkitPackage"), "CommunityToolkit.Maui"),
+        @("builderRegistration", (Get-JsonProperty $nativeMobileDeployment "builderRegistration"), "UseMauiCommunityToolkit")
+    )
+    foreach ($check in $nativeDeploymentChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline nativeMobileDeployment.$($check[0]) must be '$($check[2])'."
+        }
+    }
+    if ((@((Get-JsonProperty $nativeMobileDeployment "platforms")) -join "|") -cne "Android|iOS") {
+        Add-Violation "Baseline nativeMobileDeployment.platforms must be Android and iOS in canonical order."
+    }
+    $nativeTypography = Get-JsonProperty $nativeMobileDeployment "typography"
+    $nativeTypographyChecks = @(
+        @("fontOwnership", (Get-JsonProperty $nativeTypography "fontOwnership"), "Device"),
+        @("rootFontSource", (Get-JsonProperty $nativeTypography "rootFontSource"), "device-browser-1rem")
+    )
+    foreach ($check in $nativeTypographyChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline nativeMobileDeployment.typography.$($check[0]) must be '$($check[2])'."
+        }
+    }
+    foreach ($flag in @("useAppFontSize", "accessibilityScalingPreserved")) {
+        $expectedValue = if ($flag -ceq "useAppFontSize") { $false } else { $true }
+        if ((Get-JsonProperty $nativeTypography $flag) -ne $expectedValue) {
+            Add-Violation "Baseline nativeMobileDeployment.typography.$flag must be $($expectedValue.ToString().ToLowerInvariant())."
+        }
+    }
+    $statusBar = Get-JsonProperty $nativeMobileDeployment "statusBar"
+    $statusBarChecks = @(
+        @("toolkitApi", (Get-JsonProperty $statusBar "toolkitApi"), "StatusBarBehavior"),
+        @("colorContract", (Get-JsonProperty $statusBar "colorContract"), "same-resolved-appbar-background")
+    )
+    foreach ($check in $statusBarChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline nativeMobileDeployment.statusBar.$($check[0]) must be '$($check[2])'."
+        }
+    }
+    foreach ($flag in @("syncOnThemeOrPaletteChange", "contrastAwareContentStyle", "nativeVerificationRequired")) {
+        if ((Get-JsonProperty $statusBar $flag) -ne $true) {
+            Add-Violation "Baseline nativeMobileDeployment.statusBar.$flag must be true."
+        }
+    }
+    if ((Get-JsonProperty $statusBar "iosViewControllerBasedStatusBarAppearance") -ne $false) {
+        Add-Violation "Baseline nativeMobileDeployment.statusBar.iosViewControllerBasedStatusBarAppearance must be false."
     }
     if ((Get-JsonProperty $baseline "defaultThemeMode") -cne "Light") {
         Add-Violation "Baseline defaultThemeMode must be Light."
@@ -326,11 +377,18 @@ if (Test-Path -LiteralPath $assetsPath) {
     try {
         $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json
         $packageFolders = @($assets.packageFolders.PSObject.Properties.Name)
-        if ($packageFolders.Count -eq 1) {
-            $nugetPackagesRoot = $packageFolders[0]
+        $packageRelativePath = "opx.mudblazor.flatui\$($expectedPackages['Opx.MudBlazor.FlatUi'])\staticwebassets\opx-flat-ui.css"
+        $matchingPackageFolders = @($packageFolders | Where-Object {
+            Test-Path -LiteralPath (Join-Path $_ $packageRelativePath)
+        })
+        if ($matchingPackageFolders.Count -eq 1) {
+            $nugetPackagesRoot = $matchingPackageFolders[0]
         }
-        elseif ($packageFolders.Count -gt 1) {
-            Add-Violation "Restore produced multiple package folders; the OPX package asset source is ambiguous."
+        elseif ($matchingPackageFolders.Count -gt 1) {
+            Add-Violation "Restore produced multiple package folders containing the OPX package asset; its effective source is ambiguous."
+        }
+        else {
+            Add-Violation "No package folder from obj/project.assets.json contains the restored OPX package stylesheet."
         }
     }
     catch {
@@ -350,7 +408,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.10; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.11; found $packageCssHash."
     }
 }
 
@@ -518,8 +576,11 @@ if (Test-Path -LiteralPath $settingsPath) {
         }
 
         $display = Get-JsonProperty $opxSettings "Display"
-        if ([double](Get-JsonProperty $display "DefaultFontSizePx") -ne 14.5) {
-            Add-Violation "OpxFlatUi:Display:DefaultFontSizePx must start at 14.5."
+        if ((Get-JsonProperty $display "UseAppFontSize") -ne $false) {
+            Add-Violation "OpxFlatUi:Display:UseAppFontSize must start false so Device/browser font ownership is the default."
+        }
+        if ([double](Get-JsonProperty $display "DefaultFontSizePx") -ne 16) {
+            Add-Violation "OpxFlatUi:Display:DefaultFontSizePx must start at 16 for Manual font mode."
         }
         if ([int](Get-JsonProperty $display "DefaultRoundedSizePx") -ne 0) {
             Add-Violation "OpxFlatUi:Display:DefaultRoundedSizePx must start at 0."
@@ -581,6 +642,7 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         ".agents\skills\opx-flat-ui-development\SKILL.md",
         ".agents\skills\opx-flat-ui-development\references\page-registry.md",
         ".agents\skills\opx-flat-ui-development\references\layout-decision.md",
+        ".agents\skills\opx-flat-ui-development\references\maui-mobile-deployment.md",
         ".agents\skills\opx-flat-ui-development\references\sample-source-map.md",
         "docs\WIDGETS.md"
     )

@@ -1,20 +1,21 @@
 {
   "$schema": "flat-ui.contract.schema.json",
-  "schemaVersion": "1.8",
-  "contractVersion": "2.0.10",
+  "schemaVersion": "2.0",
+  "contractVersion": "2.0.11",
   "source": {
     "repository": "mudblazor-flat-ui",
     "samplePath": "samples/Opx.MudBlazor.FlatUi.Sample"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.0.10",
+    "Opx.MudBlazor.FlatUi": "2.0.11",
     "MudBlazor": "9.7.0"
   },
   "baseline": {
     "pageId": "opx.page.dashboard.overview",
     "route": "/",
     "archetype": "Home.razor",
-    "baseFontSizePx": 14.5,
+    "useAppFontSize": false,
+    "baseFontSizePx": 16,
     "responsiveBreakpointPx": 900,
     "adaptiveResponsive": {
       "desktopTableAbovePx": 900,
@@ -24,6 +25,26 @@
       "phoneSingleColumnMaxPx": 600,
       "liveResizeRequired": true,
       "platformUserAgentLayoutForbidden": true
+    },
+    "nativeMobileDeployment": {
+      "appliesWhen": "maui-android-ios-host-present",
+      "platforms": ["Android", "iOS"],
+      "toolkitPackage": "CommunityToolkit.Maui",
+      "builderRegistration": "UseMauiCommunityToolkit",
+      "typography": {
+        "fontOwnership": "Device",
+        "useAppFontSize": false,
+        "rootFontSource": "device-browser-1rem",
+        "accessibilityScalingPreserved": true
+      },
+      "statusBar": {
+        "toolkitApi": "StatusBarBehavior",
+        "colorContract": "same-resolved-appbar-background",
+        "syncOnThemeOrPaletteChange": true,
+        "contrastAwareContentStyle": true,
+        "iosViewControllerBasedStatusBarAppearance": false,
+        "nativeVerificationRequired": true
+      }
     },
     "defaultThemeMode": "Light",
     "crudTerminology": {
@@ -40,11 +61,11 @@
     "stylesheetOwnership": {
       "reusableCssSource": "package-only",
       "packageStylesheet": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css",
-      "packageStylesheetSha256": "947B1552B674240931BF08B4450414020F61390D611FDC7B09CA0DD3A5255C02",
+      "packageStylesheetSha256": "7B710961C2B1C9E978003A5A88735B24A2CB7A68FFA4EC12AC17655183EC7026",
       "mudBlazorStylesheet": "_content/MudBlazor/MudBlazor.min.css",
       "hostStylesheet": "wwwroot/app.css",
       "hostStylesheetPurpose": "sample-and-domain-composition-only",
-      "hostStylesheetSha256": "F62454A693C20C446ECDCDF563C6F0A6DF1AABB5604C352558D7CB54CFA9CE82",
+      "hostStylesheetSha256": "2857DD00F01305D6A573717A5793D272B882EE320752DD0207A562C41722D988",
       "localPackageCssCopyForbidden": true,
       "additionalUiFrameworkCssForbidden": true
     },

@@ -16,6 +16,7 @@
                   IsDarkMode="@IsDarkMode"
                   ThemeMode="@EffectiveThemeMode"
                   Density="@EffectiveDisplayDensity"
+                  UseAppFontSize="@EffectiveUseAppFontSize"
                   FontSizePx="@EffectiveDisplayFontSizePx"
                   RoundedSizePx="@DisplayPreferences.Current.RoundedSizePx"
                   HostKind="@DisplayPreferences.Options.HostKind"
@@ -163,6 +164,8 @@
                                          NavigationLayoutChanged="SetDraftNavigationLayout"
                                          BottomNavigationChildPresentation="@_draftBottomNavigationChildPresentation"
                                          BottomNavigationChildPresentationChanged="SetDraftBottomNavigationChildPresentation"
+                                         UseAppFontSize="@_draftUseAppFontSize"
+                                         UseAppFontSizeChanged="SetDraftUseAppFontSize"
                                          FontSizePx="@_draftFontSizePx"
                                          FontSizePxChanged="SetDraftFontSize"
                                          MinimumFontSizePx="@DisplayPreferences.Options.MinimumFontSizePx"
@@ -416,7 +419,8 @@
     private string _draftNavigationLayout = FlatUiNavigationLayout.Vertical;
     private string _draftBottomNavigationChildPresentation = FlatBottomNavigationChildPresentation.Sheet;
     private string _draftColorPalette = "blue";
-    private double _draftFontSizePx = 14.5;
+    private bool _draftUseAppFontSize;
+    private double _draftFontSizePx = 16;
     private double _draftBackdropOpacity = 0.48;
     private double _draftRoundedSizePx;
     private bool _restoreDisplayDefaults;
@@ -426,6 +430,9 @@
     private double EffectiveDisplayFontSizePx => _settingsOpen
         ? _draftFontSizePx
         : DisplayPreferences.Current.FontSizePx;
+    private bool EffectiveUseAppFontSize => _settingsOpen
+        ? _draftUseAppFontSize
+        : DisplayPreferences.Current.UseAppFontSize;
     private static bool IsBottomMainViewPreviewUri(string uri) =>
         Microsoft.AspNetCore.WebUtilities.QueryHelpers
             .ParseQuery(new Uri(uri, UriKind.Absolute).Query)
@@ -609,6 +616,7 @@
         _draftNavigationLayout = DisplayPreferences.Current.NavigationLayout;
         _draftBottomNavigationChildPresentation = DisplayPreferences.Current.BottomNavigationChildPresentation;
         _draftColorPalette = DisplayPreferences.Current.ColorPalette;
+        _draftUseAppFontSize = DisplayPreferences.Current.UseAppFontSize;
         _draftFontSizePx = DisplayPreferences.Current.FontSizePx;
         _draftBackdropOpacity = DisplayPreferences.Current.BackdropOpacity;
         _draftRoundedSizePx = DisplayPreferences.Current.RoundedSizePx;
@@ -650,6 +658,13 @@
         await PreviewDisplayDraftAsync();
     }
 
+    private async Task SetDraftUseAppFontSize(bool useAppFontSize)
+    {
+        _draftUseAppFontSize = useAppFontSize;
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
     private async Task SetDraftBackdropOpacity(double backdropOpacity)
     {
         _draftBackdropOpacity = backdropOpacity;
@@ -679,6 +694,7 @@
         _draftNavigationLayout = defaults.NavigationLayout;
         _draftBottomNavigationChildPresentation = defaults.BottomNavigationChildPresentation;
         _draftColorPalette = defaults.ColorPalette;
+        _draftUseAppFontSize = defaults.UseAppFontSize;
         _draftFontSizePx = defaults.FontSizePx;
         _draftBackdropOpacity = defaults.BackdropOpacity;
         _draftRoundedSizePx = defaults.RoundedSizePx;
@@ -689,6 +705,7 @@
     private ValueTask PreviewDisplayDraftAsync() =>
         DisplayPreferences.PreviewAsync(new FlatUiDisplayPreferences
         {
+            UseAppFontSize = _draftUseAppFontSize,
             ThemeMode = _draftThemeMode,
             Density = _draftDensity,
             NavigationLayout = _draftNavigationLayout,
@@ -709,6 +726,7 @@
         {
             await DisplayPreferences.SaveAsync(new FlatUiDisplayPreferences
             {
+                UseAppFontSize = _draftUseAppFontSize,
                 ThemeMode = _draftThemeMode,
                 Density = _draftDensity,
                 NavigationLayout = _draftNavigationLayout,

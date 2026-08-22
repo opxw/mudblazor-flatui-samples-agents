@@ -23,7 +23,7 @@ The generated project remains in public NuGet package mode. Do not replace `Opx.
 ## Required workflow
 
 1. Read `RULES.md`, `.agents/AGENTS.md`, `.agents/RULES.md`, and the development skill.
-2. Read `flat-ui.contract.json` and keep its package, clean initial-run, stylesheet ownership, runtime HTML attribution, theme, adaptive responsive boundaries, mandatory shell, and widget-spacing baseline values aligned with the installed contract.
+2. Read `flat-ui.contract.json` and keep its package, clean initial-run, stylesheet ownership, runtime HTML attribution, theme, adaptive responsive boundaries, native-mobile deployment, mandatory shell, and widget-spacing baseline values aligned with the installed contract.
 3. Resolve the requested UI to one canonical `PageId` in `page-registry.md`.
 4. Open the mapped archetype and every shared component it directly uses.
 5. Keep the initialized admin shell complete: `MainLayout.razor` must expose the AppBar three-dot menu with `Settings`, its dedicated Application preferences modal, and Light/Dark/Auto choices; it must mount `SampleSidebarMenu.razor` with Dashboard `/`, the initial sample groups, search, and active-route expansion. In the seeded user block, keep the Logout icon last and aligned to the right edge on desktop and responsive drawers, while the avatar and identity copy remain on the left. The initial groups are seed content, not permanent business-menu records; labels, routes, permissions, grouping, identity data, and actual logout/session behavior may be replaced by the consumer while the functional shell geometry remains.
@@ -33,6 +33,14 @@ The generated project remains in public NuGet package mode. Do not replace `Opx.
 ## Adaptive responsive design
 
 Responsive behavior is a composition contract, not desktop scaling. Keep table/desktop presentation above `900px`, equivalent responsive cards at `900px` and below, two-column cards from `601px` through `900px`, and single-column phone refinement at `600px` and below. Preserve one query, selection, permission, loading, validation, and mutation state across representations. Use viewport/container CSS rather than Android/iOS user-agent checks, perform desktop -> responsive -> desktop live resize without reload, and verify Light/Dark/Auto, browser text scaling, keyboard focus, touch geometry, internal scroll ownership, and zero document-level horizontal overflow. Browser checks do not prove MAUI native behavior.
+
+## Android/iOS MAUI deployment
+
+When this Web composition is hosted by a .NET MAUI Android or iOS app, add the `CommunityToolkit.Maui` NuGet package compatible with the selected MAUI SDK and call `UseMauiCommunityToolkit()` from `MauiProgram.cs`. Mobile typography starts with Device ownership (`OpxFlatUi:Display:UseAppFontSize=false`), follows device/browser `1rem`, and preserves OS/browser accessibility text scaling. Manual remains available as an explicit persisted user preference, but a fixed Manual value is not the Android/iOS default.
+
+Attach Toolkit `StatusBarBehavior` to the native root `ContentPage`/BlazorWebView page. The native host must resolve the status-bar background and the OPX AppBar background from the same theme/palette value, update both after Light/Dark/Auto or palette changes, and choose `LightContent` or `DarkContent` from the resulting contrast. Do not copy a similar hex value into platform files or infer the current AppBar color by scraping rendered CSS.
+
+Android needs no additional Toolkit status-bar configuration. For iOS, set `UIViewControllerBasedStatusBarAppearance` to `false` in `Platforms/iOS/Info.plist`. Verify startup, navigation/back, live theme and palette changes, device text scaling, orientation, suspend/resume, safe-area geometry, and readable status-bar icons on representative Android and iOS emulators or devices. Browser responsive validation does not satisfy this native deployment gate. The detailed host checklist is in `.agents/skills/opx-flat-ui-development/references/maui-mobile-deployment.md`.
 
 ## CRUD terminology
 
@@ -44,7 +52,8 @@ Use `run-clean.ps1` for the first application start. It resolves the single proj
 
 ## Stylesheet ownership
 
-- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.10` pins its SHA-256 so a stale or substituted package asset fails audit.
+- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.11` pins its SHA-256 so a stale or substituted package asset fails audit.
+- The consumer starts with Light theme and Device/browser font ownership (`UseAppFontSize=false`). Settings always exposes Device/Manual; Manual uses the bounded `16px` default, while Device follows browser `1rem` and preserves accessibility scaling. This intentionally differs from the source showroom's theme default while retaining its `2.0.11` font behavior.
 - MudBlazor styling comes only from `_content/MudBlazor/MudBlazor.min.css`. Never copy either package stylesheet into `wwwroot`.
 - `wwwroot/app.css` is the canonical source-sample host/domain composition layer, not a fork of reusable package CSS. A newly generated project receives its normalized-LF source-of-truth hash so Windows/Linux line endings do not create false drift. Change it only when implementing deliberate consumer composition, and do not redefine reusable OPX component behavior there.
 - The template excludes the unused local Bootstrap distribution. Additional UI-framework packages, stylesheet links, and CSS imports are forbidden.

@@ -16,10 +16,10 @@
       "type": "string"
     },
     "schemaVersion": {
-      "const": "1.8"
+      "const": "2.0"
     },
     "contractVersion": {
-      "const": "2.0.10"
+      "const": "2.0.11"
     },
     "source": {
       "type": "object",
@@ -40,7 +40,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.0.10"
+          "const": "2.0.11"
         },
         "MudBlazor": {
           "const": "9.7.0"
@@ -54,9 +54,11 @@
         "pageId",
         "route",
         "archetype",
+        "useAppFontSize",
         "baseFontSizePx",
         "responsiveBreakpointPx",
         "adaptiveResponsive",
+        "nativeMobileDeployment",
         "defaultThemeMode",
         "crudTerminology",
         "runtimeHtml",
@@ -79,8 +81,11 @@
           "type": "string",
           "pattern": "^[A-Za-z0-9._-]+\\.razor$"
         },
+        "useAppFontSize": {
+          "const": false
+        },
         "baseFontSizePx": {
-          "const": 14.5
+          "const": 16
         },
         "responsiveBreakpointPx": {
           "const": 900
@@ -105,6 +110,60 @@
             "phoneSingleColumnMaxPx": { "const": 600 },
             "liveResizeRequired": { "const": true },
             "platformUserAgentLayoutForbidden": { "const": true }
+          }
+        },
+        "nativeMobileDeployment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "appliesWhen",
+            "platforms",
+            "toolkitPackage",
+            "builderRegistration",
+            "typography",
+            "statusBar"
+          ],
+          "properties": {
+            "appliesWhen": { "const": "maui-android-ios-host-present" },
+            "platforms": { "const": ["Android", "iOS"] },
+            "toolkitPackage": { "const": "CommunityToolkit.Maui" },
+            "builderRegistration": { "const": "UseMauiCommunityToolkit" },
+            "typography": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fontOwnership",
+                "useAppFontSize",
+                "rootFontSource",
+                "accessibilityScalingPreserved"
+              ],
+              "properties": {
+                "fontOwnership": { "const": "Device" },
+                "useAppFontSize": { "const": false },
+                "rootFontSource": { "const": "device-browser-1rem" },
+                "accessibilityScalingPreserved": { "const": true }
+              }
+            },
+            "statusBar": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "toolkitApi",
+                "colorContract",
+                "syncOnThemeOrPaletteChange",
+                "contrastAwareContentStyle",
+                "iosViewControllerBasedStatusBarAppearance",
+                "nativeVerificationRequired"
+              ],
+              "properties": {
+                "toolkitApi": { "const": "StatusBarBehavior" },
+                "colorContract": { "const": "same-resolved-appbar-background" },
+                "syncOnThemeOrPaletteChange": { "const": true },
+                "contrastAwareContentStyle": { "const": true },
+                "iosViewControllerBasedStatusBarAppearance": { "const": false },
+                "nativeVerificationRequired": { "const": true }
+              }
+            }
           }
         },
         "defaultThemeMode": {
@@ -153,11 +212,11 @@
           "properties": {
             "reusableCssSource": { "const": "package-only" },
             "packageStylesheet": { "const": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" },
-            "packageStylesheetSha256": { "const": "947B1552B674240931BF08B4450414020F61390D611FDC7B09CA0DD3A5255C02" },
+            "packageStylesheetSha256": { "const": "7B710961C2B1C9E978003A5A88735B24A2CB7A68FFA4EC12AC17655183EC7026" },
             "mudBlazorStylesheet": { "const": "_content/MudBlazor/MudBlazor.min.css" },
             "hostStylesheet": { "const": "wwwroot/app.css" },
             "hostStylesheetPurpose": { "const": "sample-and-domain-composition-only" },
-            "hostStylesheetSha256": { "const": "F62454A693C20C446ECDCDF563C6F0A6DF1AABB5604C352558D7CB54CFA9CE82" },
+            "hostStylesheetSha256": { "const": "2857DD00F01305D6A573717A5793D272B882EE320752DD0207A562C41722D988" },
             "localPackageCssCopyForbidden": { "const": true },
             "additionalUiFrameworkCssForbidden": { "const": true }
           }
