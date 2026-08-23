@@ -115,8 +115,8 @@ if (Test-Path -LiteralPath $manifestPath) {
 }
 
 if ($null -ne $manifest) {
-    if ((Get-JsonProperty $manifest "schemaVersion") -cne "2.0") {
-        Add-Violation "Contract schemaVersion must be 2.0."
+    if ((Get-JsonProperty $manifest "schemaVersion") -cne "2.5") {
+        Add-Violation "Contract schemaVersion must be 2.5."
     }
     if ((Get-JsonProperty $manifest "contractVersion") -cne $expectedContractVersion) {
         Add-Violation "Contract version must be $expectedContractVersion."
@@ -205,23 +205,154 @@ if ($null -ne $manifest) {
             Add-Violation "Baseline nativeMobileDeployment.typography.$flag must be $($expectedValue.ToString().ToLowerInvariant())."
         }
     }
+    $nativeButtonSizing = Get-JsonProperty $nativeTypography "buttonSizing"
+    foreach ($flag in @(
+        "labelFollowsDeviceFontScale",
+        "containerGrowsWithScaledText",
+        "inlineSizeAccommodatesScaledLabel",
+        "minimumTouchTargetPreserved",
+        "textClippingForbidden",
+        "fixedHeightAtAccessibilityScaleForbidden"
+    )) {
+        if ((Get-JsonProperty $nativeButtonSizing $flag) -ne $true) {
+            Add-Violation "Baseline nativeMobileDeployment.typography.buttonSizing.$flag must be true."
+        }
+    }
     $statusBar = Get-JsonProperty $nativeMobileDeployment "statusBar"
     $statusBarChecks = @(
         @("toolkitApi", (Get-JsonProperty $statusBar "toolkitApi"), "StatusBarBehavior"),
-        @("colorContract", (Get-JsonProperty $statusBar "colorContract"), "same-resolved-appbar-background")
+        @("colorContract", (Get-JsonProperty $statusBar "colorContract"), "same-resolved-appbar-background"),
+        @("colorSource", (Get-JsonProperty $statusBar "colorSource"), "resolved-appbar-theme-token")
     )
     foreach ($check in $statusBarChecks) {
         if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
             Add-Violation "Baseline nativeMobileDeployment.statusBar.$($check[0]) must be '$($check[2])'."
         }
     }
-    foreach ($flag in @("syncOnThemeOrPaletteChange", "contrastAwareContentStyle", "nativeVerificationRequired")) {
+    foreach ($arrayCheck in @(
+        @("synchronizedThemeModes", @("Light", "Dark / Night", "Auto")),
+        @("updateTriggers", @("startup", "theme-change", "palette-change", "navigation", "resume"))
+    )) {
+        $actual = @((Get-JsonProperty $statusBar $arrayCheck[0]))
+        $expected = @($arrayCheck[1])
+        if ($actual.Count -ne $expected.Count -or (Compare-Object -ReferenceObject $expected -DifferenceObject $actual -SyncWindow 0)) {
+            Add-Violation "Baseline nativeMobileDeployment.statusBar.$($arrayCheck[0]) must be '$($expected -join ", ")' in contract order."
+        }
+    }
+    foreach ($flag in @("followsResolvedUiTheme", "followsResolvedAppBarColor", "syncOnThemeOrPaletteChange", "contrastAwareContentStyle", "nativeVerificationRequired")) {
         if ((Get-JsonProperty $statusBar $flag) -ne $true) {
             Add-Violation "Baseline nativeMobileDeployment.statusBar.$flag must be true."
         }
     }
     if ((Get-JsonProperty $statusBar "iosViewControllerBasedStatusBarAppearance") -ne $false) {
         Add-Violation "Baseline nativeMobileDeployment.statusBar.iosViewControllerBasedStatusBarAppearance must be false."
+    }
+    $startupLoading = Get-JsonProperty $nativeMobileDeployment "startupLoading"
+    $startupLoadingChecks = @(
+        @("displayText", (Get-JsonProperty $startupLoading "displayText"), "Memuat"),
+        @("spinnerCssClass", (Get-JsonProperty $startupLoading "spinnerCssClass"), "flat-system-loading-spinner"),
+        @("visualReference", (Get-JsonProperty $startupLoading "visualReference"), "FlatReconnectModal.Reconnecting")
+    )
+    foreach ($check in $startupLoadingChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline nativeMobileDeployment.startupLoading.$($check[0]) must be '$($check[2])'."
+        }
+    }
+    if ((@((Get-JsonProperty $startupLoading "appliesDuring")) -join "|") -cne "blazor-webview-bootstrap|session-authorization-check") {
+        Add-Violation "Baseline nativeMobileDeployment.startupLoading.appliesDuring must contain blazor-webview-bootstrap and session-authorization-check in canonical order."
+    }
+    foreach ($flag in @(
+        "spinnerRequired",
+        "textOnlyForbidden",
+        "singleSystemLoadingVisual",
+        "staticHostMarkupRequiredBeforeRazorInteractive",
+        "fullViewport",
+        "centered",
+        "themeAware",
+        "safeAreaAware",
+        "reducedMotionFallbackVisible",
+        "protectedLayoutBeforeCompletionForbidden"
+    )) {
+        if ((Get-JsonProperty $startupLoading $flag) -ne $true) {
+            Add-Violation "Baseline nativeMobileDeployment.startupLoading.$flag must be true."
+        }
+    }
+    $webViewInteraction = Get-JsonProperty $nativeMobileDeployment "webViewInteraction"
+    $webViewInteractionChecks = @(
+        @("documentOverscrollBehavior", (Get-JsonProperty $webViewInteraction "documentOverscrollBehavior"), "none"),
+        @("androidOverScrollMode", (Get-JsonProperty $webViewInteraction "androidOverScrollMode"), "Never")
+    )
+    foreach ($check in $webViewInteractionChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.$($check[0]) must be '$($check[2])'."
+        }
+    }
+    foreach ($flag in @("ordinaryScrollingPreserved", "rootBounceForbidden", "pullToRefreshRequiresDedicatedControl")) {
+        if ((Get-JsonProperty $webViewInteraction $flag) -ne $true) {
+            Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.$flag must be true."
+        }
+    }
+    foreach ($flag in @("iosScrollViewBounces", "iosAlwaysBounceVertical")) {
+        if ((Get-JsonProperty $webViewInteraction $flag) -ne $false) {
+            Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.$flag must be false."
+        }
+    }
+    $textSelection = Get-JsonProperty $webViewInteraction "textSelection"
+    $textSelectionChecks = @(
+        @("defaultPolicy", (Get-JsonProperty $textSelection "defaultPolicy"), "disabled"),
+        @("allowedUserSelect", (Get-JsonProperty $textSelection "allowedUserSelect"), "text"),
+        @("outsideAllowedTargetsUserSelect", (Get-JsonProperty $textSelection "outsideAllowedTargetsUserSelect"), "none")
+    )
+    foreach ($check in $textSelectionChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.textSelection.$($check[0]) must be '$($check[2])'."
+        }
+    }
+    if ((@((Get-JsonProperty $textSelection "allowedTargets")) -join "|") -cne "input-text|textarea|contenteditable") {
+        Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.textSelection.allowedTargets must contain input-text, textarea, and contenteditable in canonical order."
+    }
+    foreach ($flag in @("touchCalloutOutsideAllowedTargetsForbidden", "caretAndClipboardPreservedForAllowedTargets")) {
+        if ((Get-JsonProperty $textSelection $flag) -ne $true) {
+            Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.textSelection.$flag must be true."
+        }
+    }
+    $startupAccessGate = Get-JsonProperty $baseline "startupAccessGate"
+    $startupAccessChecks = @(
+        @("appliesWhen", (Get-JsonProperty $startupAccessGate "appliesWhen"), "host-authentication-enabled"),
+        @("preloaderComponent", (Get-JsonProperty $startupAccessGate "preloaderComponent"), "FlatSessionRestore"),
+        @("storageHint", (Get-JsonProperty $startupAccessGate "storageHint"), "local-storage")
+    )
+    foreach ($check in $startupAccessChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline startupAccessGate.$($check[0]) must be '$($check[2])'."
+        }
+    }
+    foreach ($flag in @(
+        "hostValidationRequired",
+        "backendAuthorizationEnforcementRequired",
+        "protectedLayoutBeforeValidationForbidden",
+        "singleFlight",
+        "authenticationStateUpdatedBeforeMainLayout",
+        "staleSessionClearedOnInvalid"
+    )) {
+        if ((Get-JsonProperty $startupAccessGate $flag) -ne $true) {
+            Add-Violation "Baseline startupAccessGate.$flag must be true."
+        }
+    }
+    if ((Get-JsonProperty $startupAccessGate "localStorageIsAuthorizationAuthority") -ne $false) {
+        Add-Violation "Baseline startupAccessGate.localStorageIsAuthorizationAuthority must be false."
+    }
+    $startupStates = Get-JsonProperty $startupAccessGate "states"
+    $startupStateChecks = @(
+        @("checking", (Get-JsonProperty $startupStates "checking"), "FlatSessionRestore"),
+        @("valid", (Get-JsonProperty $startupStates "valid"), "MainLayout"),
+        @("invalid", (Get-JsonProperty $startupStates "invalid"), "Login"),
+        @("error", (Get-JsonProperty $startupStates "error"), "Login")
+    )
+    foreach ($check in $startupStateChecks) {
+        if ($null -eq $check[1] -or $check[1] -cne $check[2]) {
+            Add-Violation "Baseline startupAccessGate.states.$($check[0]) must be '$($check[2])'."
+        }
     }
     if ((Get-JsonProperty $baseline "defaultThemeMode") -cne "Light") {
         Add-Violation "Baseline defaultThemeMode must be Light."
@@ -643,6 +774,7 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         ".agents\skills\opx-flat-ui-development\references\page-registry.md",
         ".agents\skills\opx-flat-ui-development\references\layout-decision.md",
         ".agents\skills\opx-flat-ui-development\references\maui-mobile-deployment.md",
+        ".agents\skills\opx-flat-ui-development\references\session-authorization-bootstrap.md",
         ".agents\skills\opx-flat-ui-development\references\sample-source-map.md",
         "docs\WIDGETS.md"
     )

@@ -16,7 +16,7 @@
       "type": "string"
     },
     "schemaVersion": {
-      "const": "2.0"
+      "const": "2.5"
     },
     "contractVersion": {
       "const": "2.0.11"
@@ -59,6 +59,7 @@
         "responsiveBreakpointPx",
         "adaptiveResponsive",
         "nativeMobileDeployment",
+        "startupAccessGate",
         "defaultThemeMode",
         "crudTerminology",
         "runtimeHtml",
@@ -121,7 +122,9 @@
             "toolkitPackage",
             "builderRegistration",
             "typography",
-            "statusBar"
+            "statusBar",
+            "startupLoading",
+            "webViewInteraction"
           ],
           "properties": {
             "appliesWhen": { "const": "maui-android-ios-host-present" },
@@ -135,13 +138,34 @@
                 "fontOwnership",
                 "useAppFontSize",
                 "rootFontSource",
-                "accessibilityScalingPreserved"
+                "accessibilityScalingPreserved",
+                "buttonSizing"
               ],
               "properties": {
                 "fontOwnership": { "const": "Device" },
                 "useAppFontSize": { "const": false },
                 "rootFontSource": { "const": "device-browser-1rem" },
-                "accessibilityScalingPreserved": { "const": true }
+                "accessibilityScalingPreserved": { "const": true },
+                "buttonSizing": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "labelFollowsDeviceFontScale",
+                    "containerGrowsWithScaledText",
+                    "inlineSizeAccommodatesScaledLabel",
+                    "minimumTouchTargetPreserved",
+                    "textClippingForbidden",
+                    "fixedHeightAtAccessibilityScaleForbidden"
+                  ],
+                  "properties": {
+                    "labelFollowsDeviceFontScale": { "const": true },
+                    "containerGrowsWithScaledText": { "const": true },
+                    "inlineSizeAccommodatesScaledLabel": { "const": true },
+                    "minimumTouchTargetPreserved": { "const": true },
+                    "textClippingForbidden": { "const": true },
+                    "fixedHeightAtAccessibilityScaleForbidden": { "const": true }
+                  }
+                }
               }
             },
             "statusBar": {
@@ -150,6 +174,11 @@
               "required": [
                 "toolkitApi",
                 "colorContract",
+                "colorSource",
+                "synchronizedThemeModes",
+                "updateTriggers",
+                "followsResolvedUiTheme",
+                "followsResolvedAppBarColor",
                 "syncOnThemeOrPaletteChange",
                 "contrastAwareContentStyle",
                 "iosViewControllerBasedStatusBarAppearance",
@@ -158,12 +187,136 @@
               "properties": {
                 "toolkitApi": { "const": "StatusBarBehavior" },
                 "colorContract": { "const": "same-resolved-appbar-background" },
+                "colorSource": { "const": "resolved-appbar-theme-token" },
+                "synchronizedThemeModes": { "const": ["Light", "Dark / Night", "Auto"] },
+                "updateTriggers": { "const": ["startup", "theme-change", "palette-change", "navigation", "resume"] },
+                "followsResolvedUiTheme": { "const": true },
+                "followsResolvedAppBarColor": { "const": true },
                 "syncOnThemeOrPaletteChange": { "const": true },
                 "contrastAwareContentStyle": { "const": true },
                 "iosViewControllerBasedStatusBarAppearance": { "const": false },
                 "nativeVerificationRequired": { "const": true }
               }
+            },
+            "startupLoading": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "appliesDuring",
+                "displayText",
+                "spinnerRequired",
+                "spinnerCssClass",
+                "visualReference",
+                "textOnlyForbidden",
+                "singleSystemLoadingVisual",
+                "staticHostMarkupRequiredBeforeRazorInteractive",
+                "fullViewport",
+                "centered",
+                "themeAware",
+                "safeAreaAware",
+                "reducedMotionFallbackVisible",
+                "protectedLayoutBeforeCompletionForbidden"
+              ],
+              "properties": {
+                "appliesDuring": { "const": ["blazor-webview-bootstrap", "session-authorization-check"] },
+                "displayText": { "const": "Memuat" },
+                "spinnerRequired": { "const": true },
+                "spinnerCssClass": { "const": "flat-system-loading-spinner" },
+                "visualReference": { "const": "FlatReconnectModal.Reconnecting" },
+                "textOnlyForbidden": { "const": true },
+                "singleSystemLoadingVisual": { "const": true },
+                "staticHostMarkupRequiredBeforeRazorInteractive": { "const": true },
+                "fullViewport": { "const": true },
+                "centered": { "const": true },
+                "themeAware": { "const": true },
+                "safeAreaAware": { "const": true },
+                "reducedMotionFallbackVisible": { "const": true },
+                "protectedLayoutBeforeCompletionForbidden": { "const": true }
+              }
+            },
+            "webViewInteraction": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinaryScrollingPreserved",
+                "rootBounceForbidden",
+                "documentOverscrollBehavior",
+                "iosScrollViewBounces",
+                "iosAlwaysBounceVertical",
+                "androidOverScrollMode",
+                "pullToRefreshRequiresDedicatedControl",
+                "textSelection"
+              ],
+              "properties": {
+                "ordinaryScrollingPreserved": { "const": true },
+                "rootBounceForbidden": { "const": true },
+                "documentOverscrollBehavior": { "const": "none" },
+                "iosScrollViewBounces": { "const": false },
+                "iosAlwaysBounceVertical": { "const": false },
+                "androidOverScrollMode": { "const": "Never" },
+                "pullToRefreshRequiresDedicatedControl": { "const": true },
+                "textSelection": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "defaultPolicy",
+                    "allowedTargets",
+                    "allowedUserSelect",
+                    "outsideAllowedTargetsUserSelect",
+                    "touchCalloutOutsideAllowedTargetsForbidden",
+                    "caretAndClipboardPreservedForAllowedTargets"
+                  ],
+                  "properties": {
+                    "defaultPolicy": { "const": "disabled" },
+                    "allowedTargets": { "const": ["input-text", "textarea", "contenteditable"] },
+                    "allowedUserSelect": { "const": "text" },
+                    "outsideAllowedTargetsUserSelect": { "const": "none" },
+                    "touchCalloutOutsideAllowedTargetsForbidden": { "const": true },
+                    "caretAndClipboardPreservedForAllowedTargets": { "const": true }
+                  }
+                }
+              }
             }
+          }
+        },
+        "startupAccessGate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "appliesWhen",
+            "preloaderComponent",
+            "storageHint",
+            "localStorageIsAuthorizationAuthority",
+            "hostValidationRequired",
+            "backendAuthorizationEnforcementRequired",
+            "protectedLayoutBeforeValidationForbidden",
+            "singleFlight",
+            "states",
+            "authenticationStateUpdatedBeforeMainLayout",
+            "staleSessionClearedOnInvalid"
+          ],
+          "properties": {
+            "appliesWhen": { "const": "host-authentication-enabled" },
+            "preloaderComponent": { "const": "FlatSessionRestore" },
+            "storageHint": { "const": "local-storage" },
+            "localStorageIsAuthorizationAuthority": { "const": false },
+            "hostValidationRequired": { "const": true },
+            "backendAuthorizationEnforcementRequired": { "const": true },
+            "protectedLayoutBeforeValidationForbidden": { "const": true },
+            "singleFlight": { "const": true },
+            "states": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["checking", "valid", "invalid", "error"],
+              "properties": {
+                "checking": { "const": "FlatSessionRestore" },
+                "valid": { "const": "MainLayout" },
+                "invalid": { "const": "Login" },
+                "error": { "const": "Login" }
+              }
+            },
+            "authenticationStateUpdatedBeforeMainLayout": { "const": true },
+            "staleSessionClearedOnInvalid": { "const": true }
           }
         },
         "defaultThemeMode": {

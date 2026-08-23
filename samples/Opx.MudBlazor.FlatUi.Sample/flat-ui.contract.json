@@ -1,6 +1,6 @@
 {
   "$schema": "flat-ui.contract.schema.json",
-  "schemaVersion": "2.0",
+  "schemaVersion": "2.5",
   "contractVersion": "2.0.11",
   "source": {
     "repository": "mudblazor-flat-ui",
@@ -35,16 +35,80 @@
         "fontOwnership": "Device",
         "useAppFontSize": false,
         "rootFontSource": "device-browser-1rem",
-        "accessibilityScalingPreserved": true
+        "accessibilityScalingPreserved": true,
+        "buttonSizing": {
+          "labelFollowsDeviceFontScale": true,
+          "containerGrowsWithScaledText": true,
+          "inlineSizeAccommodatesScaledLabel": true,
+          "minimumTouchTargetPreserved": true,
+          "textClippingForbidden": true,
+          "fixedHeightAtAccessibilityScaleForbidden": true
+        }
       },
       "statusBar": {
         "toolkitApi": "StatusBarBehavior",
         "colorContract": "same-resolved-appbar-background",
+        "colorSource": "resolved-appbar-theme-token",
+        "synchronizedThemeModes": ["Light", "Dark / Night", "Auto"],
+        "updateTriggers": ["startup", "theme-change", "palette-change", "navigation", "resume"],
+        "followsResolvedUiTheme": true,
+        "followsResolvedAppBarColor": true,
         "syncOnThemeOrPaletteChange": true,
         "contrastAwareContentStyle": true,
         "iosViewControllerBasedStatusBarAppearance": false,
         "nativeVerificationRequired": true
+      },
+      "startupLoading": {
+        "appliesDuring": ["blazor-webview-bootstrap", "session-authorization-check"],
+        "displayText": "Memuat",
+        "spinnerRequired": true,
+        "spinnerCssClass": "flat-system-loading-spinner",
+        "visualReference": "FlatReconnectModal.Reconnecting",
+        "textOnlyForbidden": true,
+        "singleSystemLoadingVisual": true,
+        "staticHostMarkupRequiredBeforeRazorInteractive": true,
+        "fullViewport": true,
+        "centered": true,
+        "themeAware": true,
+        "safeAreaAware": true,
+        "reducedMotionFallbackVisible": true,
+        "protectedLayoutBeforeCompletionForbidden": true
+      },
+      "webViewInteraction": {
+        "ordinaryScrollingPreserved": true,
+        "rootBounceForbidden": true,
+        "documentOverscrollBehavior": "none",
+        "iosScrollViewBounces": false,
+        "iosAlwaysBounceVertical": false,
+        "androidOverScrollMode": "Never",
+        "pullToRefreshRequiresDedicatedControl": true,
+        "textSelection": {
+          "defaultPolicy": "disabled",
+          "allowedTargets": ["input-text", "textarea", "contenteditable"],
+          "allowedUserSelect": "text",
+          "outsideAllowedTargetsUserSelect": "none",
+          "touchCalloutOutsideAllowedTargetsForbidden": true,
+          "caretAndClipboardPreservedForAllowedTargets": true
+        }
       }
+    },
+    "startupAccessGate": {
+      "appliesWhen": "host-authentication-enabled",
+      "preloaderComponent": "FlatSessionRestore",
+      "storageHint": "local-storage",
+      "localStorageIsAuthorizationAuthority": false,
+      "hostValidationRequired": true,
+      "backendAuthorizationEnforcementRequired": true,
+      "protectedLayoutBeforeValidationForbidden": true,
+      "singleFlight": true,
+      "states": {
+        "checking": "FlatSessionRestore",
+        "valid": "MainLayout",
+        "invalid": "Login",
+        "error": "Login"
+      },
+      "authenticationStateUpdatedBeforeMainLayout": true,
+      "staleSessionClearedOnInvalid": true
     },
     "defaultThemeMode": "Light",
     "crudTerminology": {
