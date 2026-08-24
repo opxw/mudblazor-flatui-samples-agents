@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "opx",
+  "classifications": ["MAUI", "Blazor Hybrid", "Android", "iOS", "MudBlazor", "OPX"],
+  "identity": "Opx.MudBlazor.FlatUi.Maui.Template.2.0.17.MudBlazor980",
+  "name": "OPX MudBlazor Flat UI MAUI Hybrid",
+  "shortName": "opx-flatui-maui",
+  "sourceName": "Opx.MudBlazor.FlatUi.Maui.Template",
+  "defaultName": "Opx.FlatUi.Mobile",
+  "preferNameDirectory": true,
+  "description": "Creates a package-mode OPX Flat UI .NET MAUI Blazor Hybrid app for Android and iOS with Device typography, theme-synchronized native status bar, root authorization gate, Memuat spinner, no-bounce WebView, textbox-only selection, Settings, sidebar and Bottom navigation.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sources": [
+    {
+      "modifiers": [
+        { "exclude": ["**/[Bb]in/**", "**/[Oo]bj/**", "**/.nuget/**", "**/.git/**"] }
+      ]
+    }
+  ],
+  "primaryOutputs": [
+    { "path": "Opx.MudBlazor.FlatUi.Maui.Template.csproj" }
+  ]
+}

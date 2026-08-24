@@ -39,19 +39,19 @@
                      OnSubmit="Save"
                      ConfirmClose="ConfirmClose">
         <div class="flat-crud-form-grid simple-crud-form">
-            <MudTextField T="string" @bind-Value="_draft.Code" Label="Code" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" />
-            <MudTextField T="string" @bind-Value="_draft.Name" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
-            <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudTextField T="string" @bind-Value="_draft.Code" Label="Code" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" />
+            <MudTextField T="string" @bind-Value="_draft.Name" Label="Name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+            <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("Hardware")">Hardware</MudSelectItem>
                 <MudSelectItem Value="@("Software")">Software</MudSelectItem>
                 <MudSelectItem Value="@("Service")">Service</MudSelectItem>
             </MudSelect>
-            <MudSelect T="string" @bind-Value="_draft.Status" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_draft.Status" Label="Status" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("Active")">Active</MudSelectItem>
                 <MudSelectItem Value="@("Draft")">Draft</MudSelectItem>
                 <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
             </MudSelect>
-            <MudTextField T="string" @bind-Value="_draft.Notes" Label="Notes" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Notes" Label="Notes" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" Class="wide" />
         </div>
     </CrudEditorShell>
 }

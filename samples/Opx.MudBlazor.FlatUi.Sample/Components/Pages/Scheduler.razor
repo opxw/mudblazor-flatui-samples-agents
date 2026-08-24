@@ -1,0 +1,86 @@
+@page "/scheduler"
+@inject ISnackbar Snackbar
+
+@* Copyright (c) 2026 opx. All rights reserved. *@
+
+<PageTitle>Scheduler - Opx MudBlazor Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module"
+          UsePanel="false"
+          PageCssClass="scheduler-page no-mobile-fab"
+          PrimaryActionVisible="false">
+    <ChildContent>
+        <FlatScheduler Layout="FlatSchedulerLayout.WorkWeek"
+                       PeriodStart="_periodStart"
+                       PeriodChanged="SetPeriod"
+                       VisibleDayCount="5"
+                       StartHour="7"
+                       EndHour="18"
+                       Items="VisibleEvents"
+                       Calendars="_calendars"
+                       ItemSelected="SelectEvent"
+                       DaySelected="SelectDay"
+                       CreateRequested="CreateEvent"
+                       CalendarToggled="ToggleCalendar"
+                       ItemMoveRequested="MoveEvent"
+                       AriaLabel="Operations work-week scheduler" />
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private DateTimeOffset _periodStart = new(2026, 8, 24, 0, 0, 0, TimeSpan.FromHours(7));
+
+    private readonly List<FlatSchedulerCalendar> _calendars =
+    [
+        new("operations", "Operations", true, "#16a085", "My calendars"),
+        new("sales", "Sales", true, "#2980b9", "My calendars"),
+        new("finance", "Finance", true, "#c0392b", "My calendars"),
+        new("reminders", "Reminders", true, "#f39c12", "Other calendars")
+    ];
+
+    private readonly List<FlatSchedulerItem> _events =
+    [
+        Event("EV-001", "Clarify customer requirements", 24, 7, 30, 10, 30, "sales", "blue", "Sales"),
+        Event("EV-002", "Send product reference pack", 25, 10, 0, 13, 0, "operations", "green", "Operations"),
+        Event("EV-003", "Follow up and discuss the offer", 26, 8, 30, 11, 30, "finance", "red", "Finance"),
+        Event("EV-004", "Obtain customer contact information", 27, 7, 0, 10, 0, "reminders", "amber", "Reminders"),
+        Event("EV-005", "Warehouse capacity review", 28, 13, 0, 15, 0, "operations", "indigo", "Operations")
+    ];
+
+    private IReadOnlyList<FlatSchedulerItem> VisibleEvents => _events
+        .Where(item => _calendars.FirstOrDefault(calendar => calendar.Key == item.Category)?.Selected != false)
+        .ToArray();
+
+    private Task SetPeriod(DateTimeOffset value)
+    {
+        _periodStart = value;
+        return Task.CompletedTask;
+    }
+
+    private void SelectEvent(FlatSchedulerItem item) => Snackbar.Add($"Selected: {item.Title}", Severity.Info);
+    private void SelectDay(DateTimeOffset day) => Snackbar.Add(day.ToString("D"), Severity.Info);
+    private void CreateEvent(DateTimeOffset day) => Snackbar.Add($"Create event intent for {day:d}", Severity.Success);
+
+    private void ToggleCalendar(FlatSchedulerCalendarToggle toggle)
+    {
+        var index = _calendars.FindIndex(calendar => calendar.Key == toggle.Key);
+        if (index >= 0)
+            _calendars[index] = _calendars[index] with { Selected = toggle.Selected };
+    }
+
+    private void MoveEvent(FlatSchedulerMoveRequest request)
+    {
+        var index = _events.FindIndex(item => item.Key == request.Key);
+        if (index < 0)
+            return;
+
+        _events[index] = _events[index] with { Start = request.Start, End = request.End };
+        Snackbar.Add("Event move intent applied to sample memory.", Severity.Success);
+    }
+
+    private static FlatSchedulerItem Event(string key, string title, int day, int startHour, int startMinute, int endHour, int endMinute, string calendar, string tone, string resource) =>
+        new(key, title,
+            new DateTimeOffset(2026, 8, day, startHour, startMinute, 0, TimeSpan.FromHours(7)),
+            new DateTimeOffset(2026, 8, day, endHour, endMinute, 0, TimeSpan.FromHours(7)),
+            resource, tone) { Category = calendar };
+}

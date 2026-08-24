@@ -1,0 +1,104 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/hierarchy-designer"
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="hierarchy-designer-page no-mobile-fab">
+    <div class="hierarchy-designer-showcase">
+        <FlatPanel>
+            <div class="panel-header">
+                <div>
+                    <h2>Report outline</h2>
+                    <p>Compact hierarchy with controlled drag-and-drop</p>
+                </div>
+                <MudSwitch T="bool" @bind-Value="_compact" Color="Color.Primary" Label="Compact" />
+            </div>
+            <div class="hierarchy-designer-stage">
+                <FlatHierarchyDesigner Items="_items"
+                                       ItemsChanged="UpdateItems"
+                                       MoveResult="HandleMoveResult"
+                                       EditRequested="HandleEdit"
+                                       JsonExported="HandleExport"
+                                       Compact="_compact"
+                                       Title="Report definition" />
+            </div>
+            @if (!string.IsNullOrWhiteSpace(_status))
+            {
+                <div class="hierarchy-designer-status" role="status">@_status</div>
+            }
+        </FlatPanel>
+
+        <FlatPanel>
+            <div class="panel-header">
+                <div>
+                    <h2>JSON result</h2>
+                    <p>Versioned snapshot ready for host persistence</p>
+                </div>
+                <MudTooltip Text="Copy JSON">
+                    <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy"
+                                   OnClick="CopyJsonAsync"
+                                   Disabled="@string.IsNullOrWhiteSpace(_json)"
+                                   Class="grid-action-button"
+                                   aria-label="Copy JSON" />
+                </MudTooltip>
+            </div>
+            <pre class="hierarchy-designer-json"><code>@(_json ?? "Use Export JSON in the hierarchy toolbar.")</code></pre>
+        </FlatPanel>
+    </div>
+</FlatPage>
+
+@code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private IReadOnlyList<FlatHierarchyDesignerItem> _items =
+    [
+        new("report", null, "Report", Icons.Material.Outlined.Assignment, "Root document", 0),
+        new("top-margin", "report", "TopMargin", Icons.Material.Outlined.BorderTop, null, 0, Droppable: false),
+        new("page-header", "report", "PageHeader", Icons.Material.Outlined.ViewHeadline, "Expandable band", 1),
+        new("detail", "report", "Detail", Icons.Material.Outlined.Article, "Primary data band", 2),
+        new("detail-report", "report", "DetailReport", Icons.Material.Outlined.DynamicFeed, "Nested report band", 3),
+        new("bottom-margin", "report", "BottomMargin", Icons.Material.Outlined.BorderBottom, null, 4, Droppable: false),
+        new("styles", null, "Styles", Icons.Material.Outlined.Style, "Reusable visual definitions", 1),
+        new("foreground", "styles", "Foreground", Icons.Material.Outlined.FormatColorText, null, 0, Droppable: false),
+        new("foreground-disabled", "styles", "ForegroundDisabled", Icons.Material.Outlined.FormatColorText, null, 1, Droppable: false),
+        new("simple-text", "styles", "SimpleTextStyle", Icons.Material.Outlined.TextFields, null, 2, Droppable: false),
+        new("table-header", "styles", "TableHeaderStyle", Icons.Material.Outlined.TableRows, null, 3, Droppable: false),
+        new("cross-band", null, "Cross-Band Controls", Icons.Material.Outlined.ViewWeek, "Shared report controls", 2),
+        new("data-sources", null, "Data Sources", Icons.Material.Outlined.Storage, "Host-owned data contracts", 3)
+    ];
+    private bool _compact = true;
+    private string? _json;
+    private string? _status;
+
+    private Task UpdateItems(IReadOnlyList<FlatHierarchyDesignerItem> items)
+    {
+        _items = items;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleMoveResult(FlatHierarchyDesignerMoveResult result)
+    {
+        _status = result.Succeeded && result.Request is not null
+            ? $"{result.Request.Key}: {result.Request.OldParentKey ?? "root"} → {result.Request.NewParentKey ?? "root"}, position {result.Request.NewIndex + 1}."
+            : result.ErrorMessage;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleEdit(FlatHierarchyDesignerItem item)
+    {
+        _status = $"Edit requested for {item.Text}. The host owns the editor and persistence.";
+        return Task.CompletedTask;
+    }
+
+    private Task HandleExport(FlatHierarchyDesignerExportResult result)
+    {
+        _json = result.Json;
+        _status = $"JSON schema v{result.Document.SchemaVersion} generated.";
+        return Task.CompletedTask;
+    }
+
+    private async Task CopyJsonAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_json)) return;
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", _json);
+        _status = "JSON copied to clipboard.";
+    }
+}

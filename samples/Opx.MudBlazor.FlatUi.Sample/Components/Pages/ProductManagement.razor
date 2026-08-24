@@ -44,7 +44,7 @@
                         </button>
                     }
                 </div>
-                <MudTextField T="string" Value="_search" ValueChanged="SetSearch" Immediate="true" Placeholder="Search products..." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="product-management-search" />
+                <MudTextField T="string" Value="_search" ValueChanged="SetSearch" Immediate="true" Placeholder="Search products..." Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="product-management-search" />
             </ResultToolbar>
             <ChildContent>
                 <FlatDataGrid TItem="ProductAdminRecord" State="GridState" Columns="Columns" Items="PagedRows" Changed="Reload" ExtraColumnCount="1" AriaLabel="Products">
@@ -99,11 +99,11 @@
                CanSubmit="@(!string.IsNullOrWhiteSpace(_draftName))"
                OnSubmit="SaveProduct">
     <div class="flat-crud-form-grid">
-        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        <MudSelect T="string" @bind-Value="_draftCategory" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">
+        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+        <MudSelect T="string" @bind-Value="_draftCategory" Label="Category" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             @foreach (var category in Categories) { <MudSelectItem Value="@category">@category</MudSelectItem> }
         </MudSelect>
-        <MudNumericField T="decimal?" @bind-Value="_draftPrice" Label="Price" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+        <MudNumericField T="decimal?" @bind-Value="_draftPrice" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" />
     </div>
 </FlatFormModal>
 

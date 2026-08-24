@@ -2,7 +2,7 @@
 
 Copyright (c) 2026 opx. All rights reserved.
 
-Use the repository template when a new Blazor Web project must reproduce the compiled OPX Flat UI sample. The template carries the sample composition, repository rules, agent skill, NuGet.org configuration, and the versioned consumer contract.
+Use the repository templates when a new Blazor Web or Android/iOS MAUI Blazor Hybrid project must reproduce the compiled OPX Flat UI composition. Both templates carry repository rules, agent skill, NuGet.org configuration, and a versioned consumer contract; the MAUI template additionally owns the native host boundary.
 
 ## Create a consumer
 
@@ -13,12 +13,24 @@ dotnet new install .
 dotnet new opx-flatui-web -n MyCompany.MyApp
 Set-Location MyCompany.MyApp
 & .\run-clean.ps1 -PrepareOnly
-& .\.agents\skills\opx-flat-ui-development\scripts\audit_flat_ui_consumer.ps1 -ProjectPath .
+& .\.agents\skills\opx-flat-ui-development\scripts\audit_flat_ui_consumer.ps1 -ProjectPath . -ExactSample
 dotnet build -c Release --no-restore --nologo
 & .\run-clean.ps1
 ```
 
 The generated project remains in public NuGet package mode. Do not replace `Opx.MudBlazor.FlatUi` with a source `ProjectReference`.
+
+For a native Android/iOS host, create and audit the dedicated template:
+
+```powershell
+dotnet new opx-flatui-maui -n MyCompany.MyMobileApp
+Set-Location MyCompany.MyMobileApp
+& .\run-clean.ps1 -PrepareOnly
+& .\scripts\audit_maui_consumer.ps1 -ProjectPath . -ExactSample
+dotnet build -f net10.0-android -c Release --no-restore
+```
+
+Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.8.0`, and OPX Flat UI `2.0.17`. Android compilation is required source evidence; iOS build/runtime and all native UX claims still require macOS/Xcode plus simulator/device evidence.
 
 ## Required workflow
 
@@ -28,11 +40,17 @@ The generated project remains in public NuGet package mode. Do not replace `Opx.
 4. Open the mapped archetype and every shared component it directly uses.
 5. Keep the initialized admin shell complete: `MainLayout.razor` must expose the AppBar three-dot menu with `Settings`, its dedicated Application preferences modal, and Light/Dark/Auto choices; it must mount `SampleSidebarMenu.razor` with Dashboard `/`, the initial sample groups, search, and active-route expansion. In the seeded user block, keep the Logout icon last and aligned to the right edge on desktop and responsive drawers, while the avatar and identity copy remain on the left. The initial groups are seed content, not permanent business-menu records; labels, routes, permissions, grouping, identity data, and actual logout/session behavior may be replaced by the consumer while the functional shell geometry remains.
 6. Adapt only branding, wording, data, authorization, and domain integration. Start with the Light default theme and preserve composition, responsive behavior, theme tokens, widget padding/margins/gaps, loading, modal, toolbar, grid, and FAB contracts. For widgets, use the parent grid gap and do not add outer margins to individual cards; follow `docs/WIDGETS.md`.
-7. Run the consumer audit, Release build, and representative desktop/mobile Light/Dark browser validation.
+7. Run the consumer audit with `-ExactSample`, Release build, and representative desktop/mobile Light/Dark browser validation.
+
+Exact Sample Mode is mandatory when the request says the result must be the same, exact, canonical, like the sample, or follow the source of truth. Generate a fresh canonical consumer and pass the unchanged hash baseline before integration. Then replace only host-owned branding, wording, data, authorization, callbacks, endpoints, and persistence through the sample's existing seams. If the application differs while the fresh reference is correct, treat it as integration drift; investigate the package only when the same defect reproduces in the verified fresh reference.
 
 ## Adaptive responsive design
 
 Responsive behavior is a composition contract, not desktop scaling. Keep table/desktop presentation above `900px`, equivalent responsive cards at `900px` and below, two-column cards from `601px` through `900px`, and single-column phone refinement at `600px` and below. Preserve one query, selection, permission, loading, validation, and mutation state across representations. Use viewport/container CSS rather than Android/iOS user-agent checks, perform desktop -> responsive -> desktop live resize without reload, and verify Light/Dark/Auto, browser text scaling, keyboard focus, touch geometry, internal scroll ownership, and zero document-level horizontal overflow. Browser checks do not prove MAUI native behavior.
+
+For `NavigationLayout=Bottom`, `FlatAppShell.BottomNavigationMaxWidthPx` defaults to `600`. The initialized template sets `900`, rendering Bottom navigation at tablet and phone widths and the sidebar above `900px`. This decision must follow live viewport width identically on Web, MAUI Hybrid, and resized Windows EXE hosts; OS, device type, user-agent, and MAUI-platform branching are forbidden.
+
+Bottom-navigation labels are package-owned and descender-safe: line-height `1.25`, bottom inset `1px`, single-line ellipsis, and bar height `60px`. Validate letters `g`, `j`, `p`, `q`, and `y`; do not recreate this fix in `app.css`.
 
 ## Android/iOS MAUI deployment
 
@@ -48,7 +66,7 @@ Android needs no additional Toolkit status-bar configuration. For iOS, set `UIVi
 
 ## Startup authorization preloader
 
-When a host enables authentication, gate protected routes before `MainLayout` is rendered. While reading the saved-session hint from local storage and validating it, show only the full-page `FlatSessionRestore` preloader. Never show a default shell first and replace it later, because that flashes protected navigation/content and produces a misleading authenticated state.
+When a host enables authentication, mount `RootStartupGate` directly from `App.razor` and gate route creation before `MainLayout` is rendered. Its checking branch first initializes `FlatUiPreferencesService`, resolves Light/Dark/Auto and the selected palette, then shows only full-page `FlatSessionRestore` inside the matching `FlatMudProviders`, so the package theme and spinner geometry are active even though `Router` does not exist yet. Source its copy from `OpxFlatUi:Reconnect:StartupTitle` and `StartupMessage`; this template seeds `Memuat halaman` and `Menyiapkan aplikasi...`. After validation completes, remove that loading-only provider branch and create `Router`; the selected layout then owns its normal provider. This preserves Settings theme/palette preview without nested providers and applies even when the requested URL is anonymous, including Login. Never show a default shell first and replace it later, because that flashes protected navigation/content and produces a misleading authenticated state.
 
 Local storage is client-controlled and is not authorization authority. Missing, expired, revoked, tampered, or failed validation clears stale saved state and opens Login. Only a successful host/server validation may update `AuthenticationStateProvider` and then render protected routes through `MainLayout`. Protected APIs and route policies must still enforce authorization independently. Keep the check single-flight, avoid redirect loops, validate return URLs, and never log or persist passwords, raw credentials, roles, or permission authority as trusted local data. See `.agents/skills/opx-flat-ui-development/references/session-authorization-bootstrap.md`.
 
@@ -62,8 +80,8 @@ Use `run-clean.ps1` for the first application start. It resolves the single proj
 
 ## Stylesheet ownership
 
-- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.11` pins its SHA-256 so a stale or substituted package asset fails audit.
-- The consumer starts with Light theme and Device/browser font ownership (`UseAppFontSize=false`). Settings always exposes Device/Manual; Manual uses the bounded `16px` default, while Device follows browser `1rem` and preserves accessibility scaling. This intentionally differs from the source showroom's theme default while retaining its `2.0.11` font behavior.
+- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.17` pins its SHA-256 so a stale or substituted package asset fails audit.
+- The consumer starts with Light theme and Device/browser font ownership (`UseAppFontSize=false`). Settings always exposes Device/Manual; Manual uses the bounded `16px` default, while Device follows browser `1rem` and preserves accessibility scaling. This intentionally differs from the source showroom's theme default while retaining its `2.0.17` font behavior.
 - MudBlazor styling comes only from `_content/MudBlazor/MudBlazor.min.css`. Never copy either package stylesheet into `wwwroot`.
 - `wwwroot/app.css` is the canonical source-sample host/domain composition layer, not a fork of reusable package CSS. A newly generated project receives its normalized-LF source-of-truth hash so Windows/Linux line endings do not create false drift. Change it only when implementing deliberate consumer composition, and do not redefine reusable OPX component behavior there.
 - The template excludes the unused local Bootstrap distribution. Additional UI-framework packages, stylesheet links, and CSS imports are forbidden.
@@ -71,7 +89,7 @@ Use `run-clean.ps1` for the first application start. It resolves the single proj
 
 ## Runtime HTML attribution
 
-`Components/App.razor` emits exactly one `<!-- Powered by opx (github.com/opxw) -->` immediately inside `<body>` before `Routes` through an explicit `MarkupString`. This is a non-visible HTML comment that must remain present in the initial runtime response for every route. A literal HTML comment in a Razor file and a Razor comment are both removed during compilation, so source inspection alone is not proof. Do not place secrets, environment details, user data, or dynamic identifiers in this comment.
+`Components/App.razor` emits exactly one `<!-- Powered by opx (github.com/opxw) -->` immediately inside `<body>` before `RootStartupGate` through an explicit `MarkupString`. This is a non-visible HTML comment that must remain present in the initial runtime response for every route. A literal HTML comment in a Razor file and a Razor comment are both removed during compilation, so source inspection alone is not proof. Do not place secrets, environment details, user data, or dynamic identifiers in this comment.
 
 ## Business and data decision contract
 

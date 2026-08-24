@@ -39,9 +39,9 @@
                IsDirty="@IsAddDirty"
                ConfirmClose="ConfirmDiscardAsync"
                OnSubmit="AddMemberAsync">
-    <MudTextField T="string" @bind-Value="_newName" Immediate="true" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
-    <MudTextField T="string" @bind-Value="_newRole" Immediate="true" Label="Designation" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
-    <MudTextField T="string" @bind-Value="_newInitials" Immediate="true" Label="Initials (optional)" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    <MudTextField T="string" @bind-Value="_newName" Immediate="true" Label="Name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
+    <MudTextField T="string" @bind-Value="_newRole" Immediate="true" Label="Designation" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
+    <MudTextField T="string" @bind-Value="_newInitials" Immediate="true" Label="Initials (optional)" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
 </FlatFormModal>
 
 @code {

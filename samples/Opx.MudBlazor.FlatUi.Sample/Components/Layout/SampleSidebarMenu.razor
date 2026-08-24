@@ -90,9 +90,11 @@
         @if (ShowItem("Operations Workspace", "Operations", "Service Desk", "Approval")) { <MudNavLink Href="/operations-workspace" Icon="@Icons.Material.Outlined.Workspaces">Operations Workspace</MudNavLink> }
         @if (ShowItem("Spatial Operations", "Operations", "Map", "Geofence", "Route Playback")) { <MudNavLink Href="/spatial-operations" Icon="@Icons.Material.Outlined.Explore">Spatial Operations</MudNavLink> }
         @if (ShowItem("Tree Grid", "Operations")) { <MudNavLink Href="/tree-grid" Icon="@Icons.Material.Outlined.AccountTree">Tree Grid</MudNavLink> }
+        @if (ShowItem("Hierarchy Designer", "Operations", "Outline", "Export JSON")) { <MudNavLink Href="/hierarchy-designer" Icon="@Icons.Material.Outlined.Schema">Hierarchy Designer</MudNavLink> }
         @if (ShowItem("Jobs", "Operations", "Job Board")) { <MudNavLink Href="/jobs" Icon="@Icons.Material.Outlined.WorkHistory">Jobs</MudNavLink> }
         @if (ShowItem("Kanban", "Operations")) { <MudNavLink Href="/kanban" Icon="@Icons.Material.Outlined.ViewKanban">Kanban</MudNavLink> }
         @if (ShowItem("Calendar", "Operations", "Schedule")) { <MudNavLink Href="/calendar" Icon="@Icons.Material.Outlined.CalendarMonth">Calendar</MudNavLink> }
+        @if (ShowItem("Scheduler", "Operations", "Work Week", "Timeline")) { <MudNavLink Href="/scheduler" Icon="@Icons.Material.Outlined.CalendarViewWeek">Scheduler</MudNavLink> }
         @if (ShowItem("Sales Pipeline", "Operations")) { <MudNavLink Href="/sales-pipeline" Icon="@Icons.Material.Outlined.FilterAlt">Sales Pipeline</MudNavLink> }
         @if (ShowItem("Chat", "Operations")) { <MudNavLink Href="/chat" Icon="@Icons.Material.Outlined.Chat">Chat</MudNavLink> }
         @if (ShowItem("AI Chat", "Operations", "Assistant")) { <MudNavLink Href="/ai-chat" Icon="@Icons.Material.Outlined.AutoAwesome">AI Chat</MudNavLink> }
@@ -118,7 +120,9 @@
                  Class="sample-menu-tree">
         @if (ShowItem("Static / Master", "Data & Reports")) { <MudNavLink Href="/static-data" Icon="@Icons.Material.Outlined.Storage">Static / Master</MudNavLink> }
         @if (ShowItem("Large Data Grid", "Data & Reports")) { <MudNavLink Href="/data-grid-large" Icon="@Icons.Material.Outlined.TableRows">Large Data Grid</MudNavLink> }
+        @if (ShowItem("Grouped Data Grid", "Data & Reports", "Aggregate", "Expand", "Collapse")) { <MudNavLink Href="/grouped-data-grid" Icon="@Icons.Material.Outlined.ViewStream">Grouped Data Grid</MudNavLink> }
         @if (ShowItem("Reports", "Data & Reports")) { <MudNavLink Href="/reports" Icon="@Icons.Material.Outlined.Assessment">Reports</MudNavLink> }
+        @if (ShowItem("PDF Viewer", "Data & Reports", "PDF.js", "Print", "Share")) { <MudNavLink Href="/pdf-viewer" Icon="@Icons.Material.Outlined.PictureAsPdf">PDF Viewer</MudNavLink> }
         @if (ShowItem("Pivot", "Data & Reports")) { <MudNavLink Href="/pivot" Icon="@Icons.Material.Outlined.PivotTableChart">Pivot</MudNavLink> }
         @if (ShowItem("Enterprise Toolkit", "Data & Reports")) { <MudNavLink Href="/enterprise-toolkit" Icon="@Icons.Material.Outlined.DomainAdd">Enterprise Toolkit</MudNavLink> }
         @if (ShowItem("Experience Toolkit", "Data & Reports", "Accessibility", "Command Palette")) { <MudNavLink Href="/experience-toolkit" Icon="@Icons.Material.Outlined.AccessibilityNew">Experience Toolkit</MudNavLink> }
@@ -191,8 +195,8 @@
 
 @code {
     private static readonly string[] OperationsTerms =
-        ["Operations", "CRUD Asset", "CRUD Simple", "Grid Editor", "Inline Edit", "Model CRUD", "Generated Form", "Data Annotations", "Form Designer", "WYSIWYG", "Live Preview", "Padding", "Margin", "CSS Class", "Dynamic Menu", "Autoload", "MenuText", "ParentId", "Operations Workspace", "Spatial Operations", "Map", "Geofence", "Route Playback", "Fleet", "Service Desk", "Approval", "Procurement", "Stock Transfer", "Timesheet", "POS", "Tree Grid", "Hierarchy", "Parent Key", "Drag Drop", "Jobs", "Job Board", "Kanban", "Task Board", "Workflow", "Calendar", "Schedule", "Agenda", "Sales Pipeline", "CRM", "Deals", "Chat", "AI Chat", "Assistant", "Prompt", "Messages", "Conversation", "Email", "Mailbox", "Inbox", "Compose", "Monitoring Service", "Monitoring Database"];
-    private static readonly string[] DataTerms = ["Data & Reports", "Static / Master", "Large Data Grid", "Table", "Scroll", "Reports", "Pivot", "Matrix", "Aggregate", "Enterprise Toolkit", "Experience Toolkit", "Accessibility", "Command Palette", "Schema Form", "Collaboration", "Conflict", "Import", "Master Detail", "Audit", "Workflow", "Scheduler", "Offline Sync", "Documents"];
+        ["Operations", "CRUD Asset", "CRUD Simple", "Grid Editor", "Inline Edit", "Model CRUD", "Generated Form", "Data Annotations", "Form Designer", "WYSIWYG", "Live Preview", "Padding", "Margin", "CSS Class", "Dynamic Menu", "Autoload", "MenuText", "ParentId", "Operations Workspace", "Spatial Operations", "Map", "Geofence", "Route Playback", "Fleet", "Service Desk", "Approval", "Procurement", "Stock Transfer", "Timesheet", "POS", "Tree Grid", "Hierarchy", "Hierarchy Designer", "Outline", "Export JSON", "Parent Key", "Drag Drop", "Jobs", "Job Board", "Kanban", "Task Board", "Workflow", "Calendar", "Schedule", "Agenda", "Sales Pipeline", "CRM", "Deals", "Chat", "AI Chat", "Assistant", "Prompt", "Messages", "Conversation", "Email", "Mailbox", "Inbox", "Compose", "Monitoring Service", "Monitoring Database"];
+    private static readonly string[] DataTerms = ["Data & Reports", "Static / Master", "Large Data Grid", "Grouped Data Grid", "Table", "Scroll", "Expand", "Collapse", "Reports", "PDF Viewer", "PDF.js", "Print", "Share", "Thumbnail", "Pivot", "Matrix", "Aggregate", "Enterprise Toolkit", "Experience Toolkit", "Accessibility", "Command Palette", "Schema Form", "Collaboration", "Conflict", "Import", "Master Detail", "Audit", "Workflow", "Scheduler", "Offline Sync", "Documents"];
     private static readonly string[] CommerceTerms = ["Commerce & Content", "Product Catalog", "Product Management", "Product Detail", "Product Editor", "Catalog", "Ecommerce", "Products", "Filters", "Gallery", "Publish", "Tags", "Website Front", "Job Landing", "Careers", "Recruitment", "Blog", "Landing Page", "Front Page"];
     private static readonly string[] AccountTerms = ["Account", "Edit Account", "User Profile", "Login Sample", "Two-step Verification", "2FA", "OTP", "Reset Password", "Forgot Password", "Recovery"];
     private static readonly string[] UiKitTerms = ["UI Kit", "Components", "Development Rules", "Rules", "Skill", "Source of Truth", "PageId", "Accordions", "Accordion", "Collapse", "Expand", "Flush", "Charts", "MudBlazor Charts", "Line", "Bar", "Stacked Bar", "Pie", "Donut", "Timeseries", "Heat Map", "Rose", "Radar", "Sankey", "Scatter Plot", "File Upload", "Drag Drop", "Progress", "Grid Preferences", "Saved Views", "Virtualization", "Vector Map", "Floor Plan", "Denah", "Location", "Tracking", "GPS", "Route", "Waypoint", "Colors", "Palette", "Semantic", "Timeline", "Activity", "Widgets", "Metric", "Profile Card Grid", "Members", "Card Grid"];
@@ -262,6 +266,7 @@
             case "/grid-editor":
             case "/model-crud":
             case "/model-form-designer":
+            case "/hierarchy-designer":
             case "/dynamic-menu":
             case "/operations-workspace":
             case "/spatial-operations":
@@ -277,6 +282,7 @@
                 break;
             case "/static-data":
             case "/data-grid-large":
+            case "/grouped-data-grid":
             case "/reports":
             case "/pivot":
             case "/enterprise-toolkit":

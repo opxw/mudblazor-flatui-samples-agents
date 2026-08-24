@@ -3,18 +3,27 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [string] $ProjectPath = "."
+    [string] $ProjectPath = ".",
+    [switch] $ExactSample
 )
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.0.11"
+$expectedContractVersion = "2.0.17"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.0.11"
-    "MudBlazor" = "9.7.0"
+    "Opx.MudBlazor.FlatUi" = "2.0.17"
+    "MudBlazor" = "9.8.0"
 }
-$expectedHostCssSha256 = "2857DD00F01305D6A573717A5793D272B882EE320752DD0207A562C41722D988"
-$expectedPackageCssSha256 = "7B710961C2B1C9E978003A5A88735B24A2CB7A68FFA4EC12AC17655183EC7026"
+$expectedHostCssSha256 = "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666"
+$expectedPackageCssSha256 = "57EE747876F19F0F082B2249E4562F82B45A101AA50F65D8681C7082B1E9E165"
+$expectedExactSampleHashes = [ordered]@{
+    "Components\Layout\MainLayout.razor" = "1329B9F7A058128B3971CA6C76FD4CCB06333CA9D7C17A2733D07109E46328A8"
+    "Components\Layout\SampleSidebarMenu.razor" = "8157F2819E65D521AFB4C49BF6D2C4C4BE423C7FBBF1DF26CC7139EBB0FDA5AB"
+    "Components\Pages\Home.razor" = "9303D93EAC12EAC1EB81CC2057E3283896C190086DBD7057BBBB07674CFA4440"
+    "Components\RootStartupGate.razor" = "1513F7901D638CFAA829E6B55EE623B5D9A42D8C0D1AE80FE9C130C5DCB78D1D"
+    "appsettings.json" = "1465D5A8931899ACDD96D7EB4C66EB9F08415267B7F35495E6D7615B557C8C9C"
+    "wwwroot\app.css" = "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666"
+}
 $violations = [System.Collections.Generic.List[string]]::new()
 
 function Add-Violation([string] $Message) {
@@ -114,9 +123,22 @@ if (Test-Path -LiteralPath $manifestPath) {
     }
 }
 
+if ((Test-Path -LiteralPath $manifestPath) -and (Test-Path -LiteralPath $schemaPath)) {
+    try {
+        $manifestText = Get-Content -LiteralPath $manifestPath -Raw
+        $schemaText = Get-Content -LiteralPath $schemaPath -Raw
+        if (-not ($manifestText | Test-Json -Schema $schemaText)) {
+            Add-Violation "flat-ui.contract.json does not satisfy flat-ui.contract.schema.json."
+        }
+    }
+    catch {
+        Add-Violation "Contract schema validation failed: $($_.Exception.Message)"
+    }
+}
+
 if ($null -ne $manifest) {
-    if ((Get-JsonProperty $manifest "schemaVersion") -cne "2.5") {
-        Add-Violation "Contract schemaVersion must be 2.5."
+    if ((Get-JsonProperty $manifest "schemaVersion") -cne "3.1") {
+        Add-Violation "Contract schemaVersion must be 3.1."
     }
     if ((Get-JsonProperty $manifest "contractVersion") -cne $expectedContractVersion) {
         Add-Violation "Contract version must be $expectedContractVersion."
@@ -135,6 +157,20 @@ if ($null -ne $manifest) {
         $actualVersion = Get-JsonProperty $manifestPackages $packageName
         if ($actualVersion -cne $expectedPackages[$packageName]) {
             Add-Violation "Contract package $packageName must be $($expectedPackages[$packageName])."
+        }
+    }
+
+    $canonicalSample = Get-JsonProperty $manifest "canonicalSample"
+    if ((Get-JsonProperty $canonicalSample "mode") -cne "exact-initial-baseline" -or
+        (Get-JsonProperty $canonicalSample "auditSwitch") -cne "-ExactSample" -or
+        (Get-JsonProperty $canonicalSample "visualDriftRequiresExplicitDecision") -ne $true) {
+        Add-Violation "Contract canonicalSample must require the exact initial baseline, -ExactSample audit, and explicit approval for visual drift."
+    }
+    $canonicalFiles = Get-JsonProperty $canonicalSample "files"
+    foreach ($entry in $expectedExactSampleHashes.GetEnumerator()) {
+        $jsonName = $entry.Key.Replace("\", "/")
+        if ((Get-JsonProperty $canonicalFiles $jsonName) -cne $entry.Value) {
+            Add-Violation "Contract canonicalSample.files.$jsonName does not match the canonical normalized hash."
         }
     }
 
@@ -163,14 +199,19 @@ if ($null -ne $manifest) {
         @("responsiveCardMaxPx", (Get-JsonProperty $adaptiveResponsive "responsiveCardMaxPx"), 900),
         @("twoColumnCardMinPx", (Get-JsonProperty $adaptiveResponsive "twoColumnCardMinPx"), 601),
         @("twoColumnCardMaxPx", (Get-JsonProperty $adaptiveResponsive "twoColumnCardMaxPx"), 900),
-        @("phoneSingleColumnMaxPx", (Get-JsonProperty $adaptiveResponsive "phoneSingleColumnMaxPx"), 600)
+        @("phoneSingleColumnMaxPx", (Get-JsonProperty $adaptiveResponsive "phoneSingleColumnMaxPx"), 600),
+        @("bottomNavigationDefaultMaxWidthPx", (Get-JsonProperty $adaptiveResponsive "bottomNavigationDefaultMaxWidthPx"), 600),
+        @("bottomNavigationSampleMaxWidthPx", (Get-JsonProperty $adaptiveResponsive "bottomNavigationSampleMaxWidthPx"), 900),
+        @("bottomNavigationBarHeightPx", (Get-JsonProperty $adaptiveResponsive "bottomNavigationBarHeightPx"), 60),
+        @("bottomNavigationLabelLineHeight", (Get-JsonProperty $adaptiveResponsive "bottomNavigationLabelLineHeight"), 1.25),
+        @("bottomNavigationLabelBottomInsetPx", (Get-JsonProperty $adaptiveResponsive "bottomNavigationLabelBottomInsetPx"), 1)
     )
     foreach ($check in $responsiveChecks) {
         if ($null -eq $check[1] -or [int]$check[1] -ne [int]$check[2]) {
             Add-Violation "Baseline adaptiveResponsive.$($check[0]) must be $($check[2])."
         }
     }
-    foreach ($flag in @("liveResizeRequired", "platformUserAgentLayoutForbidden")) {
+    foreach ($flag in @("bottomNavigationViewportOnly", "bottomNavigationDescendersVisible", "liveResizeRequired", "platformUserAgentLayoutForbidden")) {
         if ((Get-JsonProperty $adaptiveResponsive $flag) -ne $true) {
             Add-Violation "Baseline adaptiveResponsive.$flag must be true."
         }
@@ -319,6 +360,14 @@ if ($null -ne $manifest) {
     $startupAccessGate = Get-JsonProperty $baseline "startupAccessGate"
     $startupAccessChecks = @(
         @("appliesWhen", (Get-JsonProperty $startupAccessGate "appliesWhen"), "host-authentication-enabled"),
+        @("placement", (Get-JsonProperty $startupAccessGate "placement"), "root-before-router"),
+        @("rootComponent", (Get-JsonProperty $startupAccessGate "rootComponent"), "RootStartupGate"),
+        @("loadingProvider", (Get-JsonProperty $startupAccessGate "loadingProvider"), "FlatMudProviders"),
+        @("loadingProviderPlacement", (Get-JsonProperty $startupAccessGate "loadingProviderPlacement"), "checking-branch-before-router"),
+        @("loadingTitle", (Get-JsonProperty $startupAccessGate "loadingTitle"), "Memuat halaman"),
+        @("loadingTitleSource", (Get-JsonProperty $startupAccessGate "loadingTitleSource"), "OpxFlatUi:Reconnect:StartupTitle"),
+        @("loadingMessageSource", (Get-JsonProperty $startupAccessGate "loadingMessageSource"), "OpxFlatUi:Reconnect:StartupMessage"),
+        @("loadingVisualReference", (Get-JsonProperty $startupAccessGate "loadingVisualReference"), "FlatReconnectModal.Reconnecting"),
         @("preloaderComponent", (Get-JsonProperty $startupAccessGate "preloaderComponent"), "FlatSessionRestore"),
         @("storageHint", (Get-JsonProperty $startupAccessGate "storageHint"), "local-storage")
     )
@@ -331,6 +380,11 @@ if ($null -ne $manifest) {
         "hostValidationRequired",
         "backendAuthorizationEnforcementRequired",
         "protectedLayoutBeforeValidationForbidden",
+        "nestedLoadingProviderForbidden",
+        "routerCreationBeforeCompletionForbidden",
+        "runsForAnonymousRoutes",
+        "preferencesInitializedBeforeValidation",
+        "resolvedThemeProviderBeforeValidation",
         "singleFlight",
         "authenticationStateUpdatedBeforeMainLayout",
         "staleSessionClearedOnInvalid"
@@ -539,7 +593,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.11; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.15; found $packageCssHash."
     }
 }
 
@@ -555,10 +609,12 @@ foreach ($packageNode in $packageNodes) {
 $requiredFiles = @(
     "Program.cs",
     "Components\App.razor",
+    "Components\RootStartupGate.razor",
     "Components\_Imports.razor",
     "Components\Layout\MainLayout.razor",
     "Components\Layout\SampleSidebarMenu.razor",
     "Components\Pages\Home.razor",
+    "Services\IRootStartupGateValidator.cs",
     "appsettings.json",
     "run-clean.ps1",
     "wwwroot\app.css"
@@ -579,6 +635,7 @@ if (Test-Path -LiteralPath $programPath) {
         "FlatPageLoadingState",
         "FlatMessageBoxService",
         "FlatUiPreferencesService",
+        "IRootStartupGateValidator",
         "MapStaticAssets()",
         "AddInteractiveServerRenderMode()"
     )
@@ -629,9 +686,47 @@ if (Test-Path -LiteralPath $appPath) {
     $commentMatches = [regex]::Matches($appSource, [regex]::Escape($poweredByComment)).Count
     $bodyIndex = $appSource.IndexOf('<body>', [StringComparison]::Ordinal)
     $commentIndex = $appSource.IndexOf($poweredByComment, [StringComparison]::Ordinal)
-    $routesIndex = $appSource.IndexOf('<Routes', [StringComparison]::Ordinal)
-    if ($commentMatches -ne 1 -or $bodyIndex -lt 0 -or $commentIndex -le $bodyIndex -or $routesIndex -le $commentIndex) {
-        Add-Violation "Components/App.razor must emit exactly one '$poweredByComment' through MarkupString immediately inside the body before Routes. A literal Razor HTML comment is removed during compilation."
+    $rootGateIndex = $appSource.IndexOf('<RootStartupGate', [StringComparison]::Ordinal)
+    if ($commentMatches -ne 1 -or $bodyIndex -lt 0 -or $commentIndex -le $bodyIndex -or $rootGateIndex -le $commentIndex) {
+        Add-Violation "Components/App.razor must emit exactly one '$poweredByComment' through MarkupString immediately inside the body before RootStartupGate. A literal Razor HTML comment is removed during compilation."
+    }
+    if ($appSource.Contains('<Router', [StringComparison]::Ordinal) -or $appSource.Contains('<Routes', [StringComparison]::Ordinal)) {
+        Add-Violation "Components/App.razor must not create Router or Routes before RootStartupGate completes."
+    }
+}
+
+$rootStartupGatePath = Join-Path $projectRoot "Components\RootStartupGate.razor"
+if (Test-Path -LiteralPath $rootStartupGatePath) {
+    $rootStartupGateSource = Get-Content -LiteralPath $rootStartupGatePath -Raw
+    foreach ($token in @(
+        '@if (!_completed)',
+        '<FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentThemePalette">',
+        '<FlatSessionRestore Title="@StartupTitle" Message="@StartupMessage"',
+        '</FlatMudProviders>',
+        '<Router ',
+        'ReconnectOptions.StartupTitle',
+        'ReconnectOptions.StartupMessage',
+        'DisplayPreferences.InitializeAsync',
+        'opxFlatThemeBootstrap.prefersDarkMode',
+        'StartupGateValidator.ValidateAsync',
+        'OnAfterRenderAsync',
+        'RootStartupGateResult.Login'
+    )) {
+        if (-not $rootStartupGateSource.Contains($token, [StringComparison]::Ordinal)) {
+            Add-Violation "Components/RootStartupGate.razor is missing startup-gate behavior '$token'."
+        }
+    }
+
+    $checkingIndex = $rootStartupGateSource.IndexOf('@if (!_completed)', [StringComparison]::Ordinal)
+    $providerIndex = $rootStartupGateSource.IndexOf('<FlatMudProviders ', [StringComparison]::Ordinal)
+    $loadingIndex = $rootStartupGateSource.IndexOf('<FlatSessionRestore', [StringComparison]::Ordinal)
+    $providerCloseIndex = $rootStartupGateSource.IndexOf('</FlatMudProviders>', [StringComparison]::Ordinal)
+    $routerIndex = $rootStartupGateSource.IndexOf('<Router ', [StringComparison]::Ordinal)
+    if ($checkingIndex -lt 0 -or $providerIndex -le $checkingIndex -or $loadingIndex -le $providerIndex -or $providerCloseIndex -le $loadingIndex -or $routerIndex -le $providerCloseIndex) {
+        Add-Violation "RootStartupGate must render FlatSessionRestore inside FlatMudProviders in the checking branch, then create Router only in the completed branch."
+    }
+    if ([regex]::Matches($rootStartupGateSource, '<FlatMudProviders(?:\s|>)').Count -ne 1) {
+        Add-Violation "RootStartupGate must contain exactly one loading-only FlatMudProviders instance."
     }
 }
 
@@ -665,6 +760,7 @@ if (Test-Path -LiteralPath $mainLayoutPath) {
         "Auto theme choice" = "FlatUiThemeMode.Auto"
         "Display settings editor" = "<FlatDisplaySettings"
         "Default sidebar mount" = "<SampleSidebarMenu />"
+        "Bottom navigation sample threshold" = 'BottomNavigationMaxWidthPx="900"'
         "Logout action icon" = "Icons.Material.Outlined.Logout"
         "Logout action class" = 'Class="logout-action"'
         "Logout accessible name" = 'aria-label="Logout"'
@@ -723,6 +819,14 @@ if (Test-Path -LiteralPath $settingsPath) {
             Add-Violation "OpxFlatUi:Display:DefaultThemeMode must start at Light."
         }
 
+        $reconnect = Get-JsonProperty $opxSettings "Reconnect"
+        if ((Get-JsonProperty $reconnect "StartupTitle") -cne "Memuat halaman") {
+            Add-Violation "OpxFlatUi:Reconnect:StartupTitle must be 'Memuat halaman'."
+        }
+        if ((Get-JsonProperty $reconnect "StartupMessage") -cne "Menyiapkan aplikasi...") {
+            Add-Violation "OpxFlatUi:Reconnect:StartupMessage must be 'Menyiapkan aplikasi...'."
+        }
+
         $assets = Get-JsonProperty $opxSettings "Assets"
         if ((Get-JsonProperty $assets "UseMinifiedJavaScript") -ne $true) {
             Add-Violation "OpxFlatUi:Assets:UseMinifiedJavaScript must be true for the consumer baseline."
@@ -755,6 +859,20 @@ foreach ($copy in $localPackageCssCopies) {
     Add-Violation "Reusable CSS must come from NuGet static web assets; remove local package CSS copy '$($copy.FullName)'."
 }
 
+if ($ExactSample) {
+    foreach ($entry in $expectedExactSampleHashes.GetEnumerator()) {
+        $exactPath = Join-Path $projectRoot $entry.Key
+        if (-not (Test-Path -LiteralPath $exactPath)) {
+            Add-Violation "Exact Sample Mode is missing canonical file '$($entry.Key)'."
+            continue
+        }
+        $actualHash = Get-NormalizedTextSha256 $exactPath
+        if ($actualHash -cne $entry.Value) {
+            Add-Violation "Exact Sample Mode drift: '$($entry.Key)' must match normalized SHA-256 $($entry.Value); found $actualHash. Generate the canonical template and integrate through its existing seams instead of approximating the layout."
+        }
+    }
+}
+
 $localCssFiles = @(Get-ChildItem -LiteralPath $projectRoot -Recurse -File -Filter "*.css" | Where-Object {
     $_.FullName -notmatch "[\\/](bin|obj|[.]nuget)[\\/]"
 })
@@ -771,6 +889,7 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         ".agents\AGENTS.md",
         ".agents\RULES.md",
         ".agents\skills\opx-flat-ui-development\SKILL.md",
+        ".agents\skills\opx-flat-ui-development\references\exact-sample-mode.md",
         ".agents\skills\opx-flat-ui-development\references\page-registry.md",
         ".agents\skills\opx-flat-ui-development\references\layout-decision.md",
         ".agents\skills\opx-flat-ui-development\references\maui-mobile-deployment.md",
@@ -790,4 +909,4 @@ if ($violations.Count -gt 0) {
     exit 1
 }
 
-Write-Output "OPX Flat UI consumer audit passed for '$($project.FullName)' (contract $expectedContractVersion)."
+Write-Output "OPX Flat UI consumer audit passed for '$($project.FullName)' (contract $expectedContractVersion$(if ($ExactSample) { ', Exact Sample Mode' }))."

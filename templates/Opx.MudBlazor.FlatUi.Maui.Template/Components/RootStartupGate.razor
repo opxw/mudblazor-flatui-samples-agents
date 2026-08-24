@@ -1,0 +1,89 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject FlatUiPreferencesService DisplayPreferences
+@inject FlatReconnectOptions ReconnectOptions
+@inject IRootStartupGateValidator StartupGateValidator
+@inject MobileThemeBridge ThemeBridge
+@inject NavigationManager Navigation
+
+@if (!_completed)
+{
+    <FlatMudProviders IsDarkMode="@ThemeBridge.IsDarkMode" Palette="@CurrentPalette">
+        <FlatSessionRestore Title="@StartupTitle" Message="@StartupMessage" />
+    </FlatMudProviders>
+}
+else
+{
+    <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+    </Router>
+}
+
+@code {
+    private readonly CancellationTokenSource _lifetime = new();
+    private Task? _bootstrapTask;
+    private bool _completed;
+
+    private string StartupTitle => string.IsNullOrWhiteSpace(ReconnectOptions.StartupTitle)
+        ? "Memuat"
+        : ReconnectOptions.StartupTitle.Trim();
+
+    private string StartupMessage => string.IsNullOrWhiteSpace(ReconnectOptions.StartupMessage)
+        ? "Menyiapkan aplikasi..."
+        : ReconnectOptions.StartupMessage.Trim();
+
+    private FlatUiPalette CurrentPalette
+    {
+        get
+        {
+            var value = DisplayPreferences.Options.ResolveColorPalette(DisplayPreferences.Current.ColorPalette);
+            return new(value.Accent, value.AccentHover, value.AccentSubtle, value.AccentDark,
+                value.DarkAccent, value.DarkAccentHover, value.Secondary, value.Success,
+                value.Warning, value.Danger);
+        }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) _bootstrapTask = CompleteAsync(_lifetime.Token);
+        return Task.CompletedTask;
+    }
+
+    private async Task CompleteAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await DisplayPreferences.InitializeAsync();
+            await ThemeBridge.ApplyAsync(DisplayPreferences.Current.ThemeMode, JS);
+            await InvokeAsync(StateHasChanged);
+
+            var result = await StartupGateValidator.ValidateAsync(cancellationToken);
+            if (result == RootStartupGateResult.Login)
+                Navigation.NavigateTo("/login", replace: true);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+        catch
+        {
+            Navigation.NavigateTo("/login", replace: true);
+        }
+
+        _completed = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _lifetime.CancelAsync();
+        if (_bootstrapTask is not null)
+        {
+            try { await _bootstrapTask; } catch (OperationCanceledException) { }
+        }
+        _lifetime.Dispose();
+    }
+}

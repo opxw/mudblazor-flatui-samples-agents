@@ -17,14 +17,14 @@
                           @bind-Value="_search"
                           Immediate="true"
                           Placeholder="Job title, skill, or company"
-                          Variant="Variant.Outlined"
+                          Variant="@FlatPreferences.InputVariant"
                           Margin="Margin.Dense"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Outlined.Search"
                           aria-label="Job keyword" />
             <MudSelect T="string"
                        @bind-Value="_workMode"
-                       Variant="Variant.Outlined"
+                       Variant="@FlatPreferences.InputVariant"
                        Margin="Margin.Dense"
                        aria-label="Work arrangement">
                 <MudSelectItem Value="@("All")">All work modes</MudSelectItem>
@@ -165,7 +165,7 @@
 <section class="job-landing-cta">
     <div><span class="website-eyebrow">Stay informed</span><h2>Get relevant roles delivered to your inbox.</h2><p>Subscription transport, consent, frequency, and unsubscribe handling remain owned by the host application.</p></div>
     <div class="job-subscribe-form">
-        <MudTextField T="string" @bind-Value="_email" Placeholder="you@example.com" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Email" aria-label="Email for job alerts" />
+        <MudTextField T="string" @bind-Value="_email" Placeholder="you@example.com" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" InputType="InputType.Email" aria-label="Email for job alerts" />
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@string.IsNullOrWhiteSpace(_email)" OnClick="Subscribe">Subscribe</MudButton>
     </div>
     @if (_subscribed)

@@ -12,7 +12,7 @@
         <FlatEditorWorkspace MainAriaLabel="Product content" SidebarAriaLabel="Product publishing settings">
             <MainContent>
                 <FlatEditorSection>
-                    <MudTextField T="string" @bind-Value="_title" Label="Product title" Placeholder="Enter product title" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                    <MudTextField T="string" @bind-Value="_title" Label="Product title" Placeholder="Enter product title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
                     <div class="product-editor-rich-field">
                         <label>Product description</label>
                         <div class="product-editor-rich-toolbar" role="toolbar" aria-label="Description formatting">
@@ -39,10 +39,10 @@
 
                 <FlatEditorSection Title="Inventory and pricing">
                     <div class="product-editor-field-grid">
-                        <MudTextField T="string" @bind-Value="_sku" Label="SKU" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                        <MudNumericField T="decimal" @bind-Value="_price" Label="Price" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
-                        <MudNumericField T="int" @bind-Value="_stock" Label="Stock" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
-                        <MudSelect T="string" @bind-Value="_taxClass" Label="Tax class" Variant="Variant.Outlined" Margin="Margin.Dense">
+                        <MudTextField T="string" @bind-Value="_sku" Label="SKU" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+                        <MudNumericField T="decimal" @bind-Value="_price" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" />
+                        <MudNumericField T="int" @bind-Value="_stock" Label="Stock" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" />
+                        <MudSelect T="string" @bind-Value="_taxClass" Label="Tax class" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                             <MudSelectItem Value="@("Standard")">Standard</MudSelectItem><MudSelectItem Value="@("Reduced")">Reduced</MudSelectItem><MudSelectItem Value="@("Exempt")">Exempt</MudSelectItem>
                         </MudSelect>
                     </div>
@@ -50,21 +50,21 @@
             </MainContent>
             <SidebarContent>
                 <FlatEditorSection Title="Publish">
-                    <MudSelect T="string" @bind-Value="_status" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense"><MudSelectItem Value="@("Published")">Published</MudSelectItem><MudSelectItem Value="@("Draft")">Draft</MudSelectItem></MudSelect>
-                    <MudSelect T="string" @bind-Value="_visibility" Label="Visibility" Variant="Variant.Outlined" Margin="Margin.Dense"><MudSelectItem Value="@("Public")">Public</MudSelectItem><MudSelectItem Value="@("Private")">Private</MudSelectItem></MudSelect>
+                    <MudSelect T="string" @bind-Value="_status" Label="Status" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense"><MudSelectItem Value="@("Published")">Published</MudSelectItem><MudSelectItem Value="@("Draft")">Draft</MudSelectItem></MudSelect>
+                    <MudSelect T="string" @bind-Value="_visibility" Label="Visibility" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense"><MudSelectItem Value="@("Public")">Public</MudSelectItem><MudSelectItem Value="@("Private")">Private</MudSelectItem></MudSelect>
                 </FlatEditorSection>
                 <FlatEditorSection Title="Publish schedule">
-                    <MudDatePicker @bind-Date="_publishDate" Label="Publish date" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudDatePicker @bind-Date="_publishDate" Label="Publish date" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
                 </FlatEditorSection>
                 <FlatEditorSection Title="Product category">
-                    <MudSelect T="string" @bind-Value="_category" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">@foreach (var category in Categories) { <MudSelectItem Value="@category">@category</MudSelectItem> }</MudSelect>
+                    <MudSelect T="string" @bind-Value="_category" Label="Category" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">@foreach (var category in Categories) { <MudSelectItem Value="@category">@category</MudSelectItem> }</MudSelect>
                     <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Outlined.Add">Add category</MudButton>
                 </FlatEditorSection>
                 <FlatEditorSection Title="Product tags">
                     <FlatMultiSelect T="string" Items="TagOptions" Label="Tags" Placeholder="Select tags" SelectedValues="_tags" SelectedValuesChanged="SetTags" ShowItemLeading="false" MaxDisplayedSelectionItems="3" />
                 </FlatEditorSection>
                 <FlatEditorSection Title="Short description">
-                    <MudTextField T="string" @bind-Value="_shortDescription" Placeholder="Catalog and search summary" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="4" />
+                    <MudTextField T="string" @bind-Value="_shortDescription" Placeholder="Catalog and search summary" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="4" />
                 </FlatEditorSection>
             </SidebarContent>
         </FlatEditorWorkspace>

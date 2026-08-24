@@ -7,7 +7,7 @@
 @if (CurrentView == "work-orders")
 {
     <FlatPage Kind="FlatPageKind.Module" PageCssClass="erp-page erp-list-page" RefreshEnabled="true" OnRefresh="() => StateHasChanged()" DownloadVisible="true" PullToRefreshEnabled="true">
-        <ToolbarContent><MudTextField @bind-Value="_search" Immediate="true" Placeholder="Search work order..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" Margin="Margin.Dense" Variant="Variant.Outlined" /></ToolbarContent>
+        <ToolbarContent><MudTextField @bind-Value="_search" Immediate="true" Placeholder="Search work order..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" Margin="Margin.Dense" Variant="@FlatPreferences.InputVariant" /></ToolbarContent>
         <ChildContent>
             <div class="table-scroll erp-desktop-table"><table class="monitor-table erp-table"><thead><tr><th>Work order</th><th>Item</th><th>Resource</th><th>Progress</th><th>Due date</th><th>Status</th></tr></thead><tbody>
                 @foreach (var order in FilteredWorkOrders)

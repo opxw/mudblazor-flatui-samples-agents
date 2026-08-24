@@ -94,7 +94,7 @@
                     <small>Flags control presentation, never route authorization.</small>
                 </div>
                 <div class="global-foundation-card global-foundation-wide">
-                    <MudTextField T="string" Label="Protected draft" Variant="Variant.Outlined" Margin="Margin.Dense"
+                    <MudTextField T="string" Label="Protected draft" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense"
                                   Value="_globalDraft" ValueChanged="ChangeGlobalDraft" />
                     <small>@(_globalDraftDirty ? "Unsaved guard is active." : "Change the value to activate the guard.")</small>
                 </div>

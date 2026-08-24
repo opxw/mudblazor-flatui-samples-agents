@@ -32,7 +32,7 @@
                     <MudTextField T="string"
                                   @bind-Value="_draft.PhotoUrl"
                                   Label="Picture URL"
-                                  Variant="Variant.Outlined"
+                                  Variant="@FlatPreferences.InputVariant"
                                   Margin="Margin.Dense"
                                   Immediate="true"
                                   Disabled="@(!_draft.UsePhoto)"
@@ -40,7 +40,7 @@
                     <MudTextField T="string"
                                   @bind-Value="_draft.Initials"
                                   Label="Fallback initials"
-                                  Variant="Variant.Outlined"
+                                  Variant="@FlatPreferences.InputVariant"
                                   Margin="Margin.Dense"
                                   Immediate="true"
                                   MaxLength="3"
@@ -51,17 +51,17 @@
             <div class="account-details-stack">
                 <FlatPanel Title="Account details" CssClass="flat-panel account-edit-panel">
                     <div class="account-form-grid">
-                        <MudTextField T="string" @bind-Value="_draft.Username" Label="Username" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="true" />
-                        <MudTextField T="string" @bind-Value="_draft.DisplayName" Label="Display name" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" Required="true" />
-                        <MudTextField T="string" @bind-Value="_draft.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Email" Required="true" />
-                        <MudTextField T="string" @bind-Value="_draft.Phone" Label="Phone" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Telephone" />
-                        <MudTextField T="string" @bind-Value="_draft.JobTitle" Label="Job title" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
-                        <MudTextField T="string" @bind-Value="_draft.Department" Label="Department" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
-                        <MudSelect T="string" @bind-Value="_draft.Language" Label="Language" Variant="Variant.Outlined" Margin="Margin.Dense">
+                        <MudTextField T="string" @bind-Value="_draft.Username" Label="Username" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="true" />
+                        <MudTextField T="string" @bind-Value="_draft.DisplayName" Label="Display name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" Required="true" />
+                        <MudTextField T="string" @bind-Value="_draft.Email" Label="Email" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" InputType="InputType.Email" Required="true" />
+                        <MudTextField T="string" @bind-Value="_draft.Phone" Label="Phone" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" InputType="InputType.Telephone" />
+                        <MudTextField T="string" @bind-Value="_draft.JobTitle" Label="Job title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
+                        <MudTextField T="string" @bind-Value="_draft.Department" Label="Department" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
+                        <MudSelect T="string" @bind-Value="_draft.Language" Label="Language" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                             <MudSelectItem Value="@("English")">English</MudSelectItem>
                             <MudSelectItem Value="@("Bahasa Indonesia")">Bahasa Indonesia</MudSelectItem>
                         </MudSelect>
-                        <MudSelect T="string" @bind-Value="_draft.TimeZone" Label="Time zone" Variant="Variant.Outlined" Margin="Margin.Dense">
+                        <MudSelect T="string" @bind-Value="_draft.TimeZone" Label="Time zone" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                             <MudSelectItem Value="@("Asia/Jakarta")">Asia/Jakarta (UTC+7)</MudSelectItem>
                             <MudSelectItem Value="@("Asia/Makassar")">Asia/Makassar (UTC+8)</MudSelectItem>
                             <MudSelectItem Value="@("Asia/Jayapura")">Asia/Jayapura (UTC+9)</MudSelectItem>
@@ -113,14 +113,14 @@
                             <MudTextField T="string"
                                           @bind-Value="_newPassword"
                                           Label="New password"
-                                          Variant="Variant.Outlined"
+                                          Variant="@FlatPreferences.InputVariant"
                                           Margin="Margin.Dense"
                                           InputType="InputType.Password"
                                           Required="true" />
                             <MudTextField T="string"
                                           @bind-Value="_confirmPassword"
                                           Label="Confirm password"
-                                          Variant="Variant.Outlined"
+                                          Variant="@FlatPreferences.InputVariant"
                                           Margin="Margin.Dense"
                                           InputType="InputType.Password"
                                           Required="true"

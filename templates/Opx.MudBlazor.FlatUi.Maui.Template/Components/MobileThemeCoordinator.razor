@@ -1,0 +1,33 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject FlatUiPreferencesService Preferences
+@inject MobileThemeBridge ThemeBridge
+
+@code {
+    private readonly string _watchId = $"opx-maui-theme-{Guid.NewGuid():N}";
+    private DotNetObjectReference<MobileThemeCoordinator>? _reference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _reference = DotNetObjectReference.Create(this);
+        Preferences.Changed += HandlePreferencesChanged;
+        var systemDark = await JS.InvokeAsync<bool>("opxFlatTheme.watchSystemPreference", _watchId, _reference);
+        await ThemeBridge.ApplyAsync(Preferences.Current.ThemeMode, JS, systemDark);
+    }
+
+    [JSInvokable]
+    public ValueTask OnSystemThemeChanged(bool prefersDark) =>
+        ThemeBridge.ApplyAsync(Preferences.Current.ThemeMode, JS, prefersDark);
+
+    private void HandlePreferencesChanged() =>
+        _ = InvokeAsync(async () => await ThemeBridge.ApplyAsync(Preferences.Current.ThemeMode, JS));
+
+    public async ValueTask DisposeAsync()
+    {
+        Preferences.Changed -= HandlePreferencesChanged;
+        try { await JS.InvokeVoidAsync("opxFlatTheme.unwatchSystemPreference", _watchId); }
+        catch (JSDisconnectedException) { }
+        _reference?.Dispose();
+    }
+}

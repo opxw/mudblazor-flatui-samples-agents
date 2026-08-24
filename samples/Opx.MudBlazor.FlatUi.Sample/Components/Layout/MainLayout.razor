@@ -25,12 +25,13 @@
                   HighDensityTouchFloatingLabelFontSizePx="@DisplayPreferences.Options.NormalizedHighDensityTouchFloatingLabelFontSizePx"
                   SidebarGroupFontWeight="@DisplayPreferences.Options.NormalizedSidebarGroupFontWeight"
                   SidebarItemFontWeight="@DisplayPreferences.Options.NormalizedSidebarItemFontWeight"
-                  LightSidebarBackground="@DisplayPreferences.Options.NormalizedLightSidebarBackground"
-                  LightSidebarForeground="@DisplayPreferences.Options.NormalizedLightSidebarForeground"
-                  DarkSidebarBackground="@DisplayPreferences.Options.NormalizedDarkSidebarBackground"
-                  DarkSidebarForeground="@DisplayPreferences.Options.NormalizedDarkSidebarForeground"
+                  LightSidebarBackground="@DisplayPreferences.Effective.LightSidebarBackground"
+                  LightSidebarForeground="@DisplayPreferences.Effective.LightSidebarForeground"
+                  DarkSidebarBackground="@DisplayPreferences.Effective.DarkSidebarBackground"
+                  DarkSidebarForeground="@DisplayPreferences.Effective.DarkSidebarForeground"
                   RightToLeft="@LocalizationOptions.RightToLeft"
                   NavigationLayout="@EffectiveNavigationLayout"
+                  BottomNavigationMaxWidthPx="900"
                   BottomNavigationChildPresentation="@EffectiveBottomNavigationChildPresentation"
                   NavigationItems="@HorizontalNavigationItems">
         <AppBarActions>
@@ -156,9 +157,19 @@
                     </div>
                     <FlatDisplaySettings Density="@_draftDensity"
                                          DensityChanged="SetDraftDensity"
+                                         InputStyle="@_draftInputStyle"
+                                         InputStyleChanged="SetDraftInputStyle"
                                          ColorPalette="@_draftColorPalette"
                                          ColorPaletteChanged="SetDraftColorPalette"
                                          ColorPalettes="@DisplayPreferences.Options.AvailableColorPalettes"
+                                         LightSidebarBackground="@_draftLightSidebarBackground"
+                                         LightSidebarBackgroundChanged="SetDraftLightSidebarBackground"
+                                         LightSidebarForeground="@_draftLightSidebarForeground"
+                                         LightSidebarForegroundChanged="SetDraftLightSidebarForeground"
+                                         DarkSidebarBackground="@_draftDarkSidebarBackground"
+                                         DarkSidebarBackgroundChanged="SetDraftDarkSidebarBackground"
+                                         DarkSidebarForeground="@_draftDarkSidebarForeground"
+                                         DarkSidebarForegroundChanged="SetDraftDarkSidebarForeground"
                                          HostKind="@DisplayPreferences.Options.HostKind"
                                          NavigationLayout="@_draftNavigationLayout"
                                          NavigationLayoutChanged="SetDraftNavigationLayout"
@@ -180,7 +191,7 @@
                         <MudIcon Icon="@Icons.Material.Outlined.RestartAlt" Size="Size.Small" />
                         <span>
                             <strong>Restore application defaults</strong>
-                            <small>Use the palette, layout, density, and font size configured by the host app.</small>
+                            <small>Use the colors, palette, layout, density, and font size configured by the host app.</small>
                         </span>
                     </button>
                     <MudDivider />
@@ -285,8 +296,10 @@
             new("Operations Workspace", "/operations-workspace", Icons.Material.Outlined.Workspaces),
             new("Spatial Operations", "/spatial-operations", Icons.Material.Outlined.Explore),
             new("Tree Grid", "/tree-grid", Icons.Material.Outlined.AccountTree),
+            new("Hierarchy Designer", "/hierarchy-designer", Icons.Material.Outlined.Schema),
             new("Kanban", "/kanban", Icons.Material.Outlined.ViewKanban),
             new("Calendar", "/calendar", Icons.Material.Outlined.CalendarMonth),
+            new("Scheduler", "/scheduler", Icons.Material.Outlined.CalendarViewWeek),
             new("Sales Pipeline", "/sales-pipeline", Icons.Material.Outlined.FilterAlt),
             new("Chat", "/chat", Icons.Material.Outlined.Chat),
             new("AI Chat", "/ai-chat", Icons.Material.Outlined.AutoAwesome),
@@ -298,7 +311,9 @@
         [
             new("Static / Master", "/static-data", Icons.Material.Outlined.Storage),
             new("Large Data Grid", "/data-grid-large", Icons.Material.Outlined.TableRows),
+            new("Grouped Data Grid", "/grouped-data-grid", Icons.Material.Outlined.ViewStream),
             new("Reports", "/reports", Icons.Material.Outlined.Assessment),
+            new("PDF Viewer", "/pdf-viewer", Icons.Material.Outlined.PictureAsPdf),
             new("Pivot", "/pivot", Icons.Material.Outlined.PivotTableChart),
             new("Enterprise Toolkit", "/enterprise-toolkit", Icons.Material.Outlined.DomainAdd)
             ,new("Experience Toolkit", "/experience-toolkit", Icons.Material.Outlined.AccessibilityNew)
@@ -367,8 +382,10 @@
         new("Operations Workspace", "/operations-workspace", "Operations", "service desk approval procurement stock transfer timesheet POS cart", Icons.Material.Outlined.Workspaces),
         new("Spatial Operations", "/spatial-operations", "Operations", "map floor layer geofence location tracking route playback fleet warehouse", Icons.Material.Outlined.Explore),
         new("Tree Grid", "/tree-grid", "Operations", "hierarchy parent key drag drop expand collapse tree table", Icons.Material.Outlined.AccountTree),
+        new("Hierarchy Designer", "/hierarchy-designer", "Operations", "compact outline designer hierarchy drag drop reorder export JSON report bands styles data sources", Icons.Material.Outlined.Schema),
         new("Kanban", "/kanban", "Operations", "task board workflow cards columns drag drop WIP", Icons.Material.Outlined.ViewKanban),
         new("Calendar", "/calendar", "Operations", "month week day list agenda events schedule", Icons.Material.Outlined.CalendarMonth),
+        new("Scheduler", "/scheduler", "Operations", "work week timeline appointments resources calendar", Icons.Material.Outlined.CalendarViewWeek),
         new("Sales Pipeline", "/sales-pipeline", "Operations", "CRM deal pipeline stages values contacts", Icons.Material.Outlined.FilterAlt),
         new("Chat", "/chat", "Operations", "messages conversations team inbox composer", Icons.Material.Outlined.Chat),
         new("AI Chat", "/ai-chat", "Operations", "assistant prompt generated response history integration", Icons.Material.Outlined.AutoAwesome),
@@ -377,7 +394,9 @@
         new("Monitoring Database", "/monitoring-database", "Operations", "database connection monitoring", Icons.Material.Outlined.Dns),
         new("Static / Master", "/static-data", "Data & Reports", "master data read only", Icons.Material.Outlined.Storage),
         new("Large Data Grid", "/data-grid-large", "Data & Reports", "large table many records vertical horizontal scroll paging", Icons.Material.Outlined.TableRows),
+        new("Grouped Data Grid", "/grouped-data-grid", "Data & Reports", "group expand collapse aggregate count sum average responsive cards", Icons.Material.Outlined.ViewStream),
         new("Reports", "/reports", "Data & Reports", "report export print", Icons.Material.Outlined.Assessment),
+        new("PDF Viewer", "/pdf-viewer", "Data & Reports", "PDF.js preview search thumbnails print share open external", Icons.Material.Outlined.PictureAsPdf),
         new("Pivot", "/pivot", "Data & Reports", "pivot matrix row column aggregate subtotal drill down", Icons.Material.Outlined.PivotTableChart),
         new("Enterprise Toolkit", "/enterprise-toolkit", "Data & Reports", "import master detail audit schema workflow bulk scheduler dashboard notifications offline sync documents print", Icons.Material.Outlined.DomainAdd),
         new("Experience Toolkit", "/experience-toolkit", "Data & Reports", "accessibility command palette schema form collaboration conflict realtime", Icons.Material.Outlined.AccessibilityNew),
@@ -415,10 +434,15 @@
     private bool _aboutOpen;
     private bool _bottomMainViewPreview;
     private string _draftDensity = FlatUiDensity.Default;
+    private string _draftInputStyle = FlatInputStyle.Outlined;
     private string _draftThemeMode = FlatUiThemeMode.Auto;
     private string _draftNavigationLayout = FlatUiNavigationLayout.Vertical;
     private string _draftBottomNavigationChildPresentation = FlatBottomNavigationChildPresentation.Sheet;
     private string _draftColorPalette = "blue";
+    private string _draftLightSidebarBackground = "#f3f6f9";
+    private string _draftLightSidebarForeground = "#495057";
+    private string _draftDarkSidebarBackground = "#212529";
+    private string _draftDarkSidebarForeground = "#ced4da";
     private bool _draftUseAppFontSize;
     private double _draftFontSizePx = 16;
     private double _draftBackdropOpacity = 0.48;
@@ -532,8 +556,10 @@
             "/operations-workspace" => "Operations-Workspace",
             "/advanced-editable-grid" => "Operations-Advanced Editable Grid",
             "/tree-grid" => "Operations-Tree Grid",
+            "/hierarchy-designer" => "Operations-Hierarchy Designer",
             "/kanban" => "Operations-Kanban",
             "/calendar" => "Operations-Calendar",
+            "/scheduler" => "Operations-Scheduler",
             "/sales-pipeline" => "Operations-Sales Pipeline",
             "/chat" => "Operations-Chat",
             "/ai-chat" => "Operations-AI Chat",
@@ -542,7 +568,9 @@
             "/monitoring-database" => "Monitoring Database",
             "/static-data" => "Static / Master",
             "/data-grid-large" => "Data & Reports-Large Data Grid",
+            "/grouped-data-grid" => "Data & Reports-Grouped Data Grid",
             "/reports" => "Reports",
+            "/pdf-viewer" => "Reports-PDF Viewer",
             "/pivot" => "Data & Reports-Pivot",
             "/enterprise-toolkit" => "Data & Reports-Enterprise Toolkit",
             "/experience-toolkit" => "Data & Reports-Experience Toolkit",
@@ -613,9 +641,14 @@
     {
         _draftThemeMode = DisplayPreferences.Current.ThemeMode;
         _draftDensity = DisplayPreferences.Current.Density;
+        _draftInputStyle = DisplayPreferences.Current.InputStyle;
         _draftNavigationLayout = DisplayPreferences.Current.NavigationLayout;
         _draftBottomNavigationChildPresentation = DisplayPreferences.Current.BottomNavigationChildPresentation;
         _draftColorPalette = DisplayPreferences.Current.ColorPalette;
+        _draftLightSidebarBackground = DisplayPreferences.Current.LightSidebarBackground;
+        _draftLightSidebarForeground = DisplayPreferences.Current.LightSidebarForeground;
+        _draftDarkSidebarBackground = DisplayPreferences.Current.DarkSidebarBackground;
+        _draftDarkSidebarForeground = DisplayPreferences.Current.DarkSidebarForeground;
         _draftUseAppFontSize = DisplayPreferences.Current.UseAppFontSize;
         _draftFontSizePx = DisplayPreferences.Current.FontSizePx;
         _draftBackdropOpacity = DisplayPreferences.Current.BackdropOpacity;
@@ -633,6 +666,13 @@
     private async Task SetDraftDensity(string density)
     {
         _draftDensity = FlatUiDensity.Normalize(density);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftInputStyle(string inputStyle)
+    {
+        _draftInputStyle = FlatInputStyle.Normalize(inputStyle);
         _restoreDisplayDefaults = false;
         await PreviewDisplayDraftAsync();
     }
@@ -686,14 +726,47 @@
         await PreviewDisplayDraftAsync();
     }
 
+    private async Task SetDraftLightSidebarBackground(string color)
+    {
+        _draftLightSidebarBackground = DisplayPreferences.Options.ResolveLightSidebarBackground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftLightSidebarForeground(string color)
+    {
+        _draftLightSidebarForeground = DisplayPreferences.Options.ResolveLightSidebarForeground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftDarkSidebarBackground(string color)
+    {
+        _draftDarkSidebarBackground = DisplayPreferences.Options.ResolveDarkSidebarBackground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftDarkSidebarForeground(string color)
+    {
+        _draftDarkSidebarForeground = DisplayPreferences.Options.ResolveDarkSidebarForeground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
     private async Task RestoreDisplayDefaultsAsync()
     {
         var defaults = DisplayPreferences.Options.CreateDefaults();
         _draftThemeMode = defaults.ThemeMode;
         _draftDensity = defaults.Density;
+        _draftInputStyle = defaults.InputStyle;
         _draftNavigationLayout = defaults.NavigationLayout;
         _draftBottomNavigationChildPresentation = defaults.BottomNavigationChildPresentation;
         _draftColorPalette = defaults.ColorPalette;
+        _draftLightSidebarBackground = defaults.LightSidebarBackground;
+        _draftLightSidebarForeground = defaults.LightSidebarForeground;
+        _draftDarkSidebarBackground = defaults.DarkSidebarBackground;
+        _draftDarkSidebarForeground = defaults.DarkSidebarForeground;
         _draftUseAppFontSize = defaults.UseAppFontSize;
         _draftFontSizePx = defaults.FontSizePx;
         _draftBackdropOpacity = defaults.BackdropOpacity;
@@ -708,9 +781,14 @@
             UseAppFontSize = _draftUseAppFontSize,
             ThemeMode = _draftThemeMode,
             Density = _draftDensity,
+            InputStyle = _draftInputStyle,
             NavigationLayout = _draftNavigationLayout,
             BottomNavigationChildPresentation = _draftBottomNavigationChildPresentation,
             ColorPalette = _draftColorPalette,
+            LightSidebarBackground = _draftLightSidebarBackground,
+            LightSidebarForeground = _draftLightSidebarForeground,
+            DarkSidebarBackground = _draftDarkSidebarBackground,
+            DarkSidebarForeground = _draftDarkSidebarForeground,
             FontSizePx = _draftFontSizePx,
             RoundedSizePx = _draftRoundedSizePx,
             BackdropOpacity = _draftBackdropOpacity
@@ -729,9 +807,14 @@
                 UseAppFontSize = _draftUseAppFontSize,
                 ThemeMode = _draftThemeMode,
                 Density = _draftDensity,
+                InputStyle = _draftInputStyle,
                 NavigationLayout = _draftNavigationLayout,
                 BottomNavigationChildPresentation = _draftBottomNavigationChildPresentation,
                 ColorPalette = _draftColorPalette,
+                LightSidebarBackground = _draftLightSidebarBackground,
+                LightSidebarForeground = _draftLightSidebarForeground,
+                DarkSidebarBackground = _draftDarkSidebarBackground,
+                DarkSidebarForeground = _draftDarkSidebarForeground,
                 FontSizePx = _draftFontSizePx,
                 RoundedSizePx = _draftRoundedSizePx,
                 BackdropOpacity = _draftBackdropOpacity
@@ -753,7 +836,7 @@
             Keywords: item.Keywords))
         .Concat(
         [
-            new FlatCommandDefinition("settings", "Open application settings", "Quick actions", Icon: Icons.Material.Outlined.Settings, Shortcut: "S", Keywords: "theme density font palette"),
+            new FlatCommandDefinition("settings", "Open application settings", "Quick actions", Icon: Icons.Material.Outlined.Settings, Shortcut: "S", Keywords: "theme density font palette sidebar color"),
             new FlatCommandDefinition("home", "Go to dashboard", "Quick actions", "/", Icons.Material.Outlined.Home, "G H", "dashboard home")
         ])
         .ToArray();

@@ -1,0 +1,116 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject FlatUiPreferencesService Preferences
+@inject MobileThemeBridge ThemeBridge
+
+<FlatMudProviders IsDarkMode="@ThemeBridge.IsDarkMode" Palette="@CurrentPalette">
+    <MobileThemeCoordinator />
+    <FlatAppShell AppName="OPX MOBILE"
+                  PageTitle="@PageTitle"
+                  HostKind="FlatUiHostKind.MauiHybrid"
+                  IsDarkMode="@ThemeBridge.IsDarkMode"
+                  ThemeMode="@Preferences.Current.ThemeMode"
+                  Density="@Preferences.Current.Density"
+                  UseAppFontSize="@Preferences.Current.UseAppFontSize"
+                  FontSizePx="@Preferences.Current.FontSizePx"
+                  RoundedSizePx="@Preferences.Current.RoundedSizePx"
+                  NavigationLayout="@Preferences.Current.NavigationLayout"
+                  BottomNavigationMaxWidthPx="900"
+                  BottomNavigationChildPresentation="@Preferences.Current.BottomNavigationChildPresentation"
+                  NavigationItems="@NavigationItems">
+        <AppBarActions>
+            <MudIconButton Icon="@Icons.Material.Outlined.Settings" aria-label="Settings" OnClick="OpenSettings" />
+        </AppBarActions>
+        <Menu><MobileSidebarMenu /></Menu>
+        <UserContent>
+            <div class="mobile-user-block">
+                <span class="avatar">OP</span>
+                <span><strong>Mobile User</strong><small>Host-owned identity</small></span>
+                <MudIconButton Icon="@Icons.Material.Outlined.Logout" Class="logout-action" aria-label="Logout" />
+            </div>
+        </UserContent>
+        <ChildContent>@Body</ChildContent>
+    </FlatAppShell>
+
+    @if (_settingsOpen)
+    {
+        <div class="settings-modal-overlay @(ThemeBridge.IsDarkMode ? "theme-dark" : "")" role="presentation">
+            <section class="settings-modal-panel" role="dialog" aria-modal="true" aria-labelledby="mobile-settings-title">
+                <header class="settings-modal-header">
+                    <div><h2 id="mobile-settings-title">Application preferences</h2><p>Theme, navigation, typography, and density.</p></div>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Close" aria-label="Close settings" OnClick="CloseSettings" />
+                </header>
+                <div class="settings-modal-body">
+                    <div class="mobile-theme-options" role="group" aria-label="Theme mode">
+                        @foreach (var mode in ThemeModes)
+                        {
+                            <MudButton Variant="Variant.Outlined" OnClick="@(() => SetTheme(mode))">@ThemeLabel(mode)</MudButton>
+                        }
+                    </div>
+                    <FlatDisplaySettings HostKind="FlatUiHostKind.MauiHybrid"
+                                         NavigationLayout="@_draft.NavigationLayout"
+                                         NavigationLayoutChanged="@(value => _draft.NavigationLayout = value)"
+                                         BottomNavigationChildPresentation="@_draft.BottomNavigationChildPresentation"
+                                         BottomNavigationChildPresentationChanged="@(value => _draft.BottomNavigationChildPresentation = value)"
+                                         Density="@_draft.Density"
+                                         DensityChanged="@(value => _draft.Density = value)"
+                                         UseAppFontSize="@_draft.UseAppFontSize"
+                                         UseAppFontSizeChanged="@(value => _draft.UseAppFontSize = value)"
+                                         FontSizePx="@_draft.FontSizePx"
+                                         FontSizePxChanged="@(value => _draft.FontSizePx = value)"
+                                         BackdropOpacity="@_draft.BackdropOpacity"
+                                         BackdropOpacityChanged="@(value => _draft.BackdropOpacity = value)"
+                                         RoundedSizePx="@_draft.RoundedSizePx"
+                                         RoundedSizePxChanged="@(value => _draft.RoundedSizePx = value)"
+                                         ColorPalette="@_draft.ColorPalette"
+                                         ColorPaletteChanged="@(value => _draft.ColorPalette = value)"
+                                         ColorPalettes="@Preferences.Options.AvailableColorPalettes" />
+                </div>
+                <footer class="settings-modal-footer">
+                    <MudButton Variant="Variant.Text" OnClick="CloseSettings">Cancel</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveSettings">Save</MudButton>
+                </footer>
+            </section>
+        </div>
+    }
+</FlatMudProviders>
+
+@code {
+    private static readonly string[] ThemeModes = [FlatUiThemeMode.Light, FlatUiThemeMode.Dark, FlatUiThemeMode.Auto];
+    private static readonly IReadOnlyList<FlatNavigationMenuItem> NavigationItems =
+    [
+        new("Dashboard", "/", Icons.Material.Outlined.Dashboard),
+        new("Transactions", "/transactions", Icons.Material.Outlined.ReceiptLong),
+        new("Reports", "/reports", Icons.Material.Outlined.Assessment),
+        new("Settings", "/settings", Icons.Material.Outlined.Settings)
+    ];
+
+    private bool _settingsOpen;
+    private FlatUiDisplayPreferences _draft = new();
+    private string PageTitle => "Mobile dashboard";
+
+    private FlatUiPalette CurrentPalette
+    {
+        get
+        {
+            var value = Preferences.Options.ResolveColorPalette(Preferences.Current.ColorPalette);
+            return new(value.Accent, value.AccentHover, value.AccentSubtle, value.AccentDark,
+                value.DarkAccent, value.DarkAccentHover, value.Secondary, value.Success,
+                value.Warning, value.Danger);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Preferences.Changed += HandlePreferencesChanged;
+        _draft = Preferences.Current.Copy();
+    }
+
+    private void OpenSettings() { _draft = Preferences.Current.Copy(); _settingsOpen = true; }
+    private void CloseSettings() => _settingsOpen = false;
+    private void SetTheme(string mode) => _draft.ThemeMode = mode;
+    private async Task SaveSettings() { await Preferences.SaveAsync(_draft); _settingsOpen = false; }
+    private void HandlePreferencesChanged() => InvokeAsync(StateHasChanged);
+    private static string ThemeLabel(string mode) => mode == FlatUiThemeMode.Dark ? "Dark / Night" : mode;
+    public void Dispose() => Preferences.Changed -= HandlePreferencesChanged;
+}

@@ -6,8 +6,15 @@
 
 <PageTitle>Login - @ApplicationOptions.ResolvedAppName</PageTitle>
 
-<section class="login-page">
-    <div class="login-brand-panel" style="@LoginBrandStyle">
+<section class="@LoginPageClass" style="@LoginBrandStyle">
+    @if (IsBoxed && ApplicationOptions.ResolvedLoginBrandBackgroundImageUrl is { } boxedBackgroundImageUrl)
+    {
+        <img class="login-boxed-background-media" src="@boxedBackgroundImageUrl" alt="" />
+    }
+
+    @if (!IsBoxed)
+    {
+    <div class="login-brand-panel">
         @if (ApplicationOptions.ResolvedLoginBrandBackgroundImageUrl is { } backgroundImageUrl)
         {
             <img class="login-brand-background-media" src="@backgroundImageUrl" alt="" />
@@ -38,8 +45,9 @@
         </div>
         <div class="login-brand-copyright">@ApplicationOptions.ResolvedCopyright</div>
     </div>
+    }
 
-    <MudPaper Class="login-card" Elevation="0">
+    <MudPaper Class="@LoginCardClass" Elevation="0">
         <div class="login-card-header">
             <span class="login-eyebrow">Welcome back, @ApplicationOptions.ResolvedCompanyName</span>
             <div class="login-card-title">
@@ -65,7 +73,7 @@
             <div class="login-form-grid">
                 <MudTextField T="string"
                               Label="Username / Email"
-                              Variant="Variant.Outlined"
+                              Variant="@FlatPreferences.InputVariant"
                               @bind-Value="_form.Username"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Outlined.Person"
@@ -74,7 +82,7 @@
                 <MudTextField T="string"
                               Class="opx-password-visibility-field"
                               Label="Password"
-                              Variant="Variant.Outlined"
+                              Variant="@FlatPreferences.InputVariant"
                               InputType="@(_showPassword ? InputType.Text : InputType.Password)"
                               @bind-Value="_form.Password"
                               Adornment="Adornment.End"
@@ -114,6 +122,18 @@
 
     private bool _showPassword;
     private bool _busy;
+    private bool IsBoxed =>
+        ApplicationOptions.NormalizedLoginLayout == FlatLoginLayout.Boxed ||
+        Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(
+                Navigation.ToAbsoluteUri(Navigation.Uri).Query)
+            .TryGetValue("preview", out var preview) &&
+        preview.Any(value => string.Equals(value, "boxed-login", StringComparison.OrdinalIgnoreCase));
+    private string LoginPageClass => IsBoxed
+        ? "login-page login-page-boxed"
+        : "login-page login-page-default";
+    private string LoginCardClass => IsBoxed
+        ? "login-card login-card-boxed"
+        : "login-card";
     private string LoginBrandStyle =>
         $"--login-brand-background:{ApplicationOptions.ResolvedLoginBrandBackgroundColor};" +
         $"--login-brand-overlay:{ApplicationOptions.ResolvedLoginBrandOverlayColor};" +

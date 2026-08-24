@@ -1,14 +1,30 @@
 {
   "$schema": "flat-ui.contract.schema.json",
-  "schemaVersion": "2.5",
-  "contractVersion": "2.0.11",
+  "schemaVersion": "3.1",
+  "contractVersion": "2.0.17",
   "source": {
     "repository": "mudblazor-flat-ui",
     "samplePath": "samples/Opx.MudBlazor.FlatUi.Sample"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.0.11",
-    "MudBlazor": "9.7.0"
+    "Opx.MudBlazor.FlatUi": "2.0.17",
+    "MudBlazor": "9.8.0"
+  },
+  "canonicalSample": {
+    "mode": "exact-initial-baseline",
+    "auditSwitch": "-ExactSample",
+    "lineEndingNormalization": "LF",
+    "promptTriggers": ["sama", "persis", "canonical", "seperti sample", "source of truth"],
+    "files": {
+      "Components/Layout/MainLayout.razor": "1329B9F7A058128B3971CA6C76FD4CCB06333CA9D7C17A2733D07109E46328A8",
+      "Components/Layout/SampleSidebarMenu.razor": "8157F2819E65D521AFB4C49BF6D2C4C4BE423C7FBBF1DF26CC7139EBB0FDA5AB",
+      "Components/Pages/Home.razor": "9303D93EAC12EAC1EB81CC2057E3283896C190086DBD7057BBBB07674CFA4440",
+      "Components/RootStartupGate.razor": "1513F7901D638CFAA829E6B55EE623B5D9A42D8C0D1AE80FE9C130C5DCB78D1D",
+      "appsettings.json": "1465D5A8931899ACDD96D7EB4C66EB9F08415267B7F35495E6D7615B557C8C9C",
+      "wwwroot/app.css": "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666"
+    },
+    "allowedAfterBaseline": ["branding", "wording", "data", "authorization", "callbacks", "domain-integration", "persistence"],
+    "visualDriftRequiresExplicitDecision": true
   },
   "baseline": {
     "pageId": "opx.page.dashboard.overview",
@@ -23,6 +39,13 @@
       "twoColumnCardMinPx": 601,
       "twoColumnCardMaxPx": 900,
       "phoneSingleColumnMaxPx": 600,
+      "bottomNavigationDefaultMaxWidthPx": 600,
+      "bottomNavigationSampleMaxWidthPx": 900,
+      "bottomNavigationViewportOnly": true,
+      "bottomNavigationBarHeightPx": 60,
+      "bottomNavigationLabelLineHeight": 1.25,
+      "bottomNavigationLabelBottomInsetPx": 1,
+      "bottomNavigationDescendersVisible": true,
       "liveResizeRequired": true,
       "platformUserAgentLayoutForbidden": true
     },
@@ -94,6 +117,19 @@
     },
     "startupAccessGate": {
       "appliesWhen": "host-authentication-enabled",
+      "placement": "root-before-router",
+      "rootComponent": "RootStartupGate",
+      "loadingProvider": "FlatMudProviders",
+      "loadingProviderPlacement": "checking-branch-before-router",
+      "nestedLoadingProviderForbidden": true,
+      "routerCreationBeforeCompletionForbidden": true,
+      "runsForAnonymousRoutes": true,
+      "loadingTitle": "Memuat halaman",
+      "loadingTitleSource": "OpxFlatUi:Reconnect:StartupTitle",
+      "loadingMessageSource": "OpxFlatUi:Reconnect:StartupMessage",
+      "loadingVisualReference": "FlatReconnectModal.Reconnecting",
+      "preferencesInitializedBeforeValidation": true,
+      "resolvedThemeProviderBeforeValidation": true,
       "preloaderComponent": "FlatSessionRestore",
       "storageHint": "local-storage",
       "localStorageIsAuthorizationAuthority": false,
@@ -125,11 +161,11 @@
     "stylesheetOwnership": {
       "reusableCssSource": "package-only",
       "packageStylesheet": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css",
-      "packageStylesheetSha256": "7B710961C2B1C9E978003A5A88735B24A2CB7A68FFA4EC12AC17655183EC7026",
+      "packageStylesheetSha256": "57EE747876F19F0F082B2249E4562F82B45A101AA50F65D8681C7082B1E9E165",
       "mudBlazorStylesheet": "_content/MudBlazor/MudBlazor.min.css",
       "hostStylesheet": "wwwroot/app.css",
       "hostStylesheetPurpose": "sample-and-domain-composition-only",
-      "hostStylesheetSha256": "2857DD00F01305D6A573717A5793D272B882EE320752DD0207A562C41722D988",
+      "hostStylesheetSha256": "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666",
       "localPackageCssCopyForbidden": true,
       "additionalUiFrameworkCssForbidden": true
     },

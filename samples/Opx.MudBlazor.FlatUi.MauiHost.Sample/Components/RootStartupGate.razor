@@ -1,0 +1,88 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject FlatUiPreferencesService Preferences
+@inject FlatReconnectOptions ReconnectOptions
+@inject FlatAssetOptions AssetOptions
+@inject IHybridSessionBootstrapper SessionBootstrapper
+
+@if (!_startupChecked)
+{
+    <FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentPalette">
+        <FlatSessionRestore Title="@StartupTitle" Message="@StartupMessage" />
+    </FlatMudProviders>
+}
+else
+{
+    <Routes />
+}
+
+@code {
+    private readonly CancellationTokenSource _disposeToken = new();
+    private bool _startupChecked;
+    private bool _systemPrefersDark;
+
+    private string StartupTitle => string.IsNullOrWhiteSpace(ReconnectOptions.StartupTitle)
+        ? "Loading page..."
+        : ReconnectOptions.StartupTitle.Trim();
+
+    private string StartupMessage => string.IsNullOrWhiteSpace(ReconnectOptions.StartupMessage)
+        ? "Please wait a moment."
+        : ReconnectOptions.StartupMessage.Trim();
+
+    private bool IsDarkMode => Preferences.Current.ThemeMode switch
+    {
+        FlatUiThemeMode.Dark => true,
+        FlatUiThemeMode.Light => false,
+        _ => _systemPrefersDark
+    };
+
+    private FlatUiPalette CurrentPalette
+    {
+        get
+        {
+            var palette = Preferences.Options.ResolveColorPalette(Preferences.Current.ColorPalette);
+            return new FlatUiPalette(
+                palette.Accent, palette.AccentHover, palette.AccentSubtle, palette.AccentDark,
+                palette.DarkAccent, palette.DarkAccentHover, palette.Secondary,
+                palette.Success, palette.Warning, palette.Danger);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await JS.InvokeVoidAsync(
+            "opxMauiHost.loadScript",
+            _disposeToken.Token,
+            AssetOptions.ResolveJavaScriptPath(IsDebugBuild));
+        await Preferences.InitializeAsync();
+        _systemPrefersDark = await JS.InvokeAsync<bool>(
+            "opxFlatThemeBootstrap.prefersDarkMode",
+            _disposeToken.Token);
+
+        // The host performs saved-session/token validation here. This sample only
+        // demonstrates the gate and does not create a synthetic authenticated user.
+        await SessionBootstrapper.RestoreAsync(_disposeToken.Token);
+
+        if (_disposeToken.IsCancellationRequested)
+            return;
+
+        _startupChecked = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+#if DEBUG
+    private const bool IsDebugBuild = true;
+#else
+    private const bool IsDebugBuild = false;
+#endif
+
+    public ValueTask DisposeAsync()
+    {
+        _disposeToken.Cancel();
+        _disposeToken.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}

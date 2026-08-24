@@ -1,0 +1,155 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/grouped-data-grid"
+@inject FlatValueFormatter ValueFormatter
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="grouped-data-grid-page"
+          ReadOnlySource="In-memory grouped product sample"
+          FilterEnabled="@Columns.Any(column => column.FilterEnabled)"
+          FilterActive="@GridState.HasActiveFilters"
+          OnFilter="() => _filterOpen = true">
+    <ToolbarContent>
+        <MudTextField T="string"
+                      Value="_search"
+                      ValueChanged="SearchChanged"
+                      Placeholder="Search products or categories..."
+                      Variant="@FlatPreferences.InputVariant"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search"
+                      Class="module-search" />
+    </ToolbarContent>
+    <ChildContent>
+        <section class="flat-panel module-panel grouped-data-grid-panel">
+            <FlatGroupedDataGrid TItem="ProductOrderRow"
+                                 State="GridState"
+                                 Columns="Columns"
+                                 Groups="VisibleGroups"
+                                 ValueSelector="GridValue"
+                                 Changed="RefreshView"
+                                 AriaLabel="Products grouped by order month">
+                <CellTemplate Context="cell">
+                    @if (cell.Column.Key == "Category")
+                    {
+                        <span class="grouped-product-category"><MudIcon Icon="@CategoryIcon(cell.Item.Category)" />@cell.FormattedValue</span>
+                    }
+                    else
+                    {
+                        @cell.FormattedValue
+                    }
+                </CellTemplate>
+                <MobileCardTemplate Context="row">
+                    <article class="mobile-card grouped-product-card">
+                        <header><div><strong>@row.ProductName</strong><small>@row.OrderMonth.ToString("MMMM yyyy")</small></div></header>
+                        <div class="mobile-card-body">
+                            <FlatInfoItem Label="Category" Value="@row.Category" />
+                            <FlatInfoItem Label="Unit price" Value="@ValueFormatter.FormatValue(row.UnitPrice, "N2", currency: true)" />
+                            <FlatInfoItem Label="Count" Value="@ValueFormatter.FormatValue(row.Count)" />
+                            <FlatInfoItem Label="Order sum" Value="@ValueFormatter.FormatValue(row.OrderSum, "N2", currency: true)" />
+                        </div>
+                    </article>
+                </MobileCardTemplate>
+            </FlatGroupedDataGrid>
+        </section>
+    </ChildContent>
+</FlatPage>
+
+<MobileGridFilterSheet Open="_filterOpen"
+                       OpenChanged="value => _filterOpen = value"
+                       Columns="Columns"
+                       State="GridState"
+                       OnApplied="RefreshView" />
+
+@code {
+    private static readonly IReadOnlyList<ProductOrderRow> Rows =
+    [
+        new("Filo Mix", "Grains/Cereals", 7.00m, 21, 147.00m, new(2025, 12, 1)),
+        new("Genen Shouyu", "Condiments", 15.50m, 23, 356.50m, new(2025, 12, 1)),
+        new("Manjimup Dried Apples", "Produce", 53.00m, 57, 3021.00m, new(2025, 12, 1)),
+        new("Northwoods Cranberry Sauce", "Condiments", 40.00m, 12, 480.00m, new(2027, 5, 1)),
+        new("Ikura", "Seafood", 31.00m, 18, 558.00m, new(2027, 5, 1)),
+        new("Queso Manchego La Pastora", "Dairy Products", 38.00m, 25, 950.00m, new(2027, 5, 1)),
+        new("Raclette Courdavault", "Dairy Products", 55.00m, 42, 2310.00m, new(2027, 5, 1))
+    ];
+
+    private static readonly IReadOnlyList<GridColumnDefinition> Columns =
+    [
+        new("ProductName", "Product name", WidthPercent: 40),
+        new("Category", "Category", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Rows.Select(row => row.Category)), WidthPercent: 20),
+        new("UnitPrice", "Unit price", GridColumnFilterType.Number, WidthPercent: 13, ValueKind: FlatGridColumnValueKind.Currency, Format: "N2"),
+        new("Count", "Count", GridColumnFilterType.Number, WidthPercent: 12, ValueKind: FlatGridColumnValueKind.Number),
+        new("OrderSum", "Order sum", GridColumnFilterType.Number, WidthPercent: 15, ValueKind: FlatGridColumnValueKind.Currency, Format: "N2")
+    ];
+
+    private readonly GridViewState GridState = new();
+    private string _search = string.Empty;
+    private bool _filterOpen;
+
+    private IReadOnlyList<FlatGroupedGridGroup<ProductOrderRow>> VisibleGroups
+    {
+        get
+        {
+            var source = Rows.Where(row => string.IsNullOrWhiteSpace(_search)
+                || row.ProductName.Contains(_search, StringComparison.OrdinalIgnoreCase)
+                || row.Category.Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+            return GridState.Apply(source, GridText)
+                .GroupBy(row => row.OrderMonth.ToString("yyyy-MM"), StringComparer.Ordinal)
+                .OrderBy(group => group.Key, StringComparer.Ordinal)
+                .Select(group =>
+                {
+                    var items = group.ToArray();
+                    return new FlatGroupedGridGroup<ProductOrderRow>(
+                        group.Key,
+                        items[0].OrderMonth.ToString("MMMM yyyy"),
+                        items,
+                        [
+                            new FlatGroupedGridSummary("Products", "Count", items.Length),
+                            new FlatGroupedGridSummary("Orders", "Sum", items.Sum(row => row.OrderSum), FlatGridColumnValueKind.Currency, "N2"),
+                            new FlatGroupedGridSummary("Price", "Average", items.Average(row => row.UnitPrice), FlatGridColumnValueKind.Currency, "N2")
+                        ]);
+                })
+                .ToArray();
+        }
+    }
+
+    private void SearchChanged(string value)
+    {
+        _search = value;
+        RefreshView();
+    }
+
+    private void RefreshView() => StateHasChanged();
+
+    private static string? GridText(ProductOrderRow row, string key) => key switch
+    {
+        "ProductName" => row.ProductName,
+        "Category" => row.Category,
+        "UnitPrice" => row.UnitPrice.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        "Count" => row.Count.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        "OrderSum" => row.OrderSum.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        _ => string.Empty
+    };
+
+    private static object? GridValue(ProductOrderRow row, string key) => key switch
+    {
+        "ProductName" => row.ProductName,
+        "Category" => row.Category,
+        "UnitPrice" => row.UnitPrice,
+        "Count" => row.Count,
+        "OrderSum" => row.OrderSum,
+        _ => null
+    };
+
+    private static string CategoryIcon(string category) => category switch
+    {
+        "Produce" => Icons.Material.Filled.ShoppingBasket,
+        "Condiments" => Icons.Material.Filled.Restaurant,
+        "Seafood" => Icons.Material.Filled.SetMeal,
+        "Dairy Products" => Icons.Material.Filled.LocalDrink,
+        _ => Icons.Material.Filled.Grain
+    };
+
+    public sealed record ProductOrderRow(string ProductName, string Category, decimal UnitPrice, int Count, decimal OrderSum, DateOnly OrderMonth);
+}

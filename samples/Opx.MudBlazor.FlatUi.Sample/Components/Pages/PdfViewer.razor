@@ -1,0 +1,55 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@page "/pdf-viewer"
+@inject FlatMessageBoxService MessageBox
+@inject FlatPageLoadingState PageLoading
+
+<FlatPage Kind="FlatPageKind.Detail" PageCssClass="pdf-viewer-page no-mobile-fab">
+    <FlatPdfViewer SourceUrl="/sample-documents/sales-report.pdf"
+                   Title="Sales Report"
+                   Subtitle="August 2026"
+                   Busy="@_busy"
+                   OnBack="BackAsync"
+                   OnRefresh="RefreshAsync"
+                   OnDownload="DownloadAsync"
+                   OnShare="ShareAsync"
+                   OnOpenExternal="OpenExternalAsync"
+                   StateChanged="StateChangedAsync">
+        <ParametersContent>
+            <MudSelect T="string" @bind-Value="_period" Label="Period" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
+                <MudSelectItem Value="@("August 2026")">August 2026</MudSelectItem>
+                <MudSelectItem Value="@("July 2026")">July 2026</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string" @bind-Value="_branch" Label="Branch" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
+                <MudSelectItem Value="@("All branches")">All branches</MudSelectItem>
+                <MudSelectItem Value="@("Jakarta")">Jakarta</MudSelectItem>
+                <MudSelectItem Value="@("Surabaya")">Surabaya</MudSelectItem>
+            </MudSelect>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RefreshAsync" Disabled="@_busy">Apply</MudButton>
+        </ParametersContent>
+    </FlatPdfViewer>
+</FlatPage>
+
+@code {
+    private string _period = "August 2026";
+    private string _branch = "All branches";
+    private bool _busy;
+    private FlatPdfViewerState? _state;
+
+    private Task BackAsync() => MessageBox.InfoAsync("The Back callback is host-owned. A MAUI host can close the document workspace or navigate to its report list.", "Back requested");
+
+    private async Task RefreshAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        using var loading = PageLoading.Begin();
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(350);
+        _busy = false;
+        await MessageBox.InfoAsync($"Refresh requested for {_period}, {_branch}. The host owns report generation and source replacement.", "Report refreshed");
+    }
+
+    private Task DownloadAsync() => MessageBox.InfoAsync("Download is an exact host callback. The host owns authorization, file access, and storage.", "Download requested");
+    private Task ShareAsync() => MessageBox.InfoAsync("A MAUI host can handle this callback with Share.Default.RequestAsync.", "Share requested");
+    private Task OpenExternalAsync() => MessageBox.InfoAsync("A MAUI host can handle this callback with Launcher.Default.OpenAsync.", "Open externally");
+    private Task StateChangedAsync(FlatPdfViewerState state) { _state = state; return Task.CompletedTask; }
+}

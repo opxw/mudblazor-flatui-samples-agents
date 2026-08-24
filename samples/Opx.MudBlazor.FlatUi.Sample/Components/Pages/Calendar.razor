@@ -54,17 +54,17 @@
                CloseOnOutsideClick="false"
                AutoRefreshOnSuccess="false">
     <div class="flat-crud-form-grid calendar-event-form">
-        <MudTextField T="string" @bind-Value="_draft.Title" Label="Event title" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
-        <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="Variant.Outlined" Margin="Margin.Dense">
+        <MudTextField T="string" @bind-Value="_draft.Title" Label="Event title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
+        <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             <MudSelectItem Value="@("Planning")">Planning</MudSelectItem>
             <MudSelectItem Value="@("Meeting")">Meeting</MudSelectItem>
             <MudSelectItem Value="@("Reporting")">Reporting</MudSelectItem>
             <MudSelectItem Value="@("Deadline")">Deadline</MudSelectItem>
         </MudSelect>
-        <MudDatePicker @bind-Date="_draft.Date" Label="Date" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        <MudTimePicker @bind-Time="_draft.Time" Label="Start time" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="@_draft.AllDay" />
+        <MudDatePicker @bind-Date="_draft.Date" Label="Date" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+        <MudTimePicker @bind-Time="_draft.Time" Label="Start time" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="@_draft.AllDay" />
         <MudCheckBox T="bool" @bind-Value="_draft.AllDay" Label="All-day event" Color="Color.Primary" />
-        <MudTextField T="string" @bind-Value="_draft.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" Class="wide" />
+        <MudTextField T="string" @bind-Value="_draft.Description" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" Class="wide" />
     </div>
 </FlatFormModal>
 

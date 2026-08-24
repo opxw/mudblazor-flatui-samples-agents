@@ -1,0 +1,6 @@
+@inherits LayoutComponentBase
+@inject MobileThemeBridge ThemeBridge
+
+<FlatMudProviders IsDarkMode="@ThemeBridge.IsDarkMode">
+    <main class="mobile-auth-layout">@Body</main>
+</FlatMudProviders>

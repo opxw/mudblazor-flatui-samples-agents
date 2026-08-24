@@ -3,22 +3,22 @@
 
 <FlatPage Kind="FlatPageKind.Module" PageCssClass="pivot-page no-mobile-fab">
     <section class="flat-panel sample-pivot-config">
-        <MudSelect T="string" Value="@_rowDimension" ValueChanged="SetRowDimension" Label="Rows" Variant="Variant.Outlined" Margin="Margin.Dense">
+        <MudSelect T="string" Value="@_rowDimension" ValueChanged="SetRowDimension" Label="Rows" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             <MudSelectItem Value="@("department")">Department</MudSelectItem>
             <MudSelectItem Value="@("region")">Region</MudSelectItem>
             <MudSelectItem Value="@("product")">Product</MudSelectItem>
         </MudSelect>
-        <MudSelect T="string" Value="@_columnDimension" ValueChanged="SetColumnDimension" Label="Columns" Variant="Variant.Outlined" Margin="Margin.Dense">
+        <MudSelect T="string" Value="@_columnDimension" ValueChanged="SetColumnDimension" Label="Columns" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             <MudSelectItem Value="@("quarter")">Quarter</MudSelectItem>
             <MudSelectItem Value="@("status")">Status</MudSelectItem>
             <MudSelectItem Value="@("region")">Region</MudSelectItem>
         </MudSelect>
-        <MudSelect T="string" Value="@_measure" ValueChanged="SetMeasure" Label="Measure" Variant="Variant.Outlined" Margin="Margin.Dense">
+        <MudSelect T="string" Value="@_measure" ValueChanged="SetMeasure" Label="Measure" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             <MudSelectItem Value="@("revenue")">Revenue</MudSelectItem>
             <MudSelectItem Value="@("quantity")">Quantity</MudSelectItem>
             <MudSelectItem Value="@("margin")">Margin</MudSelectItem>
         </MudSelect>
-        <MudSelect T="FlatPivotAggregate" @bind-Value="_aggregate" Label="Aggregate" Variant="Variant.Outlined" Margin="Margin.Dense">
+        <MudSelect T="FlatPivotAggregate" @bind-Value="_aggregate" Label="Aggregate" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             <MudSelectItem Value="FlatPivotAggregate.Sum">Sum</MudSelectItem>
             <MudSelectItem Value="FlatPivotAggregate.Count">Count</MudSelectItem>
             <MudSelectItem Value="FlatPivotAggregate.Average">Average</MudSelectItem>
@@ -58,22 +58,22 @@
              Class="mobile-filter-sheet sample-pivot-filter-sheet">
     <ChildContent>
         <div class="sample-pivot-filter-fields">
-            <MudSelect T="string" @bind-Value="_pendingRowDimension" Label="Rows" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_pendingRowDimension" Label="Rows" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("department")">Department</MudSelectItem>
                 <MudSelectItem Value="@("region")">Region</MudSelectItem>
                 <MudSelectItem Value="@("product")">Product</MudSelectItem>
             </MudSelect>
-            <MudSelect T="string" @bind-Value="_pendingColumnDimension" Label="Columns" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_pendingColumnDimension" Label="Columns" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("quarter")">Quarter</MudSelectItem>
                 <MudSelectItem Value="@("status")">Status</MudSelectItem>
                 <MudSelectItem Value="@("region")">Region</MudSelectItem>
             </MudSelect>
-            <MudSelect T="string" @bind-Value="_pendingMeasure" Label="Measure" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_pendingMeasure" Label="Measure" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("revenue")">Revenue</MudSelectItem>
                 <MudSelectItem Value="@("quantity")">Quantity</MudSelectItem>
                 <MudSelectItem Value="@("margin")">Margin</MudSelectItem>
             </MudSelect>
-            <MudSelect T="FlatPivotAggregate" @bind-Value="_pendingAggregate" Label="Aggregate" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="FlatPivotAggregate" @bind-Value="_pendingAggregate" Label="Aggregate" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="FlatPivotAggregate.Sum">Sum</MudSelectItem>
                 <MudSelectItem Value="FlatPivotAggregate.Count">Count</MudSelectItem>
                 <MudSelectItem Value="FlatPivotAggregate.Average">Average</MudSelectItem>

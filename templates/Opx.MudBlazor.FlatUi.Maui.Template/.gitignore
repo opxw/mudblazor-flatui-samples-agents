@@ -1,0 +1,11 @@
+bin/
+obj/
+artifacts/
+TestResults/
+*.user
+*.suo
+*.pdb
+.vs/
+node_modules/
+.nuget/
+/src/Opx.MudBlazor.FlatUi/wwwroot/opx-flat-ui.min.js

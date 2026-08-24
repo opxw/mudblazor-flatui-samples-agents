@@ -45,7 +45,7 @@
                     <MudSelect T="string"
                                @bind-Value="_category"
                                Label="Product category"
-                               Variant="Variant.Outlined"
+                               Variant="@FlatPreferences.InputVariant"
                                Margin="Margin.Dense"
                                Class="catalog-category-filter">
                         <MudSelectItem Value="@("All")">All categories</MudSelectItem>
@@ -58,9 +58,9 @@
                 <section class="catalog-filter-group">
                     <strong>Price range</strong>
                     <div class="catalog-price-filter" role="group" aria-label="Price range filter">
-                        <MudNumericField T="decimal?" @bind-Value="_minPrice" Label="Minimum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                        <MudNumericField T="decimal?" @bind-Value="_minPrice" Label="Minimum price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
                         <span aria-hidden="true">to</span>
-                        <MudNumericField T="decimal?" @bind-Value="_maxPrice" Label="Maximum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                        <MudNumericField T="decimal?" @bind-Value="_maxPrice" Label="Maximum price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
                     </div>
                 </section>
             </FilterContent>
@@ -71,7 +71,7 @@
                                Value="_stagedCategory"
                                ValueChanged="@(value => _stagedCategory = value)"
                                Label="Product category"
-                               Variant="Variant.Outlined"
+                               Variant="@FlatPreferences.InputVariant"
                                Margin="Margin.Dense"
                                Class="catalog-category-filter">
                         <MudSelectItem Value="@("All")">All categories</MudSelectItem>
@@ -84,9 +84,9 @@
                 <section class="catalog-filter-group">
                     <strong>Price range</strong>
                     <div class="catalog-price-filter" role="group" aria-label="Price range filter">
-                        <MudNumericField T="decimal?" Value="_stagedMinPrice" ValueChanged="@(value => _stagedMinPrice = value)" Label="Minimum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                        <MudNumericField T="decimal?" Value="_stagedMinPrice" ValueChanged="@(value => _stagedMinPrice = value)" Label="Minimum price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
                         <span aria-hidden="true">to</span>
-                        <MudNumericField T="decimal?" Value="_stagedMaxPrice" ValueChanged="@(value => _stagedMaxPrice = value)" Label="Maximum price" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
+                        <MudNumericField T="decimal?" Value="_stagedMaxPrice" ValueChanged="@(value => _stagedMaxPrice = value)" Label="Maximum price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentText="$" Min="0" Class="catalog-price-input" />
                     </div>
                 </section>
             </MobileFilterContent>
@@ -95,7 +95,7 @@
                               @bind-Value="_search"
                               Immediate="true"
                               Placeholder="Search products..."
-                              Variant="Variant.Outlined"
+                              Variant="@FlatPreferences.InputVariant"
                               Margin="Margin.Dense"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Outlined.Search"

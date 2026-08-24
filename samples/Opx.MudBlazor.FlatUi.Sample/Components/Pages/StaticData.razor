@@ -11,7 +11,7 @@
           OnRefresh="() => StateHasChanged()"
           ReadOnlySource="Static sample">
     <ToolbarContent>
-        <MudTextField T="string" @bind-Value="_search" Placeholder="Search master..." Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" />
+        <MudTextField T="string" @bind-Value="_search" Placeholder="Search master..." Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Class="module-search" />
     </ToolbarContent>
     <ChildContent>
         <div class="table-scroll">

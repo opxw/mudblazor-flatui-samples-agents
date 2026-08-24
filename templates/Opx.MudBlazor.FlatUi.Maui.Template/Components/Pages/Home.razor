@@ -1,0 +1,19 @@
+@page "/"
+
+<PageTitle>Mobile dashboard</PageTitle>
+<FlatPage Kind="FlatPageKind.Module" UsePanel="false" PageCssClass="mobile-source-page no-mobile-fab">
+    <ChildContent>
+        <section class="mobile-kpi-grid" aria-label="Operational summary">
+            <article><span>Open work</span><strong>24</strong><small>Sample data · host-owned</small></article>
+            <article><span>Due today</span><strong>7</strong><small>Sample data · host-owned</small></article>
+            <article><span>Exceptions</span><strong>3</strong><small>Review required</small></article>
+        </section>
+        <FlatPanel Title="Today" Subtitle="Mobile-first operational queue">
+            <div class="mobile-work-list">
+                <button type="button"><MudIcon Icon="@Icons.Material.Outlined.Inventory2" /><span><strong>Review inventory exception</strong><small>Warehouse · 09:30</small></span><MudIcon Icon="@Icons.Material.Outlined.ChevronRight" /></button>
+                <button type="button"><MudIcon Icon="@Icons.Material.Outlined.ReceiptLong" /><span><strong>Approve transaction draft</strong><small>Finance · 11:00</small></span><MudIcon Icon="@Icons.Material.Outlined.ChevronRight" /></button>
+                <button type="button"><MudIcon Icon="@Icons.Material.Outlined.Assessment" /><span><strong>Check daily report</strong><small>Operations · 15:00</small></span><MudIcon Icon="@Icons.Material.Outlined.ChevronRight" /></button>
+            </div>
+        </FlatPanel>
+    </ChildContent>
+</FlatPage>

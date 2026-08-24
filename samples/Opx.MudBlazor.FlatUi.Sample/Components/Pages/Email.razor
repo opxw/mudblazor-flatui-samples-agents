@@ -44,7 +44,7 @@
                     <MudSelect T="string"
                                Value="@_selectedFolder"
                                ValueChanged="SelectFolder"
-                               Variant="Variant.Outlined"
+                               Variant="@FlatPreferences.InputVariant"
                                Margin="Margin.Dense"
                                Class="flat-email-mobile-folder"
                                aria-label="Email folder">
@@ -59,7 +59,7 @@
                               ValueChanged="SearchChanged"
                               Immediate="true"
                               Placeholder="Search email..."
-                              Variant="Variant.Outlined"
+                              Variant="@FlatPreferences.InputVariant"
                               Margin="Margin.Dense"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Outlined.Search"
@@ -173,10 +173,10 @@
                      OnSubmit="SendEmail"
                      ConfirmClose="ConfirmDiscard">
         <div class="flat-crud-form-grid flat-email-compose-form">
-            <MudTextField T="string" @bind-Value="_draft.To" Label="To" Variant="Variant.Outlined" Margin="Margin.Dense" Class="wide" />
-            <MudTextField T="string" @bind-Value="_draft.Cc" Label="Cc" Variant="Variant.Outlined" Margin="Margin.Dense" Class="wide" />
-            <MudTextField T="string" @bind-Value="_draft.Subject" Label="Subject" Variant="Variant.Outlined" Margin="Margin.Dense" Class="wide" />
-            <MudTextField T="string" @bind-Value="_draft.Body" Label="Message" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="10" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.To" Label="To" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Cc" Label="Cc" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Subject" Label="Subject" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Body" Label="Message" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="10" Class="wide" />
             <div class="flat-email-compose-tools wide">
                 <MudIconButton Icon="@Icons.Material.Outlined.AttachFile" OnClick="@(() => ShowPlaceholder("Add attachment"))" aria-label="Add attachment" title="Add attachment" />
                 <MudIconButton Icon="@Icons.Material.Outlined.InsertLink" OnClick="@(() => ShowPlaceholder("Insert link"))" aria-label="Insert link" title="Insert link" />

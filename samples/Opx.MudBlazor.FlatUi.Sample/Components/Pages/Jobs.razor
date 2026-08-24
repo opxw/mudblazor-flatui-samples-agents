@@ -22,7 +22,7 @@
         <MudTextField T="string"
                       @bind-Value="_search"
                       Placeholder="Search job title, company, location"
-                      Variant="Variant.Outlined"
+                      Variant="@FlatPreferences.InputVariant"
                       Margin="Margin.Dense"
                       Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Outlined.Search"
@@ -30,7 +30,7 @@
 
         <MudSelect T="string"
                    @bind-Value="_companyFilter"
-                   Variant="Variant.Outlined"
+                   Variant="@FlatPreferences.InputVariant"
                    Margin="Margin.Dense"
                    Class="jobs-filter"
                    aria-label="Company filter">
@@ -43,7 +43,7 @@
 
         <MudSelect T="string"
                    @bind-Value="_typeFilter"
-                   Variant="Variant.Outlined"
+                   Variant="@FlatPreferences.InputVariant"
                    Margin="Margin.Dense"
                    Class="jobs-filter"
                    aria-label="Employment type filter">
@@ -55,7 +55,7 @@
 
         <MudSelect T="string"
                    @bind-Value="_modeFilter"
-                   Variant="Variant.Outlined"
+                   Variant="@FlatPreferences.InputVariant"
                    Margin="Margin.Dense"
                    Class="jobs-filter"
                    aria-label="Work mode filter">
@@ -150,23 +150,23 @@
     <MudTextField T="string"
                   @bind-Value="_draft.Title"
                   Label="Job title"
-                  Variant="Variant.Outlined"
+                  Variant="@FlatPreferences.InputVariant"
                   Margin="Margin.Dense" />
     <MudTextField T="string"
                   @bind-Value="_draft.Company"
                   Label="Company"
-                  Variant="Variant.Outlined"
+                  Variant="@FlatPreferences.InputVariant"
                   Margin="Margin.Dense" />
     <div class="jobs-form-grid">
         <MudTextField T="string"
                       @bind-Value="_draft.Location"
                       Label="Location"
-                      Variant="Variant.Outlined"
+                      Variant="@FlatPreferences.InputVariant"
                       Margin="Margin.Dense" />
         <MudSelect T="string"
                    @bind-Value="_draft.EmploymentType"
                    Label="Employment type"
-                   Variant="Variant.Outlined"
+                   Variant="@FlatPreferences.InputVariant"
                    Margin="Margin.Dense">
             <MudSelectItem Value="@("Full Time")">Full Time</MudSelectItem>
             <MudSelectItem Value="@("Part Time")">Part Time</MudSelectItem>
@@ -176,7 +176,7 @@
         <MudSelect T="string"
                    @bind-Value="_draft.WorkMode"
                    Label="Work mode"
-                   Variant="Variant.Outlined"
+                   Variant="@FlatPreferences.InputVariant"
                    Margin="Margin.Dense">
             <MudSelectItem Value="@("Remote")">Remote</MudSelectItem>
             <MudSelectItem Value="@("Hybrid")">Hybrid</MudSelectItem>
@@ -185,18 +185,18 @@
     <MudTextField T="string"
                   @bind-Value="_draft.SalaryRange"
                   Label="Salary range"
-                  Variant="Variant.Outlined"
+                  Variant="@FlatPreferences.InputVariant"
                   Margin="Margin.Dense" />
     <MudTextField T="string"
                   @bind-Value="_draft.Summary"
                   Label="Short summary"
-                  Variant="Variant.Outlined"
+                  Variant="@FlatPreferences.InputVariant"
                   Lines="3"
                   Margin="Margin.Dense" />
     <MudTextField T="string"
                   @bind-Value="_draft.Skills"
                   Label="Required skills (comma separated)"
-                  Variant="Variant.Outlined"
+                  Variant="@FlatPreferences.InputVariant"
                   Margin="Margin.Dense"
                   Immediate="true" />
 </FlatFormModal>

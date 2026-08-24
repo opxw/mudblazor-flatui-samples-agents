@@ -1,0 +1,152 @@
+/* Copyright (c) 2026 opx. All rights reserved. */
+
+html,
+body,
+#app {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    background: var(--mud-palette-background, #f3f6f9);
+}
+
+html.opx-native-transparent-statusbar {
+    --opx-native-statusbar-height: 0px;
+}
+
+html.opx-native-transparent-statusbar body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: var(--opx-native-statusbar-height);
+    background: var(--opx-native-appbar-color, #ffffff);
+    pointer-events: none;
+    z-index: 1299;
+}
+
+html.opx-native-transparent-statusbar .monitor-header {
+    box-sizing: border-box;
+    height: calc(60px + var(--opx-native-statusbar-height)) !important;
+    padding-top: var(--opx-native-statusbar-height) !important;
+}
+
+html.opx-native-transparent-statusbar .monitor-main {
+    padding-top: calc(60px + var(--opx-native-statusbar-height)) !important;
+}
+
+html.opx-native-transparent-statusbar .flat-bottom-navigation-main-view {
+    top: calc(60px + var(--opx-native-statusbar-height));
+}
+
+html.opx-native-transparent-statusbar .pull-refresh-indicator {
+    top: calc(60px + var(--opx-native-statusbar-height));
+}
+
+.status-bar-safe-area {
+    display: none;
+}
+
+@supports (-webkit-touch-callout: none) {
+    .status-bar-safe-area {
+        display: block;
+        position: fixed;
+        inset: 0 0 auto;
+        height: env(safe-area-inset-top);
+        background: var(--mud-palette-appbar-background, #ffffff);
+        z-index: 1301;
+    }
+}
+
+.hybrid-host-page {
+    display: grid;
+    gap: 14px;
+}
+
+.hybrid-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.hybrid-fact-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.hybrid-copy,
+.hybrid-boundary-list {
+    margin: 0;
+    font-weight: 400;
+}
+
+.hybrid-contract-list,
+.hybrid-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.hybrid-contract-list span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hybrid-probe-result {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dotted var(--mud-palette-lines-default);
+}
+
+.hybrid-boundary-list {
+    display: grid;
+    gap: 8px;
+    padding-left: 20px;
+}
+
+.hybrid-user-copy {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.hybrid-user-copy strong,
+.hybrid-user-copy span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 2000;
+    padding: 12px 16px;
+    background: #c23616;
+    color: #ffffff;
+}
+
+@media (max-width: 900px) {
+    .hybrid-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hybrid-host-page,
+    .hybrid-summary-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .hybrid-actions .mud-button-root {
+        flex: 1 1 calc(50% - 5px);
+    }
+}

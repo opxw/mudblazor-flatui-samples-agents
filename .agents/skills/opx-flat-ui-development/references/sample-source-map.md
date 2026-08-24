@@ -8,6 +8,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 
 ## Shell, navigation, and configuration
 
+- MAUI Blazor Hybrid host reference: `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample`, especially `MauiProgram.cs`, Android `MainActivity`, native `MainPage`, `Components/RootStartupGate.razor`, `Components/Layout/MainLayout.razor`, `Services`, and its project README. Android uses edge-to-edge, a transparent host-owned `CommunityToolkit.Maui` status bar, measured `WindowInsets`, and a `60px + inset` AppBar; Web/Windows remain unchanged.
 - Application root/reconnect: `samples/Opx.MudBlazor.FlatUi.Sample/Components/App.razor`
 - Service/configuration binding: `samples/Opx.MudBlazor.FlatUi.Sample/Program.cs` and `samples/Opx.MudBlazor.FlatUi.Sample/appsettings.json`
 - Admin shell, AppBar actions, settings: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Layout/MainLayout.razor`

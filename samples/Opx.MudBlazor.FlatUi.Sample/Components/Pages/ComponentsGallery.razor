@@ -178,6 +178,9 @@
                                     Options="ReconnectOptions"
                                     PreviewState="_reconnectPreviewState"
                                     InlinePreview="true" />
+                <FlatSessionRestore Title="Restoring session..."
+                                    Message="Checking saved credentials."
+                                    InlinePreview="true" />
             </div>
         </FlatPanel>
 
@@ -251,6 +254,19 @@
             </div>
         </FlatPanel>
 
+        <FlatPanel Title="Material Icon Picker" Subtitle="Search MudBlazor Outlined and Filled icons">
+            <div class="detail-section-body">
+                <FlatMaterialIconPicker Label="Navigation icon"
+                                        SearchPlaceholder="Search by icon name"
+                                        @bind-Value="_sampleMaterialIcon" />
+                <MudText Typo="Typo.caption" Style="margin-top:8px">
+                    Selected: @(_sampleMaterialIcon is null ? "None" : $"{_sampleMaterialIcon.Name} · {_sampleMaterialIcon.Style}")
+                </MudText>
+                <pre class="sample-inline-code"><code>&lt;FlatMaterialIconPicker Label="Navigation icon"
+                        @@bind-Value="selectedIcon" /&gt;</code></pre>
+            </div>
+        </FlatPanel>
+
         <FlatPanel Title="Multi Select with leading visuals" Subtitle="Icon/avatar + description + meta">
             <div class="detail-section-body">
                 <FlatMultiSelect T="string"
@@ -309,14 +325,14 @@
     <MudTextField T="string"
                   @bind-Value="_sampleName"
                   Label="Name"
-                  Variant="Variant.Outlined"
+                  Variant="@FlatPreferences.InputVariant"
                   Margin="Margin.Dense"
                   Immediate="true"
                   Required="true" />
     <MudSelect T="string"
                @bind-Value="_sampleCategory"
                Label="Category"
-               Variant="Variant.Outlined"
+               Variant="@FlatPreferences.InputVariant"
                Margin="Margin.Dense">
         <MudSelectItem T="string" Value="@OperationsCategory">Operations</MudSelectItem>
         <MudSelectItem T="string" Value="@FinanceCategory">Finance</MudSelectItem>
@@ -325,7 +341,7 @@
     <MudTextField T="string"
                   @bind-Value="_sampleNotes"
                   Label="Notes"
-                  Variant="Variant.Outlined"
+                  Variant="@FlatPreferences.InputVariant"
                   Margin="Margin.Dense"
                   Immediate="true"
                   Lines="3" />
@@ -403,6 +419,10 @@
         new("legacy", "Legacy Department") { Description = "Disabled sample option", Disabled = true }
     ];
     private string? _sampleDepartment = "it";
+    private FlatMaterialIconSelection? _sampleMaterialIcon = new(
+        nameof(Icons.Material.Outlined.Dashboard),
+        Icons.Material.Outlined.Dashboard,
+        FlatMaterialIconStyle.Outlined);
 
     private readonly ChartOptions ChartOptions = new()
     {

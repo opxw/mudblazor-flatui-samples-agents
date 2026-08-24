@@ -1,0 +1,166 @@
+@inherits LayoutComponentBase
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject FlatUiPreferencesService Preferences
+@inject FlatDeviceNotificationOptions NotificationOptions
+@inject FlatLocalizationOptions LocalizationOptions
+@inject IHybridStatusBarService StatusBarService
+
+<FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentPalette">
+    <FlatAppShell AppName="OPX FLAT UI"
+                  PageTitle="Hybrid Host"
+                  SidebarSubtitle="MAUI host reference"
+                  SearchPlaceholder="Search host features..."
+                  SearchItems="@SearchItems"
+                  SidebarSearchPlaceholder="Search sample menu..."
+                  IsDarkMode="@IsDarkMode"
+                  ThemeMode="@Preferences.Current.ThemeMode"
+                  Density="@Preferences.Current.Density"
+                  UseAppFontSize="@Preferences.Current.UseAppFontSize"
+                  FontSizePx="@Preferences.Current.FontSizePx"
+                  RoundedSizePx="@Preferences.Current.RoundedSizePx"
+                  HostKind="FlatUiHostKind.MauiHybrid"
+                  NavigationLayout="FlatUiNavigationLayout.Bottom"
+                  BottomNavigationMaxWidthPx="900"
+                  BottomNavigationChildPresentation="@Preferences.Current.BottomNavigationChildPresentation"
+                  NavigationItems="@NavigationItems"
+                  AutoScaleHighDensityTouchButtons="@Preferences.Options.AutoScaleHighDensityTouchButtons"
+                  HighDensityTouchButtonHeightPx="@Preferences.Options.NormalizedHighDensityTouchButtonHeightPx"
+                  HighDensityTouchFloatingLabelFontSizePx="@Preferences.Options.NormalizedHighDensityTouchFloatingLabelFontSizePx"
+                  SidebarGroupFontWeight="@Preferences.Options.NormalizedSidebarGroupFontWeight"
+                  SidebarItemFontWeight="@Preferences.Options.NormalizedSidebarItemFontWeight"
+                  LightSidebarBackground="@Preferences.Effective.LightSidebarBackground"
+                  LightSidebarForeground="@Preferences.Effective.LightSidebarForeground"
+                  DarkSidebarBackground="@Preferences.Effective.DarkSidebarBackground"
+                  DarkSidebarForeground="@Preferences.Effective.DarkSidebarForeground"
+                  RightToLeft="@LocalizationOptions.RightToLeft">
+        <AppBarActions>
+            <FlatDeviceNotification Title="@NotificationOptions.SampleTitle"
+                                    Message="@NotificationOptions.SampleMessage"
+                                    Tag="@NotificationOptions.SampleTag" />
+        </AppBarActions>
+        <Menu>
+            <MudNavMenu>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home">Hybrid host</MudNavLink>
+            </MudNavMenu>
+        </Menu>
+        <UserContent>
+            <FlatProfileAvatar Name="Hybrid User" Initials="HU" />
+            <div class="hybrid-user-copy">
+                <strong>Sample host</strong>
+                <span>Host owns identity and session</span>
+            </div>
+            <MudIconButton Icon="@Icons.Material.Outlined.Logout"
+                           Class="logout-action"
+                           aria-label="Logout" />
+        </UserContent>
+        <ChildContent>
+            @Body
+        </ChildContent>
+    </FlatAppShell>
+</FlatMudProviders>
+
+@code {
+    private const string ThemeListenerId = "opx-flat-ui-maui-host";
+    private DotNetObjectReference<MainLayout>? _themeReference;
+    private bool _systemPrefersDark;
+    private bool _statusBarSyncPending = true;
+
+    private static IReadOnlyList<FlatNavigationMenuItem> NavigationItems =>
+    [
+        new("Hybrid host", "/", Icons.Material.Outlined.Home)
+    ];
+
+    private static IReadOnlyList<FlatNavigationSearchItem> SearchItems =>
+    [
+        new("Hybrid host", "/", "Host", "maui native secure storage camera file picker share notification", Icons.Material.Outlined.Home)
+    ];
+
+    private bool IsDarkMode => Preferences.Current.ThemeMode switch
+    {
+        FlatUiThemeMode.Dark => true,
+        FlatUiThemeMode.Light => false,
+        _ => _systemPrefersDark
+    };
+
+    private FlatUiPalette CurrentPalette
+    {
+        get
+        {
+            var palette = Preferences.Options.ResolveColorPalette(Preferences.Current.ColorPalette);
+            return new FlatUiPalette(
+                palette.Accent, palette.AccentHover, palette.AccentSubtle, palette.AccentDark,
+                palette.DarkAccent, palette.DarkAccentHover, palette.Secondary,
+                palette.Success, palette.Warning, palette.Danger);
+        }
+    }
+
+    protected override void OnInitialized() => Preferences.Changed += HandlePreferencesChanged;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _themeReference = DotNetObjectReference.Create(this);
+            _systemPrefersDark = await JS.InvokeAsync<bool>(
+                "opxFlatTheme.watchSystemPreference",
+                ThemeListenerId,
+                _themeReference);
+            _statusBarSyncPending = true;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (_statusBarSyncPending)
+        {
+            _statusBarSyncPending = false;
+            await SyncStatusBarAsync();
+        }
+    }
+
+    [JSInvokable]
+    public Task OnSystemThemeChanged(bool prefersDark)
+    {
+        return InvokeAsync(() =>
+        {
+            _systemPrefersDark = prefersDark;
+            _statusBarSyncPending = true;
+            StateHasChanged();
+        });
+    }
+
+    private void HandlePreferencesChanged() => _ = InvokeAsync(() =>
+    {
+        _statusBarSyncPending = true;
+        StateHasChanged();
+    });
+
+    private async Task SyncStatusBarAsync()
+    {
+        var appearance = await JS.InvokeAsync<HybridStatusBarAppearance>(
+            "opxMauiHost.getAppBarAppearance");
+        var topInsetPx = await StatusBarService.ApplyAsync(appearance);
+        await JS.InvokeVoidAsync(
+            "opxMauiHost.applyTransparentStatusBarLayout",
+            topInsetPx,
+            appearance.BackgroundColor);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Preferences.Changed -= HandlePreferencesChanged;
+        if (_themeReference is null)
+            return;
+
+        try
+        {
+            await JS.InvokeVoidAsync("opxFlatTheme.unwatchSystemPreference", ThemeListenerId);
+        }
+        catch (Exception exception) when (exception is JSException or InvalidOperationException)
+        {
+            // The WebView can already be detached during native shutdown.
+        }
+
+        _themeReference.Dispose();
+    }
+}

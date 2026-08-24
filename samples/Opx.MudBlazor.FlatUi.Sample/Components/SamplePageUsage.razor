@@ -37,12 +37,34 @@
             <FlatDataGrid TItem="Order"
                           State="GridState"
                           Columns="Columns"
-                          Items="PagedOrders" />
+                          Items="PagedOrders"
+                          HeaderStyle="FlatGridHeaderStyle.CompactSearch"
+                          AutoRowHeight="true"
+                          ShowHeaderIcons="true" />
 
             new GridColumnDefinition("total", "Total",
                 GridColumnFilterType.Number,
                 ValueKind: FlatGridColumnValueKind.Currency,
                 Format: "#,##0.00");
+
+            new GridColumnDefinition("product", "Product")
+            {
+                HeaderIcon = Icons.Material.Outlined.Restaurant,
+                SearchPlaceholder = "Search product"
+            };
+            """,
+        "/grouped-data-grid" => """
+            <FlatGroupedDataGrid TItem="Product"
+                                 State="GridState"
+                                 Columns="Columns"
+                                 Groups="GroupedProducts"
+                                 ValueSelector="GridValue"
+                                 GroupToggled="HandleGroupToggled" />
+
+            new FlatGroupedGridGroup<Product>(
+                "2025-12", "December 2025", products,
+                [new("Orders", "Sum", orderTotal,
+                    FlatGridColumnValueKind.Currency, "N2")]);
             """,
         "/model-crud" => """
             <FlatModelCrud TItem="Product"
@@ -64,6 +86,17 @@
                           ItemKey="node => node.Id"
                           ParentKey="node => node.ParentId"
                           MoveItem="MoveNodeAsync" />
+            """,
+        "/hierarchy-designer" => """
+            <FlatHierarchyDesigner Items="Hierarchy"
+                                   ItemsChanged="PersistOrderAsync"
+                                   MoveResult="HandleMoveResult"
+                                   JsonExported="HandleJsonExport"
+                                   Compact="true" />
+
+            new FlatHierarchyDesignerItem(
+                "detail", "report", "Detail",
+                Icons.Material.Outlined.Article, Order: 0);
             """,
         "/pivot" => """
             <FlatPivotGrid TItem="Sale"
@@ -127,6 +160,19 @@
                 <EditorTemplate Context="line">...</EditorTemplate>
             </FlatAdvancedEditableGrid>
             """,
+        "/pdf-viewer" => """
+            <FlatPdfViewer SourceUrl="/reports/sales.pdf"
+                           Title="Sales Report"
+                           OnRefresh="ReloadReportAsync"
+                           OnDownload="DownloadAsync"
+                           OnShare="ShareWithMauiAsync"
+                           OnOpenExternal="OpenWithLauncherAsync"
+                           OnPrint="PrintWithPlatformAdapterAsync">
+                <ParametersContent>
+                    <!-- Host-owned report parameters. -->
+                </ParametersContent>
+            </FlatPdfViewer>
+            """,
         "/components" => """
             <FlatNumberInput @bind-Value="Price" Label="Unit price" Format="#,##0.00" />
             <FlatStatusChip Text="Ready" Color="Color.Success" />
@@ -155,6 +201,15 @@
             <FlatCalendar Items="Events"
                           EventSelected="HandleEvent"
                           RangeChanged="LoadRangeAsync" />
+            """,
+        "/scheduler" => """
+            <FlatScheduler Layout="FlatSchedulerLayout.WorkWeek"
+                           PeriodStart="PeriodStart"
+                           PeriodChanged="LoadPeriodAsync"
+                           Items="Events"
+                           Calendars="Calendars"
+                           ItemSelected="OpenEvent"
+                           ItemMoveRequested="MoveEventAsync" />
             """,
         "/chat" or "/ai-chat" or "/email" => """
             <FlatChatShell>

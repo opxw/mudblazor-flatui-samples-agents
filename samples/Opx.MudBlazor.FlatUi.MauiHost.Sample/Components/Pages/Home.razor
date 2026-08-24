@@ -1,0 +1,74 @@
+@page "/"
+@inject IHybridDeviceAdapter DeviceAdapter
+
+<PageTitle>OPX Flat UI Hybrid Host</PageTitle>
+
+<FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="hybrid-host-page">
+    <div class="hybrid-summary-grid">
+        <FlatPanel Title="Host runtime" Subtitle="Current native host snapshot">
+            <div class="hybrid-fact-grid">
+                <FlatInfoItem Label="Platform" Value="@Snapshot.Platform" />
+                <FlatInfoItem Label="Device" Value="@Snapshot.Device" />
+                <FlatInfoItem Label="Form factor" Value="@Snapshot.FormFactor" />
+                <FlatInfoItem Label="Network" Value="@Snapshot.NetworkAccess" />
+            </div>
+        </FlatPanel>
+
+        <FlatPanel Title="Responsive contract" Subtitle="Viewport-owned composition">
+            <p class="hybrid-copy">
+                Bottom navigation is used at 900px and below. A resized Windows window follows the same viewport rule;
+                the host does not branch by Android, Windows, or device type.
+            </p>
+            <div class="hybrid-contract-list">
+                <span><MudIcon Icon="@Icons.Material.Outlined.DesktopWindows" /> Above 900px: sidebar</span>
+                <span><MudIcon Icon="@Icons.Material.Outlined.TabletAndroid" /> 601-900px: bottom navigation</span>
+                <span><MudIcon Icon="@Icons.Material.Outlined.PhoneAndroid" /> 600px and below: bottom navigation</span>
+            </div>
+        </FlatPanel>
+    </div>
+
+    <FlatPanel Title="Native adapter probes" Subtitle="Run only from an explicit user action">
+        <div class="hybrid-actions">
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.FolderOpen" OnClick="PickFileAsync">Pick file</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.PhotoCamera" OnClick="CapturePhotoAsync">Open camera</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Share" OnClick="ShareAsync">Share</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Lock" OnClick="ProbeSecureStorageAsync">Test secure storage</MudButton>
+        </div>
+        <div class="hybrid-probe-result" role="status" aria-live="polite">
+            <MudIcon Icon="@ResultIcon" />
+            <span>@_resultMessage</span>
+        </div>
+    </FlatPanel>
+
+    <FlatPanel Title="Production boundary" Subtitle="What the consuming application must replace">
+        <ul class="hybrid-boundary-list">
+            <li>Validate saved credentials and update authentication state inside <code>IHybridSessionBootstrapper</code>.</li>
+            <li>Replace the sample notification service with Android, Windows, or iOS implementations.</li>
+            <li>Keep token storage, native permissions, API authorization, offline queues, and business persistence host-owned.</li>
+            <li>Verify system Back, IME, safe area, camera, notifications, lifecycle, and accessibility on real target devices.</li>
+        </ul>
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    private HybridDeviceSnapshot Snapshot { get; set; } = HybridDeviceSnapshot.Unknown;
+    private string _resultMessage = "Choose an action to exercise a host-owned native adapter.";
+    private bool _lastSucceeded;
+
+    private string ResultIcon => _lastSucceeded
+        ? Icons.Material.Outlined.CheckCircle
+        : Icons.Material.Outlined.Info;
+
+    protected override void OnInitialized() => Snapshot = DeviceAdapter.GetSnapshot();
+
+    private async Task PickFileAsync() => Apply(await DeviceAdapter.PickFileAsync());
+    private async Task CapturePhotoAsync() => Apply(await DeviceAdapter.CapturePhotoAsync());
+    private async Task ShareAsync() => Apply(await DeviceAdapter.ShareAsync("OPX Flat UI MAUI Hybrid host sample"));
+    private async Task ProbeSecureStorageAsync() => Apply(await DeviceAdapter.ProbeSecureStorageAsync());
+
+    private void Apply(HybridCapabilityResult result)
+    {
+        _lastSucceeded = result.Succeeded;
+        _resultMessage = result.Message;
+    }
+}

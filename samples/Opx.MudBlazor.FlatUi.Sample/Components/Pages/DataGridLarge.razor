@@ -24,7 +24,7 @@
                       Value="_search"
                       ValueChanged="SearchChanged"
                       Placeholder="Search orders, customers, or references..."
-                      Variant="Variant.Outlined"
+                      Variant="@FlatPreferences.InputVariant"
                       Margin="Margin.Dense"
                       Immediate="true"
                       Adornment="Adornment.Start"
@@ -38,6 +38,50 @@
                        Class="grid-action-button"
                        aria-label="Preview initial skeleton loading"
                        title="Preview initial skeleton loading" />
+        <MudIconButton Icon="@(_headerStyle == FlatGridHeaderStyle.CompactSearch ? Icons.Material.Outlined.ViewHeadline : Icons.Material.Outlined.ManageSearch)"
+                       Disabled="@_initialLoading"
+                       OnClick="ToggleHeaderStyle"
+                       Class="grid-action-button"
+                       aria-label="@(_headerStyle == FlatGridHeaderStyle.CompactSearch ? "Use standard grid headers" : "Use compact searchable grid headers")"
+                       title="@(_headerStyle == FlatGridHeaderStyle.CompactSearch ? "Standard headers" : "Compact searchable headers")" />
+        <MudIconButton Icon="@(_showHeaderIcons ? Icons.Material.Outlined.VisibilityOff : Icons.Material.Outlined.Visibility)"
+                       Disabled="@(_initialLoading || _headerStyle != FlatGridHeaderStyle.CompactSearch)"
+                       OnClick="() => _showHeaderIcons = !_showHeaderIcons"
+                       Class="grid-action-button"
+                       aria-label="@(_showHeaderIcons ? "Hide grid header icons" : "Show grid header icons")"
+                       title="@(_showHeaderIcons ? "Hide header icons" : "Show header icons")" />
+        <MudIconButton Icon="@Icons.Material.Outlined.WrapText"
+                       Disabled="@_initialLoading"
+                       Color="@(_autoRowHeight ? Color.Primary : Color.Default)"
+                       OnClick="() => _autoRowHeight = !_autoRowHeight"
+                       Class="grid-action-button"
+                       aria-pressed="@_autoRowHeight"
+                       aria-label="@(_autoRowHeight ? "Disable automatic row height" : "Enable automatic row height")"
+                       title="@(_autoRowHeight ? "Fixed row height" : "Automatic row height")" />
+        <MudIconButton Icon="@Icons.Material.Outlined.TableRows"
+                       Disabled="@_initialLoading"
+                       Color="@(_alternatingRows ? Color.Primary : Color.Default)"
+                       OnClick="() => _alternatingRows = !_alternatingRows"
+                       Class="grid-action-button"
+                       aria-pressed="@_alternatingRows"
+                       aria-label="@(_alternatingRows ? "Disable alternating rows" : "Enable alternating rows")"
+                       title="@(_alternatingRows ? "Plain rows" : "Alternating rows")" />
+        <MudIconButton Icon="@Icons.Material.Outlined.BorderVertical"
+                       Disabled="@_initialLoading"
+                       Color="@(_showVerticalLines ? Color.Primary : Color.Default)"
+                       OnClick="() => _showVerticalLines = !_showVerticalLines"
+                       Class="grid-action-button"
+                       aria-pressed="@_showVerticalLines"
+                       aria-label="@(_showVerticalLines ? "Hide vertical grid lines" : "Show vertical grid lines")"
+                       title="@(_showVerticalLines ? "Hide vertical lines" : "Show vertical lines")" />
+        <MudIconButton Icon="@Icons.Material.Outlined.BorderHorizontal"
+                       Disabled="@_initialLoading"
+                       Color="@(_showHorizontalLines ? Color.Primary : Color.Default)"
+                       OnClick="() => _showHorizontalLines = !_showHorizontalLines"
+                       Class="grid-action-button"
+                       aria-pressed="@_showHorizontalLines"
+                       aria-label="@(_showHorizontalLines ? "Hide horizontal grid lines" : "Show horizontal grid lines")"
+                       title="@(_showHorizontalLines ? "Hide horizontal lines" : "Show horizontal lines")" />
     </ToolbarActions>
     <ChildContent>
         <div class="large-grid-host">
@@ -45,6 +89,12 @@
                               State="GridState"
                               Columns="Columns"
                               Items="PagedRecords"
+                              HeaderStyle="_headerStyle"
+                              ShowHeaderIcons="_showHeaderIcons"
+                              AlternatingRows="_alternatingRows"
+                              ShowVerticalLines="_showVerticalLines"
+                              ShowHorizontalLines="_showHorizontalLines"
+                              AutoRowHeight="_autoRowHeight"
                               ValueSelector="GridValue"
                               Changed="ReloadPage"
                               AriaLabel="Large data grid with vertical and horizontal scrolling">
@@ -128,21 +178,27 @@
     private string _search = string.Empty;
     private bool _filterOpen;
     private bool _initialLoading = true;
+    private FlatGridHeaderStyle _headerStyle = FlatGridHeaderStyle.CompactSearch;
+    private bool _showHeaderIcons = true;
+    private bool _autoRowHeight = true;
+    private bool _alternatingRows;
+    private bool _showVerticalLines = true;
+    private bool _showHorizontalLines = true;
 
     private static readonly IReadOnlyList<GridColumnDefinition> Columns =
     [
-        new("order", "Order", WidthPercent: 9),
-        new("customer", "Customer", WidthPercent: 12),
-        new("channel", "Channel", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Channels), WidthPercent: 7),
-        new("region", "Region", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Regions), WidthPercent: 7),
-        new("representative", "Sales Representative", WidthPercent: 10),
-        new("date", "Order Date", GridColumnFilterType.Date, WidthPercent: 7, ValueKind: FlatGridColumnValueKind.Date),
-        new("status", "Status", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Statuses), WidthPercent: 7),
-        new("warehouse", "Warehouse", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Warehouses), WidthPercent: 10),
-        new("sku", "SKU Count", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number),
-        new("quantity", "Quantity", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number),
-        new("total", "Order Total", GridColumnFilterType.Number, WidthPercent: 8, ValueKind: FlatGridColumnValueKind.Currency, Format: "N0"),
-        new("address", "Delivery Address", WidthPercent: 13, WordWrap: true)
+        new("order", "Order", WidthPercent: 9) { HeaderIcon = Icons.Material.Outlined.ReceiptLong, SearchPlaceholder = "Search order" },
+        new("customer", "Customer", WidthPercent: 12) { HeaderIcon = Icons.Material.Outlined.Business, SearchPlaceholder = "Search customer" },
+        new("channel", "Channel", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Channels), WidthPercent: 7) { HeaderIcon = Icons.Material.Outlined.Storefront },
+        new("region", "Region", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Regions), WidthPercent: 7) { HeaderIcon = Icons.Material.Outlined.Place },
+        new("representative", "Sales Representative", WidthPercent: 10) { HeaderIcon = Icons.Material.Outlined.PersonSearch },
+        new("date", "Order Date", GridColumnFilterType.Date, WidthPercent: 7, ValueKind: FlatGridColumnValueKind.Date) { HeaderIcon = Icons.Material.Outlined.Event },
+        new("status", "Status", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Statuses), WidthPercent: 7) { HeaderIcon = Icons.Material.Outlined.Flag },
+        new("warehouse", "Warehouse", GridColumnFilterType.Category, true, GridFilterOptions.FromValues(Warehouses), WidthPercent: 10) { HeaderIcon = Icons.Material.Outlined.Warehouse },
+        new("sku", "SKU Count", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number) { HeaderIcon = Icons.Material.Outlined.Inventory2 },
+        new("quantity", "Quantity", GridColumnFilterType.Number, WidthPercent: 5, ValueKind: FlatGridColumnValueKind.Number) { HeaderIcon = Icons.Material.Outlined.Numbers },
+        new("total", "Order Total", GridColumnFilterType.Number, WidthPercent: 8, ValueKind: FlatGridColumnValueKind.Currency, Format: "N0") { HeaderIcon = Icons.Material.Outlined.Payments },
+        new("address", "Delivery Address", WidthPercent: 13) { HeaderIcon = Icons.Material.Outlined.LocalShipping }
     ];
 
     protected override void OnInitialized()
@@ -202,6 +258,10 @@
             || record.Reference.Contains(_search, StringComparison.OrdinalIgnoreCase));
         PagedRecords = GridState.ApplyPage(source, ValueFor);
     }
+
+    private void ToggleHeaderStyle() => _headerStyle = _headerStyle == FlatGridHeaderStyle.CompactSearch
+        ? FlatGridHeaderStyle.Standard
+        : FlatGridHeaderStyle.CompactSearch;
 
     private static string? ValueFor(LargeGridRecord record, string key) => key switch
     {

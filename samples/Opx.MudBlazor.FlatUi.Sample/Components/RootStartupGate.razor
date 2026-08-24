@@ -1,0 +1,106 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject FlatUiPreferencesService DisplayPreferences
+@inject FlatReconnectOptions ReconnectOptions
+@inject IRootStartupGateValidator StartupGateValidator
+
+@if (!_completed)
+{
+    <FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentThemePalette">
+        <FlatSessionRestore Title="@StartupTitle" Message="@StartupMessage" />
+    </FlatMudProviders>
+}
+else
+{
+    <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+    </Router>
+}
+
+@code {
+    private readonly CancellationTokenSource _disposeToken = new();
+    private bool _completed;
+    private bool _systemPrefersDark;
+
+    private string StartupTitle => string.IsNullOrWhiteSpace(ReconnectOptions.StartupTitle)
+        ? "Loading page..."
+        : ReconnectOptions.StartupTitle.Trim();
+
+    private string StartupMessage => string.IsNullOrWhiteSpace(ReconnectOptions.StartupMessage)
+        ? "Please wait a moment."
+        : ReconnectOptions.StartupMessage.Trim();
+
+    private bool IsDarkMode => DisplayPreferences.Current.ThemeMode switch
+    {
+        FlatUiThemeMode.Dark => true,
+        FlatUiThemeMode.Light => false,
+        _ => _systemPrefersDark
+    };
+
+    private FlatUiPalette CurrentThemePalette
+    {
+        get
+        {
+            var palette = DisplayPreferences.Options.ResolveColorPalette(DisplayPreferences.Current.ColorPalette);
+            return new FlatUiPalette(
+                Accent: palette.Accent,
+                AccentHover: palette.AccentHover,
+                AccentSubtle: palette.AccentSubtle,
+                AccentDark: palette.AccentDark,
+                DarkAccent: palette.DarkAccent,
+                DarkAccentHover: palette.DarkAccentHover,
+                Secondary: palette.Secondary,
+                Success: palette.Success,
+                Warning: palette.Warning,
+                Danger: palette.Danger);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            await DisplayPreferences.InitializeAsync();
+            _systemPrefersDark = await JS.InvokeAsync<bool>(
+                "opxFlatThemeBootstrap.prefersDarkMode",
+                _disposeToken.Token);
+        }
+        catch (JSException)
+        {
+            // First-paint bootstrap classes already provide the resolved theme.
+            // MainLayout retries persisted preferences after Router is created.
+            _systemPrefersDark = false;
+        }
+
+        var result = await StartupGateValidator.ValidateAsync(_disposeToken.Token);
+        if (_disposeToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        _completed = true;
+        if (result == RootStartupGateResult.Login
+            && !new Uri(Navigation.Uri).AbsolutePath.Equals("/login", StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo("/login", replace: true);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _disposeToken.Cancel();
+        _disposeToken.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}

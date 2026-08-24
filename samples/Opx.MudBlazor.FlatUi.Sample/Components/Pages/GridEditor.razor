@@ -72,10 +72,10 @@
     </text>;
 
     private RenderFragment<EditableLine> EditCells => line => @<text>
-        <td><MudTextField T="string" @bind-Value="line.Code" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Item code" Immediate="true" /></td>
-        <td><MudTextField T="string" @bind-Value="line.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Placeholder="Description" Immediate="true" /></td>
-        <td><MudNumericField T="int" @bind-Value="line.Quantity" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" Immediate="true" /></td>
-        <td><MudNumericField T="decimal" @bind-Value="line.UnitPrice" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Format="N0" Immediate="true" /></td>
+        <td><MudTextField T="string" @bind-Value="line.Code" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Placeholder="Item code" Immediate="true" /></td>
+        <td><MudTextField T="string" @bind-Value="line.Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Placeholder="Description" Immediate="true" /></td>
+        <td><MudNumericField T="int" @bind-Value="line.Quantity" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="1" Immediate="true" /></td>
+        <td><MudNumericField T="decimal" @bind-Value="line.UnitPrice" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" Format="N0" Immediate="true" /></td>
         <td><MudSwitch T="bool" @bind-Value="line.Active" Color="Color.Primary" /></td>
     </text>;
 
@@ -88,10 +88,10 @@
     </text>;
 
     private RenderFragment<EditableLine> MobileEdit => line => @<text>
-        <MudTextField T="string" @bind-Value="line.Code" Label="Item Code" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
-        <MudTextField T="string" @bind-Value="line.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
-        <MudNumericField T="int" @bind-Value="line.Quantity" Label="Quantity" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" Immediate="true" />
-        <MudNumericField T="decimal" @bind-Value="line.UnitPrice" Label="Unit Price" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Format="N0" Immediate="true" />
+        <MudTextField T="string" @bind-Value="line.Code" Label="Item Code" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
+        <MudTextField T="string" @bind-Value="line.Description" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
+        <MudNumericField T="int" @bind-Value="line.Quantity" Label="Quantity" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="1" Immediate="true" />
+        <MudNumericField T="decimal" @bind-Value="line.UnitPrice" Label="Unit Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" Format="N0" Immediate="true" />
         <MudSwitch T="bool" @bind-Value="line.Active" Label="Active" Color="Color.Primary" />
     </text>;
 

@@ -1,0 +1,12 @@
+@page "/login"
+@layout Layout.AuthLayout
+
+<PageTitle>Login</PageTitle>
+<section class="mobile-login-card" aria-labelledby="login-title">
+    <MudIcon Icon="@Icons.Material.Outlined.Lock" />
+    <h1 id="login-title">Login</h1>
+    <p>Replace this placeholder with the host-owned authentication flow. Never authorize from local storage alone.</p>
+    <MudTextField T="string" Label="User name" Variant="Variant.Outlined" />
+    <MudTextField T="string" Label="Password" InputType="InputType.Password" Variant="Variant.Outlined" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Login</MudButton>
+</section>

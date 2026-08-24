@@ -20,19 +20,19 @@
                           ValueChanged="SetSearch"
                           Immediate="true"
                           Placeholder="Search cards..."
-                          Variant="Variant.Outlined"
+                          Variant="@FlatPreferences.InputVariant"
                           Margin="Margin.Dense"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Outlined.Search"
                           Class="module-search" />
-            <MudSelect T="string" Class="kanban-desktop-filter" @bind-Value="_assigneeFilter" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" Class="kanban-desktop-filter" @bind-Value="_assigneeFilter" Label="Assignee" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@AllFilter">All</MudSelectItem>
                 @foreach (var assignee in Assignees)
                 {
                     <MudSelectItem Value="@assignee">@assignee</MudSelectItem>
                 }
             </MudSelect>
-            <MudSelect T="string" Class="kanban-desktop-filter" @bind-Value="_priorityFilter" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" Class="kanban-desktop-filter" @bind-Value="_priorityFilter" Label="Priority" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@AllFilter">All</MudSelectItem>
                 @foreach (var priority in Priorities)
                 {
@@ -92,14 +92,14 @@
              Class="mobile-filter-sheet kanban-filter-sheet">
     <ChildContent>
         <div class="kanban-filter-sheet-fields">
-            <MudSelect T="string" @bind-Value="_pendingAssigneeFilter" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_pendingAssigneeFilter" Label="Assignee" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@AllFilter">All</MudSelectItem>
                 @foreach (var assignee in Assignees)
                 {
                     <MudSelectItem Value="@assignee">@assignee</MudSelectItem>
                 }
             </MudSelect>
-            <MudSelect T="string" @bind-Value="_pendingPriorityFilter" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_pendingPriorityFilter" Label="Priority" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@AllFilter">All</MudSelectItem>
                 @foreach (var priority in Priorities)
                 {
@@ -125,28 +125,28 @@
                      OnClose="CloseEditor"
                      OnSubmit="SaveTask"
                      ConfirmClose="ConfirmClose">
-        <MudTextField T="string" Label="Title" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.Title" Immediate="true" />
-        <MudTextField T="string" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Lines="3" @bind-Value="_draft.Description" Immediate="true" />
-        <MudSelect T="string" Label="Column" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.ColumnKey">
+        <MudTextField T="string" Label="Title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.Title" Immediate="true" />
+        <MudTextField T="string" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" @bind-Value="_draft.Description" Immediate="true" />
+        <MudSelect T="string" Label="Column" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.ColumnKey">
             @foreach (var column in Columns)
             {
                 <MudSelectItem Value="@column.Key">@column.Title</MudSelectItem>
             }
         </MudSelect>
-        <MudSelect T="string" Label="Priority" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.Priority">
+        <MudSelect T="string" Label="Priority" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.Priority">
             @foreach (var priority in Priorities)
             {
                 <MudSelectItem Value="@priority">@priority</MudSelectItem>
             }
         </MudSelect>
-        <MudSelect T="string" Label="Assignee" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.Assignee">
+        <MudSelect T="string" Label="Assignee" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.Assignee">
             @foreach (var assignee in Assignees)
             {
                 <MudSelectItem Value="@assignee">@assignee</MudSelectItem>
             }
         </MudSelect>
-        <MudTextField T="string" Label="Due" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.DueText" Immediate="true" HelperText="Example: Aug 12 or Overdue" />
-        <MudTextField T="string" Label="Tags" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_draft.TagsText" Immediate="true" HelperText="Comma-separated labels" />
+        <MudTextField T="string" Label="Due" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.DueText" Immediate="true" HelperText="Example: Aug 12 or Overdue" />
+        <MudTextField T="string" Label="Tags" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.TagsText" Immediate="true" HelperText="Comma-separated labels" />
     </CrudEditorShell>
 }
 

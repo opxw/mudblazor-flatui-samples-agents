@@ -15,18 +15,18 @@
           OnRefresh="RefreshAsync">
     <ChildContent>
         <section class="flat-panel sample-report-filter">
-            <MudSelect T="string" @bind-Value="_period" Label="Period" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_period" Label="Period" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("All")">All periods</MudSelectItem>
                 <MudSelectItem Value="@("August 2026")">August 2026</MudSelectItem>
                 <MudSelectItem Value="@("July 2026")">July 2026</MudSelectItem>
             </MudSelect>
-            <MudSelect T="string" @bind-Value="_status" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="string" @bind-Value="_status" Label="Status" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("All")">All statuses</MudSelectItem>
                 <MudSelectItem Value="@("Completed")">Completed</MudSelectItem>
                 <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
                 <MudSelectItem Value="@("At risk")">At risk</MudSelectItem>
             </MudSelect>
-            <MudTextField T="string" @bind-Value="_search" Label="Search operations" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_search" Label="Search operations" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.PlayArrow" Disabled="@_busy" OnClick="GenerateAsync" Class="sample-report-apply">Generate</MudButton>
         </section>
 
