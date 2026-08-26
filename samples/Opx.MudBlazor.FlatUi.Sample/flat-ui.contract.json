@@ -110,6 +110,12 @@
         "iosAlwaysBounceVertical": false,
         "androidOverScrollMode": "Never",
         "pullToRefreshRequiresDedicatedControl": true,
+        "backNavigation": {
+          "precedence": ["topmost-modal-overlay", "previous-blazor-history", "native-host-fallback"],
+          "modalBackKeepsCurrentRoute": true,
+          "modalBackKeepsApplicationAlive": true,
+          "nativeExitRequiresEmptyOverlayAndHistory": true
+        },
         "textSelection": {
           "defaultPolicy": "disabled",
           "allowedTargets": ["input-text", "textarea", "contenteditable"],

@@ -34,10 +34,13 @@ From a short prompt, the agent must infer and state concisely:
 
 Do not return routine UI decisions to the user. Infer standard layout, spacing, panel padding, grid/card switch, form density, button placement, validation presentation, modal geometry, and responsive behavior from `page-registry.md`, `showcase-behavior-registry.md`, and the mapped sample.
 
+Before inventing any local UI or integration mechanism, inspect the supported NuGet public API and mapped canonical sample. Reuse an existing package component, option, callback, service seam, CSS, or JavaScript behavior exactly when available; do not duplicate or override it in the consumer. If no fitting capability exists, do not silently build a substitute: classify the gap as a domain-neutral package suggestion or a host-owned domain/integration/native seam, then present one decision-ready recommendation with impact, priority, compatibility/testing/release boundary, and approval scope. Use `belum terklasifikasi` until package availability and ownership have been inspected.
+
 ## Safe defaults when the prompt is short
 
 - Use the admin shell unless the words or business job clearly indicate public website or authentication.
 - `master`, `kelola`, `management`, or a request to add/edit/delete records selects a CRUD-capable archetype. `form <business record>` defaults to `opx.page.reference.model-crud` when the form persists a normal record; use `model-form-designer` only for a WYSIWYG tool that designs form layouts.
+- CRUD/form modal Back defaults to modal first, previous Blazor page second, and native app exit only at the true navigation root. Do not ask the user to choose this routine behavior.
 - `daftar`, `list`, or `grid` defaults to a responsive read-oriented grid/list unless mutation is requested. Choose grouped, editable, hierarchy, report, or pivot behavior only when the data/job requires it.
 - For responsive/mobile grid toolbars, keep search/filter text visible and default a multi-action icon row to collapsed/hidden (`MobileToolbarActionsExpandedByDefault=false`). Do not ask the user; an initially expanded row requires an explicit request or page need.
 - `dashboard` requires decision-oriented KPIs, units, period/freshness, exceptions/trends, and drill-down; never invent formulas or thresholds.

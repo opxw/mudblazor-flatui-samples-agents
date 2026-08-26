@@ -22,6 +22,7 @@ It demonstrates:
 - Android network-state permission for the host-owned `Connectivity.Current.NetworkAccess` capability;
 - Android edge-to-edge with a transparent status bar and measured AppBar inset through CommunityToolkit.Maui;
 - no-bounce root scrolling through package overscroll CSS and Android native WebView edge-overscroll suppression;
+- Blazor-first Android Back handling: package modal/overlay, previous WebView history entry, then native dispatcher only at the true root;
 - the complete shared display Settings surface plus a MAUI-only action that tests the host-owned local notification adapter;
 - a real Android local-notification channel, dedicated monochrome small-icon resource, enabled-channel check, and runtime permission flow started only by that explicit user action.
 

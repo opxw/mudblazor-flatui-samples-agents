@@ -68,6 +68,14 @@ AppBar. Luminance-aware Light/Dark icons are synchronized after saved theme/pale
 and Auto-theme system events. This integration is Android host-owned; Web and Windows keep
 the regular `60px` AppBar.
 
+## Android Back behavior
+
+Android Back follows the Blazor-first stack. Dispatch `opxFlatModalHistory.tryHandleBack`
+so an open form/modal consumes the first Back. When no modal handles it, call the embedded
+Android WebView's `CanGoBack()` and `GoBack()` so the next Back returns to the previous
+Blazor route. Delegate to the native dispatcher—and therefore permit app exit—only when
+both checks return false.
+
 ## Build
 
 ```powershell

@@ -970,6 +970,9 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         if (($promptingText -notmatch 'UseAppFontSize=false') -or ($promptingText -notmatch 'system font') -or ($promptingText -notmatch 'no custom app font')) {
             Add-Violation "Canonical prompting contract must default ordinary typography to the device/browser system font without a forced custom app font."
         }
+        if (($promptingText -notmatch 'supported NuGet public API') -or ($promptingText -notmatch 'do not silently build a substitute') -or ($promptingText -notmatch 'domain-neutral package suggestion') -or ($promptingText -notmatch 'host-owned domain/integration/native seam')) {
+            Add-Violation "Canonical prompting contract must enforce package-first reuse and classify missing capabilities before suggesting work."
+        }
     }
     $knowledgePath = Join-Path $contractRoot ".agents\KNOWLEDGE.md"
     if (Test-Path -LiteralPath $knowledgePath) {
@@ -985,6 +988,9 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         }
         if (($knowledgeText -notmatch 'initial spacing preset') -or ($knowledgeText -notmatch 'DefaultDensity="Default"') -or ($knowledgeText -notmatch 'no separate `DefaultSpacing`')) {
             Add-Violation "Canonical knowledge must preserve Default as the package spacing/density baseline."
+        }
+        if (($knowledgeText -notmatch 'Package-first reuse is mandatory') -or ($knowledgeText -notmatch 'never duplicate package behavior') -or ($knowledgeText -notmatch 'Package changes and publication require explicit approval')) {
+            Add-Violation "Canonical knowledge must preserve package-first reuse and the approval boundary for package changes."
         }
     }
 }

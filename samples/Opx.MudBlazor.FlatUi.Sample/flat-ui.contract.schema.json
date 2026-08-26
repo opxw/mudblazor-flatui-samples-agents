@@ -296,6 +296,7 @@
                 "iosAlwaysBounceVertical",
                 "androidOverScrollMode",
                 "pullToRefreshRequiresDedicatedControl",
+                "backNavigation",
                 "textSelection"
               ],
               "properties": {
@@ -306,6 +307,17 @@
                 "iosAlwaysBounceVertical": { "const": false },
                 "androidOverScrollMode": { "const": "Never" },
                 "pullToRefreshRequiresDedicatedControl": { "const": true },
+                "backNavigation": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["precedence", "modalBackKeepsCurrentRoute", "modalBackKeepsApplicationAlive", "nativeExitRequiresEmptyOverlayAndHistory"],
+                  "properties": {
+                    "precedence": { "const": ["topmost-modal-overlay", "previous-blazor-history", "native-host-fallback"] },
+                    "modalBackKeepsCurrentRoute": { "const": true },
+                    "modalBackKeepsApplicationAlive": { "const": true },
+                    "nativeExitRequiresEmptyOverlayAndHistory": { "const": true }
+                  }
+                },
                 "textSelection": {
                   "type": "object",
                   "additionalProperties": false,

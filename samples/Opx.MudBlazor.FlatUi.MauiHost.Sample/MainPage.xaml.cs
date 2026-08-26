@@ -109,6 +109,25 @@ public partial class MainPage : ContentPage
         }
     }
 
+    public Task<bool> TryHandleBlazorBackAsync()
+    {
+#if ANDROID
+        return Dispatcher.DispatchAsync(() =>
+        {
+            if (blazorWebView.Handler?.PlatformView is not Android.Webkit.WebView webView
+                || !webView.CanGoBack())
+            {
+                return false;
+            }
+
+            webView.GoBack();
+            return true;
+        });
+#else
+        return Task.FromResult(false);
+#endif
+    }
+
 #if ANDROID
     private void DisableAndroidWebViewBounce(object? sender, EventArgs e)
     {

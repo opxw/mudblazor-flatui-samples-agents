@@ -133,6 +133,9 @@ else {
             if (($behaviorText -notmatch 'MobileToolbarActionsExpandedByDefault=false') -or ($behaviorText -notmatch 'action row defaults to collapsed/hidden') -or ($behaviorText -notmatch 'desktop actions remain visible')) {
                 Add-Violation "Canonical showcase behavior registry must preserve the collapsed responsive toolbar action-row default."
             }
+            if (($behaviorText -notmatch 'topmost modal/overlay consumes Back first') -or ($behaviorText -notmatch 'next Back uses prior Blazor history') -or ($behaviorText -notmatch 'native exit.*true root')) {
+                Add-Violation "Canonical showcase behavior registry must preserve modal, Blazor history, then native Back precedence."
+            }
             if (($behaviorText -notmatch '"bug package"') -or ($behaviorText -notmatch '"bug integrasi aplikasi"') -or ($behaviorText -notmatch '"belum terklasifikasi"')) {
                 Add-Violation "Canonical showcase behavior registry must preserve explicit package-versus-integration defect labels."
             }
@@ -421,6 +424,15 @@ if ($null -ne $manifest) {
     foreach ($flag in @("iosScrollViewBounces", "iosAlwaysBounceVertical")) {
         if ((Get-JsonProperty $webViewInteraction $flag) -ne $false) {
             Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.$flag must be false."
+        }
+    }
+    $backNavigation = Get-JsonProperty $webViewInteraction "backNavigation"
+    if ((@((Get-JsonProperty $backNavigation "precedence")) -join "|") -cne "topmost-modal-overlay|previous-blazor-history|native-host-fallback") {
+        Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.backNavigation.precedence must be modal, Blazor history, then native fallback."
+    }
+    foreach ($flag in @("modalBackKeepsCurrentRoute", "modalBackKeepsApplicationAlive", "nativeExitRequiresEmptyOverlayAndHistory")) {
+        if ((Get-JsonProperty $backNavigation $flag) -ne $true) {
+            Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.backNavigation.$flag must be true."
         }
     }
     $textSelection = Get-JsonProperty $webViewInteraction "textSelection"
@@ -1015,6 +1027,12 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         if (($promptingText -notmatch 'search/filter text visible') -or ($promptingText -notmatch 'MobileToolbarActionsExpandedByDefault=false') -or ($promptingText -notmatch 'collapsed/hidden')) {
             Add-Violation "Canonical prompting contract must default responsive search/filter toolbar action rows to collapsed/hidden."
         }
+        if (($promptingText -notmatch 'modal first') -or ($promptingText -notmatch 'previous Blazor page second') -or ($promptingText -notmatch 'native app exit only at the true navigation root')) {
+            Add-Violation "Canonical prompting contract must preserve layered Back behavior."
+        }
+        if (($promptingText -notmatch 'supported NuGet public API') -or ($promptingText -notmatch 'do not silently build a substitute') -or ($promptingText -notmatch 'domain-neutral package suggestion') -or ($promptingText -notmatch 'host-owned domain/integration/native seam')) {
+            Add-Violation "Canonical prompting contract must enforce package-first reuse and classify missing capabilities before suggesting work."
+        }
     }
     $knowledgePath = Join-Path $contractRoot ".agents\KNOWLEDGE.md"
     if (Test-Path -LiteralPath $knowledgePath) {
@@ -1036,6 +1054,12 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         }
         if (($knowledgeText -notmatch 'MobileToolbarActionsExpandedByDefault') -or ($knowledgeText -notmatch 'defaults to `false`') -or ($knowledgeText -notmatch 'collapsed/hidden')) {
             Add-Violation "Canonical knowledge must preserve collapsed/hidden as the responsive toolbar action-row default."
+        }
+        if (($knowledgeText -notmatch 'Back behavior is layered and Blazor-first') -or ($knowledgeText -notmatch 'next Back navigates through prior Blazor WebView history') -or ($knowledgeText -notmatch 'native Back/app exit only when')) {
+            Add-Violation "Canonical knowledge must preserve modal, Blazor history, then native Back precedence."
+        }
+        if (($knowledgeText -notmatch 'Package-first reuse is mandatory') -or ($knowledgeText -notmatch 'never duplicate package behavior') -or ($knowledgeText -notmatch 'Package changes and publication require explicit approval')) {
+            Add-Violation "Canonical knowledge must preserve package-first reuse and the approval boundary for package changes."
         }
     }
 }

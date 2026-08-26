@@ -57,6 +57,11 @@ public class MainActivity : MauiAppCompatActivity
                     return;
                 }
 
+                if (page is not null && await page.TryHandleBlazorBackAsync())
+                {
+                    return;
+                }
+
                 Enabled = false;
                 activity.OnBackPressedDispatcher.OnBackPressed();
             }

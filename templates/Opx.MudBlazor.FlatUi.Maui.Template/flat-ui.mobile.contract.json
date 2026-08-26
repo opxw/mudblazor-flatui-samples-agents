@@ -52,6 +52,12 @@
     "androidDeclaredPermissions": ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE", "android.permission.POST_NOTIFICATIONS"],
     "defaultDotNetSplashArtworkVisible": false,
     "neutralSplashSurface": "#FFFFFF",
+    "backBehavior": {
+      "precedence": ["topmost-modal-overlay", "previous-blazor-history", "native-host-fallback"],
+      "modalBackKeepsCurrentRoute": true,
+      "modalBackKeepsApplicationAlive": true,
+      "nativeExitRequiresEmptyOverlayAndHistory": true
+    },
     "iosBounces": false,
     "iosAlwaysBounceVertical": false
   },
