@@ -2,6 +2,7 @@ using Opx.MudBlazor.FlatUi.Sample.Components;
 using Opx.MudBlazor.FlatUi.Sample.Services;
 using Opx.MudBlazor.FlatUi.Models;
 using Opx.MudBlazor.FlatUi.Services;
+using Opx.MudBlazor.FlatUi.Showcase;
 using MudBlazor.Services;
 using System.Net.WebSockets;
 using System.Text;
@@ -26,14 +27,9 @@ builder.Services.AddMudServices(options =>
     options.SnackbarConfiguration.HideTransitionDuration =
         snackbarOptions.NormalizedHideTransitionDurationMs;
 });
-builder.Services.AddSingleton<SampleCatalog>();
-builder.Services.AddSingleton<ErpSampleCatalog>();
-builder.Services.AddScoped(typeof(FlatSessionCartService<>));
+builder.Services.AddOpxFlatUiShowcase();
 builder.Services.AddScoped<FlatPageLoadingState>();
 builder.Services.AddScoped<FlatMessageBoxService>();
-builder.Services.AddScoped<SampleStartupGateService>();
-builder.Services.AddScoped<IRootStartupGateValidator, SampleRootStartupGateValidator>();
-builder.Services.AddScoped<FlatChatWebSocketClient>();
 builder.Services.AddScoped<IDeviceNotificationService, FlatWebDeviceNotificationService>();
 var applicationOptions = builder.Configuration
     .GetSection("OpxFlatUi:Application")
@@ -130,6 +126,7 @@ app.Map("/ws/chat-demo", async context =>
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
+    .AddAdditionalAssemblies(typeof(Opx.MudBlazor.FlatUi.Showcase.ShowcaseAssemblyMarker).Assembly)
     .AddInteractiveServerRenderMode();
 
 app.Run();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-opx-theme-mode="auto" data-opx-theme-storage-key="opx.flat-ui.maui-host.display">
+<html lang="en" data-opx-theme-mode="light" data-opx-theme-storage-key="opx.flat-ui.maui-host.display">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -9,15 +9,29 @@
     <script src="_content/Opx.MudBlazor.FlatUi/opx-flat-ui-theme-bootstrap.js"></script>
     <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
     <link rel="stylesheet" href="_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" />
+    <link rel="stylesheet" href="_content/Opx.MudBlazor.FlatUi.Showcase/opx-flat-ui-showcase.css" />
     <link rel="stylesheet" href="app.css" />
 </head>
 <body>
     <div class="status-bar-safe-area"></div>
-    <div id="app"></div>
-    <div id="blazor-error-ui" data-nosnippet>
-        An unhandled error has occurred.
-        <a href="." class="reload">Reload</a>
-        <a class="dismiss">Dismiss</a>
+    <div id="app">
+        <div class="opx-maui-static-loading" role="status" aria-live="polite">
+            <span class="flat-system-loading-spinner" aria-hidden="true"></span>
+            <strong>Memuat</strong>
+            <small>Menyiapkan aplikasi...</small>
+        </div>
+    </div>
+    <div id="blazor-error-ui" class="opx-fatal-error" role="alert" aria-live="assertive" aria-atomic="true" data-nosnippet>
+        <div class="opx-fatal-error-state">
+            <svg class="opx-fatal-error-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M19.35 10.04A7.49 7.49 0 0 0 5.4 7.9 5.994 5.994 0 0 0 6 19h10.73l-2-2H6a4 4 0 0 1-.78-7.92l1.08-.22.35-1.05A5.5 5.5 0 0 1 17.74 9l.15 1.24 1.23.18A3.49 3.49 0 0 1 22 13.87c0 .75-.24 1.44-.64 2.01l1.43 1.43A5.46 5.46 0 0 0 24 13.87a5.5 5.5 0 0 0-4.65-5.43zM3.27 2 2 3.27l3.02 3.02A7.96 7.96 0 0 0 4 7.9l1.63 1.63A5.6 5.6 0 0 1 7.1 7.1l9.63 9.63L19 19l1.73 1.73L22 19.46 3.27 2z" />
+            </svg>
+            <div>
+                <strong>Application unavailable</strong>
+                <small>The app stopped unexpectedly. Restart to continue.</small>
+            </div>
+            <button type="button" class="reload" onclick="window.location.reload()">Restart</button>
+        </div>
     </div>
     <script src="maui-host.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>

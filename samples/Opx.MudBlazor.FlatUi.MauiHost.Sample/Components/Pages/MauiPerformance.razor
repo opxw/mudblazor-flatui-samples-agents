@@ -1,0 +1,92 @@
+@page "/maui-performance"
+@implements IDisposable
+@inject MauiPerformanceTracker Performance
+
+<PageTitle>MAUI Performance</PageTitle>
+
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="hybrid-host-page">
+    <div class="maui-performance-summary">
+        <FlatStatCard Label="Startup elapsed"
+                      Value="@Format(Performance.StartupElapsedMilliseconds)"
+                      Note="Since the tracker was created"
+                      Icon="@Icons.Material.Outlined.Speed" />
+        <FlatStatCard Label="Startup stages"
+                      Value="@Performance.StartupSamples.Count.ToString()"
+                      Note="Recorded host checkpoints"
+                      Icon="@Icons.Material.Outlined.Flag" />
+        <FlatStatCard Label="Measured routes"
+                      Value="@Performance.RouteSamples.Count.ToString()"
+                      Note="Rendered in this process"
+                      Icon="@Icons.Material.Outlined.Route" />
+    </div>
+
+    <FlatPanel Title="Startup checkpoints" Subtitle="Actual elapsed time in the current MAUI process">
+        <div class="table-scroll">
+            <table class="maui-performance-table">
+                <thead><tr><th>Stage</th><th>Elapsed</th></tr></thead>
+                <tbody>
+                    @foreach (var sample in Performance.StartupSamples)
+                    {
+                        <tr><td>@sample.Stage</td><td>@Format(sample.ElapsedMilliseconds)</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </FlatPanel>
+
+    <FlatPanel Title="Route render samples" Subtitle="Location change until the first completed render">
+        <div class="hybrid-actions">
+            <MudButton Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Outlined.DeleteSweep"
+                       OnClick="ClearSamples">
+                Clear route samples
+            </MudButton>
+        </div>
+        @if (Performance.RouteSamples.Count == 0)
+        {
+            <p class="maui-performance-empty">Open sample pages, then return here to compare their measured renders.</p>
+        }
+        else
+        {
+            <div class="table-scroll">
+                <table class="maui-performance-table">
+                    <thead>
+                        <tr><th>Route</th><th>Runs</th><th>Last</th><th>Min</th><th>Average</th><th>Max</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sample in Performance.RouteSamples)
+                        {
+                            <tr>
+                                <td><a href="@sample.Route">@sample.Route</a></td>
+                                <td>@sample.Count</td>
+                                <td>@Format(sample.LastMilliseconds)</td>
+                                <td>@Format(sample.MinimumMilliseconds)</td>
+                                <td>@Format(sample.AverageMilliseconds)</td>
+                                <td>@Format(sample.MaximumMilliseconds)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </FlatPanel>
+
+    <FlatPanel Title="Evidence boundary" Subtitle="How to interpret the numbers">
+        <p class="hybrid-copy">
+            These values measure the current process and device. Compare repeated Release runs on the same hardware;
+            they do not represent API latency, database performance, iOS behavior, or another device.
+        </p>
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    protected override void OnInitialized() => Performance.Changed += HandleChanged;
+
+    private static string Format(double milliseconds) => $"{milliseconds:N1} ms";
+
+    private void ClearSamples() => Performance.ClearRouteSamples();
+
+    private void HandleChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Performance.Changed -= HandleChanged;
+}

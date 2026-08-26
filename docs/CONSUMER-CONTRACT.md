@@ -11,9 +11,9 @@ From this repository root:
 ```powershell
 dotnet new install .
 dotnet new opx-flatui-web -n MyCompany.MyApp
-Set-Location MyCompany.MyApp
+Set-Location MyCompany.MyApp\MyCompany.MyApp
 & .\run-clean.ps1 -PrepareOnly
-& .\.agents\skills\opx-flat-ui-development\scripts\audit_flat_ui_consumer.ps1 -ProjectPath . -ExactSample
+& ..\.agents\skills\opx-flat-ui-development\scripts\audit_flat_ui_consumer.ps1 -ProjectPath . -ExactSample
 dotnet build -c Release --no-restore --nologo
 & .\run-clean.ps1
 ```
@@ -30,7 +30,7 @@ Set-Location MyCompany.MyMobileApp
 dotnet build -f net10.0-android -c Release --no-restore
 ```
 
-Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.8.0`, and OPX Flat UI `2.0.17`. Android compilation is required source evidence; iOS build/runtime and all native UX claims still require macOS/Xcode plus simulator/device evidence.
+Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.0.20`. Android compilation is required source evidence; iOS build/runtime and all native UX claims still require macOS/Xcode plus simulator/device evidence.
 
 ## Required workflow
 
@@ -38,7 +38,7 @@ Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `1
 2. Read `flat-ui.contract.json` and keep its package, clean initial-run, stylesheet ownership, runtime HTML attribution, theme, adaptive responsive boundaries, native-mobile deployment, startup access gate, mandatory shell, and widget-spacing baseline values aligned with the installed contract.
 3. Resolve the requested UI to one canonical `PageId` in `page-registry.md`.
 4. Open the mapped archetype and every shared component it directly uses.
-5. Keep the initialized admin shell complete: `MainLayout.razor` must expose the AppBar three-dot menu with `Settings`, its dedicated Application preferences modal, and Light/Dark/Auto choices; it must mount `SampleSidebarMenu.razor` with Dashboard `/`, the initial sample groups, search, and active-route expansion. In the seeded user block, keep the Logout icon last and aligned to the right edge on desktop and responsive drawers, while the avatar and identity copy remain on the left. The initial groups are seed content, not permanent business-menu records; labels, routes, permissions, grouping, identity data, and actual logout/session behavior may be replaced by the consumer while the functional shell geometry remains.
+5. Keep the initialized admin shell complete: host `MainLayout.razor` exposes the AppBar three-dot menu with `Settings`, its Application preferences modal, and Light/Dark/Auto choices; shared `ShowcaseNavigationCatalog` supplies Dashboard `/`, initial groups, search, and route titles. In the seeded user block, keep Logout last and right-aligned while avatar/copy remain left. Seed labels, permissions, identity data, and actual logout/session behavior remain host-owned.
 6. Adapt only branding, wording, data, authorization, and domain integration. Start with the Light default theme and preserve composition, responsive behavior, theme tokens, widget padding/margins/gaps, loading, modal, toolbar, grid, and FAB contracts. For widgets, use the parent grid gap and do not add outer margins to individual cards; follow `docs/WIDGETS.md`.
 7. Run the consumer audit with `-ExactSample`, Release build, and representative desktop/mobile Light/Dark browser validation.
 
@@ -48,7 +48,17 @@ Exact Sample Mode is mandatory when the request says the result must be the same
 
 Responsive behavior is a composition contract, not desktop scaling. Keep table/desktop presentation above `900px`, equivalent responsive cards at `900px` and below, two-column cards from `601px` through `900px`, and single-column phone refinement at `600px` and below. Preserve one query, selection, permission, loading, validation, and mutation state across representations. Use viewport/container CSS rather than Android/iOS user-agent checks, perform desktop -> responsive -> desktop live resize without reload, and verify Light/Dark/Auto, browser text scaling, keyboard focus, touch geometry, internal scroll ownership, and zero document-level horizontal overflow. Browser checks do not prove MAUI native behavior.
 
+The initialized geometry baseline sets `OpxFlatUi:Display:DefaultRoundedSizePx` to `7`. The package applies it to ordinary buttons and bottom-sheet top corners; other standard Flat UI surfaces remain square. Keep this package-owned token as the single authority and do not recreate the radius with consumer CSS.
+
+The initialized color baseline sets `OpxFlatUi:Display:DefaultColorPalette` to the built-in ID `fluent-blue`. Settings may preview and persist another built-in/configured palette, but Restore clears that override and returns to Fluent Blue. Consume the resolved shared palette tokens across Light and Dark/Night; do not hard-code its hex values into page CSS.
+
+The initialized spacing preset uses the package density key `OpxFlatUi:Display:DefaultDensity` with value `Default`. Do not create a parallel `DefaultSpacing` setting. Compact and Comfortable remain optional persisted choices; density affects internal component rhythm but never replaces the canonical page gutters, panel insets, safe areas, or widget/component spacing contracts.
+
 For `NavigationLayout=Bottom`, `FlatAppShell.BottomNavigationMaxWidthPx` defaults to `600`. The initialized template sets `900`, rendering Bottom navigation at tablet and phone widths and the sidebar above `900px`. This decision must follow live viewport width identically on Web, MAUI Hybrid, and resized Windows EXE hosts; OS, device type, user-agent, and MAUI-platform branching are forbidden.
+
+If a request selects Bottom navigation but does not specify child presentation, set `OpxFlatUi:Display:DefaultBottomNavigationChildPresentation` to `Sheet`. Parent and overflow items then open through the package-owned recursive bottom sheet. `MainView` is an explicit opt-in that replaces the content area with navigation tiles; it must not be inferred silently.
+
+Responsive/mobile search and filter toolbars keep their text field visible while a toolbar row containing at least two secondary icon actions starts collapsed/hidden. Preserve the package default `FlatPage.MobileToolbarActionsExpandedByDefault=false`; the accessible Apps/Close toggle controls the row, desktop actions remain visible, and initial expansion is explicit opt-in.
 
 Bottom-navigation labels are package-owned and descender-safe: line-height `1.25`, bottom inset `1px`, single-line ellipsis, and bar height `60px`. Validate letters `g`, `j`, `p`, `q`, and `y`; do not recreate this fix in `app.css`.
 
@@ -76,16 +86,16 @@ Use `Edit` consistently for the CRUD edit button, editor-title verb, tooltip, an
 
 ## Clean initial run
 
-Use `run-clean.ps1` for the first application start. It resolves the single project in its own directory, deletes only that project's exact `bin` and `obj` directories, restores through the copied `NuGet.Config`, and then runs with `--no-restore`. `-PrepareOnly` performs the clean and restore without launching a long-running server and exists for CI/audit preparation. Do not replace this with a broad recursive cleanup from a parent workspace.
+Use `run-clean.ps1` for the first Web application start. It resolves the thin host and its fixed sibling `Opx.MudBlazor.FlatUi.Showcase`, deletes only those two projects' exact `bin` and `obj` directories, restores through the copied `NuGet.Config`, and runs the host with `--no-restore`. `-PrepareOnly` performs clean/restore only. Do not replace this with broad recursive cleanup.
 
 ## Stylesheet ownership
 
-- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.17` pins its SHA-256 so a stale or substituted package asset fails audit.
-- The consumer starts with Light theme and Device/browser font ownership (`UseAppFontSize=false`). Settings always exposes Device/Manual; Manual uses the bounded `16px` default, while Device follows browser `1rem` and preserves accessibility scaling. This intentionally differs from the source showroom's theme default while retaining its `2.0.17` font behavior.
+- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.0.20` pins its SHA-256 so a stale or substituted package asset fails audit.
+- The consumer starts with Light theme and Device/browser font ownership (`UseAppFontSize=false`). Settings always exposes Device/Manual; Manual uses the bounded `16px` default, while Device follows browser `1rem` and preserves accessibility scaling. This intentionally differs from the source showroom's theme default while retaining its `2.0.20` font behavior.
 - MudBlazor styling comes only from `_content/MudBlazor/MudBlazor.min.css`. Never copy either package stylesheet into `wwwroot`.
-- `wwwroot/app.css` is the canonical source-sample host/domain composition layer, not a fork of reusable package CSS. A newly generated project receives its normalized-LF source-of-truth hash so Windows/Linux line endings do not create false drift. Change it only when implementing deliberate consumer composition, and do not redefine reusable OPX component behavior there.
+- `Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css` is the canonical sample/domain composition layer, not a fork of reusable package CSS. Its normalized-LF hash is audited; change it only for deliberate shared sample composition.
 - The template excludes the unused local Bootstrap distribution. Additional UI-framework packages, stylesheet links, and CSS imports are forbidden.
-- `Components/App.razor` keeps theme bootstrap first, then MudBlazor CSS, OPX package CSS, and the canonical host composition stylesheet. Stale `bin`/`obj` static-web-asset manifests cannot be used as visual evidence because the initial launcher removes them.
+- `Components/App.razor` keeps theme bootstrap first, then MudBlazor CSS, OPX NuGet CSS, and the shared Showcase composition stylesheet. Stale `bin`/`obj` static-web-asset manifests cannot be used as visual evidence because the initial launcher removes them.
 
 ## Runtime HTML attribution
 

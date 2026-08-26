@@ -15,11 +15,16 @@ Naming rules:
 | PageId | Canonical page name | Route | Prompt cues | Shell / archetype | Source |
 |---|---|---|---|---|---|
 | `opx.page.dashboard.overview` | Dashboard Overview | `/` | dashboard, overview, KPI | Admin / dashboard widgets | `Home.razor` |
+| `opx.page.reference.maui-host` | MAUI Hybrid Host | `/maui-host` | MAUI host, native adapters, device capabilities | Repository MAUI showroom | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/MauiHost.razor` |
+| `opx.page.reference.maui-performance` | MAUI Performance | `/maui-performance` | startup timing, route render, performance measurement | Repository MAUI runtime diagnostics | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/MauiPerformance.razor` |
+| `opx.page.reference.maui-compatibility` | MAUI Compatibility | `/compatibility` | WebView compatibility, viewport, theme, lifecycle, status bar | Repository MAUI native reference | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/Compatibility.razor` |
+| `opx.page.reference.maui-native-adapters` | MAUI Native Adapters | `/native-adapters` | secure storage, camera, file picker, share, notification | Repository MAUI capability reference | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/NativeAdapters.razor` |
 | `opx.page.reference.accordions` | Accordion Showcase | `/accordions` | accordion, FAQ, disclosure | Admin / component showroom | `Accordions.razor` |
 | `opx.page.account.profile-edit` | Account Profile Editor | `/account/edit` | edit account, profile, permissions | Admin / settings form | `EditAccount.razor` |
 | `opx.page.assistant.ai-chat` | AI Chat Workspace | `/ai-chat` | AI chat, assistant, streaming prompt | Admin / AI chat | `AiChat.razor` |
 | `opx.page.content.blog-index` | Blog Index | `/blog` | blog, article cards, content | Website / public content | `Blog.razor` |
 | `opx.page.schedule.calendar` | Calendar Workspace | `/calendar` | calendar, year, month, week, agenda | Admin / calendar | `Calendar.razor` |
+| `opx.page.schedule.scheduler` | Work Week Scheduler | `/scheduler` | scheduler, appointments, work week, timeline, resources | Admin / scheduler time grid | `Scheduler.razor` |
 | `opx.page.commerce.catalog` | Product Catalog | `/catalog` | ecommerce catalog, storefront, price filter | Website / public catalog | `Catalog.razor` |
 | `opx.page.reference.charts` | Chart Showcase | `/charts` | charts, MudBlazor charts, sample code | Admin / component showroom | `Charts.razor` |
 | `opx.page.collaboration.chat` | Realtime Chat Workspace | `/chat` | chat, conversation, typing | Admin / chat | `Chat.razor` |
@@ -29,6 +34,7 @@ Naming rules:
 | `opx.page.operations.asset-crud` | Asset Management CRUD | `/crud` | CRUD, asset grid, filter, paging | Admin / full CRUD | `Crud.razor` |
 | `opx.page.operations.simple-crud` | Simple CRUD | `/crud-simple` | simple CRUD, add form | Admin / compact CRUD | `SimpleCrud.razor` |
 | `opx.page.reference.large-data-grid` | Large Data Grid | `/data-grid-large` | many rows, vertical horizontal scroll | Admin / bounded grid | `DataGridLarge.razor` |
+| `opx.page.reference.grouped-data-grid` | Grouped Data Grid | `/grouped-data-grid` | grouped grid, expandable rows, count sum average | Admin / bounded grouped grid | `GroupedDataGrid.razor` |
 | `opx.page.collaboration.email` | Email Workspace | `/email` | email, inbox, compose | Admin / email | `Email.razor` |
 | `opx.page.reference.enterprise-toolkit` | Enterprise Toolkit | `/enterprise-toolkit` | enterprise components, workflow, audit, import | Admin / enterprise showroom | `EnterpriseToolkit.razor` |
 | `opx.page.reference.experience-toolkit` | Experience Toolkit | `/experience-toolkit` | accessibility, command palette, schema form, collaboration, conflict | Admin / application experience showroom | `ExperienceToolkit.razor` |
@@ -72,11 +78,13 @@ Naming rules:
 | `opx.page.commerce.product-management` | Product Management | `/product-management` | product admin, filter rail, inventory list | Admin / filter workspace | `ProductManagement.razor` |
 | `opx.page.reference.profile-grid` | Profile Card Grid | `/profile-grid` | profile cards, people grid | Admin / card grid | `ProfileGrid.razor` |
 | `opx.page.reporting.operational` | Operational Reports | `/reports` | report, export, filter | Admin / report viewer | `Reports.razor` |
+| `opx.page.reporting.pdf-viewer` | PDF Viewer | `/pdf-viewer` | PDF preview, PDF.js, print, share, thumbnails, search | Admin / responsive document viewer | `PdfViewer.razor` |
 | `opx.page.auth.reset-password` | Reset Password | `/reset-password` | forgot password, reset password | Auth / recovery | `ResetPassword.razor` |
 | `opx.page.sales.pipeline` | Sales Pipeline | `/sales-pipeline` | CRM pipeline, deal stages | Admin / pipeline kanban | `SalesPipeline.razor` |
 | `opx.page.reference.static-data` | Static Data Management | `/static-data` | master data, static CRUD | Admin / static responsive list | `StaticData.razor` |
 | `opx.page.reference.timeline` | Timeline Showcase | `/timeline` | timeline, audit activity | Admin / timeline | `Timeline.razor` |
 | `opx.page.reference.tree-grid` | Tree Grid Showcase | `/tree-grid` | hierarchy, parent key, drag drop tree | Admin / tree grid | `TreeGrid.razor` |
+| `opx.page.reference.hierarchy-designer` | Hierarchy Designer | `/hierarchy-designer` | compact outline, hierarchy designer, drag drop reorder, export JSON | Admin / compact hierarchy designer | `HierarchyDesigner.razor` |
 | `opx.page.reference.vector-map` | Vector Map Showcase | `/vector-map` | vector map, floor plan, denah, location tracking, route | Admin / component showroom | `VectorMap.razor` |
 | `opx.page.operations.spatial-workspace` | Spatial Operations | `/spatial-operations` | layered floor, geofence, work list map, route playback, fleet tracking | Admin / spatial operations workspace | `SpatialOperations.razor` |
 | `opx.page.auth.two-step-verification` | Two-Step Verification | `/two-step-verification` | OTP, 2FA, verification code | Auth / verification | `TwoStepVerification.razor` |

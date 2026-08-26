@@ -1,0 +1,70 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject FlatUiPreferencesService Preferences
+@inject IHybridStatusBarService StatusBarService
+@inject MauiPerformanceTracker Performance
+
+@code {
+    private string _pendingRoute = "/";
+    private bool _measurePending;
+    private bool _statusBarPending = true;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += HandleLocationChanged;
+        Preferences.Changed += HandlePreferencesChanged;
+        _pendingRoute = Navigation.Uri;
+        Performance.BeginRoute(_pendingRoute);
+        _measurePending = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_measurePending)
+        {
+            _measurePending = false;
+            Performance.CompleteRoute(_pendingRoute);
+        }
+
+        if (!_statusBarPending)
+            return;
+
+        _statusBarPending = false;
+        try
+        {
+            var appearance = await JS.InvokeAsync<HybridStatusBarAppearance>(
+                "opxMauiHost.getAppBarAppearance");
+            var inset = await StatusBarService.ApplyAsync(appearance);
+            await JS.InvokeVoidAsync(
+                "opxMauiHost.applyTransparentStatusBarLayout",
+                inset,
+                appearance.BackgroundColor);
+        }
+        catch (Exception exception) when (exception is JSException or InvalidOperationException)
+        {
+            // The WebView may be detaching during native shutdown.
+        }
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        _pendingRoute = args.Location;
+        Performance.BeginRoute(_pendingRoute);
+        _measurePending = true;
+        _statusBarPending = true;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void HandlePreferencesChanged()
+    {
+        _statusBarPending = true;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= HandleLocationChanged;
+        Preferences.Changed -= HandlePreferencesChanged;
+    }
+}

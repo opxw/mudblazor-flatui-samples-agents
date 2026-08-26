@@ -5,11 +5,27 @@ body,
 #app {
     min-height: 100%;
     margin: 0;
+    overscroll-behavior: none;
 }
 
 body {
     background: var(--mud-palette-background, #f3f6f9);
 }
+
+.opx-maui-static-loading {
+    min-height: 100dvh;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 10px;
+    padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
+    background: var(--surface, #fff);
+    color: var(--foreground, #495057);
+    text-align: center;
+}
+
+.opx-maui-static-loading strong { font-size: 1rem; }
+.opx-maui-static-loading small { color: var(--text-secondary, #878a99); font-size: .8rem; }
 
 html.opx-native-transparent-statusbar {
     --opx-native-statusbar-height: 0px;
@@ -67,6 +83,11 @@ html.opx-native-transparent-statusbar .pull-refresh-indicator {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
+}
+
+.hybrid-panel-body {
+    min-width: 0;
+    padding: 12px 14px 14px;
 }
 
 .hybrid-fact-grid {
@@ -148,5 +169,71 @@ html.opx-native-transparent-statusbar .pull-refresh-indicator {
 
     .hybrid-actions .mud-button-root {
         flex: 1 1 calc(50% - 5px);
+    }
+
+    .hybrid-panel-body {
+        padding: 10px 12px 12px;
+    }
+}
+.maui-settings-body {
+    padding-bottom: 12px;
+}
+
+.maui-notification-test {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+}
+
+.maui-notification-copy strong,
+.maui-notification-copy small {
+    display: block;
+}
+
+.maui-notification-copy strong {
+    color: var(--foreground);
+    font-size: calc(var(--opx-ui-font-size, 16px) * .857);
+    font-weight: 600;
+}
+
+.maui-notification-copy small {
+    margin-top: 3px;
+    color: var(--text-secondary);
+    font-size: calc(var(--opx-ui-font-size, 16px) * .714);
+    line-height: 1.4;
+}
+
+.maui-notification-test > .mud-button-root {
+    justify-self: start;
+    min-height: var(--opx-touch-button-height, 36px);
+    font-weight: 400;
+}
+
+.maui-notification-result {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-subtle);
+    color: var(--text-secondary);
+    font-size: calc(var(--opx-ui-font-size, 16px) * .75);
+}
+
+.maui-notification-result.status-shown {
+    border-color: color-mix(in srgb, var(--success) 45%, var(--border));
+    color: var(--success);
+}
+
+.maui-notification-result.status-permissiondenied,
+.maui-notification-result.status-failed {
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+    color: var(--danger);
+}
+
+@media (max-width: 600px) {
+    .maui-notification-test > .mud-button-root {
+        width: 100%;
     }
 }

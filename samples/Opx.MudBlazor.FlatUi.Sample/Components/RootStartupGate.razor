@@ -1,29 +1,24 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JS
-@inject NavigationManager Navigation
 @inject FlatUiPreferencesService DisplayPreferences
 @inject FlatReconnectOptions ReconnectOptions
-@inject IRootStartupGateValidator StartupGateValidator
+@inject SampleStartupGateService StartupGate
 
-@if (!_completed)
+@if (!_startupChecked)
 {
     <FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentThemePalette">
-        <FlatSessionRestore Title="@StartupTitle" Message="@StartupMessage" />
+        <FlatSessionRestore Title="@StartupTitle"
+                            Message="@StartupMessage" />
     </FlatMudProviders>
 }
 else
 {
-    <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-        <Found Context="routeData">
-            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-            <FocusOnNavigate RouteData="routeData" Selector="h1" />
-        </Found>
-    </Router>
+    <Routes />
 }
 
 @code {
     private readonly CancellationTokenSource _disposeToken = new();
-    private bool _completed;
+    private bool _startupChecked;
     private bool _systemPrefersDark;
 
     private string StartupTitle => string.IsNullOrWhiteSpace(ReconnectOptions.StartupTitle)
@@ -81,19 +76,16 @@ else
             _systemPrefersDark = false;
         }
 
-        var result = await StartupGateValidator.ValidateAsync(_disposeToken.Token);
+        // The sample has no real authentication state. Consumer hosts replace this
+        // scoped callback with their saved-session/token validation and auth update.
+        await StartupGate.CheckAsync(_disposeToken.Token);
+
         if (_disposeToken.IsCancellationRequested)
         {
             return;
         }
 
-        _completed = true;
-        if (result == RootStartupGateResult.Login
-            && !new Uri(Navigation.Uri).AbsolutePath.Equals("/login", StringComparison.OrdinalIgnoreCase))
-        {
-            Navigation.NavigateTo("/login", replace: true);
-        }
-
+        _startupChecked = true;
         await InvokeAsync(StateHasChanged);
     }
 

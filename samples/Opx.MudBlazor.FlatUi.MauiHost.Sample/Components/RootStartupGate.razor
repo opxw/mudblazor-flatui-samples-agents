@@ -4,6 +4,7 @@
 @inject FlatReconnectOptions ReconnectOptions
 @inject FlatAssetOptions AssetOptions
 @inject IHybridSessionBootstrapper SessionBootstrapper
+@inject MauiPerformanceTracker Performance
 
 @if (!_startupChecked)
 {
@@ -13,6 +14,7 @@
 }
 else
 {
+    <MauiRoutePerformanceObserver />
     <Routes />
 }
 
@@ -42,9 +44,16 @@ else
         {
             var palette = Preferences.Options.ResolveColorPalette(Preferences.Current.ColorPalette);
             return new FlatUiPalette(
-                palette.Accent, palette.AccentHover, palette.AccentSubtle, palette.AccentDark,
-                palette.DarkAccent, palette.DarkAccentHover, palette.Secondary,
-                palette.Success, palette.Warning, palette.Danger);
+                Accent: palette.Accent,
+                AccentHover: palette.AccentHover,
+                AccentSubtle: palette.AccentSubtle,
+                AccentDark: palette.AccentDark,
+                DarkAccent: palette.DarkAccent,
+                DarkAccentHover: palette.DarkAccentHover,
+                Secondary: palette.Secondary,
+                Success: palette.Success,
+                Warning: palette.Warning,
+                Danger: palette.Danger);
         }
     }
 
@@ -57,7 +66,9 @@ else
             "opxMauiHost.loadScript",
             _disposeToken.Token,
             AssetOptions.ResolveJavaScriptPath(IsDebugBuild));
+        Performance.MarkStartup("Package script loaded");
         await Preferences.InitializeAsync();
+        Performance.MarkStartup("Display preferences restored");
         _systemPrefersDark = await JS.InvokeAsync<bool>(
             "opxFlatThemeBootstrap.prefersDarkMode",
             _disposeToken.Token);
@@ -65,11 +76,13 @@ else
         // The host performs saved-session/token validation here. This sample only
         // demonstrates the gate and does not create a synthetic authenticated user.
         await SessionBootstrapper.RestoreAsync(_disposeToken.Token);
+        Performance.MarkStartup("Session restore completed");
 
         if (_disposeToken.IsCancellationRequested)
             return;
 
         _startupChecked = true;
+        Performance.MarkStartup("Router enabled");
         await InvokeAsync(StateHasChanged);
     }
 

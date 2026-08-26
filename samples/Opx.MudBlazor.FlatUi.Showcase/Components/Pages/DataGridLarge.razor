@@ -178,8 +178,8 @@
     private string _search = string.Empty;
     private bool _filterOpen;
     private bool _initialLoading = true;
-    private FlatGridHeaderStyle _headerStyle = FlatGridHeaderStyle.CompactSearch;
-    private bool _showHeaderIcons = true;
+    private FlatGridHeaderStyle _headerStyle;
+    private bool _showHeaderIcons;
     private bool _autoRowHeight = true;
     private bool _alternatingRows;
     private bool _showVerticalLines = true;
@@ -203,6 +203,8 @@
 
     protected override void OnInitialized()
     {
+        _headerStyle = GridOptions.NormalizedDefaultHeaderStyle;
+        _showHeaderIcons = GridOptions.ShowHeaderIcons;
         GridState = new GridViewState(GridOptions);
         GridState.SetPageSize(50);
     }

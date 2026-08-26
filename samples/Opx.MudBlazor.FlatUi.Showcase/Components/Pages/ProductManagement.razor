@@ -10,9 +10,16 @@
           PrimaryActionIcon="@Icons.Material.Outlined.Add"
           PrimaryActionAriaLabel="Add product"
           OnPrimaryAction="AddProduct"
-          RefreshEnabled="true"
+          RefreshVisible="false"
           OnRefresh="Reload"
           PullToRefreshEnabled="true">
+    <HeaderActions>
+        <MudIconButton Icon="@Icons.Material.Outlined.Refresh"
+                       Class="grid-action-button"
+                       aria-label="Refresh products"
+                       title="Refresh"
+                       OnClick="Reload" />
+    </HeaderActions>
     <ChildContent>
         <FlatFilterWorkspace FilterTitle="Filters"
                              FilterAriaLabel="Product filters"

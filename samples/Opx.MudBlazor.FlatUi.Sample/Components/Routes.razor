@@ -1,6 +1,16 @@
-﻿<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+@using Opx.MudBlazor.FlatUi.Showcase
+@using SharedPages = Opx.MudBlazor.FlatUi.Sample.Components.Pages
+
+<Router AppAssembly="typeof(Program).Assembly"
+        AdditionalAssemblies="SharedAssemblies"
+        NotFoundPage="typeof(SharedPages.NotFound)">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
 </Router>
+
+@code {
+    private static readonly System.Reflection.Assembly[] SharedAssemblies =
+        [typeof(ShowcaseAssemblyMarker).Assembly];
+}

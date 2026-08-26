@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 using Opx.MudBlazor.FlatUi.Models;
 using Opx.MudBlazor.FlatUi.Services;
+using Opx.MudBlazor.FlatUi.Showcase;
 using Opx.MudBlazor.FlatUi.MauiHost.Sample.Services;
 
 namespace Opx.MudBlazor.FlatUi.MauiHost.Sample;
@@ -32,6 +33,8 @@ public static class MauiProgram
         });
 
         RegisterFlatUiOptions(builder.Services, builder.Configuration);
+        builder.Services.AddOpxFlatUiShowcase();
+        builder.Services.AddSingleton<FlatNativePullToRefreshState>();
         builder.Services.AddScoped<FlatPageLoadingState>();
         builder.Services.AddScoped<FlatMessageBoxService>();
         builder.Services.AddScoped<FlatUiPreferencesService>();
@@ -39,6 +42,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IHybridStatusBarService, MauiHybridStatusBarService>();
         builder.Services.AddSingleton<IHybridSessionBootstrapper, SampleHybridSessionBootstrapper>();
         builder.Services.AddSingleton<IDeviceNotificationService, MauiDeviceNotificationService>();
+        builder.Services.AddSingleton<MauiPerformanceTracker>();
         builder.Services.AddSingleton<MainPage>();
 
 #if DEBUG

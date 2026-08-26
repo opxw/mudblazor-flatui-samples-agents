@@ -4,9 +4,14 @@
              xmlns:components="clr-namespace:Opx.MudBlazor.FlatUi.MauiHost.Sample.Components"
              x:Class="Opx.MudBlazor.FlatUi.MauiHost.Sample.MainPage"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
-        <BlazorWebView.RootComponents>
-            <RootComponent Selector="#app" ComponentType="{x:Type components:App}" />
-        </BlazorWebView.RootComponents>
-    </BlazorWebView>
+    <RefreshView x:Name="nativeRefreshView"
+                 IsRefreshEnabled="False"
+                 RefreshColor="{DynamicResource NativeRefreshColor}"
+                 BackgroundColor="{DynamicResource PageBackgroundColor}">
+        <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+            <BlazorWebView.RootComponents>
+                <RootComponent Selector="#app" ComponentType="{x:Type components:App}" />
+            </BlazorWebView.RootComponents>
+        </BlazorWebView>
+    </RefreshView>
 </ContentPage>

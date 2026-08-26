@@ -16,7 +16,7 @@ dotnet build -f net10.0-android -c Release --no-restore
 
 - Replace `SampleRootStartupGateValidator` with the application's real session validator. Local storage is only an untrusted restoration hint; server/API authorization remains authoritative.
 - Replace the sample Dashboard, Transactions, Reports, identity, logout, routes, permissions, and data with the application's actual business contracts.
-- Keep Settings and the default navigable shell available at initialization. Bottom navigation is viewport-driven through `900px`; wider windows use the sidebar.
+- Keep Settings and the default navigable shell available at initialization. Bottom navigation is viewport-driven through `900px`; wider windows use the sidebar. Parent and overflow items default to the package Bottom Sheet; `MainView` is explicit opt-in.
 - Keep Light as the initial theme and Device typography as the mobile default. Buttons must accommodate accessibility-scaled text without clipping.
 - Preserve Toolkit `StatusBarBehavior` and `MobileThemeBridge`, native no-bounce mappings, textbox-only text selection, and the continuous static-to-interactive `Memuat` spinner.
 - Do not copy or override reusable OPX component CSS in the app.

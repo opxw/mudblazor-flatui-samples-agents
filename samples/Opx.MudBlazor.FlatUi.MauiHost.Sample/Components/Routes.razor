@@ -1,4 +1,6 @@
-<Router AppAssembly="typeof(MauiProgram).Assembly">
+@using Opx.MudBlazor.FlatUi.Showcase
+
+<Router AppAssembly="typeof(MauiProgram).Assembly" AdditionalAssemblies="SharedAssemblies">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
@@ -9,3 +11,8 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    private static readonly System.Reflection.Assembly[] SharedAssemblies =
+        [typeof(ShowcaseAssemblyMarker).Assembly];
+}

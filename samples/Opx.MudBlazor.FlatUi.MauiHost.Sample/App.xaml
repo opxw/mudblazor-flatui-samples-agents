@@ -4,5 +4,6 @@
              x:Class="Opx.MudBlazor.FlatUi.MauiHost.Sample.App">
     <Application.Resources>
         <Color x:Key="PageBackgroundColor">#f3f6f9</Color>
+        <Color x:Key="NativeRefreshColor">#0067c0</Color>
     </Application.Resources>
 </Application>

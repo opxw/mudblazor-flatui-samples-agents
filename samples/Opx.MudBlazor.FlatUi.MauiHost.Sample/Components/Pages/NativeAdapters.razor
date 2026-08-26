@@ -1,0 +1,41 @@
+@page "/native-adapters"
+@inject IHybridDeviceAdapter DeviceAdapter
+
+<PageTitle>Native Adapters - OPX Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="hybrid-host-page">
+    <FlatPanel Title="Native adapter probes" Subtitle="Run only from an explicit user action">
+        <div class="hybrid-panel-body">
+            <div class="hybrid-actions">
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.FolderOpen" OnClick="PickFileAsync">Pick file</MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.PhotoCamera" OnClick="CapturePhotoAsync">Open camera</MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Share" OnClick="ShareAsync">Share</MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Lock" OnClick="ProbeSecureStorageAsync">Test secure storage</MudButton>
+            </div>
+            <div class="hybrid-probe-result" role="status" aria-live="polite">
+                <MudIcon Icon="@ResultIcon" />
+                <span>@_resultMessage</span>
+            </div>
+        </div>
+    </FlatPanel>
+</FlatPage>
+
+@code {
+    private string _resultMessage = "Choose an action to exercise a host-owned native adapter.";
+    private bool _lastSucceeded;
+
+    private string ResultIcon => _lastSucceeded
+        ? Icons.Material.Outlined.CheckCircle
+        : Icons.Material.Outlined.Info;
+
+    private async Task PickFileAsync() => Apply(await DeviceAdapter.PickFileAsync());
+    private async Task CapturePhotoAsync() => Apply(await DeviceAdapter.CapturePhotoAsync());
+    private async Task ShareAsync() => Apply(await DeviceAdapter.ShareAsync("OPX Flat UI MAUI Hybrid host sample"));
+    private async Task ProbeSecureStorageAsync() => Apply(await DeviceAdapter.ProbeSecureStorageAsync());
+
+    private void Apply(HybridCapabilityResult result)
+    {
+        _lastSucceeded = result.Succeeded;
+        _resultMessage = result.Message;
+    }
+}

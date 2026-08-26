@@ -16,7 +16,7 @@ The `/widgets` showroom is the canonical visual archetype for PageId `opx.page.r
 
 ## Canonical spacing
 
-Spacing is container-owned and follows the package CSS shipped by `Opx.MudBlazor.FlatUi` `2.0.17`:
+Spacing is container-owned and follows the package CSS shipped by `Opx.MudBlazor.FlatUi` `2.0.20`:
 
 | Surface | Desktop | Mobile at `600px` and below |
 | --- | ---: | ---: |

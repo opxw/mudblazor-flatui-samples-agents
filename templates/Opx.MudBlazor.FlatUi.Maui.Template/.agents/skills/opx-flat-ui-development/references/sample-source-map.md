@@ -4,9 +4,11 @@ Copyright (c) 2026 opx. All rights reserved.
 
 Resolve paths from the repository root. Read only the archetypes relevant to the requested change, but read each selected file completely.
 
-First resolve the request to a stable `PageId` in [page-registry.md](page-registry.md). This source map explains implementation ownership after page identity is known.
+First resolve the request to a stable `PageId` in [page-registry.md](page-registry.md), then apply its canonical interaction/state profile from [showcase-behavior-registry.md](showcase-behavior-registry.md). This source map explains implementation ownership after page identity and behavior are known.
 
 ## Shell, navigation, and configuration
+
+- Complete MAUI showroom and runtime measurement: repository `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample`; its sync/audit scripts keep canonical Web routes aligned while `/maui-host` and `/maui-performance` remain host-only adapters.
 
 - MAUI Blazor Hybrid consumer host reference: this generated project, especially `MauiProgram.cs`, platform `MainActivity`/`AppDelegate`, native `MainPage`, `Components/RootStartupGate.razor`, `Components/Layout/MainLayout.razor`, `Services`, and its mobile contract. Keep status-bar behavior host-owned and derive native geometry from actual platform insets rather than hardcoded values.
 - Application root/reconnect: `samples/Opx.MudBlazor.FlatUi.Sample/Components/App.razor`
@@ -22,13 +24,16 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Compact/simple CRUD: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Pages/SimpleCrud.razor`
 - Static responsive data list: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Pages/StaticData.razor`
 - Large two-axis scrolling DataGrid with responsive cards: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Pages/DataGridLarge.razor`
+- Expandable grouped DataGrid with host-owned summaries and responsive grouped cards: canonical `GroupedDataGrid.razor` composition with package `FlatGroupedDataGrid` contracts.
 - Inline Add/Edit/Delete grid with responsive editor cards: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Pages/GridEditor.razor`
 - Dashboard/widgets/charts: `Home.razor`, `Widgets.razor`, `docs/WIDGETS.md`, and ERP overview pages under `Components/Pages`. Widget grids own inter-card gaps; individual widgets keep zero outer margin and package-defined internal padding.
 - Complete MudBlazor chart gallery with copy-ready code: `Charts.razor` and `Components/ChartCode.razor`
 - Host-owned file/image upload with preview, autoscale, progress/cancel/retry: `FileUpload.razor`, `Components/FlatFileUpload.razor`, and `Components/FlatImageUpload.razor`
 - Versioned grid presentation state and saved views: `GridPreferences.razor`, `Components/Grid/FlatGridPreferencesPanel.razor`, and `Models/FlatGridPreferences.cs`
 - Hierarchical Tree Grid with host-owned parent persistence: `TreeGrid.razor`, `Components/Grid/FlatTreeGrid.razor`, and `Models/FlatTreeGridModels.cs`
+- Compact hierarchy/outline design with sibling ordering and JSON snapshots: canonical `HierarchyDesigner.razor` composition with package `FlatHierarchyDesigner` contracts.
 - Monitoring and reports: `Monitoring.razor`, `MonitoringDatabase.razor`, `Reports.razor`, `Pivot.razor`, `Components/Reporting/FlatOperationalReportViewer.razor`, and `Components/Reporting/FlatPivotGrid.razor`
+- Responsive PDF.js preview with host-owned native print/share/open adapters: canonical `PdfViewer.razor` composition with package `FlatPdfViewer` contracts.
 - Enterprise 1.2-1.5 showroom and contracts: `EnterpriseToolkit.razor`, `docs/ENTERPRISE-TOOLKIT.md`, `Components/FlatDataImport.razor`, `FlatMasterDetailWorkspace.razor`, `FlatAuditTrail.razor`, `FlatSchemaForm.razor`, `FlatWorkflowPanel.razor`, `FlatBulkActionBar.razor`, `FlatScheduler.razor`, `FlatDashboardComposer.razor`, `FlatNotificationCenter.razor`, `FlatOfflineSyncPanel.razor`, `FlatDocumentWorkspace.razor`, and `FlatPrintLayout.razor`
 - Application experience 1.6-2.3: `ExperienceToolkit.razor`, `docs/APPLICATION-EXPERIENCE-2.0.md`, `docs/GLOBAL-APPLICATION-FEATURES.md`, `FlatCommandPalette`, `FlatSchemaForm`, `FlatCollaborationPanel`, `FlatConflictResolver`, `FlatUnsavedChangesGuard`, `FlatPermissionView`, `FlatFeatureView`, `FlatOperationState`, `FlatSessionTimeout`, and `FlatAccessibilitySettings`.
 - Operational compositions 2.0: `OperationsWorkspace.razor` and the host-owned typed contracts in `Models/FlatExperienceModels.cs`
@@ -41,7 +46,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Deterministic NuGet consumer bootstrap and validation: root `.template.config/template.json`, sample `flat-ui.contract.json`, `flat-ui.contract.schema.json`, `run-clean.ps1`, `docs/CONSUMER-CONTRACT.md`, and `scripts/audit_flat_ui_consumer.ps1`. Initialized admin consumers must clean their own `bin`/`obj` before first run, load reusable CSS from NuGet `_content` assets without local package copies or extra framework CSS, and retain the `MainLayout.razor` Settings menu/modal plus searchable, active-route-aware `SampleSidebarMenu.razor` scaffold.
 - Route-wide sample-code disclosure: `samples/Opx.MudBlazor.FlatUi.Sample/Components/SamplePageUsage.razor`, mounted once by `MainLayout`, `AuthLayout`, and `WebsiteLayout`; detailed component-specific examples remain page-local.
 - Account editor and multi-select: `EditAccount.razor`
-- Kanban, calendar, chat, AI chat, email, jobs, timeline: `Kanban.razor`, `Calendar.razor`, `Components/FlatCalendar.razor`, `Chat.razor`, `AiChat.razor`, `Email.razor`, `Jobs.razor`, and `Timeline.razor`
+- Kanban, calendar, scheduler, chat, AI chat, email, jobs, timeline: canonical `Kanban.razor`, `Calendar.razor`, `Scheduler.razor`, package `FlatCalendar`/`FlatScheduler`, `Chat.razor`, `AiChat.razor`, `Email.razor`, `Jobs.razor`, and `Timeline.razor` compositions.
 - Provider-neutral SVG floor plan, projected location tracking, and route presentation: `VectorMap.razor`, `Components/FlatVectorMap.razor`, `Models/FlatVectorMapModels.cs`, and `docs/VECTOR-MAP.md`
 - Public landing/storefront/content: `WebsiteHome.razor`, `JobLanding.razor`, `Catalog.razor`, and `Blog.razor`; filter-heavy administration workspace: `ProductManagement.razor`; media/detail composition: `ProductDetail.razor`; large editor/settings rail: `ProductEditor.razor`
 - Authentication: `Login.razor`, `TwoStepVerification.razor`, and `ResetPassword.razor`

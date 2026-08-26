@@ -9,9 +9,9 @@
 <FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentThemePalette">
     <FlatAppShell AppName="OPX FLAT UI"
                   PageTitle="@CurrentPageTitle"
-                  SidebarSubtitle="Multi-purpose UI Reference"
+                  SidebarSubtitle="Flat UI powered by MudBlazor"
                   SearchPlaceholder="Search pages or components..."
-                  SearchItems="@NavigationSearchItems"
+                  SearchItems="@ShowcaseNavigationCatalog.SearchItems"
                   SidebarSearchPlaceholder="Search sample menu..."
                   IsDarkMode="@IsDarkMode"
                   ThemeMode="@EffectiveThemeMode"
@@ -33,7 +33,7 @@
                   NavigationLayout="@EffectiveNavigationLayout"
                   BottomNavigationMaxWidthPx="900"
                   BottomNavigationChildPresentation="@EffectiveBottomNavigationChildPresentation"
-                  NavigationItems="@HorizontalNavigationItems">
+                  NavigationItems="@ShowcaseNavigationCatalog.NavigationItems">
         <AppBarActions>
             <FlatDeviceNotification Title="@DeviceNotificationOptions.SampleTitle"
                                     Message="@DeviceNotificationOptions.SampleMessage"
@@ -52,11 +52,8 @@
                 </ChildContent>
             </MudMenu>
         </AppBarActions>
-        <Menu>
-            <SampleSidebarMenu />
-        </Menu>
         <HorizontalMenu>
-            <FlatHorizontalNavigation Items="@HorizontalNavigationItems" />
+            <FlatHorizontalNavigation Items="@ShowcaseNavigationCatalog.NavigationItems" />
         </HorizontalMenu>
         <HorizontalBrand>
             <a class="horizontal-brand" href="/" aria-label="Opx Flat UI home">
@@ -73,7 +70,7 @@
             <FlatProfileAvatar Name="Opx Reference User" Initials="OR" />
             <div class="sample-user-copy">
                 <strong>UI Template</strong>
-                <span>Blazor + MAUI Hybrid ready</span>
+                <span>Flat UI powered by MudBlazor</span>
             </div>
             <MudIconButton Icon="@Icons.Material.Outlined.Logout"
                            Href="/login"
@@ -271,161 +268,6 @@
 </div>
 
 @code {
-    private static readonly FlatNavigationMenuItem[] HorizontalNavigationItems =
-    [
-        new("Dashboard", "/", Icons.Material.Outlined.Dashboard),
-        new("ERP", Icon: Icons.Material.Outlined.Business, Children:
-        [
-            new("ERP Overview", "/erp", Icons.Material.Outlined.SpaceDashboard),
-            new("ERP Toolkit", "/erp-toolkit", Icons.Material.Outlined.AccountTree),
-            new("Human Resources", "/erp/hr", Icons.Material.Outlined.Groups),
-            new("Production", "/erp/production", Icons.Material.Outlined.Factory),
-            new("Finance", "/erp/finance", Icons.Material.Outlined.AccountBalance),
-            new("Procurement", "/erp/procurement", Icons.Material.Outlined.ShoppingCart),
-            new("Sales", "/erp/sales", Icons.Material.Outlined.PointOfSale)
-        ]),
-        new("Operations", Icon: Icons.Material.Outlined.AccountTree, Children:
-        [
-            new("CRUD Asset", "/crud", Icons.Material.Outlined.EditNote),
-            new("CRUD Simple", "/crud-simple", Icons.Material.Outlined.AddBox),
-            new("Grid Editor", "/grid-editor", Icons.Material.Outlined.EditRoad),
-            new("Advanced Editable Grid", "/advanced-editable-grid", Icons.Material.Outlined.TableView),
-            new("Model CRUD", "/model-crud", Icons.Material.Outlined.DynamicForm),
-            new("Form Designer", "/model-form-designer", Icons.Material.Outlined.DashboardCustomize),
-            new("Dynamic Menu", "/dynamic-menu", Icons.Material.Outlined.AccountTree),
-            new("Operations Workspace", "/operations-workspace", Icons.Material.Outlined.Workspaces),
-            new("Spatial Operations", "/spatial-operations", Icons.Material.Outlined.Explore),
-            new("Tree Grid", "/tree-grid", Icons.Material.Outlined.AccountTree),
-            new("Hierarchy Designer", "/hierarchy-designer", Icons.Material.Outlined.Schema),
-            new("Kanban", "/kanban", Icons.Material.Outlined.ViewKanban),
-            new("Calendar", "/calendar", Icons.Material.Outlined.CalendarMonth),
-            new("Scheduler", "/scheduler", Icons.Material.Outlined.CalendarViewWeek),
-            new("Sales Pipeline", "/sales-pipeline", Icons.Material.Outlined.FilterAlt),
-            new("Chat", "/chat", Icons.Material.Outlined.Chat),
-            new("AI Chat", "/ai-chat", Icons.Material.Outlined.AutoAwesome),
-            new("Email", "/email", Icons.Material.Outlined.MailOutline),
-            new("Service Monitoring", "/monitoring", Icons.Material.Outlined.MonitorHeart),
-            new("Database Monitoring", "/monitoring-database", Icons.Material.Outlined.Dns)
-        ]),
-        new("Data", Icon: Icons.Material.Outlined.FolderOpen, Children:
-        [
-            new("Static / Master", "/static-data", Icons.Material.Outlined.Storage),
-            new("Large Data Grid", "/data-grid-large", Icons.Material.Outlined.TableRows),
-            new("Grouped Data Grid", "/grouped-data-grid", Icons.Material.Outlined.ViewStream),
-            new("Reports", "/reports", Icons.Material.Outlined.Assessment),
-            new("PDF Viewer", "/pdf-viewer", Icons.Material.Outlined.PictureAsPdf),
-            new("Pivot", "/pivot", Icons.Material.Outlined.PivotTableChart),
-            new("Enterprise Toolkit", "/enterprise-toolkit", Icons.Material.Outlined.DomainAdd)
-            ,new("Experience Toolkit", "/experience-toolkit", Icons.Material.Outlined.AccessibilityNew)
-            ,new("Business Toolkit", "/business-toolkit", Icons.Material.Outlined.AccountTree)
-            ,new("ERP Release Train", "/erp-release-train", Icons.Material.Outlined.Factory)
-        ]),
-        new("Commerce", Icon: Icons.Material.Outlined.Storefront, Children:
-        [
-            new("Product Catalog", "/catalog", Icons.Material.Outlined.ShoppingBag),
-            new("Product Management", "/product-management", Icons.Material.Outlined.Inventory2),
-            new("Product Detail", "/product-detail", Icons.Material.Outlined.Sell),
-            new("Product Editor", "/product-editor", Icons.Material.Outlined.EditNote),
-            new("Website Front", "/website", Icons.Material.Outlined.Language),
-            new("Job Landing", "/job-landing", Icons.Material.Outlined.WorkOutline),
-            new("Blog", "/blog", Icons.Material.Outlined.Article)
-        ]),
-        new("Account", Icon: Icons.Material.Outlined.ManageAccounts, Children:
-        [
-            new("Edit Account", "/account/edit", Icons.Material.Outlined.ManageAccounts),
-            new("Login", "/login", Icons.Material.Outlined.Login),
-            new("Two-step verification", "/two-step-verification", Icons.Material.Outlined.VerifiedUser),
-            new("Reset password", "/reset-password", Icons.Material.Outlined.LockReset)
-        ]),
-        new("UI Kit", Icon: Icons.Material.Outlined.Widgets, Children:
-        [
-            new("Components", "/components", Icons.Material.Outlined.Widgets),
-            new("Development Rules", "/development-rules", Icons.Material.Outlined.Rule),
-            new("Accordions", "/accordions", Icons.Material.Outlined.UnfoldMore),
-            new("Charts", "/charts", Icons.Material.Outlined.InsertChartOutlined),
-            new("File Upload", "/file-upload", Icons.Material.Outlined.CloudUpload),
-            new("Grid Preferences", "/grid-preferences", Icons.Material.Outlined.ViewColumn),
-            new("Vector Map", "/vector-map", Icons.Material.Outlined.Map),
-            new("Colors", "/colors", Icons.Material.Outlined.Palette),
-            new("Timeline", "/timeline", Icons.Material.Outlined.Timeline),
-            new("Widgets", "/widgets", Icons.Material.Outlined.ViewQuilt),
-            new("Profile Card Grid", "/profile-grid", Icons.Material.Outlined.Badge)
-        ])
-    ];
-
-    private static readonly FlatNavigationSearchItem[] NavigationSearchItems =
-    [
-        new("Dashboard", "/", "Showcase", "overview metrics charts", Icons.Material.Outlined.Dashboard),
-        new("ERP Overview", "/erp", "ERP", "workflow KPI exceptions", Icons.Material.Outlined.SpaceDashboard),
-        new("ERP Toolkit", "/erp-toolkit", "ERP", "transaction document lines entity lookup journal reconciliation planning background operations", Icons.Material.Outlined.AccountTree),
-        new("HR Overview", "/erp/hr", "ERP / Human Resources", "people workforce", Icons.Material.Outlined.Groups),
-        new("Employees", "/erp/hr/employees", "ERP / Human Resources", "employee directory staff", Icons.Material.Outlined.Badge),
-        new("Attendance & Leave", "/erp/hr/attendance", "ERP / Human Resources", "attendance leave time", Icons.Material.Outlined.EventAvailable),
-        new("Production Plan", "/erp/production", "ERP / Production", "planning factory", Icons.Material.Outlined.Factory),
-        new("Work Orders", "/erp/production/work-orders", "ERP / Production", "manufacturing orders", Icons.Material.Outlined.PrecisionManufacturing),
-        new("Quality Control", "/erp/production/quality", "ERP / Production", "quality inspection", Icons.Material.Outlined.FactCheck),
-        new("Finance Overview", "/erp/finance", "ERP / Finance", "accounting finance dashboard", Icons.Material.Outlined.AccountBalance),
-        new("General Ledger", "/erp/finance/general-ledger", "ERP / Finance", "journal ledger accounting", Icons.Material.Outlined.MenuBook),
-        new("Accounts Payable", "/erp/finance/payables", "ERP / Finance", "supplier invoice payment", Icons.Material.Outlined.Payments),
-        new("Accounts Receivable", "/erp/finance/receivables", "ERP / Finance", "customer invoice collection", Icons.Material.Outlined.RequestQuote),
-        new("Procurement", "/erp/procurement", "ERP / Supply Chain", "purchase order supplier", Icons.Material.Outlined.ShoppingCart),
-        new("Inventory", "/erp/inventory", "ERP / Supply Chain", "stock warehouse", Icons.Material.Outlined.Inventory2),
-        new("Sales Overview", "/erp/sales", "ERP / Sales & Distribution", "sales pipeline", Icons.Material.Outlined.ShowChart),
-        new("Sales Orders", "/erp/sales/orders", "ERP / Sales & Distribution", "customer sales order", Icons.Material.Outlined.ReceiptLong),
-        new("CRUD Asset", "/crud", "Operations", "grid table sort filter paging editor", Icons.Material.Outlined.EditNote),
-        new("CRUD Simple", "/crud-simple", "Operations", "simple form add", Icons.Material.Outlined.AddBox),
-        new("Grid Editor", "/grid-editor", "Operations", "inline add edit save cancel delete row value", Icons.Material.Outlined.EditRoad),
-        new("Advanced Editable Grid", "/advanced-editable-grid", "Operations", "advanced inline add edit save cancel copy fill down undo redo spreadsheet", Icons.Material.Outlined.TableView),
-        new("Model CRUD", "/model-crud", "Operations", "automatic model metadata data annotations generated list grid form create update delete", Icons.Material.Outlined.DynamicForm),
-        new("Form Designer", "/model-form-designer", "Operations", "visual WYSIWYG form designer drag drop spacing padding margin CSS class live preview", Icons.Material.Outlined.DashboardCustomize),
-        new("Dynamic Menu", "/dynamic-menu", "Operations", "autoload navigation MenuText Id ParentId Url Icon recursive API", Icons.Material.Outlined.AccountTree),
-        new("Operations Workspace", "/operations-workspace", "Operations", "service desk approval procurement stock transfer timesheet POS cart", Icons.Material.Outlined.Workspaces),
-        new("Spatial Operations", "/spatial-operations", "Operations", "map floor layer geofence location tracking route playback fleet warehouse", Icons.Material.Outlined.Explore),
-        new("Tree Grid", "/tree-grid", "Operations", "hierarchy parent key drag drop expand collapse tree table", Icons.Material.Outlined.AccountTree),
-        new("Hierarchy Designer", "/hierarchy-designer", "Operations", "compact outline designer hierarchy drag drop reorder export JSON report bands styles data sources", Icons.Material.Outlined.Schema),
-        new("Kanban", "/kanban", "Operations", "task board workflow cards columns drag drop WIP", Icons.Material.Outlined.ViewKanban),
-        new("Calendar", "/calendar", "Operations", "month week day list agenda events schedule", Icons.Material.Outlined.CalendarMonth),
-        new("Scheduler", "/scheduler", "Operations", "work week timeline appointments resources calendar", Icons.Material.Outlined.CalendarViewWeek),
-        new("Sales Pipeline", "/sales-pipeline", "Operations", "CRM deal pipeline stages values contacts", Icons.Material.Outlined.FilterAlt),
-        new("Chat", "/chat", "Operations", "messages conversations team inbox composer", Icons.Material.Outlined.Chat),
-        new("AI Chat", "/ai-chat", "Operations", "assistant prompt generated response history integration", Icons.Material.Outlined.AutoAwesome),
-        new("Email", "/email", "Operations", "mailbox inbox sent drafts compose message attachment", Icons.Material.Outlined.MailOutline),
-        new("Monitoring Service", "/monitoring", "Operations", "service status monitoring", Icons.Material.Outlined.MonitorHeart),
-        new("Monitoring Database", "/monitoring-database", "Operations", "database connection monitoring", Icons.Material.Outlined.Dns),
-        new("Static / Master", "/static-data", "Data & Reports", "master data read only", Icons.Material.Outlined.Storage),
-        new("Large Data Grid", "/data-grid-large", "Data & Reports", "large table many records vertical horizontal scroll paging", Icons.Material.Outlined.TableRows),
-        new("Grouped Data Grid", "/grouped-data-grid", "Data & Reports", "group expand collapse aggregate count sum average responsive cards", Icons.Material.Outlined.ViewStream),
-        new("Reports", "/reports", "Data & Reports", "report export print", Icons.Material.Outlined.Assessment),
-        new("PDF Viewer", "/pdf-viewer", "Data & Reports", "PDF.js preview search thumbnails print share open external", Icons.Material.Outlined.PictureAsPdf),
-        new("Pivot", "/pivot", "Data & Reports", "pivot matrix row column aggregate subtotal drill down", Icons.Material.Outlined.PivotTableChart),
-        new("Enterprise Toolkit", "/enterprise-toolkit", "Data & Reports", "import master detail audit schema workflow bulk scheduler dashboard notifications offline sync documents print", Icons.Material.Outlined.DomainAdd),
-        new("Experience Toolkit", "/experience-toolkit", "Data & Reports", "accessibility command palette schema form collaboration conflict realtime", Icons.Material.Outlined.AccessibilityNew),
-        new("Business Toolkit", "/business-toolkit", "Data & Reports", "traceability BOM routing rules approval attachments recurrence query comparison", Icons.Material.Outlined.AccountTree),
-        new("ERP Release Train", "/erp-release-train", "Data & Reports", "transaction engine spreadsheet inventory allocation finance workflow approval integration MRP capacity governance", Icons.Material.Outlined.Factory),
-        new("Product Catalog", "/catalog", "Commerce & Content", "ecommerce products price range cart", Icons.Material.Outlined.ShoppingBag),
-        new("Product Management", "/product-management", "Commerce & Content", "admin product list filter rail price brand status grid", Icons.Material.Outlined.Inventory2),
-        new("Product Detail", "/product-detail", "Commerce & Content", "product gallery metrics variants specification details", Icons.Material.Outlined.Sell),
-        new("Product Editor", "/product-editor", "Commerce & Content", "product form publish schedule category tags gallery upload", Icons.Material.Outlined.EditNote),
-        new("Website Front", "/website", "Commerce & Content", "landing page storefront frontend", Icons.Material.Outlined.Language),
-        new("Job Landing", "/job-landing", "Commerce & Content", "careers recruitment public jobs hero categories companies", Icons.Material.Outlined.WorkOutline),
-        new("Blog", "/blog", "Commerce & Content", "article content blog", Icons.Material.Outlined.Article),
-        new("Edit Account", "/account/edit", "Account", "user profile avatar personal security password", Icons.Material.Outlined.ManageAccounts),
-        new("Login Sample", "/login", "Account", "authentication login", Icons.Material.Outlined.Login),
-        new("Two-step Verification", "/two-step-verification", "Account", "authentication 2fa otp verification code", Icons.Material.Outlined.VerifiedUser),
-        new("Reset Password", "/reset-password", "Account", "authentication forgot password account recovery reset code", Icons.Material.Outlined.LockReset),
-        new("Components", "/components", "UI Kit", "component grid chart avatar theme empty state info loading dialog bottom sheet", Icons.Material.Outlined.Widgets),
-        new("Development Rules", "/development-rules", "UI Kit", "rules skill page identity appbar responsive grid CRUD modal theme accessibility source of truth", Icons.Material.Outlined.Rule),
-        new("Accordions", "/accordions", "UI Kit", "accordion collapse expand flush icons disclosure faq", Icons.Material.Outlined.UnfoldMore),
-        new("Charts", "/charts", "UI Kit", "MudBlazor line bar stacked pie donut timeseries heatmap rose radar sankey scatter plot sample code", Icons.Material.Outlined.InsertChartOutlined),
-        new("File Upload", "/file-upload", "UI Kit", "multiple files picker drag drop progress cancel retry validation camera gallery adapter", Icons.Material.Outlined.CloudUpload),
-        new("Grid Preferences", "/grid-preferences", "UI Kit", "column visibility order width pinning saved view reset virtualization", Icons.Material.Outlined.ViewColumn),
-        new("Vector Map", "/vector-map", "UI Kit", "SVG vector map floor plan denah location tracking GPS route waypoint vehicle asset", Icons.Material.Outlined.Map),
-        new("Colors", "/colors", "UI Kit", "palette semantic primary secondary success info warning danger surface border opacity", Icons.Material.Outlined.Palette),
-        new("Timeline", "/timeline", "UI Kit", "center left activity event history social attachments project", Icons.Material.Outlined.Timeline),
-        new("Widgets", "/widgets", "UI Kit", "metric statistics tile progress activity schedule reference", Icons.Material.Outlined.ViewQuilt),
-        new("Profile Card Grid", "/profile-grid", "UI Kit", "member people profile card grid list favorite search", Icons.Material.Outlined.Badge)
-    ];
-
     private const string ThemeListenerId = "opx-flat-ui-sample-main-layout";
     private bool _commandPaletteOpen;
     private DotNetObjectReference<MainLayout>? _themeReference;
@@ -438,7 +280,7 @@
     private string _draftThemeMode = FlatUiThemeMode.Auto;
     private string _draftNavigationLayout = FlatUiNavigationLayout.Vertical;
     private string _draftBottomNavigationChildPresentation = FlatBottomNavigationChildPresentation.Sheet;
-    private string _draftColorPalette = "blue";
+    private string _draftColorPalette = "fluent-blue";
     private string _draftLightSidebarBackground = "#f3f6f9";
     private string _draftLightSidebarForeground = "#495057";
     private string _draftDarkSidebarBackground = "#212529";
@@ -472,7 +314,7 @@
         : _settingsOpen
             ? _draftBottomNavigationChildPresentation
             : DisplayPreferences.Current.BottomNavigationChildPresentation;
-    private string CurrentPageTitle => PageTitleFor(Navigation.Uri);
+    private string CurrentPageTitle => ShowcaseNavigationCatalog.ResolvePageTitle(Navigation.Uri);
     private string CurrentBrandTitle => "OPX FLAT UI";
     private string SettingsModalClass => $"settings-modal-overlay {(IsDarkMode ? "theme-dark" : "theme-light")}";
     private string EffectiveThemeMode => _settingsOpen
@@ -539,85 +381,6 @@
     {
         _bottomMainViewPreview |= IsBottomMainViewPreviewUri(args.Location);
         StateHasChanged();
-    }
-
-    private string PageTitleFor(string uri)
-    {
-        var path = "/" + Navigation.ToBaseRelativePath(uri).Split('?', '#')[0].Trim('/');
-        return path.ToLowerInvariant() switch
-        {
-            "/" => "Dashboard",
-            "/crud" => "Operations-CrudAsset",
-            "/crud-simple" => "CRUD Simple",
-            "/grid-editor" => "Operations-Grid Editor",
-            "/model-crud" => "Operations-Model CRUD",
-            "/model-form-designer" => "Operations-Form Designer",
-            "/dynamic-menu" => "Operations-Dynamic Menu",
-            "/operations-workspace" => "Operations-Workspace",
-            "/advanced-editable-grid" => "Operations-Advanced Editable Grid",
-            "/tree-grid" => "Operations-Tree Grid",
-            "/hierarchy-designer" => "Operations-Hierarchy Designer",
-            "/kanban" => "Operations-Kanban",
-            "/calendar" => "Operations-Calendar",
-            "/scheduler" => "Operations-Scheduler",
-            "/sales-pipeline" => "Operations-Sales Pipeline",
-            "/chat" => "Operations-Chat",
-            "/ai-chat" => "Operations-AI Chat",
-            "/email" => "Operations-Email",
-            "/monitoring" => "Monitoring Service",
-            "/monitoring-database" => "Monitoring Database",
-            "/static-data" => "Static / Master",
-            "/data-grid-large" => "Data & Reports-Large Data Grid",
-            "/grouped-data-grid" => "Data & Reports-Grouped Data Grid",
-            "/reports" => "Reports",
-            "/pdf-viewer" => "Reports-PDF Viewer",
-            "/pivot" => "Data & Reports-Pivot",
-            "/enterprise-toolkit" => "Data & Reports-Enterprise Toolkit",
-            "/experience-toolkit" => "Data & Reports-Experience Toolkit",
-            "/business-toolkit" => "Data & Reports-Business Toolkit",
-            "/erp-release-train" => "ERP-Release Train",
-            "/catalog" => "Ecommerce-Catalog",
-            "/product-management" => "Ecommerce-Product Management",
-            "/product-detail" => "Ecommerce-Product Detail",
-            "/product-editor" => "Ecommerce-Product Editor",
-            "/website" => "Website-FrontPage",
-            "/job-landing" => "Website-Job Landing",
-            "/blog" => "Content-Blog",
-            "/erp" => "ERP-Overview",
-            "/erp-toolkit" => "ERP-Toolkit",
-            "/erp/hr" => "ERP-Human Resources",
-            "/erp/hr/employees" => "HR-Employees",
-            "/erp/hr/attendance" => "HR-Attendance & Leave",
-            "/erp/production" => "ERP-Production Plan",
-            "/erp/production/work-orders" => "Production-Work Orders",
-            "/erp/production/quality" => "Production-Quality Control",
-            "/erp/finance" => "ERP-Finance Overview",
-            "/erp/finance/general-ledger" => "Finance-General Ledger",
-            "/erp/finance/payables" => "Finance-Accounts Payable",
-            "/erp/finance/receivables" => "Finance-Accounts Receivable",
-            "/erp/procurement" => "ERP-Procurement",
-            "/erp/inventory" => "ERP-Inventory",
-            "/erp/sales" => "ERP-Sales Overview",
-            "/erp/sales/orders" => "Sales-Sales Orders",
-            "/components" => "Components",
-            "/development-rules" => "UI Kit-Development Rules",
-            "/accordions" => "Accordions",
-            "/charts" => "UI Kit-Charts",
-            "/file-upload" => "UI Kit-File Upload",
-            "/grid-preferences" => "UI Kit-Grid Preferences",
-            "/vector-map" => "UI Kit-Vector Map",
-            "/spatial-operations" => "Operations-Spatial Operations",
-            "/colors" => "UI Kit-Colors",
-            "/timeline" => "UI Kit-Timeline",
-            "/widgets" => "UI Kit-Widgets",
-            "/profile-grid" => "UI Kit-Profile Card Grid",
-            "/account/edit" => "Account-Edit User",
-            "/login" => "Login",
-            "/two-step-verification" => "Account-Two-step Verification",
-            "/reset-password" => "Account-Reset Password",
-            "/not-found" => "Not found",
-            _ => "Not found"
-        };
     }
 
     private string SettingItemClass(string mode) =>
@@ -826,7 +589,7 @@
 
     private void HandleDisplayPreferencesChanged() => _ = InvokeAsync(StateHasChanged);
 
-    private static IReadOnlyList<FlatCommandDefinition> CommandPaletteItems => NavigationSearchItems
+    private static IReadOnlyList<FlatCommandDefinition> CommandPaletteItems => ShowcaseNavigationCatalog.SearchItems
         .Select(item => new FlatCommandDefinition(
             item.Href,
             item.Title,

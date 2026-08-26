@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#004A77" />
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#004A77" BaseSize="128,128" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="1,1" />
     <EmbeddedResource Include="appsettings.json" LogicalName="appsettings.json" />
   </ItemGroup>
 
@@ -28,7 +28,7 @@
     <PackageReference Include="CommunityToolkit.Maui" Version="15.0.1" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
-    <PackageReference Include="MudBlazor" Version="9.8.0" />
-    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.0.17" />
+    <PackageReference Include="MudBlazor" Version="9.9.0" />
+    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.0.20" />
   </ItemGroup>
 </Project>

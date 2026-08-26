@@ -2,14 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Opx.MudBlazor.FlatUi.Sample</RootNamespace>
+    <AssemblyName>Opx.MudBlazor.FlatUi.Sample</AssemblyName>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.0.17" />
-    <PackageReference Include="MudBlazor" Version="9.8.0" />
+    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.0.20" />
+    <ProjectReference Include="..\Opx.MudBlazor.FlatUi.Showcase\Opx.MudBlazor.FlatUi.Showcase.csproj" />
+    <PackageReference Include="MudBlazor" Version="9.9.0" />
   </ItemGroup>
 
 </Project>

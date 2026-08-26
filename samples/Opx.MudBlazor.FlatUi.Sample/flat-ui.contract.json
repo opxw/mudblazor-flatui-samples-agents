@@ -1,14 +1,14 @@
 {
   "$schema": "flat-ui.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.0.17",
+  "contractVersion": "2.0.20",
   "source": {
     "repository": "mudblazor-flat-ui",
-    "samplePath": "samples/Opx.MudBlazor.FlatUi.Sample"
+    "samplePath": "samples/Opx.MudBlazor.FlatUi.Showcase"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.0.17",
-    "MudBlazor": "9.8.0"
+    "Opx.MudBlazor.FlatUi": "2.0.20",
+    "MudBlazor": "9.9.0"
   },
   "canonicalSample": {
     "mode": "exact-initial-baseline",
@@ -16,12 +16,12 @@
     "lineEndingNormalization": "LF",
     "promptTriggers": ["sama", "persis", "canonical", "seperti sample", "source of truth"],
     "files": {
-      "Components/Layout/MainLayout.razor": "1329B9F7A058128B3971CA6C76FD4CCB06333CA9D7C17A2733D07109E46328A8",
-      "Components/Layout/SampleSidebarMenu.razor": "8157F2819E65D521AFB4C49BF6D2C4C4BE423C7FBBF1DF26CC7139EBB0FDA5AB",
-      "Components/Pages/Home.razor": "9303D93EAC12EAC1EB81CC2057E3283896C190086DBD7057BBBB07674CFA4440",
-      "Components/RootStartupGate.razor": "1513F7901D638CFAA829E6B55EE623B5D9A42D8C0D1AE80FE9C130C5DCB78D1D",
-      "appsettings.json": "1465D5A8931899ACDD96D7EB4C66EB9F08415267B7F35495E6D7615B557C8C9C",
-      "wwwroot/app.css": "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666"
+      "Components/Layout/MainLayout.razor": "D7BA2362A1050C3F5331711BBAD67F0EFA984BAEC49519101E6A55EEBDBC5968",
+      "../Opx.MudBlazor.FlatUi.Showcase/ShowcaseNavigationCatalog.cs": "215AAD5AFA5E90A634C2EDB59E83138CD9428D43B4C596122BAA640ACB05CD2D",
+      "../Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Home.razor": "E46EBA5E931C90FFBE1A15337015AB180B8E0E4A86554B97EC7F20ABD148947A",
+      "Components/RootStartupGate.razor": "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F",
+      "appsettings.json": "B2962DC468D4A2FCEDDA84B4FCCCF895CC1383E91796BF7A9AB0B9ABE7DD5699",
+      "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css": "ACFE823AE8A68B737E6DB7814864CDFAE6CEAC3A79C31A73565E345EB2529E48"
     },
     "allowedAfterBaseline": ["branding", "wording", "data", "authorization", "callbacks", "domain-integration", "persistence"],
     "visualDriftRequiresExplicitDecision": true
@@ -32,6 +32,10 @@
     "archetype": "Home.razor",
     "useAppFontSize": false,
     "baseFontSizePx": 16,
+    "defaultRoundedSizePx": 7,
+    "defaultColorPalette": "fluent-blue",
+    "defaultDensity": "Default",
+    "defaultBottomNavigationChildPresentation": "Sheet",
     "responsiveBreakpointPx": 900,
     "adaptiveResponsive": {
       "desktopTableAbovePx": 900,
@@ -46,6 +50,7 @@
       "bottomNavigationLabelLineHeight": 1.25,
       "bottomNavigationLabelBottomInsetPx": 1,
       "bottomNavigationDescendersVisible": true,
+      "mobileToolbarActionsExpandedByDefault": false,
       "liveResizeRequired": true,
       "platformUserAgentLayoutForbidden": true
     },
@@ -161,11 +166,11 @@
     "stylesheetOwnership": {
       "reusableCssSource": "package-only",
       "packageStylesheet": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css",
-      "packageStylesheetSha256": "57EE747876F19F0F082B2249E4562F82B45A101AA50F65D8681C7082B1E9E165",
+      "packageStylesheetSha256": "48A1CE43A374E36E14836703886E14A4C1217D9C27A614DA6A72FC73802E4B9F",
       "mudBlazorStylesheet": "_content/MudBlazor/MudBlazor.min.css",
-      "hostStylesheet": "wwwroot/app.css",
+      "hostStylesheet": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css",
       "hostStylesheetPurpose": "sample-and-domain-composition-only",
-      "hostStylesheetSha256": "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666",
+      "hostStylesheetSha256": "ACFE823AE8A68B737E6DB7814864CDFAE6CEAC3A79C31A73565E345EB2529E48",
       "localPackageCssCopyForbidden": true,
       "additionalUiFrameworkCssForbidden": true
     },

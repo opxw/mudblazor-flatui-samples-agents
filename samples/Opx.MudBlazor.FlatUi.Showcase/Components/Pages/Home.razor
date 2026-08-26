@@ -1,13 +1,13 @@
 @page "/"
 @inject SampleCatalog Catalog
 
-<div class="page-content">
-    <div class="page-actions-only">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Refresh">Refresh</MudButton>
-    </div>
-
+<FlatPage Kind="FlatPageKind.Dashboard"
+          PageCssClass="dashboard-page"
+          UsePanel="false"
+          RefreshVisible="false"
+          OnRefresh="RefreshDashboardAsync">
     <div class="stat-grid">
-        <FlatStatCard Label="Total Assets" Value="@Catalog.Assets.Count.ToString()" Icon="@Icons.Material.Outlined.Devices" Note="Synced today" />
+        <FlatStatCard Label="Total Assets" Value="@Catalog.Assets.Count.ToString()" Icon="@Icons.Material.Outlined.Devices" Note="@DashboardSyncNote" />
         <FlatStatCard Label="Online" Value="@Catalog.Assets.Count(x => x.Status == "Online").ToString()" Icon="@Icons.Material.Outlined.CheckCircle" Tone="green" Note="Healthy devices" />
         <FlatStatCard Label="Active Tickets" Value="@Catalog.Tickets.Count(x => x.Status != "Done").ToString()" Icon="@Icons.Material.Outlined.ConfirmationNumber" Tone="amber" Note="Needs follow-up" />
         <FlatStatCard Label="Health Avg" Value="@($"{Catalog.Assets.Average(x => x.Health):N0}%")" Icon="@Icons.Material.Outlined.MonitorHeart" Tone="sky" Note="Sample static" />
@@ -62,7 +62,7 @@
             </table>
         </div>
     </FlatPanel>
-</div>
+</FlatPage>
 
 @code {
     private readonly string[] TicketTrendLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -76,6 +76,17 @@
     {
         ChartPalette = ["#0078d4", "#10b981", "#f59e0b", "#d13438", "#60a5fa"]
     };
+
+    private DateTimeOffset _lastRefreshedAt = DateTimeOffset.Now;
+
+    private string DashboardSyncNote => $"Updated {_lastRefreshedAt:HH:mm}";
+
+    private async Task RefreshDashboardAsync()
+    {
+        // The production host replaces this sample boundary with its coordinated data loader.
+        await Task.Delay(120);
+        _lastRefreshedAt = DateTimeOffset.Now;
+    }
 
     private static string StatusClass(string status) => status switch
     {

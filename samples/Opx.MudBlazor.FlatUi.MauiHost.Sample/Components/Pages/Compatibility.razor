@@ -1,0 +1,27 @@
+@page "/compatibility"
+
+<PageTitle>Hybrid Compatibility - OPX Flat UI</PageTitle>
+
+<FlatPage Kind="FlatPageKind.DashboardList" PageCssClass="hybrid-host-page">
+    <FlatPanel Title="MAUI Blazor Hybrid compatibility" Subtitle="Package and host responsibilities">
+        <div class="hybrid-panel-body">
+            <div class="hybrid-fact-grid">
+                <FlatInfoItem Label="Rendering" Value="BlazorWebView + MudBlazor" />
+                <FlatInfoItem Label="Navigation" Value="Viewport owned" />
+                <FlatInfoItem Label="Menu source" Value="Typed NavigationItems" />
+                <FlatInfoItem Label="Theme" Value="Light / Dark / Auto" />
+            </div>
+        </div>
+    </FlatPanel>
+
+    <FlatPanel Title="Responsive navigation" Subtitle="The same contract applies to Android and resized Windows windows">
+        <div class="hybrid-panel-body">
+            <ul class="hybrid-boundary-list">
+                <li>At 900px and below, the typed menu renders as bottom navigation.</li>
+                <li>Above 900px, the same typed menu renders recursively in the sidebar.</li>
+                <li>Parent items open their children without navigating to an invalid route.</li>
+                <li>Search, active route, theme, and typography remain package-owned UI behavior.</li>
+            </ul>
+        </div>
+    </FlatPanel>
+</FlatPage>

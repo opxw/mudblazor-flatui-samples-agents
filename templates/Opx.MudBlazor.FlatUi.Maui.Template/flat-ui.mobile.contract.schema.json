@@ -6,12 +6,12 @@
   "properties": {
     "$schema": { "const": "flat-ui.mobile.contract.schema.json" },
     "schemaVersion": { "const": "3.1" },
-    "contractVersion": { "const": "2.0.17" },
+    "contractVersion": { "const": "2.0.20" },
     "packages": {
       "const": {
         "Microsoft.Maui.Controls": "10.0.90",
-        "Opx.MudBlazor.FlatUi": "2.0.17",
-        "MudBlazor": "9.8.0",
+        "Opx.MudBlazor.FlatUi": "2.0.20",
+        "MudBlazor": "9.9.0",
         "CommunityToolkit.Maui": "15.0.1"
       }
     },
@@ -24,23 +24,26 @@
         "namespaceNormalization": "Opx.MudBlazor.FlatUi.Maui.Template",
         "promptTriggers": ["sama", "persis", "canonical", "seperti sample", "source of truth"],
         "files": {
+          "Components/_Imports.razor": "22BA9D3C78BF7BD40A1C8B5460E27B9226908CAF769D508D899222A56FD570B3",
           "Components/Layout/MainLayout.razor": "01588A5DFA354458C9E5A01204D314B7DDA74CF0CB89FA601269429E112B886C",
           "Components/Layout/MobileSidebarMenu.razor": "DD3CA98750144D20B90615556E72009E948AA2E6D69E7C1C3A8D9D14EC705FED",
           "Components/Pages/Home.razor": "8AF7B2D7A3DD7625ED09D8157368FA9481F62FFEA32890D6901941E8B09656A5",
           "Components/RootStartupGate.razor": "B16425B1B88AAE60091BD24AC4877EFCE78DFDF6053F560CA4D78AE99A4AB939",
           "MauiProgram.cs": "DB63AA10050CD8ACF5F6EB1ED5ADEBAA54E99B24A48494B6B5AB48E1DE9D49FB",
           "MainPage.xaml": "5E0FD69C86C9A67BCA5C705E4CB1EAA632801773567E7A36A1342C496CB54108",
-          "appsettings.json": "98ED21544BFC7451A6F0D34E0BFC8EA0A89F12174B89C87E7EC8EBCDCFF2CDF8",
+          "Platforms/Android/AndroidManifest.xml": "99473DD217AFF65C62A3198157E794674190858388530E0E3C074FEF63227F56",
+          "Resources/Splash/splash.svg": "2CE5A083499E8A1FB0CD3E81FC6D029563B821C8B63960552F8593A35600821F",
+          "appsettings.json": "97E304D72B68C75D5ADDD2481041AD83400AE9E95783971FB0AA6F4883FF33BE",
           "wwwroot/app.css": "92FA657E143FAF00348F4E5CEF9CE806F5FBE1D8CB37E45863DE759194B94DDB"
         },
         "allowedAfterBaseline": ["branding", "wording", "data", "authorization", "callbacks", "domain-integration", "persistence"],
         "visualDriftRequiresExplicitDecision": true
       }
     },
-    "defaults": { "const": { "theme": "Light", "fontOwnership": "Device", "useAppFontSize": false, "navigationLayout": "Bottom", "bottomNavigationMaxWidthPx": 900 } },
-    "native": { "const": { "toolkitRegistration": "UseMauiCommunityToolkit", "statusBarBehavior": true, "statusBarMatchesResolvedAppBar": true, "iosViewControllerBasedStatusBarAppearance": false, "androidOverScrollMode": "Never", "iosBounces": false, "iosAlwaysBounceVertical": false } },
+    "defaults": { "const": { "theme": "Light", "fontOwnership": "Device", "useAppFontSize": false, "defaultRoundedSizePx": 7, "defaultColorPalette": "fluent-blue", "defaultDensity": "Default", "navigationLayout": "Bottom", "defaultBottomNavigationChildPresentation": "Sheet", "mobileToolbarActionsExpandedByDefault": false, "bottomNavigationMaxWidthPx": 900 } },
+    "native": { "const": { "toolkitRegistration": "UseMauiCommunityToolkit", "statusBarBehavior": true, "statusBarMatchesResolvedAppBar": true, "iosViewControllerBasedStatusBarAppearance": false, "androidOverScrollMode": "Never", "androidDeclaredPermissions": ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE", "android.permission.POST_NOTIFICATIONS"], "defaultDotNetSplashArtworkVisible": false, "neutralSplashSurface": "#FFFFFF", "iosBounces": false, "iosAlwaysBounceVertical": false } },
     "startup": { "const": { "rootGateBeforeRouter": true, "staticLoadingBeforeInteractive": true, "title": "Memuat", "spinnerClass": "flat-system-loading-spinner", "protectedLayoutFlashForbidden": true } },
-    "webView": { "const": { "rootOverscrollBehavior": "none", "ordinaryTextSelectable": false, "textboxSelectionPreserved": true, "reusableCssFromPackageOnly": true, "opxPackageCssSha256": "57EE747876F19F0F082B2249E4562F82B45A101AA50F65D8681C7082B1E9E165" } },
+    "webView": { "const": { "rootOverscrollBehavior": "none", "ordinaryTextSelectable": false, "textboxSelectionPreserved": true, "reusableCssFromPackageOnly": true, "opxPackageCssSha256": "48A1CE43A374E36E14836703886E14A4C1217D9C27A614DA6A72FC73802E4B9F" } },
     "verification": { "const": { "androidReleaseBuildRequired": true, "androidDeviceEvidenceRequiredForNativeClaims": true, "iosDeviceEvidenceRequiredForNativeClaims": true } }
   }
 }

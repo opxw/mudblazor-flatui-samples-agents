@@ -1,29 +1,31 @@
 @inherits LayoutComponentBase
 @implements IAsyncDisposable
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 @inject FlatUiPreferencesService Preferences
 @inject FlatDeviceNotificationOptions NotificationOptions
+@inject IDeviceNotificationService DeviceNotifications
 @inject FlatLocalizationOptions LocalizationOptions
 @inject IHybridStatusBarService StatusBarService
 
 <FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentPalette">
     <FlatAppShell AppName="OPX FLAT UI"
-                  PageTitle="Hybrid Host"
-                  SidebarSubtitle="MAUI host reference"
+                  PageTitle="@CurrentPageTitle"
+                  SidebarSubtitle="Flat UI powered by MudBlazor"
                   SearchPlaceholder="Search host features..."
-                  SearchItems="@SearchItems"
+                  SearchItems="@CombinedSearchItems"
                   SidebarSearchPlaceholder="Search sample menu..."
                   IsDarkMode="@IsDarkMode"
-                  ThemeMode="@Preferences.Current.ThemeMode"
-                  Density="@Preferences.Current.Density"
-                  UseAppFontSize="@Preferences.Current.UseAppFontSize"
-                  FontSizePx="@Preferences.Current.FontSizePx"
-                  RoundedSizePx="@Preferences.Current.RoundedSizePx"
+                  ThemeMode="@Preferences.Effective.ThemeMode"
+                  Density="@Preferences.Effective.Density"
+                  UseAppFontSize="@Preferences.Effective.UseAppFontSize"
+                  FontSizePx="@Preferences.Effective.FontSizePx"
+                  RoundedSizePx="@Preferences.Effective.RoundedSizePx"
                   HostKind="FlatUiHostKind.MauiHybrid"
-                  NavigationLayout="FlatUiNavigationLayout.Bottom"
+                  NavigationLayout="@Preferences.Effective.NavigationLayout"
                   BottomNavigationMaxWidthPx="900"
-                  BottomNavigationChildPresentation="@Preferences.Current.BottomNavigationChildPresentation"
-                  NavigationItems="@NavigationItems"
+                  BottomNavigationChildPresentation="@Preferences.Effective.BottomNavigationChildPresentation"
+                  NavigationItems="@CombinedNavigationItems"
                   AutoScaleHighDensityTouchButtons="@Preferences.Options.AutoScaleHighDensityTouchButtons"
                   HighDensityTouchButtonHeightPx="@Preferences.Options.NormalizedHighDensityTouchButtonHeightPx"
                   HighDensityTouchFloatingLabelFontSizePx="@Preferences.Options.NormalizedHighDensityTouchFloatingLabelFontSizePx"
@@ -35,15 +37,19 @@
                   DarkSidebarForeground="@Preferences.Effective.DarkSidebarForeground"
                   RightToLeft="@LocalizationOptions.RightToLeft">
         <AppBarActions>
-            <FlatDeviceNotification Title="@NotificationOptions.SampleTitle"
-                                    Message="@NotificationOptions.SampleMessage"
-                                    Tag="@NotificationOptions.SampleTag" />
+            <MudMenu Icon="@Icons.Material.Outlined.MoreVert"
+                     AriaLabel="Open app menu"
+                     Class="header-action-menu"
+                     AnchorOrigin="global::MudBlazor.Origin.BottomRight"
+                     TransformOrigin="global::MudBlazor.Origin.TopRight"
+                     PopoverClass="settings-menu-popover">
+                <ChildContent>
+                    <MudMenuItem Icon="@Icons.Material.Outlined.Settings"
+                                 Label="Settings"
+                                 OnClick="OpenSettings" />
+                </ChildContent>
+            </MudMenu>
         </AppBarActions>
-        <Menu>
-            <MudNavMenu>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home">Hybrid host</MudNavLink>
-            </MudNavMenu>
-        </Menu>
         <UserContent>
             <FlatProfileAvatar Name="Hybrid User" Initials="HU" />
             <div class="hybrid-user-copy">
@@ -56,8 +62,140 @@
         </UserContent>
         <ChildContent>
             @Body
+            <SamplePageUsage />
         </ChildContent>
     </FlatAppShell>
+
+    @if (_settingsOpen)
+    {
+        <div class="@SettingsModalClass" role="presentation">
+            <section class="settings-modal-panel" role="dialog" aria-modal="true" aria-labelledby="maui-settings-title">
+                <header class="settings-modal-header">
+                    <div>
+                        <span class="notification-eyebrow">MAUI settings</span>
+                        <h2 id="maui-settings-title">Native host settings</h2>
+                        <p>Test capabilities provided by the Android or Windows host.</p>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Close"
+                                   Class="settings-modal-close"
+                                   OnClick="CloseSettingsAsync"
+                                   aria-label="Close settings" />
+                </header>
+                <div class="settings-modal-body maui-settings-body">
+                    <div class="settings-menu-section">
+                        <MudIcon Icon="@Icons.Material.Outlined.Palette" Size="global::MudBlazor.Size.Small" />
+                        <span>
+                            <strong>Theme settings</strong>
+                            <small>Choose the application color mode.</small>
+                        </span>
+                    </div>
+                    <button type="button" class="@SettingItemClass(FlatUiThemeMode.Light)" @onclick="@(() => SetThemeModeAsync(FlatUiThemeMode.Light))">
+                        <MudIcon Icon="@Icons.Material.Outlined.LightMode" Size="global::MudBlazor.Size.Small" />
+                        <span><strong>Light</strong><small>Bright workspace mode</small></span>
+                        @if (_draftThemeMode == FlatUiThemeMode.Light)
+                        {
+                            <MudIcon Icon="@Icons.Material.Outlined.Check" Size="global::MudBlazor.Size.Small" />
+                        }
+                    </button>
+                    <button type="button" class="@SettingItemClass(FlatUiThemeMode.Dark)" @onclick="@(() => SetThemeModeAsync(FlatUiThemeMode.Dark))">
+                        <MudIcon Icon="@Icons.Material.Outlined.DarkMode" Size="global::MudBlazor.Size.Small" />
+                        <span><strong>Dark / Night</strong><small>Dark mode for night monitoring</small></span>
+                        @if (_draftThemeMode == FlatUiThemeMode.Dark)
+                        {
+                            <MudIcon Icon="@Icons.Material.Outlined.Check" Size="global::MudBlazor.Size.Small" />
+                        }
+                    </button>
+                    <button type="button" class="@SettingItemClass(FlatUiThemeMode.Auto)" @onclick="@(() => SetThemeModeAsync(FlatUiThemeMode.Auto))">
+                        <MudIcon Icon="@Icons.Material.Outlined.BrightnessAuto" Size="global::MudBlazor.Size.Small" />
+                        <span><strong>Auto</strong><small>Follow the device system preference</small></span>
+                        @if (_draftThemeMode == FlatUiThemeMode.Auto)
+                        {
+                            <MudIcon Icon="@Icons.Material.Outlined.Check" Size="global::MudBlazor.Size.Small" />
+                        }
+                    </button>
+                    <MudDivider />
+                    <div class="settings-menu-section">
+                        <MudIcon Icon="@Icons.Material.Outlined.FormatSize" Size="global::MudBlazor.Size.Small" />
+                        <span>
+                            <strong>Interface settings</strong>
+                            <small>Preview all shared display preferences immediately.</small>
+                        </span>
+                    </div>
+                    <FlatDisplaySettings Density="@_draftDensity"
+                                         DensityChanged="SetDraftDensity"
+                                         InputStyle="@_draftInputStyle"
+                                         InputStyleChanged="SetDraftInputStyle"
+                                         ColorPalette="@_draftColorPalette"
+                                         ColorPaletteChanged="SetDraftColorPalette"
+                                         ColorPalettes="@Preferences.Options.AvailableColorPalettes"
+                                         LightSidebarBackground="@_draftLightSidebarBackground"
+                                         LightSidebarBackgroundChanged="SetDraftLightSidebarBackground"
+                                         LightSidebarForeground="@_draftLightSidebarForeground"
+                                         LightSidebarForegroundChanged="SetDraftLightSidebarForeground"
+                                         DarkSidebarBackground="@_draftDarkSidebarBackground"
+                                         DarkSidebarBackgroundChanged="SetDraftDarkSidebarBackground"
+                                         DarkSidebarForeground="@_draftDarkSidebarForeground"
+                                         DarkSidebarForegroundChanged="SetDraftDarkSidebarForeground"
+                                         HostKind="@Preferences.Options.HostKind"
+                                         NavigationLayout="@_draftNavigationLayout"
+                                         NavigationLayoutChanged="SetDraftNavigationLayout"
+                                         BottomNavigationChildPresentation="@_draftBottomNavigationChildPresentation"
+                                         BottomNavigationChildPresentationChanged="SetDraftBottomNavigationChildPresentation"
+                                         UseAppFontSize="@_draftUseAppFontSize"
+                                         UseAppFontSizeChanged="SetDraftUseAppFontSize"
+                                         FontSizePx="@_draftFontSizePx"
+                                         FontSizePxChanged="SetDraftFontSize"
+                                         MinimumFontSizePx="@Preferences.Options.MinimumFontSizePx"
+                                         MaximumFontSizePx="@Preferences.Options.MaximumFontSizePx"
+                                         BackdropOpacity="@_draftBackdropOpacity"
+                                         BackdropOpacityChanged="SetDraftBackdropOpacity"
+                                         MinimumBackdropOpacity="@Preferences.Options.MinimumBackdropOpacity"
+                                         MaximumBackdropOpacity="@Preferences.Options.MaximumBackdropOpacity"
+                                         RoundedSizePx="@_draftRoundedSizePx"
+                                         RoundedSizePxChanged="SetDraftRoundedSize" />
+                    <button type="button" class="settings-menu-item display-reset-button" @onclick="RestoreDisplayDefaultsAsync">
+                        <MudIcon Icon="@Icons.Material.Outlined.RestartAlt" Size="global::MudBlazor.Size.Small" />
+                        <span>
+                            <strong>Restore application defaults</strong>
+                            <small>Use the display values configured by the MAUI host.</small>
+                        </span>
+                    </button>
+                    <MudDivider />
+                    <div class="settings-menu-section">
+                        <MudIcon Icon="@Icons.Material.Outlined.NotificationsActive" Size="global::MudBlazor.Size.Small" />
+                        <span>
+                            <strong>Local notification</strong>
+                            <small>Permission is requested only after this explicit test action.</small>
+                        </span>
+                    </div>
+                    <div class="maui-notification-test">
+                        <div class="maui-notification-copy">
+                            <strong>Device notification</strong>
+                            <small>Sends the configured sample message through the native host adapter.</small>
+                        </div>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="global::MudBlazor.Color.Primary"
+                                   StartIcon="@Icons.Material.Outlined.NotificationsActive"
+                                   Disabled="@_testingNotification"
+                                   OnClick="TestLocalNotificationAsync">
+                            @(_testingNotification ? "Sending..." : "Test local notification")
+                        </MudButton>
+                        @if (!string.IsNullOrWhiteSpace(_notificationTestMessage))
+                        {
+                            <div class="@NotificationResultClass" role="status" aria-live="polite">
+                                <MudIcon Icon="@NotificationResultIcon" Size="global::MudBlazor.Size.Small" />
+                                <span>@_notificationTestMessage</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <footer class="settings-modal-footer">
+                    <MudButton Variant="Variant.Outlined" OnClick="CloseSettingsAsync">Cancel</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="global::MudBlazor.Color.Primary" OnClick="SaveSettingsAsync">Save</MudButton>
+                </footer>
+            </section>
+        </div>
+    }
 </FlatMudProviders>
 
 @code {
@@ -65,37 +203,330 @@
     private DotNetObjectReference<MainLayout>? _themeReference;
     private bool _systemPrefersDark;
     private bool _statusBarSyncPending = true;
+    private bool _settingsOpen;
+    private bool _testingNotification;
+    private string _draftDensity = FlatUiDensity.Default;
+    private string _draftInputStyle = FlatInputStyle.Outlined;
+    private string _draftThemeMode = FlatUiThemeMode.Auto;
+    private string _draftNavigationLayout = FlatUiNavigationLayout.Bottom;
+    private string _draftBottomNavigationChildPresentation = FlatBottomNavigationChildPresentation.Sheet;
+    private string _draftColorPalette = "fluent-blue";
+    private string _draftLightSidebarBackground = "#f3f6f9";
+    private string _draftLightSidebarForeground = "#495057";
+    private string _draftDarkSidebarBackground = "#212529";
+    private string _draftDarkSidebarForeground = "#ced4da";
+    private bool _draftUseAppFontSize;
+    private double _draftFontSizePx = 16;
+    private double _draftBackdropOpacity = 0.48;
+    private double _draftRoundedSizePx;
+    private bool _restoreDisplayDefaults;
+    private FlatDeviceNotificationStatus _notificationTestStatus = FlatDeviceNotificationStatus.Ready;
+    private string? _notificationTestMessage;
 
-    private static IReadOnlyList<FlatNavigationMenuItem> NavigationItems =>
+    private string SettingsModalClass => $"settings-modal-overlay {(IsDarkMode ? "theme-dark" : "theme-light")}";
+
+    private string NotificationResultClass =>
+        $"maui-notification-result status-{_notificationTestStatus.ToString().ToLowerInvariant()}";
+
+    private string NotificationResultIcon => _notificationTestStatus switch
+    {
+        FlatDeviceNotificationStatus.Shown => Icons.Material.Outlined.CheckCircle,
+        FlatDeviceNotificationStatus.PermissionDenied => Icons.Material.Outlined.Block,
+        FlatDeviceNotificationStatus.Unsupported => Icons.Material.Outlined.NotificationImportant,
+        FlatDeviceNotificationStatus.Failed => Icons.Material.Outlined.ErrorOutline,
+        _ => Icons.Material.Outlined.Info
+    };
+
+    private static IReadOnlyList<FlatNavigationMenuItem> MauiNavigationItems =>
     [
-        new("Hybrid host", "/", Icons.Material.Outlined.Home)
+        new("MAUI Host", Icon: Icons.Material.Outlined.Devices, Children:
+        [
+            new("Host overview", "/maui-host", Icons.Material.Outlined.SpaceDashboard),
+            new("MAUI Performance", "/maui-performance", Icons.Material.Outlined.Speed),
+            new("Compatibility", "/compatibility", Icons.Material.Outlined.Devices),
+            new("Native adapters", "/native-adapters", Icons.Material.Outlined.PhoneAndroid)
+        ])
     ];
 
-    private static IReadOnlyList<FlatNavigationSearchItem> SearchItems =>
+    private static IReadOnlyList<FlatNavigationSearchItem> MauiSearchItems =>
     [
-        new("Hybrid host", "/", "Host", "maui native secure storage camera file picker share notification", Icons.Material.Outlined.Home)
+        new("MAUI Host", "/maui-host", "Native host", "maui hybrid dashboard runtime viewport", Icons.Material.Outlined.SpaceDashboard),
+        new("MAUI Performance", "/maui-performance", "Hybrid", "startup route render timing performance evidence", Icons.Material.Outlined.Speed),
+        new("Compatibility", "/compatibility", "Hybrid", "webview viewport menu theme status bar lifecycle", Icons.Material.Outlined.Devices),
+        new("Native adapters", "/native-adapters", "Hybrid", "secure storage camera file picker share notification", Icons.Material.Outlined.PhoneAndroid)
     ];
 
-    private bool IsDarkMode => Preferences.Current.ThemeMode switch
+    private static IReadOnlyList<FlatNavigationMenuItem> CombinedNavigationItems { get; } =
+        ShowcaseNavigationCatalog.NavigationItems.Concat(MauiNavigationItems).ToArray();
+
+    private static IReadOnlyList<FlatNavigationSearchItem> CombinedSearchItems { get; } =
+        ShowcaseNavigationCatalog.SearchItems.Concat(MauiSearchItems).ToArray();
+
+    private string CurrentPageTitle => CurrentPath switch
+    {
+        "/maui-host" => "Hybrid - Host Overview",
+        "/maui-performance" => "Hybrid - Performance",
+        "/compatibility" => "Hybrid - Compatibility",
+        "/native-adapters" => "Hybrid - Native Adapters",
+        _ => ShowcaseNavigationCatalog.ResolvePageTitle(CurrentPath)
+    };
+
+    private string CurrentPath => "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+
+    private bool IsDarkMode => Preferences.Effective.ThemeMode switch
     {
         FlatUiThemeMode.Dark => true,
         FlatUiThemeMode.Light => false,
         _ => _systemPrefersDark
     };
 
+    private void OpenSettings()
+    {
+        _draftThemeMode = Preferences.Current.ThemeMode;
+        _draftDensity = Preferences.Current.Density;
+        _draftInputStyle = Preferences.Current.InputStyle;
+        _draftNavigationLayout = Preferences.Current.NavigationLayout;
+        _draftBottomNavigationChildPresentation = Preferences.Current.BottomNavigationChildPresentation;
+        _draftColorPalette = Preferences.Current.ColorPalette;
+        _draftLightSidebarBackground = Preferences.Current.LightSidebarBackground;
+        _draftLightSidebarForeground = Preferences.Current.LightSidebarForeground;
+        _draftDarkSidebarBackground = Preferences.Current.DarkSidebarBackground;
+        _draftDarkSidebarForeground = Preferences.Current.DarkSidebarForeground;
+        _draftUseAppFontSize = Preferences.Current.UseAppFontSize;
+        _draftFontSizePx = Preferences.Current.FontSizePx;
+        _draftBackdropOpacity = Preferences.Current.BackdropOpacity;
+        _draftRoundedSizePx = Preferences.Current.RoundedSizePx;
+        _restoreDisplayDefaults = false;
+        _notificationTestStatus = FlatDeviceNotificationStatus.Ready;
+        _notificationTestMessage = null;
+        _settingsOpen = true;
+    }
+
+    private string SettingItemClass(string mode) =>
+        $"settings-menu-item {(_draftThemeMode == mode ? "active" : "")}";
+
+    private async Task CloseSettingsAsync()
+    {
+        await Preferences.RestoreCurrentPreviewAsync();
+        _settingsOpen = false;
+    }
+
+    private async Task SetThemeModeAsync(string mode)
+    {
+        _draftThemeMode = FlatUiThemeMode.Normalize(mode);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftDensity(string density)
+    {
+        _draftDensity = FlatUiDensity.Normalize(density);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftInputStyle(string inputStyle)
+    {
+        _draftInputStyle = FlatInputStyle.Normalize(inputStyle);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftNavigationLayout(string navigationLayout)
+    {
+        _draftNavigationLayout = FlatUiNavigationLayout.ResolveForHost(navigationLayout, Preferences.Options.HostKind);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftBottomNavigationChildPresentation(string presentation)
+    {
+        _draftBottomNavigationChildPresentation = FlatBottomNavigationChildPresentation.Normalize(presentation);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftFontSize(double fontSizePx)
+    {
+        _draftFontSizePx = fontSizePx;
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftUseAppFontSize(bool useAppFontSize)
+    {
+        _draftUseAppFontSize = useAppFontSize;
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftBackdropOpacity(double backdropOpacity)
+    {
+        _draftBackdropOpacity = backdropOpacity;
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftRoundedSize(double roundedSizePx)
+    {
+        _draftRoundedSizePx = roundedSizePx;
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftColorPalette(string colorPalette)
+    {
+        _draftColorPalette = Preferences.Options.ResolveColorPalette(colorPalette).Id;
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftLightSidebarBackground(string color)
+    {
+        _draftLightSidebarBackground = Preferences.Options.ResolveLightSidebarBackground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftLightSidebarForeground(string color)
+    {
+        _draftLightSidebarForeground = Preferences.Options.ResolveLightSidebarForeground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftDarkSidebarBackground(string color)
+    {
+        _draftDarkSidebarBackground = Preferences.Options.ResolveDarkSidebarBackground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task SetDraftDarkSidebarForeground(string color)
+    {
+        _draftDarkSidebarForeground = Preferences.Options.ResolveDarkSidebarForeground(color);
+        _restoreDisplayDefaults = false;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private async Task RestoreDisplayDefaultsAsync()
+    {
+        var defaults = Preferences.Options.CreateDefaults();
+        _draftThemeMode = defaults.ThemeMode;
+        _draftDensity = defaults.Density;
+        _draftInputStyle = defaults.InputStyle;
+        _draftNavigationLayout = defaults.NavigationLayout;
+        _draftBottomNavigationChildPresentation = defaults.BottomNavigationChildPresentation;
+        _draftColorPalette = defaults.ColorPalette;
+        _draftLightSidebarBackground = defaults.LightSidebarBackground;
+        _draftLightSidebarForeground = defaults.LightSidebarForeground;
+        _draftDarkSidebarBackground = defaults.DarkSidebarBackground;
+        _draftDarkSidebarForeground = defaults.DarkSidebarForeground;
+        _draftUseAppFontSize = defaults.UseAppFontSize;
+        _draftFontSizePx = defaults.FontSizePx;
+        _draftBackdropOpacity = defaults.BackdropOpacity;
+        _draftRoundedSizePx = defaults.RoundedSizePx;
+        _restoreDisplayDefaults = true;
+        await PreviewDisplayDraftAsync();
+    }
+
+    private ValueTask PreviewDisplayDraftAsync() => Preferences.PreviewAsync(CreateDraftPreferences());
+
+    private FlatUiDisplayPreferences CreateDraftPreferences() => new()
+    {
+        UseAppFontSize = _draftUseAppFontSize,
+        ThemeMode = _draftThemeMode,
+        Density = _draftDensity,
+        InputStyle = _draftInputStyle,
+        NavigationLayout = _draftNavigationLayout,
+        BottomNavigationChildPresentation = _draftBottomNavigationChildPresentation,
+        ColorPalette = _draftColorPalette,
+        LightSidebarBackground = _draftLightSidebarBackground,
+        LightSidebarForeground = _draftLightSidebarForeground,
+        DarkSidebarBackground = _draftDarkSidebarBackground,
+        DarkSidebarForeground = _draftDarkSidebarForeground,
+        FontSizePx = _draftFontSizePx,
+        RoundedSizePx = _draftRoundedSizePx,
+        BackdropOpacity = _draftBackdropOpacity
+    };
+
+    private async Task SaveSettingsAsync()
+    {
+        if (_restoreDisplayDefaults)
+            await Preferences.ResetAsync();
+        else
+            await Preferences.SaveAsync(CreateDraftPreferences());
+
+        _settingsOpen = false;
+    }
+
+    private async Task TestLocalNotificationAsync()
+    {
+        if (_testingNotification)
+            return;
+
+        _testingNotification = true;
+        _notificationTestMessage = "Requesting the native notification service...";
+        try
+        {
+            _notificationTestStatus = await DeviceNotifications.ShowAsync(
+                new FlatDeviceNotificationRequest(NotificationOptions.SampleTitle, NotificationOptions.SampleMessage)
+                {
+                    IconUrl = NotificationOptions.IconUrl,
+                    Tag = NotificationOptions.SampleTag
+                });
+
+            _notificationTestMessage = _notificationTestStatus switch
+            {
+                FlatDeviceNotificationStatus.Shown => "Local notification sent to this device.",
+                FlatDeviceNotificationStatus.PermissionDenied => "Notification permission was denied in device settings.",
+                FlatDeviceNotificationStatus.Unsupported => "Local notifications are not supported by this host adapter.",
+                _ => "The local notification could not be sent."
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            _notificationTestStatus = FlatDeviceNotificationStatus.Failed;
+            _notificationTestMessage = "The local notification test was cancelled.";
+        }
+        catch
+        {
+            _notificationTestStatus = FlatDeviceNotificationStatus.Failed;
+            _notificationTestMessage = "The local notification could not be sent.";
+        }
+        finally
+        {
+            _testingNotification = false;
+        }
+    }
+
     private FlatUiPalette CurrentPalette
     {
         get
         {
-            var palette = Preferences.Options.ResolveColorPalette(Preferences.Current.ColorPalette);
+            var palette = Preferences.Options.ResolveColorPalette(Preferences.Effective.ColorPalette);
             return new FlatUiPalette(
-                palette.Accent, palette.AccentHover, palette.AccentSubtle, palette.AccentDark,
-                palette.DarkAccent, palette.DarkAccentHover, palette.Secondary,
-                palette.Success, palette.Warning, palette.Danger);
+                Accent: palette.Accent,
+                AccentHover: palette.AccentHover,
+                AccentSubtle: palette.AccentSubtle,
+                AccentDark: palette.AccentDark,
+                DarkAccent: palette.DarkAccent,
+                DarkAccentHover: palette.DarkAccentHover,
+                Secondary: palette.Secondary,
+                Success: palette.Success,
+                Warning: palette.Warning,
+                Danger: palette.Danger);
         }
     }
 
-    protected override void OnInitialized() => Preferences.Changed += HandlePreferencesChanged;
+    protected override void OnInitialized()
+    {
+        Preferences.Changed += HandlePreferencesChanged;
+        Navigation.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args) =>
+        _ = InvokeAsync(StateHasChanged);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -149,6 +580,7 @@
     public async ValueTask DisposeAsync()
     {
         Preferences.Changed -= HandlePreferencesChanged;
+        Navigation.LocationChanged -= HandleLocationChanged;
         if (_themeReference is null)
             return;
 

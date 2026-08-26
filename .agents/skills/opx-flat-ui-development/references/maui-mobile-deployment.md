@@ -10,6 +10,7 @@ Read this reference when a consumer adds, deploys, or reviews a .NET MAUI Blazor
 - Add `using CommunityToolkit.Maui;` and call `.UseMauiCommunityToolkit()` on the `MauiAppBuilder` in `MauiProgram.cs`.
 - Attach `CommunityToolkit.Maui.Behaviors.StatusBarBehavior` to the native root `ContentPage` that owns the `BlazorWebView`. Prefer the behavior over calling the platform API directly from the page constructor, `OnAppearing`, or `OnNavigatedTo`.
 - Android requires no additional Toolkit status-bar configuration. In `Platforms/iOS/Info.plist`, set `UIViewControllerBasedStatusBarAppearance` to `false`.
+- In Android `AndroidManifest.xml`, declare `android.permission.ACCESS_NETWORK_STATE` before reading `Connectivity.Current.NetworkAccess`. Declare `android.permission.POST_NOTIFICATIONS` when the host exposes local notifications; on Android versions requiring runtime approval, request it only from the notification action initiated by the user. A manifest declaration alone does not implement notification channels, delivery, tap routing, or scheduling.
 
 ## Color and theme ownership
 
@@ -34,6 +35,7 @@ Read this reference when a consumer adds, deploys, or reviews a .NET MAUI Blazor
 
 ## Mandatory startup-loading rule
 
+- Remove stock .NET/MAUI splash artwork. Keep `MauiSplashScreen` only as a neutral `#FFFFFF` surface with the canonical one-pixel white-on-white invisible SVG so Android 12+ can satisfy its mandatory system-splash contract without displaying a .NET logo or colored brand frame. Hand off immediately to `Memuat`; do not claim the Android-owned frame can be eliminated on every supported OS version.
 - During both native `BlazorWebView` bootstrap and session authorization checking, render `Memuat` with exactly one package-owned `.flat-system-loading-spinner`. Its geometry, accent, border, and motion match the Reconnecting state of `FlatReconnectModal`; do not create a host-specific spinner.
 - Place centered full-viewport static placeholder markup in the MAUI host document so it appears before Razor becomes interactive. Once interactive, authentication-enabled hosts hand off to `<FlatSessionRestore Title="Memuat" />`. Coordinate visibility so the user never sees a blank frame, two spinners, text-only `Memuat`, or a protected-layout flash.
 - Resolve surface and text colors from the active Light/Dark/Night/Auto theme, respect safe-area insets, and retain a visible static ring when reduced motion suppresses rotation. This contract governs the first WebView-owned loading surface after the native launch splash.

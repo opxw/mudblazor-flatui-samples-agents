@@ -9,13 +9,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.0.17"
+$expectedContractVersion = "2.0.20"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.0.17"
-    "MudBlazor" = "9.8.0"
+    "Opx.MudBlazor.FlatUi" = "2.0.20"
+    "MudBlazor" = "9.9.0"
 }
 $expectedHostCssSha256 = "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666"
-$expectedPackageCssSha256 = "57EE747876F19F0F082B2249E4562F82B45A101AA50F65D8681C7082B1E9E165"
+$expectedPackageCssSha256 = "48A1CE43A374E36E14836703886E14A4C1217D9C27A614DA6A72FC73802E4B9F"
 $expectedExactSampleHashes = [ordered]@{
     "Components\Layout\MainLayout.razor" = "1329B9F7A058128B3971CA6C76FD4CCB06333CA9D7C17A2733D07109E46328A8"
     "Components\Layout\SampleSidebarMenu.razor" = "8157F2819E65D521AFB4C49BF6D2C4C4BE423C7FBBF1DF26CC7139EBB0FDA5AB"
@@ -109,6 +109,41 @@ $contractRoot = Resolve-ContractRoot $projectRoot
 if ([string]::IsNullOrWhiteSpace($contractRoot)) {
     Add-Violation "RULES.md and .agents/AGENTS.md were not found at the project root or any parent."
 }
+else {
+    $registryPath = Join-Path $contractRoot ".agents\skills\opx-flat-ui-development\references\page-registry.md"
+    $behaviorRegistryPath = Join-Path $contractRoot ".agents\skills\opx-flat-ui-development\references\showcase-behavior-registry.md"
+    if ((Test-Path -LiteralPath $registryPath) -and (Test-Path -LiteralPath $behaviorRegistryPath)) {
+        $registryIds = @([regex]::Matches(
+            (Get-Content -LiteralPath $registryPath -Raw),
+            '(?m)^\| `(?<id>opx\.page\.[^`]+)` \|') | ForEach-Object { $_.Groups['id'].Value })
+        $behaviorText = Get-Content -LiteralPath $behaviorRegistryPath -Raw
+        if (($behaviorText -notmatch 'logical `padding-inline`') -or ($behaviorText -notmatch '`14px` desktop') -or ($behaviorText -notmatch '`12px` at `<=900px`') -or ($behaviorText -notmatch 'zero left inset')) {
+            Add-Violation "Canonical showcase behavior registry must preserve the positive content-panel inset contract."
+        }
+        if (($behaviorText -notmatch '"bug package"') -or ($behaviorText -notmatch '"bug integrasi aplikasi"') -or ($behaviorText -notmatch '"belum terklasifikasi"')) {
+            Add-Violation "Canonical showcase behavior registry must preserve explicit package-versus-integration defect labels."
+        }
+        $declaredProfiles = @([regex]::Matches($behaviorText, '(?m)^### `(?<profile>[^`]+)`\s*$') | ForEach-Object { $_.Groups['profile'].Value })
+        $behaviorMatches = [regex]::Matches(
+            $behaviorText,
+            '(?m)^\| `(?<id>opx\.page\.[^`]+)` \| `(?<profile>[^`]+)` \| `(?<source>[^`]+)` \|\s*$')
+        $behaviorIds = @($behaviorMatches | ForEach-Object { $_.Groups['id'].Value })
+        foreach ($duplicate in @($behaviorIds | Group-Object | Where-Object Count -gt 1)) {
+            Add-Violation "Canonical showcase behavior registry contains duplicate PageId '$($duplicate.Name)'."
+        }
+        foreach ($missingId in @($registryIds | Where-Object { $_ -notin $behaviorIds })) {
+            Add-Violation "Canonical PageId '$missingId' has no showcase behavior profile."
+        }
+        foreach ($staleId in @($behaviorIds | Where-Object { $_ -notin $registryIds })) {
+            Add-Violation "Showcase behavior registry contains unknown PageId '$staleId'."
+        }
+        foreach ($profile in @($behaviorMatches | ForEach-Object { $_.Groups['profile'].Value } | Select-Object -Unique)) {
+            if ($profile -notin $declaredProfiles) {
+                Add-Violation "Showcase behavior profile '$profile' is mapped but not declared."
+            }
+        }
+    }
+}
 
 $manifestPath = Join-Path $projectRoot "flat-ui.contract.json"
 $schemaPath = Join-Path $projectRoot "flat-ui.contract.schema.json"
@@ -195,6 +230,15 @@ if ($null -ne $manifest) {
     }
     if ([double](Get-JsonProperty $baseline "baseFontSizePx") -ne 16) {
         Add-Violation "Baseline baseFontSizePx must be 16 for Manual font mode."
+    }
+    if ([int](Get-JsonProperty $baseline "defaultRoundedSizePx") -ne 7) {
+        Add-Violation "Baseline defaultRoundedSizePx must be 7 for canonical button corners."
+    }
+    if ((Get-JsonProperty $baseline "defaultColorPalette") -cne "fluent-blue") {
+        Add-Violation "Baseline defaultColorPalette must be fluent-blue."
+    }
+    if ((Get-JsonProperty $baseline "defaultDensity") -cne "Default") {
+        Add-Violation "Baseline defaultDensity must be Default."
     }
     if ([int](Get-JsonProperty $baseline "responsiveBreakpointPx") -ne 900) {
         Add-Violation "Baseline responsiveBreakpointPx must be 900."
@@ -557,7 +601,7 @@ foreach ($packageName in $expectedPackages.Keys) {
 
 $projectReferences = @($projectXml.SelectNodes("//ProjectReference"))
 foreach ($reference in $projectReferences) {
-    if ($reference.Include -match "(?i)Opx[.]MudBlazor[.]FlatUi|mudblazor-flat-ui") {
+    if ($reference.Include -match "(?i)(^|[\\/])Opx[.]MudBlazor[.]FlatUi[.]csproj$|mudblazor-flat-ui[\\/]src") {
         Add-Violation "Opx.MudBlazor.FlatUi must use the public PackageReference, not ProjectReference '$($reference.Include)'."
     }
 }
@@ -599,7 +643,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.15; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.0.20; found $packageCssHash."
     }
 }
 
@@ -815,8 +859,14 @@ if (Test-Path -LiteralPath $settingsPath) {
         if ([double](Get-JsonProperty $display "DefaultFontSizePx") -ne 16) {
             Add-Violation "OpxFlatUi:Display:DefaultFontSizePx must start at 16 for Manual font mode."
         }
-        if ([int](Get-JsonProperty $display "DefaultRoundedSizePx") -ne 0) {
-            Add-Violation "OpxFlatUi:Display:DefaultRoundedSizePx must start at 0."
+        if ([int](Get-JsonProperty $display "DefaultRoundedSizePx") -ne 7) {
+            Add-Violation "OpxFlatUi:Display:DefaultRoundedSizePx must start at 7 for canonical button corners."
+        }
+        if ((Get-JsonProperty $display "DefaultColorPalette") -cne "fluent-blue") {
+            Add-Violation "OpxFlatUi:Display:DefaultColorPalette must start at fluent-blue."
+        }
+        if ((Get-JsonProperty $display "DefaultDensity") -cne "Default") {
+            Add-Violation "OpxFlatUi:Display:DefaultDensity must start at Default."
         }
         if ((Get-JsonProperty $display "DefaultFabShape") -cne "Circle") {
             Add-Violation "OpxFlatUi:Display:DefaultFabShape must start at Circle."
@@ -894,9 +944,12 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         "RULES.md",
         ".agents\AGENTS.md",
         ".agents\RULES.md",
+        ".agents\KNOWLEDGE.md",
+        ".agents\PROMPTING.md",
         ".agents\skills\opx-flat-ui-development\SKILL.md",
         ".agents\skills\opx-flat-ui-development\references\exact-sample-mode.md",
         ".agents\skills\opx-flat-ui-development\references\page-registry.md",
+        ".agents\skills\opx-flat-ui-development\references\showcase-behavior-registry.md",
         ".agents\skills\opx-flat-ui-development\references\layout-decision.md",
         ".agents\skills\opx-flat-ui-development\references\maui-mobile-deployment.md",
         ".agents\skills\opx-flat-ui-development\references\session-authorization-bootstrap.md",
@@ -906,6 +959,32 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
     foreach ($relativePath in $contractFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $contractRoot $relativePath))) {
             Add-Violation "Canonical consumer instruction is missing: $relativePath"
+        }
+    }
+    $promptingPath = Join-Path $contractRoot ".agents\PROMPTING.md"
+    if (Test-Path -LiteralPath $promptingPath) {
+        $promptingText = Get-Content -LiteralPath $promptingPath -Raw
+        if (($promptingText -notmatch 'Saran UI/UX') -or ($promptingText -notmatch '`Wajib`') -or ($promptingText -notmatch '`Disarankan`') -or ($promptingText -notmatch '`Opsional`')) {
+            Add-Violation "Canonical prompting contract must preserve the expert UI/UX suggestion format and priorities."
+        }
+        if (($promptingText -notmatch 'UseAppFontSize=false') -or ($promptingText -notmatch 'system font') -or ($promptingText -notmatch 'no custom app font')) {
+            Add-Violation "Canonical prompting contract must default ordinary typography to the device/browser system font without a forced custom app font."
+        }
+    }
+    $knowledgePath = Join-Path $contractRoot ".agents\KNOWLEDGE.md"
+    if (Test-Path -LiteralPath $knowledgePath) {
+        $knowledgeText = Get-Content -LiteralPath $knowledgePath -Raw
+        if (($knowledgeText -notmatch 'UseAppFontSize=false') -or ($knowledgeText -notmatch 'system UI font stack') -or ($knowledgeText -notmatch 'does not replace the system font family')) {
+            Add-Violation "Canonical knowledge must preserve Device ownership for both ordinary font family and accessibility-scaled size."
+        }
+        if (($knowledgeText -notmatch 'DefaultRoundedSizePx') -or ($knowledgeText -notmatch '`7px` corner radius') -or ($knowledgeText -notmatch 'remain square')) {
+            Add-Violation "Canonical knowledge must preserve the package-owned 7px ordinary-button corner baseline."
+        }
+        if (($knowledgeText -notmatch 'Default color palette') -or ($knowledgeText -notmatch '`fluent-blue`') -or ($knowledgeText -notmatch 'Restore returns')) {
+            Add-Violation "Canonical knowledge must preserve fluent-blue as the default color palette."
+        }
+        if (($knowledgeText -notmatch 'initial spacing preset') -or ($knowledgeText -notmatch 'DefaultDensity="Default"') -or ($knowledgeText -notmatch 'no separate `DefaultSpacing`')) {
+            Add-Violation "Canonical knowledge must preserve Default as the package spacing/density baseline."
         }
     }
 }
