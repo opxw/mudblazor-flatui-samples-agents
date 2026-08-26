@@ -973,6 +973,9 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         if (($promptingText -notmatch 'supported NuGet public API') -or ($promptingText -notmatch 'do not silently build a substitute') -or ($promptingText -notmatch 'domain-neutral package suggestion') -or ($promptingText -notmatch 'host-owned domain/integration/native seam')) {
             Add-Violation "Canonical prompting contract must enforce package-first reuse and classify missing capabilities before suggesting work."
         }
+        if (($promptingText -notmatch 'FlatMobileGrid') -or ($promptingText -notmatch 'article\.mobile-card') -or ($promptingText -notmatch 'Never improvise a bare `div\.mobile-grid-list`')) {
+            Add-Violation "Canonical prompting contract must prohibit manual responsive CRUD/list cards when the package pattern exists."
+        }
     }
     $knowledgePath = Join-Path $contractRoot ".agents\KNOWLEDGE.md"
     if (Test-Path -LiteralPath $knowledgePath) {
@@ -991,6 +994,9 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         }
         if (($knowledgeText -notmatch 'Package-first reuse is mandatory') -or ($knowledgeText -notmatch 'never duplicate package behavior') -or ($knowledgeText -notmatch 'Package changes and publication require explicit approval')) {
             Add-Violation "Canonical knowledge must preserve package-first reuse and the approval boundary for package changes."
+        }
+        if (($knowledgeText -notmatch 'FlatMobileGrid') -or ($knowledgeText -notmatch 'article\.mobile-card') -or ($knowledgeText -notmatch 'bare manual `div\.mobile-grid-list`') -or ($knowledgeText -notmatch 'consumer integration defect')) {
+            Add-Violation "Canonical knowledge must preserve the package-owned responsive card DOM contract."
         }
     }
 }

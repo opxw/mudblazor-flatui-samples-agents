@@ -36,6 +36,8 @@ Do not return routine UI decisions to the user. Infer standard layout, spacing, 
 
 Before inventing any local UI or integration mechanism, inspect the supported NuGet public API and mapped canonical sample. Reuse an existing package component, option, callback, service seam, CSS, or JavaScript behavior exactly when available; do not duplicate or override it in the consumer. If no fitting capability exists, do not silently build a substitute: classify the gap as a domain-neutral package suggestion or a host-owned domain/integration/native seam, then present one decision-ready recommendation with impact, priority, compatibility/testing/release boundary, and approval scope. Use `belum terklasifikasi` until package availability and ownership have been inspected.
 
+For a responsive CRUD or list result, default to package `FlatMobileGrid` and the mapped canonical `article.mobile-card` body/footer structure. Never improvise a bare `div.mobile-grid-list`, omit the `mobile-card` root class, or recreate card padding/alignment in consumer CSS. Infer and preserve this without asking the user.
+
 ## Safe defaults when the prompt is short
 
 - Use the admin shell unless the words or business job clearly indicate public website or authentication.

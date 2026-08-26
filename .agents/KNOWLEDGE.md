@@ -28,6 +28,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 ## Durable UI and behavior decisions
 
 - Exact Sample Mode applies to requests for the same, exact, canonical, sample-matching, or source-of-truth UI. Preserve geometry, hierarchy, responsive transformations, typography, spacing, states, actions, and scroll ownership; adapt host-owned data/integration seams only.
+- Responsive CRUD/list cards use package `FlatMobileGrid`, `article.mobile-card`, and the mapped facts/body/footer classes. A bare manual `div.mobile-grid-list`, a classless card article, or local card geometry CSS is forbidden when that package pattern exists; losing the required class is a consumer integration defect because package selectors own padding, hierarchy, alignment, scrolling, and touch behavior.
 - Responsive composition uses desktop/table behavior above `900px`, responsive/two-column behavior from `601-900px`, and phone/one-column refinement at `<=600px`, subject to documented component-specific boundaries.
 - Content-panel bodies have a positive logical horizontal inset: default `padding-inline:14px` desktop and `12px` at `<=900px`, unless the mapped compiled sample defines another positive value. Edge-to-edge table/media shells may use outer zero padding only when immediate readable children own a positive inset.
 - Spacing ownership is singular: parent layout owns gaps, panel body owns inner padding, and widgets do not add compensating outer margins or duplicate padding at the same boundary.
