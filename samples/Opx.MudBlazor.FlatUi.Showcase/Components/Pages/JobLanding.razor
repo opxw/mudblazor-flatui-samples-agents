@@ -133,7 +133,8 @@
                         <MudButton Variant="Variant.Outlined"
                                    Color="Color.Primary"
                                    Size="Size.Small"
-                                   OnClick="@(() => ViewRole(job))">View role</MudButton>
+                                   StartIcon="@Icons.Material.Outlined.Email"
+                                   OnClick="@(() => OpenEmailApplication(job))">Apply by email</MudButton>
                     </div>
                 </article>
             }
@@ -144,6 +145,10 @@
         <FlatEmptyState Title="No matching roles" Message="Try another keyword or clear the selected work mode." CssClass="job-landing-empty">
             <Actions><MudButton Variant="Variant.Outlined" OnClick="ClearSearch">Clear filters</MudButton></Actions>
         </FlatEmptyState>
+    }
+    @if (!string.IsNullOrWhiteSpace(_applicationStatus))
+    {
+        <p class="job-application-result" role="status">@_applicationStatus</p>
     }
 </section>
 
@@ -174,11 +179,24 @@
     }
 </section>
 
+<FlatJobEmailApplicationDialog TJob="JobRecord"
+                               @bind-Open="_applicationOpen"
+                               Job="@_selectedJob"
+                               JobTitle="@(_selectedJob?.Title ?? string.Empty)"
+                               Company="@_selectedJob?.Company"
+                               Saving="@_applicationSaving"
+                               ApplicationSubmitted="SubmitEmailApplicationAsync"
+                               OnResult="HandleApplicationResultAsync" />
+
 @code {
     private string _search = string.Empty;
     private string _workMode = "All";
     private string _email = string.Empty;
     private bool _subscribed;
+    private JobRecord? _selectedJob;
+    private bool _applicationOpen;
+    private bool _applicationSaving;
+    private string? _applicationStatus;
 
     private static readonly string[] PopularKeywords = ["Design", ".NET", "Operations", "Remote"];
     private static readonly (string Number, string Title, string Description, string Icon)[] ProcessSteps =
@@ -212,6 +230,37 @@
 
     private void ClearSearch() { _search = string.Empty; _workMode = "All"; }
     private void Subscribe() => _subscribed = true;
-    private void ViewRole(JobRecord job) => Snackbar.Add($"Opening the sample role: {job.Title}", Severity.Info);
+    private void OpenEmailApplication(JobRecord job)
+    {
+        _selectedJob = job;
+        _applicationStatus = null;
+        _applicationOpen = true;
+    }
+
+    private async Task SubmitEmailApplicationAsync(FlatJobEmailApplication<JobRecord> request)
+    {
+        _applicationSaving = true;
+        try
+        {
+            await Task.Delay(250);
+            _applicationStatus = $"Application request for {request.Job.Title} was returned to the sample host. No email was sent.";
+            Snackbar.Add("Application callback received. Email delivery remains host-owned.", Severity.Success);
+        }
+        finally
+        {
+            _applicationSaving = false;
+        }
+    }
+
+    private Task HandleApplicationResultAsync(bool submitted)
+    {
+        if (!submitted)
+        {
+            _applicationStatus = "Application was cancelled. No candidate data was submitted.";
+        }
+
+        return Task.CompletedTask;
+    }
+
     private static string CompanyInitials(string company) => string.Concat(company.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(word => word[0]));
 }

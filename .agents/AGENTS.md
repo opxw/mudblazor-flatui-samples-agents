@@ -37,6 +37,7 @@ When source, rules, and documentation disagree, do not silently choose one. Pres
 ## Delivery boundary
 
 - Keep reusable source domain-neutral and keep domain examples in the sample project.
+- Keep `FlatEmptyState` centered against the complete available content region. A direct child of a multi-column grid spans all columns; do not center it inside only the first grid track.
 - Preserve copyright headers on new source, scripts, rules, and documentation.
 - Preserve unrelated worktree changes. Do not reset, stash, or overwrite user work.
 - Do not claim API, authentication, persistence, Cloudflare, IIS, WebSocket, or native MAUI behavior without matching live evidence.

@@ -1,10 +1,15 @@
 @page "/jobs"
 @inject SampleCatalog Catalog
 @inject ISnackbar Snackbar
+@inject FlatMessageBoxService MessageBox
 
 <FlatPage Kind="FlatPageKind.Module"
           PageCssClass="jobs-dashboard-page"
-          ShowMobilePrimaryAction="true"
+          PrimaryActionVisible="true"
+          PrimaryActionLabel="Add vacancy"
+          PrimaryActionAriaLabel="Create vacancy"
+          PrimaryActionIcon="@Icons.Material.Outlined.PostAdd"
+          OnPrimaryAction="OpenCreateJob"
           RefreshEnabled="true"
           OnRefresh="RefreshAsync"
           ImportVisible="true"
@@ -70,7 +75,7 @@
         <div class="sample-kpis jobs-kpis" role="list" aria-label="Job board summary">
             <article role="listitem">
                 <span>Open positions</span>
-                <strong>@FilteredJobs.Count</strong>
+                <strong>@FilteredJobs.Count(IsPublished)</strong>
             </article>
             <article role="listitem">
                 <span>Remote</span>
@@ -131,22 +136,18 @@
         </FlatPanel>
     </ChildContent>
 
-    <MobilePrimaryAction>
-        <FlatFab Icon="@Icons.Material.Outlined.PostAdd" AriaLabel="Create job" OnClick="OpenCreateJob" />
-    </MobilePrimaryAction>
 </FlatPage>
 
 <FlatFormModal @bind-Open="_createOpen"
-               Title="Create job"
-               Mode="Create"
+               Title="@(_editingJobId is null ? "Create vacancy" : "Edit vacancy")"
+               Mode="@(_editingJobId is null ? "CREATE" : "EDIT")"
                Size="@FlatFormModalSize.Small"
                Saving="_createSaving"
                CanSubmit="CanSubmitCreate"
                IsDirty="IsCreateDirty"
-               OnSubmit="CreateJobAsync"
+               OnSubmit="SaveVacancyAsync"
                OnRefreshRequested="Reload"
-               CloseOnOutsideClick="false"
-               ConfirmClose="ConfirmCreateCloseAsync">
+               CloseOnOutsideClick="false">
     <MudTextField T="string"
                   @bind-Value="_draft.Title"
                   Label="Job title"
@@ -199,6 +200,10 @@
                   Variant="@FlatPreferences.InputVariant"
                   Margin="Margin.Dense"
                   Immediate="true" />
+    <MudSwitch T="bool"
+               @bind-Value="_draft.Published"
+               Color="Color.Primary"
+               Label="Publish vacancy" />
 </FlatFormModal>
 
 @code {
@@ -208,8 +213,11 @@
     private string _modeFilter = "All";
     private bool _createOpen;
     private bool _createSaving;
+    private string? _editingJobId;
     private JobDraft _draft = new();
+    private string _draftBaseline = string.Empty;
     private IReadOnlyList<JobRecord> _jobs = [];
+    private readonly HashSet<string> _publishedJobIds = new(StringComparer.Ordinal);
 
     private static readonly (string Title, string Detail)[] _activity =
     [
@@ -228,8 +236,17 @@
                                                                        CompanyInitials="@CompanyInitials(job.Company)"
                                                                        Skills="@SkillTags(job)"
                                                                        Tone="@(job.WorkMode.Contains("Remote", StringComparison.OrdinalIgnoreCase) ? "remote" : "neutral")"
-                                                                       OnApply="() => OpenApplyToast(job)"
-                                                                       OnSave="() => OpenSaveToast(job)" />;
+                                                                       ShowApplyButton="false"
+                                                                       ShowSaveButton="false">
+        <ChildContent>
+            <FlatVacancyActions TJob="JobRecord"
+                                Job="@job"
+                                IsPublished="@IsPublished(job)"
+                                EditRequested="OpenEditVacancy"
+                                PublicationChanged="ChangePublicationAsync"
+                                DeleteRequested="DeleteVacancyAsync" />
+        </ChildContent>
+    </FlatJobCard>;
 
     private List<string> CompanyOptions => _jobs
         .Select(x => x.Company)
@@ -267,7 +284,14 @@
         _jobs.Select(ParseSalaryMin).Where(v => v > 0m).DefaultIfEmpty(0m).Average(),
         MidpointRounding.ToEven);
 
-    protected override void OnInitialized() => Reload();
+    protected override void OnInitialized()
+    {
+        Reload();
+        foreach (var job in _jobs)
+        {
+            _publishedJobIds.Add(job.Id);
+        }
+    }
 
     private void Reload() => _jobs = Catalog.Jobs.ToList();
 
@@ -329,6 +353,7 @@
 
     private void OpenCreateJob()
     {
+        _editingJobId = null;
         _draft = new JobDraft
         {
             Title = string.Empty,
@@ -336,18 +361,38 @@
             Location = "Jakarta",
             EmploymentType = "Full Time",
             WorkMode = "Hybrid",
-            SalaryRange = "IDR"
+            SalaryRange = "IDR",
+            Published = false
         };
+        _draftBaseline = DraftSignature(_draft);
         _createOpen = true;
     }
 
-    private async Task CreateJobAsync()
+    private void OpenEditVacancy(JobRecord job)
+    {
+        _editingJobId = job.Id;
+        _draft = new JobDraft
+        {
+            Title = job.Title,
+            Company = job.Company,
+            Location = job.Location,
+            EmploymentType = job.EmploymentType,
+            WorkMode = job.WorkMode,
+            SalaryRange = job.SalaryRange,
+            Summary = job.Summary,
+            Published = IsPublished(job)
+        };
+        _draftBaseline = DraftSignature(_draft);
+        _createOpen = true;
+    }
+
+    private async Task SaveVacancyAsync()
     {
         _createSaving = true;
         await Task.Delay(450);
 
-        var created = new JobRecord(
-            $"JK-{DateTime.UtcNow:yyMMddHHmmss}",
+        var saved = new JobRecord(
+            _editingJobId ?? $"JK-{DateTime.UtcNow:yyMMddHHmmss}",
             _draft.Title.Trim(),
             _draft.Company.Trim(),
             _draft.Location.Trim(),
@@ -358,27 +403,77 @@
             _draft.Summary?.Trim() ?? string.Empty);
 
         var next = _jobs.ToList();
-        next.Insert(0, created);
+        var existingIndex = _editingJobId is null
+            ? -1
+            : next.FindIndex(job => job.Id.Equals(_editingJobId, StringComparison.Ordinal));
+        if (existingIndex >= 0)
+        {
+            next[existingIndex] = saved;
+        }
+        else
+        {
+            next.Insert(0, saved);
+        }
         _jobs = next;
 
+        if (_draft.Published)
+        {
+            _publishedJobIds.Add(saved.Id);
+        }
+        else
+        {
+            _publishedJobIds.Remove(saved.Id);
+        }
+
         _createSaving = false;
-        Snackbar.Add("Sample job created in page memory only.", Severity.Success);
+        Snackbar.Add($"Vacancy {(existingIndex >= 0 ? "updated" : "created")} in page memory only.", Severity.Success);
     }
 
-    private Task<bool> ConfirmCreateCloseAsync() => Task.FromResult(true);
+    private Task ChangePublicationAsync(FlatVacancyPublicationChange<JobRecord> change)
+    {
+        if (change.IsPublished)
+        {
+            _publishedJobIds.Add(change.Job.Id);
+        }
+        else
+        {
+            _publishedJobIds.Remove(change.Job.Id);
+        }
+
+        Snackbar.Add($"{change.Job.Title} is now {(change.IsPublished ? "published" : "closed")} in page memory.", Severity.Success);
+        return Task.CompletedTask;
+    }
+
+    private async Task DeleteVacancyAsync(JobRecord job)
+    {
+        var confirmed = await MessageBox.QuestionAsync(
+            $"Delete vacancy '{job.Title}'?",
+            "Delete vacancy",
+            "Delete",
+            "Cancel");
+        if (!confirmed) return;
+
+        _jobs = _jobs.Where(item => !item.Id.Equals(job.Id, StringComparison.Ordinal)).ToList();
+        _publishedJobIds.Remove(job.Id);
+        Snackbar.Add("Vacancy deleted from page memory.", Severity.Success);
+    }
+
+    private bool IsPublished(JobRecord job) => _publishedJobIds.Contains(job.Id);
 
     private bool CanSubmitCreate => !string.IsNullOrWhiteSpace(_draft.Title) && !string.IsNullOrWhiteSpace(_draft.Company);
 
-    private bool IsCreateDirty => !string.IsNullOrWhiteSpace(_draft.Title) ||
-                                  !string.IsNullOrWhiteSpace(_draft.Company) ||
-                                  !string.IsNullOrWhiteSpace(_draft.Location) ||
-                                  !string.IsNullOrWhiteSpace(_draft.SalaryRange);
+    private bool IsCreateDirty => !string.Equals(DraftSignature(_draft), _draftBaseline, StringComparison.Ordinal);
 
-    private void OpenApplyToast(JobRecord job) =>
-        Snackbar.Add($"Apply tapped for '{job.Title}' at {job.Company}.", Severity.Info);
-
-    private void OpenSaveToast(JobRecord job) =>
-        Snackbar.Add($"Saved '{job.Title}' into saved jobs.", Severity.Info);
+    private static string DraftSignature(JobDraft draft) => string.Join('\u001f',
+        draft.Title,
+        draft.Company,
+        draft.Location,
+        draft.EmploymentType,
+        draft.WorkMode,
+        draft.SalaryRange,
+        draft.Summary,
+        draft.Skills,
+        draft.Published);
 
     private sealed class JobDraft
     {
@@ -390,5 +485,6 @@
         public string SalaryRange { get; set; } = "IDR ";
         public string Summary { get; set; } = string.Empty;
         public string Skills { get; set; } = string.Empty;
+        public bool Published { get; set; }
     }
 }
