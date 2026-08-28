@@ -2,7 +2,7 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "opx",
   "classifications": ["MAUI", "Blazor Hybrid", "Android", "iOS", "MudBlazor", "OPX"],
-  "identity": "Opx.MudBlazor.FlatUi.Maui.Template.2.1.1.MudBlazor990",
+  "identity": "Opx.MudBlazor.FlatUi.Maui.Template.2.1.2.MudBlazor990",
   "name": "OPX MudBlazor Flat UI MAUI Hybrid",
   "shortName": "opx-flatui-maui",
   "sourceName": "Opx.MudBlazor.FlatUi.Maui.Template",

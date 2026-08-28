@@ -30,7 +30,7 @@ Set-Location MyCompany.MyMobileApp
 dotnet build -f net10.0-android -c Release --no-restore
 ```
 
-Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.1`. Android compilation is required source evidence; iOS build/runtime and all native UX claims still require macOS/Xcode plus simulator/device evidence.
+Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.2`. Android compilation is required source evidence; iOS build/runtime and all native UX claims still require macOS/Xcode plus simulator/device evidence.
 
 ## Required workflow
 
@@ -91,8 +91,8 @@ Use `run-clean.ps1` for the first Web application start. It resolves the thin ho
 
 ## Stylesheet ownership
 
-- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.1.1` pins its SHA-256 so a stale or substituted package asset fails audit.
-- The consumer starts with Light theme and Device/browser font ownership (`UseAppFontSize=false`). Settings always exposes Device/Manual; Manual uses the bounded `16px` default, while Device follows browser `1rem` and preserves accessibility scaling. This intentionally differs from the source showroom's theme default while retaining its `2.1.1` font behavior.
+- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.1.2` pins its SHA-256 so a stale or substituted package asset fails audit.
+- The consumer starts with Light theme and Device/browser font ownership (`UseAppFontSize=false`). Settings always exposes Device/Manual; Manual uses the bounded `16px` default, while Device follows browser `1rem` and preserves accessibility scaling. This intentionally differs from the source showroom's theme default while retaining its `2.1.2` font behavior.
 - MudBlazor styling comes only from `_content/MudBlazor/MudBlazor.min.css`. Never copy either package stylesheet into `wwwroot`.
 - `Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css` is the canonical sample/domain composition layer, not a fork of reusable package CSS. Its normalized-LF hash is audited; change it only for deliberate shared sample composition.
 - The template excludes the unused local Bootstrap distribution. Additional UI-framework packages, stylesheet links, and CSS imports are forbidden.

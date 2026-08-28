@@ -4,7 +4,7 @@ Copyright (c) 2026 opx. All rights reserved.
 
 The executable NuGet-only reference project is
 `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample`. It targets Android and Windows
-and consumes `Opx.MudBlazor.FlatUi` `2.1.1` from NuGet.org.
+and consumes `Opx.MudBlazor.FlatUi` `2.1.2` from NuGet.org.
 
 Every canonical cross-host page route lives once in
 `samples/Opx.MudBlazor.FlatUi.Showcase`. Web and MAUI load that RCL through
