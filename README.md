@@ -1,6 +1,6 @@
 # OPX MudBlazor Flat UI
 
-[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.2)
+[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.3)
 ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)
 ![MudBlazor](https://img.shields.io/badge/Powered%20by-MudBlazor-594AE2)
 ![Web and Mobile](https://img.shields.io/badge/ready-Web%20%2B%20MAUI%20Hybrid-0A7B83)
@@ -9,7 +9,7 @@ OPX Flat UI is a NuGet-first UI reference and project template for responsive Bl
 
 **Web ready. MAUI Hybrid ready by contract. Powered by [MudBlazor](https://www.mudblazor.com/).**
 
-The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.2). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
+The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.3). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
 
 ## Web preview
 
@@ -46,11 +46,13 @@ The mobile composition is responsive, touch-aware, safe-area ready, and designed
 
 Bottom navigation reuses the same route tree as the other layouts and is selected from viewport width alone. The package default threshold is `600px`; this template explicitly uses `900px`, so tablet and phone widths receive the bottom bar while wider Web and Windows desktop windows receive the sidebar. It supports up to five root actions, a More entry for overflow, recursive child navigation, and safe-area spacing. Child and overflow navigation defaults to the package Bottom Sheet; the in-content `MainView` tile presentation is explicit opt-in.
 
-Package `2.1.2` keeps labels such as **Settings** fully readable by using a descender-safe `1.25` line-height plus a `1px` bottom inset. Single-line ellipsis and the `60px` bar height remain unchanged; consumer CSS does not override this package-owned geometry.
+Package `2.1.3` keeps labels such as **Settings** fully readable by using a descender-safe `1.25` line-height plus a `1px` bottom inset. Single-line ellipsis and the `60px` bar height remain unchanged; consumer CSS does not override this package-owned geometry.
 
 ## Application Settings
 
 Every initialized consumer keeps **Settings → Application preferences** in the AppBar overflow menu. The surface previews changes immediately, persists them only after **Save**, restores the current saved state on **Cancel**, and returns to host-configured defaults through **Restore application defaults**.
+
+Package `2.1.3` keeps the Settings/About modal's Light surface neutral/white even when another palette is selected. It also keeps date/time picker portals square and preserves selected-day text contrast; consumers must not add local CSS workarounds for these package-owned surfaces.
 
 ![OPX Flat UI Application preferences in the canonical Light Web sample](docs/images/opx-flat-ui-settings.png)
 
@@ -123,7 +125,7 @@ Navigation, theme, palette, density, and typography are available from the manda
 
 | Dependency | Version |
 |---|---:|
-| `Opx.MudBlazor.FlatUi` | `2.1.2` |
+| `Opx.MudBlazor.FlatUi` | `2.1.3` |
 | `MudBlazor` | `9.9.0` |
 | MAUI mobile template | `10.0.90` |
 | `CommunityToolkit.Maui` | `15.0.1` |
@@ -133,7 +135,7 @@ Navigation, theme, palette, density, and typography are available from the manda
 Install the public package from NuGet.org:
 
 ```powershell
-dotnet add package Opx.MudBlazor.FlatUi --version 2.1.2
+dotnet add package Opx.MudBlazor.FlatUi --version 2.1.3
 ```
 
 ## Create a consumer project
@@ -152,7 +154,7 @@ Set-Location MyOpxApp\MyOpxApp
 .\run-clean.ps1
 ```
 
-The Web template produces sibling `MyOpxApp` (thin executable host) and `Opx.MudBlazor.FlatUi.Showcase` (shared page composition) projects. The first run cleans both projects' exact `bin` and `obj`, restores reusable OPX UI 2.1.2 from NuGet.org, and starts with the canonical Light theme, Settings menu, default navigation, package-owned CSS, responsive rules, and runtime OPX attribution.
+The Web template produces sibling `MyOpxApp` (thin executable host) and `Opx.MudBlazor.FlatUi.Showcase` (shared page composition) projects. The first run cleans both projects' exact `bin` and `obj`, restores reusable OPX UI 2.1.3 from NuGet.org, and starts with the canonical Light theme, Settings menu, default navigation, package-owned CSS, responsive rules, and runtime OPX attribution.
 
 Audit a generated consumer before accepting its output:
 
@@ -171,7 +173,7 @@ Set-Location MyOpxMobileApp
 dotnet build -f net10.0-android -c Release --no-restore
 ```
 
-The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.2`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
+The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.3`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
 
 When a prompt requests UI that is the same, exact, canonical, or matches the sample/source of truth, use **Exact Sample Mode**. Generate a fresh Web or MAUI template, resolve the `PageId`, and pass `-ExactSample` before wiring host data or services. The audit rejects drift in canonical shell/page files; branding, wording, data, authorization, callbacks, and persistence may then change through existing seams without changing geometry or behavior.
 
@@ -181,7 +183,7 @@ When a prompt requests UI that is the same, exact, canonical, or matches the sam
 - `samples/Opx.MudBlazor.FlatUi.Sample` — thin NuGet Web host and one half of the multi-project Web template.
 - `.agents/skills/opx-flat-ui-development` — UI/UX, business/data analysis, implementation, responsive, Web, and MAUI rules.
 - `docs/CONSUMER-CONTRACT.md` — consumer ownership and integration contract.
-- `docs/DATA-GRID-EXCEL-EXPORT.md`, `docs/JOB-LANDING.md`, and `docs/JOBS-DASHBOARD.md` — 2.1.2 feature and sample ownership contracts.
+- `docs/DATA-GRID-EXCEL-EXPORT.md`, `docs/JOB-LANDING.md`, and `docs/JOBS-DASHBOARD.md` — 2.1.3 feature and sample ownership contracts.
 - `RULES.md` and `.agents/RULES.md` — mandatory implementation rules.
 - `flat-ui.contract.json` and its schema inside the sample — machine-readable baseline enforced by the audit.
 - `templates/Opx.MudBlazor.FlatUi.Maui.Template` — Android/iOS Blazor Hybrid source-of-truth template, mobile contract, and native audit.

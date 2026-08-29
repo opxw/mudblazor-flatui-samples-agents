@@ -173,7 +173,7 @@ if (Test-Path -LiteralPath $roadmapPath) {
 #>
 if (Test-Path -LiteralPath $roadmapPath) {
     $roadmap = Get-Content -LiteralPath $roadmapPath -Raw
-    $markers = @('Current release objective: validate 2.1.2', '### 1.2.0', '### 1.3.0', '### 1.4.0', '### 1.5.0', '### 1.6.0', '### 1.7.0', '### 1.8.0', '### 1.9.0', '### 2.0.0')
+    $markers = @('Current release objective: validate 2.1.3', '### 1.2.0', '### 1.3.0', '### 1.4.0', '### 1.5.0', '### 1.6.0', '### 1.7.0', '### 1.8.0', '### 1.9.0', '### 2.0.0')
     foreach ($marker in $markers) {
         if (-not $roadmap.Contains($marker)) { $violations.Add("ROADMAP.md is missing the approved 2.0 marker: $marker") }
     }
