@@ -22,6 +22,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - The canonical registry has 76 unique PageIds and routes. Every PageId maps exactly once to one of 45 declared profiles in `showcase-behavior-registry.md`.
 - Prompt resolution is requirements/job -> PageId -> behavior profile -> mapped sample/archetype -> implementation. The user does not need to supply PageId, form layout, CRUD mechanics, grid behavior, spacing, or standard responsive transformation.
 - `.agents/PROMPTING.md` is the canonical shortcut contract: a short business phrase is enough, routine UI decisions remain agent-owned, and at most one question is asked only for a material workflow/authority/native distinction.
+- ERP, HR, and enterprise prompts use `enterprise-domain-layout-decision.md` to choose a dominant operating mode before components. The agent decides the canonical layout from role, job, data sensitivity, lifecycle, transaction consequence, action risk, and viewport. Distinct HR jobs are not collapsed into generic CRUD, and authoritative policy, formulas, approvals, payroll/accounting/inventory effects, permissions, persistence, and audit remain host-owned.
 - Package-first reuse is mandatory: inspect the supported NuGet public API and mapped canonical sample, use an existing capability through its public seam, and never duplicate package behavior or assets in a consumer. A verified missing domain-neutral capability is proposed as a package addition; a domain, authorization, persistence, integration, or native need is proposed as a host-owned seam. Package changes and publication require explicit approval.
 - When analysis finds a material improvement, report it as `Saran UI/UX` with need/risk, one concrete recommendation, user/business impact, priority (`Wajib`, `Disarankan`, or `Opsional`), and scope/approval boundary. Do not add filler suggestions or silently expand scope.
 
@@ -38,6 +39,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 ## Durable UI and behavior decisions
 
 - Exact Sample Mode applies to requests for the same, exact, canonical, sample-matching, or source-of-truth UI. Preserve geometry, hierarchy, responsive transformations, typography, spacing, states, actions, and scroll ownership; adapt host-owned data/integration seams only.
+- Source-to-destination parity is an acceptance gate, not an aspiration. Every destination pins the public NuGet/assets, starts from or compares against a clean generated template, passes `-ExactSample` before integration, preserves canonical structure/classes/responsive/spacing/state behavior, then passes the standard audit and same-state desktop/tablet/phone visual/computed comparison after host integration. Every intentional deviation is recorded and approved; accidental drift is `bug integrasi aplikasi`.
 - Responsive CRUD/list cards use package `FlatMobileGrid`, `article.mobile-card`, and the mapped facts/body/footer classes. A bare manual `div.mobile-grid-list`, a classless card article, or local card geometry CSS is forbidden when that package pattern exists; losing the required class is a consumer integration defect because package selectors own padding, hierarchy, alignment, scrolling, and touch behavior.
 - Sidebar brand hierarchy is content-aware: when title/eyebrow is empty and subtitle is present, the subtitle becomes the primary line; populated two-line branding remains unchanged.
 - Responsive composition uses desktop/table behavior above `900px`, responsive/two-column behavior from `601-900px`, and phone/one-column refinement at `<=600px`, subject to documented component-specific boundaries.
@@ -70,5 +72,6 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Archetype/source ownership: `.agents/skills/opx-flat-ui-development/references/sample-source-map.md`
 - Exact reproduction: `.agents/skills/opx-flat-ui-development/references/exact-sample-mode.md`
 - Layout decisions: `.agents/skills/opx-flat-ui-development/references/layout-decision.md`
+- ERP/HR/enterprise layout decisions: `.agents/skills/opx-flat-ui-development/references/enterprise-domain-layout-decision.md`
 - MAUI deployment: `.agents/skills/opx-flat-ui-development/references/maui-mobile-deployment.md`
 - Simple prompts and safe defaults: `.agents/PROMPTING.md`

@@ -32,6 +32,8 @@ From a short prompt, the agent must infer and state concisely:
 7. what is package-owned versus host-owned, including data, authorization, persistence, calculations, notifications, and native adapters;
 8. verification proportional to the requested change.
 
+For ERP, HR, or enterprise requests, also infer the dominant operating mode: overview/decision, work queue, master data, transaction/document, approval/review, planning/scheduling, analysis/reporting, or setup/governance. Apply `.agents/skills/opx-flat-ui-development/references/enterprise-domain-layout-decision.md` so role, privacy, lifecycle, financial/inventory consequence, action risk, and responsive hierarchy drive the layout instead of a generic component choice.
+
 Do not return routine UI decisions to the user. Infer standard layout, spacing, panel padding, grid/card switch, form density, button placement, validation presentation, modal geometry, and responsive behavior from `page-registry.md`, `showcase-behavior-registry.md`, and the mapped sample.
 
 Before inventing any local UI or integration mechanism, inspect the supported NuGet public API and mapped canonical sample. Reuse an existing package component, option, callback, service seam, CSS, or JavaScript behavior exactly when available; do not duplicate or override it in the consumer. If no fitting capability exists, do not silently build a substitute: classify the gap as a domain-neutral package suggestion or a host-owned domain/integration/native seam, then present one decision-ready recommendation with impact, priority, compatibility/testing/release boundary, and approval scope. Use `belum terklasifikasi` until package availability and ownership have been inspected.
@@ -47,12 +49,14 @@ For a responsive CRUD or list result, default to package `FlatMobileGrid` and th
 - For responsive/mobile grid toolbars, keep search/filter text visible and default a multi-action icon row to collapsed/hidden (`MobileToolbarActionsExpandedByDefault=false`). Do not ask the user; an initially expanded row requires an explicit request or page need.
 - `dashboard` requires decision-oriented KPIs, units, period/freshness, exceptions/trends, and drill-down; never invent formulas or thresholds.
 - `approval`, `transaction`, `posting`, `stock`, `journal`, or similar high-risk work keeps lifecycle, permission, validation, review/confirmation, concurrency, reversal/recovery, and audit authority host-owned.
+- ERP transaction/document prompts default to a header-detail lifecycle workspace; HR prompts are first separated into employee self-service, HR administration, manager approval, attendance/timesheet, payroll/compensation, or recruitment. Do not turn these different jobs into one generic CRUD screen, expose unnecessary sensitive HR data, or invent policy, payroll, accounting, inventory, approval, or posting rules.
 - Use Light theme and the built-in `fluent-blue` color palette by default without asking. Device typography remains default: `UseAppFontSize=false`, ordinary UI inherits the device/browser system font and `1rem` accessibility scale, no custom app font is forced, and Manual remains an explicit `16px` size override. Also preserve canonical navigation/Settings, package CSS, positive panel inset, and standard responsive boundaries.
 - Use the package-owned `DefaultRoundedSizePx=7` for ordinary buttons and bottom-sheet top corners; keep other standard surfaces square and never add page-local radius overrides.
 - Use package spacing/density preset `Default` (`DefaultDensity="Default"`) unless the user explicitly selects Compact or Comfortable. Never create a `DefaultSpacing` key or replace canonical gutters/panel padding with density-specific page CSS.
 - A short request for `navigation Bottom`, `bottom navigation`, or `bottom bar` defaults child and overflow menus to the package `Sheet` presentation (`DefaultBottomNavigationChildPresentation="Sheet"`). Select `MainView` only when the user explicitly asks for an in-content tile view.
 - If no backend is provided, build explicit sample/in-memory data seams and state that live API, authentication, persistence, and native behavior are not proven.
 - Words such as `sama`, `persis`, `canonical`, `seperti sample`, or `source of truth` activate Exact Sample Mode automatically.
+- When this repository/sample is named as the source and another project is the destination, enforce source-to-destination parity automatically: matching public NuGet contract, generated-template baseline, canonical structure/responsive/spacing/state behavior, destination-local clean restore, Exact Sample audit before integration, standard audit plus same-state responsive comparison afterward, and an explicit record for every approved deviation.
 
 ## When one question is allowed
 
@@ -82,7 +86,7 @@ Do not invent cosmetic suggestions merely to fill a section. Omit the section wh
 
 Before implementation, keep the decision summary compact:
 
-`Dipilih: <PageId> · <behavior profile> · <sample>. Asumsi: <only material assumptions>.`
+`Dipilih: <PageId> · <behavior profile> · <sample>. Keputusan bisnis/layout: <job, operating mode, lifecycle/risk, hierarchy, responsive transformation>. Asumsi: <only material assumptions>.`
 
 Then implement and validate. For a pure recommendation or diagnosis, provide the selected mapping and evidence without mutating files.
 

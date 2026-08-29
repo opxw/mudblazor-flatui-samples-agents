@@ -12,6 +12,16 @@ Use this mode whenever the user asks for UI that is `sama`, `persis`, `canonical
 
 Only after the exact baseline passes may the host replace branding, wording, data, authorization, callbacks, endpoints, identity, permissions, and persistence. Those replacements must use the sample's existing slots and typed callbacks; they do not authorize a visual redesign. If a business requirement genuinely needs a different composition, state the deviation and obtain an explicit decision instead of silently drifting.
 
+## Source to destination acceptance contract
+
+- Treat this repository, its compiled mapped sample, registries, rules, and generated templates as the source. Treat every generated or existing consumer project as a destination.
+- A destination must use the public NuGet version and package assets pinned by the current consumer contract. Never replace them with a package-source `ProjectReference`, copied package CSS/JavaScript, or locally reconstructed component behavior.
+- Start new destinations from the matching Web or MAUI template. For existing destinations, generate a clean temporary reference from that template and compare before changing the application.
+- Preserve the mapped component/DOM hierarchy, canonical classes, responsive representations, breakpoints, typography hierarchy, padding, margins, gaps, action placement, states, scroll ownership, Settings/navigation shell, startup gate, and Back behavior. Host-owned branding, wording, records, APIs, authorization, permissions, persistence, and native adapters may change through existing seams.
+- Before integration, clear only the destination project's verified local `bin` and `obj`, restore through its `NuGet.Config`, and pass the appropriate audit with `-ExactSample`. After integration, rerun the standard audit and compare representative desktop, tablet, and phone states in the same theme, density, font mode, and navigation mode.
+- Record every intentional destination deviation. A deviation is allowed only for a stated business requirement and explicit decision; missing canonical markup/classes, local package CSS overrides, or accidental spacing/responsive drift is `bug integrasi aplikasi`.
+- When the source contract or NuGet baseline changes, update the destination deliberately: upgrade the package/template-owned contract files, clean/restore, rerun audits, and revalidate visual/computed parity. Never assume a package version bump alone synchronizes the destination.
+
 ## Diagnose application versus package
 
 - First confirm the exact package versions, restored OPX CSS hash, asset order, and absence of local `.flat-*` overrides.
