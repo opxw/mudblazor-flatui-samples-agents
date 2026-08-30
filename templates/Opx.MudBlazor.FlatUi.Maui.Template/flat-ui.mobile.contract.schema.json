@@ -6,11 +6,11 @@
   "properties": {
     "$schema": { "const": "flat-ui.mobile.contract.schema.json" },
     "schemaVersion": { "const": "3.1" },
-    "contractVersion": { "const": "2.1.3" },
+    "contractVersion": { "const": "2.1.6" },
     "packages": {
       "const": {
         "Microsoft.Maui.Controls": "10.0.90",
-        "Opx.MudBlazor.FlatUi": "2.1.3",
+        "Opx.MudBlazor.FlatUi": "2.1.6",
         "MudBlazor": "9.9.0",
         "CommunityToolkit.Maui": "15.0.1"
       }
@@ -43,7 +43,7 @@
     "defaults": { "const": { "theme": "Light", "fontOwnership": "Device", "useAppFontSize": false, "defaultRoundedSizePx": 7, "defaultColorPalette": "fluent-blue", "defaultDensity": "Default", "navigationLayout": "Bottom", "defaultBottomNavigationChildPresentation": "Sheet", "mobileToolbarActionsExpandedByDefault": false, "bottomNavigationMaxWidthPx": 900 } },
     "native": { "const": { "toolkitRegistration": "UseMauiCommunityToolkit", "statusBarBehavior": true, "statusBarMatchesResolvedAppBar": true, "iosViewControllerBasedStatusBarAppearance": false, "androidOverScrollMode": "Never", "androidDeclaredPermissions": ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE", "android.permission.POST_NOTIFICATIONS"], "defaultDotNetSplashArtworkVisible": false, "neutralSplashSurface": "#FFFFFF", "backBehavior": { "precedence": ["topmost-modal-overlay", "previous-blazor-history", "native-host-fallback"], "modalBackKeepsCurrentRoute": true, "modalBackKeepsApplicationAlive": true, "nativeExitRequiresEmptyOverlayAndHistory": true }, "iosBounces": false, "iosAlwaysBounceVertical": false } },
     "startup": { "const": { "rootGateBeforeRouter": true, "staticLoadingBeforeInteractive": true, "title": "Memuat", "spinnerClass": "flat-system-loading-spinner", "protectedLayoutFlashForbidden": true } },
-    "webView": { "const": { "rootOverscrollBehavior": "none", "ordinaryTextSelectable": false, "textboxSelectionPreserved": true, "reusableCssFromPackageOnly": true, "opxPackageCssSha256": "60C6686E76F6342A861B34988E93E407E0904AAE1E81B991EBF80809A33046D3" } },
+    "webView": { "const": { "rootOverscrollBehavior": "none", "ordinaryTextSelectable": false, "textboxSelectionPreserved": true, "reusableCssFromPackageOnly": true, "opxPackageCssSha256": "58E9285A132609D42A09CC09A309E0DD5DE959CA24AB98FF946AD90443A7A44A" } },
     "verification": { "const": { "androidReleaseBuildRequired": true, "androidDeviceEvidenceRequiredForNativeClaims": true, "iosDeviceEvidenceRequiredForNativeClaims": true } }
   }
 }

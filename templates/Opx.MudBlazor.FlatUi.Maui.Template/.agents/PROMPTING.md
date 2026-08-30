@@ -57,6 +57,7 @@ For a responsive CRUD or list result, default to package `FlatMobileGrid` and th
 - If no backend is provided, build explicit sample/in-memory data seams and state that live API, authentication, persistence, and native behavior are not proven.
 - Words such as `sama`, `persis`, `canonical`, `seperti sample`, or `source of truth` activate Exact Sample Mode automatically.
 - When this repository/sample is named as the source and another project is the destination, enforce source-to-destination parity automatically: matching public NuGet contract, generated-template baseline, canonical structure/responsive/spacing/state behavior, destination-local clean restore, Exact Sample audit before integration, standard audit plus same-state responsive comparison afterward, and an explicit record for every approved deviation.
+- Destination CSS never overrides package or MudBlazor internals: no `.flat-*`/`.mud-*` selectors, no `--opx-*` redeclarations, copied package rules, or specificity/`!important` workarounds. Use typed options and public component seams. App-owned CSS may define only new domain/composition classes that preserve canonical geometry and responsive behavior.
 
 ## When one question is allowed
 

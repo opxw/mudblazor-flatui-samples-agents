@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.3" />
+    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.6" />
   </ItemGroup>
 
   <ItemGroup>

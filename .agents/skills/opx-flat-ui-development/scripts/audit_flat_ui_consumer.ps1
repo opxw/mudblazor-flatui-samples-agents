@@ -9,15 +9,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.1.3"
+$expectedContractVersion = "2.1.6"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.1.3"
+    "Opx.MudBlazor.FlatUi" = "2.1.6"
     "MudBlazor" = "9.9.0"
 }
 $expectedHostCssSha256 = "ACFE823AE8A68B737E6DB7814864CDFAE6CEAC3A79C31A73565E345EB2529E48"
-$expectedPackageCssSha256 = "60C6686E76F6342A861B34988E93E407E0904AAE1E81B991EBF80809A33046D3"
+$expectedPackageCssSha256 = "58E9285A132609D42A09CC09A309E0DD5DE959CA24AB98FF946AD90443A7A44A"
 $expectedExactSampleHashes = [ordered]@{
-    "Components\Layout\MainLayout.razor" = "D7BA2362A1050C3F5331711BBAD67F0EFA984BAEC49519101E6A55EEBDBC5968"
+    "Components\Layout\MainLayout.razor" = "EF037586F11C4A8B144C52F91135B3F841D80FAC234A471F648D524B03F41549"
     "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "215AAD5AFA5E90A634C2EDB59E83138CD9428D43B4C596122BAA640ACB05CD2D"
     "..\Opx.MudBlazor.FlatUi.Showcase\Components\Pages\Home.razor" = "E46EBA5E931C90FFBE1A15337015AB180B8E0E4A86554B97EC7F20ABD148947A"
     "Components\RootStartupGate.razor" = "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F"
@@ -690,7 +690,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.3; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.6; found $packageCssHash."
     }
 }
 
@@ -859,6 +859,7 @@ if (Test-Path -LiteralPath $mainLayoutPath) {
         "Dark theme choice" = "FlatUiThemeMode.Dark"
         "Auto theme choice" = "FlatUiThemeMode.Auto"
         "Display settings editor" = "<FlatDisplaySettings"
+        "Composable display settings" = "FlatDisplaySettingsConfiguration.IndonesianEssentials"
         "Default sidebar mount" = 'NavigationItems="@ShowcaseNavigationCatalog.NavigationItems"'
         "Bottom navigation sample threshold" = 'BottomNavigationMaxWidthPx="900"'
         "Logout action icon" = "Icons.Material.Outlined.Logout"
@@ -987,6 +988,14 @@ foreach ($cssFile in $localCssFiles) {
     $cssSource = Get-Content -LiteralPath $cssFile.FullName -Raw
     if ($cssSource -match "(?im)@import\s+[^;]*(bootstrap|tailwind|radzen|syncfusion|telerik|blazorise|antdesign)") {
         Add-Violation "Local stylesheet '$($cssFile.FullName)' imports an additional UI framework."
+    }
+    if ($cssFile.FullName -cne $appCssPath) {
+        if ($cssSource -match "(?i)\.(flat|mud)-") {
+            Add-Violation "Destination stylesheet '$($cssFile.FullName)' may not target package-owned .flat-* or .mud-* selectors."
+        }
+        if ($cssSource -match "(?im)--opx-[a-z0-9-]+\s*:") {
+            Add-Violation "Destination stylesheet '$($cssFile.FullName)' may consume but may not redeclare package-owned --opx-* tokens."
+        }
     }
 }
 

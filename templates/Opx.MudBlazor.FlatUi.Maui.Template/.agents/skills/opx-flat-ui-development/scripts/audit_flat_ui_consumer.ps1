@@ -9,20 +9,20 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.1.3"
+$expectedContractVersion = "2.1.6"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.1.3"
+    "Opx.MudBlazor.FlatUi" = "2.1.6"
     "MudBlazor" = "9.9.0"
 }
-$expectedHostCssSha256 = "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666"
-$expectedPackageCssSha256 = "60C6686E76F6342A861B34988E93E407E0904AAE1E81B991EBF80809A33046D3"
+$expectedHostCssSha256 = "ACFE823AE8A68B737E6DB7814864CDFAE6CEAC3A79C31A73565E345EB2529E48"
+$expectedPackageCssSha256 = "58E9285A132609D42A09CC09A309E0DD5DE959CA24AB98FF946AD90443A7A44A"
 $expectedExactSampleHashes = [ordered]@{
-    "Components\Layout\MainLayout.razor" = "1329B9F7A058128B3971CA6C76FD4CCB06333CA9D7C17A2733D07109E46328A8"
-    "Components\Layout\SampleSidebarMenu.razor" = "8157F2819E65D521AFB4C49BF6D2C4C4BE423C7FBBF1DF26CC7139EBB0FDA5AB"
-    "Components\Pages\Home.razor" = "9303D93EAC12EAC1EB81CC2057E3283896C190086DBD7057BBBB07674CFA4440"
-    "Components\RootStartupGate.razor" = "1513F7901D638CFAA829E6B55EE623B5D9A42D8C0D1AE80FE9C130C5DCB78D1D"
-    "appsettings.json" = "1465D5A8931899ACDD96D7EB4C66EB9F08415267B7F35495E6D7615B557C8C9C"
-    "wwwroot\app.css" = "EDF51498287AA77C650FCC86D5E6F9DCC0FFC56D02B222FCDE51EFE977720666"
+    "Components\Layout\MainLayout.razor" = "EF037586F11C4A8B144C52F91135B3F841D80FAC234A471F648D524B03F41549"
+    "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "215AAD5AFA5E90A634C2EDB59E83138CD9428D43B4C596122BAA640ACB05CD2D"
+    "..\Opx.MudBlazor.FlatUi.Showcase\Components\Pages\Home.razor" = "E46EBA5E931C90FFBE1A15337015AB180B8E0E4A86554B97EC7F20ABD148947A"
+    "Components\RootStartupGate.razor" = "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F"
+    "appsettings.json" = "B2962DC468D4A2FCEDDA84B4FCCCF895CC1383E91796BF7A9AB0B9ABE7DD5699"
+    "..\Opx.MudBlazor.FlatUi.Showcase\wwwroot\opx-flat-ui-showcase.css" = "ACFE823AE8A68B737E6DB7814864CDFAE6CEAC3A79C31A73565E345EB2529E48"
 }
 $violations = [System.Collections.Generic.List[string]]::new()
 
@@ -97,49 +97,81 @@ function Get-NormalizedTextSha256([string] $Path) {
     return [System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($bytes))
 }
 
-function Get-NormalizedTextSha256([string] $Path) {
-    $text = (Get-Content -LiteralPath $Path -Raw).Replace("`r`n", "`n").Replace("`r", "`n")
-    $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
-    return [System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($bytes))
-}
-
 $project = Resolve-ProjectFile $ProjectPath
 $projectRoot = $project.Directory.FullName
+$showcaseRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot "..\Opx.MudBlazor.FlatUi.Showcase"))
 $contractRoot = Resolve-ContractRoot $projectRoot
 if ([string]::IsNullOrWhiteSpace($contractRoot)) {
     Add-Violation "RULES.md and .agents/AGENTS.md were not found at the project root or any parent."
 }
 else {
     $registryPath = Join-Path $contractRoot ".agents\skills\opx-flat-ui-development\references\page-registry.md"
-    $behaviorRegistryPath = Join-Path $contractRoot ".agents\skills\opx-flat-ui-development\references\showcase-behavior-registry.md"
-    if ((Test-Path -LiteralPath $registryPath) -and (Test-Path -LiteralPath $behaviorRegistryPath)) {
-        $registryIds = @([regex]::Matches(
+    if (-not (Test-Path -LiteralPath $registryPath)) {
+        Add-Violation "Canonical PageId registry is missing."
+    }
+    else {
+        $registryMatches = [regex]::Matches(
             (Get-Content -LiteralPath $registryPath -Raw),
-            '(?m)^\| `(?<id>opx\.page\.[^`]+)` \|') | ForEach-Object { $_.Groups['id'].Value })
-        $behaviorText = Get-Content -LiteralPath $behaviorRegistryPath -Raw
-        if (($behaviorText -notmatch 'logical `padding-inline`') -or ($behaviorText -notmatch '`14px` desktop') -or ($behaviorText -notmatch '`12px` at `<=900px`') -or ($behaviorText -notmatch 'zero left inset')) {
-            Add-Violation "Canonical showcase behavior registry must preserve the positive content-panel inset contract."
+            '(?m)^\| `(?<id>opx\.page\.[^`]+)` \|.*?\| `(?<route>/[^`]*)` \|')
+        $registryIds = @($registryMatches | ForEach-Object { $_.Groups['id'].Value })
+        $registryRoutes = @($registryMatches | ForEach-Object { $_.Groups['route'].Value })
+        foreach ($duplicate in @($registryIds | Group-Object | Where-Object Count -gt 1)) {
+            Add-Violation "Canonical PageId registry contains duplicate ID '$($duplicate.Name)'."
         }
-        if (($behaviorText -notmatch '"bug package"') -or ($behaviorText -notmatch '"bug integrasi aplikasi"') -or ($behaviorText -notmatch '"belum terklasifikasi"')) {
-            Add-Violation "Canonical showcase behavior registry must preserve explicit package-versus-integration defect labels."
+        foreach ($duplicate in @($registryRoutes | Group-Object | Where-Object Count -gt 1)) {
+            Add-Violation "Canonical PageId registry contains duplicate route '$($duplicate.Name)'."
         }
-        $declaredProfiles = @([regex]::Matches($behaviorText, '(?m)^### `(?<profile>[^`]+)`\s*$') | ForEach-Object { $_.Groups['profile'].Value })
-        $behaviorMatches = [regex]::Matches(
-            $behaviorText,
-            '(?m)^\| `(?<id>opx\.page\.[^`]+)` \| `(?<profile>[^`]+)` \| `(?<source>[^`]+)` \|\s*$')
-        $behaviorIds = @($behaviorMatches | ForEach-Object { $_.Groups['id'].Value })
-        foreach ($duplicate in @($behaviorIds | Group-Object | Where-Object Count -gt 1)) {
-            Add-Violation "Canonical showcase behavior registry contains duplicate PageId '$($duplicate.Name)'."
+        $behaviorRegistryPath = Join-Path $contractRoot ".agents\skills\opx-flat-ui-development\references\showcase-behavior-registry.md"
+        if (-not (Test-Path -LiteralPath $behaviorRegistryPath)) {
+            Add-Violation "Canonical showcase behavior registry is missing."
         }
-        foreach ($missingId in @($registryIds | Where-Object { $_ -notin $behaviorIds })) {
-            Add-Violation "Canonical PageId '$missingId' has no showcase behavior profile."
+        else {
+            $behaviorText = Get-Content -LiteralPath $behaviorRegistryPath -Raw
+            if (($behaviorText -notmatch 'logical `padding-inline`') -or ($behaviorText -notmatch '`14px` desktop') -or ($behaviorText -notmatch '`12px` at `<=900px`') -or ($behaviorText -notmatch 'zero left inset')) {
+                Add-Violation "Canonical showcase behavior registry must preserve the positive content-panel inset contract."
+            }
+            if (($behaviorText -notmatch 'MobileToolbarActionsExpandedByDefault=false') -or ($behaviorText -notmatch 'action row defaults to collapsed/hidden') -or ($behaviorText -notmatch 'desktop actions remain visible')) {
+                Add-Violation "Canonical showcase behavior registry must preserve the collapsed responsive toolbar action-row default."
+            }
+            if (($behaviorText -notmatch 'topmost modal/overlay consumes Back first') -or ($behaviorText -notmatch 'next Back uses prior Blazor history') -or ($behaviorText -notmatch 'native exit.*true root')) {
+                Add-Violation "Canonical showcase behavior registry must preserve modal, Blazor history, then native Back precedence."
+            }
+            if (($behaviorText -notmatch '"bug package"') -or ($behaviorText -notmatch '"bug integrasi aplikasi"') -or ($behaviorText -notmatch '"belum terklasifikasi"')) {
+                Add-Violation "Canonical showcase behavior registry must preserve explicit package-versus-integration defect labels."
+            }
+            $declaredProfiles = @([regex]::Matches($behaviorText, '(?m)^### `(?<profile>[^`]+)`\s*$') | ForEach-Object { $_.Groups['profile'].Value })
+            $behaviorMatches = [regex]::Matches(
+                $behaviorText,
+                '(?m)^\| `(?<id>opx\.page\.[^`]+)` \| `(?<profile>[^`]+)` \| `(?<source>[^`]+)` \|\s*$')
+            $behaviorIds = @($behaviorMatches | ForEach-Object { $_.Groups['id'].Value })
+            foreach ($duplicate in @($behaviorIds | Group-Object | Where-Object Count -gt 1)) {
+                Add-Violation "Canonical showcase behavior registry contains duplicate PageId '$($duplicate.Name)'."
+            }
+            foreach ($missingId in @($registryIds | Where-Object { $_ -notin $behaviorIds })) {
+                Add-Violation "Canonical PageId '$missingId' has no showcase behavior profile."
+            }
+            foreach ($staleId in @($behaviorIds | Where-Object { $_ -notin $registryIds })) {
+                Add-Violation "Showcase behavior registry contains unknown PageId '$staleId'."
+            }
+            foreach ($profile in @($behaviorMatches | ForEach-Object { $_.Groups['profile'].Value } | Select-Object -Unique)) {
+                if ($profile -notin $declaredProfiles) {
+                    Add-Violation "Showcase behavior profile '$profile' is mapped but not declared."
+                }
+            }
         }
-        foreach ($staleId in @($behaviorIds | Where-Object { $_ -notin $registryIds })) {
-            Add-Violation "Showcase behavior registry contains unknown PageId '$staleId'."
-        }
-        foreach ($profile in @($behaviorMatches | ForEach-Object { $_.Groups['profile'].Value } | Select-Object -Unique)) {
-            if ($profile -notin $declaredProfiles) {
-                Add-Violation "Showcase behavior profile '$profile' is mapped but not declared."
+        $pageRoots = @(
+            (Join-Path $projectRoot "Components\Pages"),
+            (Join-Path $showcaseRoot "Components\Pages")
+        )
+        foreach ($pageRoot in $pageRoots) {
+            if (-not (Test-Path -LiteralPath $pageRoot)) { continue }
+            foreach ($page in Get-ChildItem -LiteralPath $pageRoot -Filter "*.razor" -File) {
+                foreach ($routeMatch in [regex]::Matches((Get-Content -LiteralPath $page.FullName -Raw), '@page\s+"([^"]+)"')) {
+                    $route = $routeMatch.Groups[1].Value
+                    if ($route -notin $registryRoutes) {
+                        Add-Violation "Declared route '$route' in '$($page.Name)' has no canonical PageId."
+                    }
+                }
             }
         }
     }
@@ -189,7 +221,7 @@ if ($null -ne $manifest) {
     if ((Get-JsonProperty $source "repository") -cne "mudblazor-flat-ui") {
         Add-Violation "Contract source.repository must be mudblazor-flat-ui."
     }
-    if ((Get-JsonProperty $source "samplePath") -cne "samples/Opx.MudBlazor.FlatUi.Sample") {
+    if ((Get-JsonProperty $source "samplePath") -cne "samples/Opx.MudBlazor.FlatUi.Showcase") {
         Add-Violation "Contract source.samplePath must identify the canonical sample."
     }
 
@@ -240,6 +272,9 @@ if ($null -ne $manifest) {
     if ((Get-JsonProperty $baseline "defaultDensity") -cne "Default") {
         Add-Violation "Baseline defaultDensity must be Default."
     }
+    if ((Get-JsonProperty $baseline "defaultBottomNavigationChildPresentation") -cne "Sheet") {
+        Add-Violation "Baseline defaultBottomNavigationChildPresentation must be Sheet."
+    }
     if ([int](Get-JsonProperty $baseline "responsiveBreakpointPx") -ne 900) {
         Add-Violation "Baseline responsiveBreakpointPx must be 900."
     }
@@ -265,6 +300,9 @@ if ($null -ne $manifest) {
         if ((Get-JsonProperty $adaptiveResponsive $flag) -ne $true) {
             Add-Violation "Baseline adaptiveResponsive.$flag must be true."
         }
+    }
+    if ((Get-JsonProperty $adaptiveResponsive "mobileToolbarActionsExpandedByDefault") -ne $false) {
+        Add-Violation "Baseline adaptiveResponsive.mobileToolbarActionsExpandedByDefault must be false."
     }
     $nativeMobileDeployment = Get-JsonProperty $baseline "nativeMobileDeployment"
     $nativeDeploymentChecks = @(
@@ -388,6 +426,15 @@ if ($null -ne $manifest) {
             Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.$flag must be false."
         }
     }
+    $backNavigation = Get-JsonProperty $webViewInteraction "backNavigation"
+    if ((@((Get-JsonProperty $backNavigation "precedence")) -join "|") -cne "topmost-modal-overlay|previous-blazor-history|native-host-fallback") {
+        Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.backNavigation.precedence must be modal, Blazor history, then native fallback."
+    }
+    foreach ($flag in @("modalBackKeepsCurrentRoute", "modalBackKeepsApplicationAlive", "nativeExitRequiresEmptyOverlayAndHistory")) {
+        if ((Get-JsonProperty $backNavigation $flag) -ne $true) {
+            Add-Violation "Baseline nativeMobileDeployment.webViewInteraction.backNavigation.$flag must be true."
+        }
+    }
     $textSelection = Get-JsonProperty $webViewInteraction "textSelection"
     $textSelectionChecks = @(
         @("defaultPolicy", (Get-JsonProperty $textSelection "defaultPolicy"), "disabled"),
@@ -488,7 +535,7 @@ if ($null -ne $manifest) {
         @("packageStylesheet", (Get-JsonProperty $stylesheetOwnership "packageStylesheet"), "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css"),
         @("packageStylesheetSha256", (Get-JsonProperty $stylesheetOwnership "packageStylesheetSha256"), $expectedPackageCssSha256),
         @("mudBlazorStylesheet", (Get-JsonProperty $stylesheetOwnership "mudBlazorStylesheet"), "_content/MudBlazor/MudBlazor.min.css"),
-        @("hostStylesheet", (Get-JsonProperty $stylesheetOwnership "hostStylesheet"), "wwwroot/app.css"),
+        @("hostStylesheet", (Get-JsonProperty $stylesheetOwnership "hostStylesheet"), "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css"),
         @("hostStylesheetPurpose", (Get-JsonProperty $stylesheetOwnership "hostStylesheetPurpose"), "sample-and-domain-composition-only"),
         @("hostStylesheetSha256", (Get-JsonProperty $stylesheetOwnership "hostStylesheetSha256"), $expectedHostCssSha256),
         @("localPackageCssCopyForbidden", (Get-JsonProperty $stylesheetOwnership "localPackageCssCopyForbidden"), $true),
@@ -643,7 +690,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.3; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.6; found $packageCssHash."
     }
 }
 
@@ -662,16 +709,18 @@ $requiredFiles = @(
     "Components\RootStartupGate.razor",
     "Components\_Imports.razor",
     "Components\Layout\MainLayout.razor",
-    "Components\Layout\SampleSidebarMenu.razor",
-    "Components\Pages\Home.razor",
-    "Services\IRootStartupGateValidator.cs",
     "appsettings.json",
-    "run-clean.ps1",
-    "wwwroot\app.css"
+    "run-clean.ps1"
 )
 foreach ($relativePath in $requiredFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relativePath))) {
         Add-Violation "Required consumer baseline file is missing: $relativePath"
+    }
+}
+
+foreach ($relativePath in @("ShowcaseNavigationCatalog.cs", "Components\Pages\Home.razor", "Services\SampleStartupGateService.cs", "wwwroot\opx-flat-ui-showcase.css")) {
+    if (-not (Test-Path -LiteralPath (Join-Path $showcaseRoot $relativePath))) {
+        Add-Violation "Required shared Showcase baseline file is missing: $relativePath"
     }
 }
 
@@ -685,7 +734,7 @@ if (Test-Path -LiteralPath $programPath) {
         "FlatPageLoadingState",
         "FlatMessageBoxService",
         "FlatUiPreferencesService",
-        "IRootStartupGateValidator",
+        "AddOpxFlatUiShowcase",
         "MapStaticAssets()",
         "AddInteractiveServerRenderMode()"
     )
@@ -709,7 +758,7 @@ if (Test-Path -LiteralPath $appPath) {
         "opx-flat-ui-theme-bootstrap.js",
         "MudBlazor/MudBlazor.min.css",
         "Opx.MudBlazor.FlatUi/opx-flat-ui.css",
-        "app.css",
+        "Opx.MudBlazor.FlatUi.Showcase/opx-flat-ui-showcase.css",
         "MudBlazor/MudBlazor.min.js",
         "FlatUiJavaScriptPath",
         "_framework/blazor.web.js"
@@ -749,29 +798,30 @@ $rootStartupGatePath = Join-Path $projectRoot "Components\RootStartupGate.razor"
 if (Test-Path -LiteralPath $rootStartupGatePath) {
     $rootStartupGateSource = Get-Content -LiteralPath $rootStartupGatePath -Raw
     foreach ($token in @(
-        '@if (!_completed)',
+        '@if (!_startupChecked)',
         '<FlatMudProviders IsDarkMode="@IsDarkMode" Palette="@CurrentThemePalette">',
-        '<FlatSessionRestore Title="@StartupTitle" Message="@StartupMessage"',
+        '<FlatSessionRestore Title="@StartupTitle"',
+        'Message="@StartupMessage"',
         '</FlatMudProviders>',
-        '<Router ',
+        '<Routes />',
         'ReconnectOptions.StartupTitle',
         'ReconnectOptions.StartupMessage',
         'DisplayPreferences.InitializeAsync',
         'opxFlatThemeBootstrap.prefersDarkMode',
-        'StartupGateValidator.ValidateAsync',
+        'StartupGate.CheckAsync',
         'OnAfterRenderAsync',
-        'RootStartupGateResult.Login'
+        '_startupChecked = true'
     )) {
         if (-not $rootStartupGateSource.Contains($token, [StringComparison]::Ordinal)) {
             Add-Violation "Components/RootStartupGate.razor is missing startup-gate behavior '$token'."
         }
     }
 
-    $checkingIndex = $rootStartupGateSource.IndexOf('@if (!_completed)', [StringComparison]::Ordinal)
+    $checkingIndex = $rootStartupGateSource.IndexOf('@if (!_startupChecked)', [StringComparison]::Ordinal)
     $providerIndex = $rootStartupGateSource.IndexOf('<FlatMudProviders ', [StringComparison]::Ordinal)
     $loadingIndex = $rootStartupGateSource.IndexOf('<FlatSessionRestore', [StringComparison]::Ordinal)
     $providerCloseIndex = $rootStartupGateSource.IndexOf('</FlatMudProviders>', [StringComparison]::Ordinal)
-    $routerIndex = $rootStartupGateSource.IndexOf('<Router ', [StringComparison]::Ordinal)
+    $routerIndex = $rootStartupGateSource.IndexOf('<Routes />', [StringComparison]::Ordinal)
     if ($checkingIndex -lt 0 -or $providerIndex -le $checkingIndex -or $loadingIndex -le $providerIndex -or $providerCloseIndex -le $loadingIndex -or $routerIndex -le $providerCloseIndex) {
         Add-Violation "RootStartupGate must render FlatSessionRestore inside FlatMudProviders in the checking branch, then create Router only in the completed branch."
     }
@@ -809,7 +859,8 @@ if (Test-Path -LiteralPath $mainLayoutPath) {
         "Dark theme choice" = "FlatUiThemeMode.Dark"
         "Auto theme choice" = "FlatUiThemeMode.Auto"
         "Display settings editor" = "<FlatDisplaySettings"
-        "Default sidebar mount" = "<SampleSidebarMenu />"
+        "Composable display settings" = "FlatDisplaySettingsConfiguration.IndonesianEssentials"
+        "Default sidebar mount" = 'NavigationItems="@ShowcaseNavigationCatalog.NavigationItems"'
         "Bottom navigation sample threshold" = 'BottomNavigationMaxWidthPx="900"'
         "Logout action icon" = "Icons.Material.Outlined.Logout"
         "Logout action class" = 'Class="logout-action"'
@@ -822,17 +873,15 @@ if (Test-Path -LiteralPath $mainLayoutPath) {
     }
 }
 
-$sidebarPath = Join-Path $projectRoot "Components\Layout\SampleSidebarMenu.razor"
+$sidebarPath = Join-Path $showcaseRoot "ShowcaseNavigationCatalog.cs"
 if (Test-Path -LiteralPath $sidebarPath) {
     $sidebarSource = Get-Content -LiteralPath $sidebarPath -Raw
     $requiredSidebarTokens = [ordered]@{
-        "Showcase caption" = 'Class="nav-caption">Showcase'
-        "Dashboard home route" = 'Href="/" Match="NavLinkMatch.All"'
-        "Dashboard label" = "Dashboard"
-        "Sidebar group structure" = "<MudNavGroup"
-        "Sidebar search state" = "FlatSidebarSearchState"
-        "Active-route expansion" = "ExpandActiveRouteGroup"
-        "Route change subscription" = "Navigation.LocationChanged"
+        "Dashboard home route" = 'new("Dashboard", "/"'
+        "Dashboard label" = '"Dashboard"'
+        "Typed navigation items" = "NavigationItems"
+        "Search metadata" = "SearchItems"
+        "Route title resolver" = "ResolvePageTitle"
     }
     foreach ($requirement in $requiredSidebarTokens.GetEnumerator()) {
         if (-not $sidebarSource.Contains($requirement.Value, [StringComparison]::Ordinal)) {
@@ -868,6 +917,9 @@ if (Test-Path -LiteralPath $settingsPath) {
         if ((Get-JsonProperty $display "DefaultDensity") -cne "Default") {
             Add-Violation "OpxFlatUi:Display:DefaultDensity must start at Default."
         }
+        if ((Get-JsonProperty $display "DefaultBottomNavigationChildPresentation") -cne "Sheet") {
+            Add-Violation "OpxFlatUi:Display:DefaultBottomNavigationChildPresentation must start at Sheet."
+        }
         if ((Get-JsonProperty $display "DefaultFabShape") -cne "Circle") {
             Add-Violation "OpxFlatUi:Display:DefaultFabShape must start at Circle."
         }
@@ -893,15 +945,15 @@ if (Test-Path -LiteralPath $settingsPath) {
     }
 }
 
-$appCssPath = Join-Path $projectRoot "wwwroot\app.css"
+$appCssPath = Join-Path $showcaseRoot "wwwroot\opx-flat-ui-showcase.css"
 if (Test-Path -LiteralPath $appCssPath) {
     $appCss = Get-Content -LiteralPath $appCssPath -Raw
     $appCssHash = Get-NormalizedTextSha256 $appCssPath
     if ($appCssHash -cne $expectedHostCssSha256) {
-        Add-Violation "wwwroot/app.css must be the untouched canonical host/sample stylesheet with SHA-256 $expectedHostCssSha256; found $appCssHash."
+        Add-Violation "Showcase composition CSS must be untouched with SHA-256 $expectedHostCssSha256; found $appCssHash."
     }
     if (-not $appCss.Contains('.logout-action{margin-left:auto!important;', [StringComparison]::Ordinal)) {
-        Add-Violation "wwwroot/app.css must keep the initialized admin Logout action aligned to the right edge."
+        Add-Violation "Showcase composition CSS must keep the initialized admin Logout action aligned to the right edge."
     }
     if ($appCss -match "(?im)@import\s+[^;]*(bootstrap|tailwind|radzen|syncfusion|telerik|blazorise|antdesign)") {
         Add-Violation "wwwroot/app.css imports another UI framework and may override the Flat UI baseline."
@@ -937,6 +989,14 @@ foreach ($cssFile in $localCssFiles) {
     if ($cssSource -match "(?im)@import\s+[^;]*(bootstrap|tailwind|radzen|syncfusion|telerik|blazorise|antdesign)") {
         Add-Violation "Local stylesheet '$($cssFile.FullName)' imports an additional UI framework."
     }
+    if ($cssFile.FullName -cne $appCssPath) {
+        if ($cssSource -match "(?i)\.(flat|mud)-") {
+            Add-Violation "Destination stylesheet '$($cssFile.FullName)' may not target package-owned .flat-* or .mud-* selectors."
+        }
+        if ($cssSource -match "(?im)--opx-[a-z0-9-]+\s*:") {
+            Add-Violation "Destination stylesheet '$($cssFile.FullName)' may consume but may not redeclare package-owned --opx-* tokens."
+        }
+    }
 }
 
 if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
@@ -970,6 +1030,15 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         if (($promptingText -notmatch 'UseAppFontSize=false') -or ($promptingText -notmatch 'system font') -or ($promptingText -notmatch 'no custom app font')) {
             Add-Violation "Canonical prompting contract must default ordinary typography to the device/browser system font without a forced custom app font."
         }
+        if (($promptingText -notmatch 'bottom navigation') -or ($promptingText -notmatch 'DefaultBottomNavigationChildPresentation="Sheet"') -or ($promptingText -notmatch 'MainView.*explicit')) {
+            Add-Violation "Canonical prompting contract must resolve ordinary Bottom navigation requests to Sheet and keep MainView explicit opt-in."
+        }
+        if (($promptingText -notmatch 'search/filter text visible') -or ($promptingText -notmatch 'MobileToolbarActionsExpandedByDefault=false') -or ($promptingText -notmatch 'collapsed/hidden')) {
+            Add-Violation "Canonical prompting contract must default responsive search/filter toolbar action rows to collapsed/hidden."
+        }
+        if (($promptingText -notmatch 'modal first') -or ($promptingText -notmatch 'previous Blazor page second') -or ($promptingText -notmatch 'native app exit only at the true navigation root')) {
+            Add-Violation "Canonical prompting contract must preserve layered Back behavior."
+        }
         if (($promptingText -notmatch 'supported NuGet public API') -or ($promptingText -notmatch 'do not silently build a substitute') -or ($promptingText -notmatch 'domain-neutral package suggestion') -or ($promptingText -notmatch 'host-owned domain/integration/native seam')) {
             Add-Violation "Canonical prompting contract must enforce package-first reuse and classify missing capabilities before suggesting work."
         }
@@ -991,6 +1060,15 @@ if (-not [string]::IsNullOrWhiteSpace($contractRoot)) {
         }
         if (($knowledgeText -notmatch 'initial spacing preset') -or ($knowledgeText -notmatch 'DefaultDensity="Default"') -or ($knowledgeText -notmatch 'no separate `DefaultSpacing`')) {
             Add-Violation "Canonical knowledge must preserve Default as the package spacing/density baseline."
+        }
+        if (($knowledgeText -notmatch 'Bottom navigation requests default') -or ($knowledgeText -notmatch 'DefaultBottomNavigationChildPresentation="Sheet"') -or ($knowledgeText -notmatch '`MainView` is opt-in only')) {
+            Add-Violation "Canonical knowledge must preserve Sheet as the inferred Bottom navigation child presentation and MainView as opt-in."
+        }
+        if (($knowledgeText -notmatch 'MobileToolbarActionsExpandedByDefault') -or ($knowledgeText -notmatch 'defaults to `false`') -or ($knowledgeText -notmatch 'collapsed/hidden')) {
+            Add-Violation "Canonical knowledge must preserve collapsed/hidden as the responsive toolbar action-row default."
+        }
+        if (($knowledgeText -notmatch 'Back behavior is layered and Blazor-first') -or ($knowledgeText -notmatch 'next Back navigates through prior Blazor WebView history') -or ($knowledgeText -notmatch 'native Back/app exit only when')) {
+            Add-Violation "Canonical knowledge must preserve modal, Blazor history, then native Back precedence."
         }
         if (($knowledgeText -notmatch 'Package-first reuse is mandatory') -or ($knowledgeText -notmatch 'never duplicate package behavior') -or ($knowledgeText -notmatch 'Package changes and publication require explicit approval')) {
             Add-Violation "Canonical knowledge must preserve package-first reuse and the approval boundary for package changes."

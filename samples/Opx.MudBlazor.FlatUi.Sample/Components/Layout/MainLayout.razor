@@ -94,16 +94,18 @@
             <section class="settings-modal-panel" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
                 <header class="settings-modal-header">
                     <div>
-                        <span class="notification-eyebrow">Settings</span>
-                        <h2 id="settings-modal-title">Application preferences</h2>
-                        <p>Configure sample UI appearance and preferences.</p>
+                        <span class="notification-eyebrow">@(_indonesianSettingsPreview ? "Pengaturan" : "Settings")</span>
+                        <h2 id="settings-modal-title">@(_indonesianSettingsPreview ? "Preferensi aplikasi" : "Application preferences")</h2>
+                        <p>@(_indonesianSettingsPreview ? "Atur tampilan aplikasi sesuai kebutuhan pengguna." : "Configure sample UI appearance and preferences.")</p>
                     </div>
                     <MudIconButton Icon="@Icons.Material.Outlined.Close"
                                    Class="settings-modal-close"
                                    OnClick="CloseSettingsAsync"
-                                   aria-label="Close settings" />
+                                   aria-label="@(_indonesianSettingsPreview ? "Tutup pengaturan" : "Close settings")" />
                 </header>
                 <div class="settings-modal-body">
+                    @if (!_indonesianSettingsPreview)
+                    {
                     <div class="settings-menu-section">
                         <MudIcon Icon="@Icons.Material.Outlined.Palette" Size="Size.Small" />
                         <span>
@@ -152,8 +154,12 @@
                             <small>Changes preview immediately. Save to keep them.</small>
                         </span>
                     </div>
+                    }
                     <FlatDisplaySettings Density="@_draftDensity"
                                          DensityChanged="SetDraftDensity"
+                                         Configuration="@SettingsConfiguration"
+                                         ThemeMode="@_draftThemeMode"
+                                         ThemeModeChanged="SetThemeModeAsync"
                                          InputStyle="@_draftInputStyle"
                                          InputStyleChanged="SetDraftInputStyle"
                                          ColorPalette="@_draftColorPalette"
@@ -184,6 +190,8 @@
                                          MaximumBackdropOpacity="@DisplayPreferences.Options.MaximumBackdropOpacity"
                                          RoundedSizePx="@_draftRoundedSizePx"
                                          RoundedSizePxChanged="SetDraftRoundedSize" />
+                    @if (!_indonesianSettingsPreview)
+                    {
                     <button type="button" class="settings-menu-item display-reset-button" @onclick="RestoreDisplayDefaultsAsync">
                         <MudIcon Icon="@Icons.Material.Outlined.RestartAlt" Size="Size.Small" />
                         <span>
@@ -206,10 +214,11 @@
                             <small>Local OS/device notifications. Permission and scheduling are controlled by the host platform.</small>
                         </span>
                     </button>
+                    }
                 </div>
                 <footer class="settings-modal-footer">
-                    <MudButton Variant="Variant.Outlined" OnClick="CloseSettingsAsync">Cancel</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveSettingsAsync">Save</MudButton>
+                    <MudButton Variant="Variant.Outlined" OnClick="CloseSettingsAsync">@(_indonesianSettingsPreview ? "Batal" : "Cancel")</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveSettingsAsync">@(_indonesianSettingsPreview ? "Simpan" : "Save")</MudButton>
                 </footer>
             </section>
         </div>
@@ -275,6 +284,7 @@
     private bool _settingsOpen;
     private bool _aboutOpen;
     private bool _bottomMainViewPreview;
+    private bool _indonesianSettingsPreview;
     private string _draftDensity = FlatUiDensity.Default;
     private string _draftInputStyle = FlatInputStyle.Outlined;
     private string _draftThemeMode = FlatUiThemeMode.Auto;
@@ -304,6 +314,14 @@
             .ParseQuery(new Uri(uri, UriKind.Absolute).Query)
             .TryGetValue("preview", out var previewValues)
         && previewValues.Any(value => string.Equals(value, "bottom-main-view", StringComparison.OrdinalIgnoreCase));
+    private static bool IsIndonesianSettingsPreviewUri(string uri) =>
+        Microsoft.AspNetCore.WebUtilities.QueryHelpers
+            .ParseQuery(new Uri(uri, UriKind.Absolute).Query)
+            .TryGetValue("preview", out var previewValues)
+        && previewValues.Any(value => string.Equals(value, "settings-indonesian-essentials", StringComparison.OrdinalIgnoreCase));
+    private FlatDisplaySettingsConfiguration SettingsConfiguration => _indonesianSettingsPreview
+        ? FlatDisplaySettingsConfiguration.IndonesianEssentials
+        : FlatDisplaySettingsConfiguration.Default;
     private string EffectiveNavigationLayout => _bottomMainViewPreview
         ? FlatUiNavigationLayout.Bottom
         : _settingsOpen
@@ -350,6 +368,11 @@
     protected override void OnInitialized()
     {
         _bottomMainViewPreview = IsBottomMainViewPreviewUri(Navigation.Uri);
+        _indonesianSettingsPreview = IsIndonesianSettingsPreviewUri(Navigation.Uri);
+        if (_indonesianSettingsPreview)
+        {
+            OpenSettings();
+        }
         Navigation.LocationChanged += HandleLocationChanged;
         DisplayPreferences.Changed += HandleDisplayPreferencesChanged;
     }
@@ -380,6 +403,11 @@
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
     {
         _bottomMainViewPreview |= IsBottomMainViewPreviewUri(args.Location);
+        _indonesianSettingsPreview = IsIndonesianSettingsPreviewUri(args.Location);
+        if (_indonesianSettingsPreview && !_settingsOpen)
+        {
+            OpenSettings();
+        }
         StateHasChanged();
     }
 

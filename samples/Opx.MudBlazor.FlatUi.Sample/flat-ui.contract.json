@@ -1,13 +1,13 @@
 {
   "$schema": "flat-ui.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.1.3",
+  "contractVersion": "2.1.6",
   "source": {
     "repository": "mudblazor-flat-ui",
     "samplePath": "samples/Opx.MudBlazor.FlatUi.Showcase"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.1.3",
+    "Opx.MudBlazor.FlatUi": "2.1.6",
     "MudBlazor": "9.9.0"
   },
   "canonicalSample": {
@@ -16,7 +16,7 @@
     "lineEndingNormalization": "LF",
     "promptTriggers": ["sama", "persis", "canonical", "seperti sample", "source of truth"],
     "files": {
-      "Components/Layout/MainLayout.razor": "D7BA2362A1050C3F5331711BBAD67F0EFA984BAEC49519101E6A55EEBDBC5968",
+      "Components/Layout/MainLayout.razor": "EF037586F11C4A8B144C52F91135B3F841D80FAC234A471F648D524B03F41549",
       "../Opx.MudBlazor.FlatUi.Showcase/ShowcaseNavigationCatalog.cs": "215AAD5AFA5E90A634C2EDB59E83138CD9428D43B4C596122BAA640ACB05CD2D",
       "../Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Home.razor": "E46EBA5E931C90FFBE1A15337015AB180B8E0E4A86554B97EC7F20ABD148947A",
       "Components/RootStartupGate.razor": "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F",
@@ -172,7 +172,7 @@
     "stylesheetOwnership": {
       "reusableCssSource": "package-only",
       "packageStylesheet": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css",
-      "packageStylesheetSha256": "60C6686E76F6342A861B34988E93E407E0904AAE1E81B991EBF80809A33046D3",
+      "packageStylesheetSha256": "58E9285A132609D42A09CC09A309E0DD5DE959CA24AB98FF946AD90443A7A44A",
       "mudBlazorStylesheet": "_content/MudBlazor/MudBlazor.min.css",
       "hostStylesheet": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css",
       "hostStylesheetPurpose": "sample-and-domain-composition-only",

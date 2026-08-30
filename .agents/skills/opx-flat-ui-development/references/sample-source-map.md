@@ -12,7 +12,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Shared pages, sample services, sample usage, page CSS, and typed navigation catalog: `samples/Opx.MudBlazor.FlatUi.Showcase`
 - Web application root/reconnect: `samples/Opx.MudBlazor.FlatUi.Sample/Components/App.razor`
 - Web service/configuration binding: `samples/Opx.MudBlazor.FlatUi.Sample/Program.cs` and `samples/Opx.MudBlazor.FlatUi.Sample/appsettings.json`
-- Web admin shell, AppBar actions, and settings: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Layout/MainLayout.razor`
+- Web admin shell, AppBar actions, and settings: `samples/Opx.MudBlazor.FlatUi.Sample/Components/Layout/MainLayout.razor`; reusable Settings composition/localization: package `FlatDisplaySettings`, `FlatDisplaySettingsConfiguration`, and `docs/DISPLAY-SETTINGS.md`
 - Shared recursive menu and search metadata: `samples/Opx.MudBlazor.FlatUi.Showcase/ShowcaseNavigationCatalog.cs`
 - Public website shell: `samples/Opx.MudBlazor.FlatUi.Showcase/Components/Layout/WebsiteLayout.razor`
 - Authentication shell: `samples/Opx.MudBlazor.FlatUi.Showcase/Components/Layout/AuthLayout.razor`
@@ -27,7 +27,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Inline Add/Edit/Delete grid with responsive editor cards: `samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/GridEditor.razor`
 - Dashboard/widgets/charts: `Home.razor`, `Widgets.razor`, and ERP overview pages under `Components/Pages`
 - Complete MudBlazor chart gallery with copy-ready code: `Charts.razor` and `Components/ChartCode.razor`
-- Host-owned file/image upload with preview, autoscale, progress/cancel/retry: `FileUpload.razor`, `Components/FlatFileUpload.razor`, and `Components/FlatImageUpload.razor`
+- Host-owned file/image upload with preview, autoscale, progress/cancel/retry, and opt-in camera/gallery adapter buttons: `FileUpload.razor`, `Components/FlatFileUpload.razor`, `Models/FlatFileUploadModels.cs`, and `Components/FlatImageUpload.razor`
 - Versioned grid presentation state and saved views: `GridPreferences.razor`, `Components/Grid/FlatGridPreferencesPanel.razor`, and `Models/FlatGridPreferences.cs`
 - Hierarchical Tree Grid with host-owned parent persistence: `TreeGrid.razor`, `Components/Grid/FlatTreeGrid.razor`, and `Models/FlatTreeGridModels.cs`
 - Compact hierarchy/outline design with sibling ordering and JSON snapshots: `HierarchyDesigner.razor`, `Components/FlatHierarchyDesigner.razor`, and `Models/FlatHierarchyDesignerModels.cs`
