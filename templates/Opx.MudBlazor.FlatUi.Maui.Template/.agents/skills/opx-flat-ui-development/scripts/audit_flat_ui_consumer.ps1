@@ -9,20 +9,20 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.1.6"
+$expectedContractVersion = "2.1.10"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.1.6"
+    "Opx.MudBlazor.FlatUi" = "2.1.10"
     "MudBlazor" = "9.9.0"
 }
-$expectedHostCssSha256 = "ACFE823AE8A68B737E6DB7814864CDFAE6CEAC3A79C31A73565E345EB2529E48"
-$expectedPackageCssSha256 = "58E9285A132609D42A09CC09A309E0DD5DE959CA24AB98FF946AD90443A7A44A"
+$expectedHostCssSha256 = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
+$expectedPackageCssSha256 = "3C3BE5D054F89B47EDDC1C0298B3D390BA938F76C66801898DEAE13DCF046FD0"
 $expectedExactSampleHashes = [ordered]@{
     "Components\Layout\MainLayout.razor" = "EF037586F11C4A8B144C52F91135B3F841D80FAC234A471F648D524B03F41549"
     "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "215AAD5AFA5E90A634C2EDB59E83138CD9428D43B4C596122BAA640ACB05CD2D"
     "..\Opx.MudBlazor.FlatUi.Showcase\Components\Pages\Home.razor" = "E46EBA5E931C90FFBE1A15337015AB180B8E0E4A86554B97EC7F20ABD148947A"
     "Components\RootStartupGate.razor" = "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F"
-    "appsettings.json" = "B2962DC468D4A2FCEDDA84B4FCCCF895CC1383E91796BF7A9AB0B9ABE7DD5699"
-    "..\Opx.MudBlazor.FlatUi.Showcase\wwwroot\opx-flat-ui-showcase.css" = "ACFE823AE8A68B737E6DB7814864CDFAE6CEAC3A79C31A73565E345EB2529E48"
+    "appsettings.json" = "019806E238B54648AB24189696C9C124EB6BED16C972891F4490004FF9F3922F"
+    "..\Opx.MudBlazor.FlatUi.Showcase\wwwroot\opx-flat-ui-showcase.css" = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
 }
 $violations = [System.Collections.Generic.List[string]]::new()
 
@@ -690,7 +690,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.6; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.10; found $packageCssHash."
     }
 }
 

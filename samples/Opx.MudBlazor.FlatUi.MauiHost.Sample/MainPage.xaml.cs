@@ -3,6 +3,7 @@
 #if ANDROID
 using Android.Views;
 using AndroidX.Core.View;
+using AndroidX.SwipeRefreshLayout.Widget;
 using CommunityToolkit.Maui.Behaviors;
 using CommunityToolkit.Maui.Core;
 #endif
@@ -14,6 +15,10 @@ namespace Opx.MudBlazor.FlatUi.MauiHost.Sample;
 
 public partial class MainPage : ContentPage
 {
+#if ANDROID
+    private const double AppBarHeightDip = 60d;
+    private const double RefreshIndicatorGapDip = 8d;
+#endif
     private readonly FlatNativePullToRefreshState _nativePullToRefreshState;
     private readonly Command _nativeRefreshCommand;
 #if ANDROID
@@ -33,7 +38,8 @@ public partial class MainPage : ContentPage
         ApplyNativePullToRefreshState();
 #if ANDROID
         Behaviors.Add(_statusBarBehavior);
-        Loaded += DisableAndroidWebViewBounce;
+        Loaded += ConfigureAndroidHost;
+        SizeChanged += RepositionAndroidRefreshIndicator;
 #endif
     }
 
@@ -129,12 +135,35 @@ public partial class MainPage : ContentPage
     }
 
 #if ANDROID
-    private void DisableAndroidWebViewBounce(object? sender, EventArgs e)
+    private void ConfigureAndroidHost(object? sender, EventArgs e)
     {
         if (blazorWebView.Handler?.PlatformView is Android.Webkit.WebView webView)
         {
             webView.OverScrollMode = OverScrollMode.Never;
         }
+
+        ApplyAndroidRefreshIndicatorOffset();
+    }
+
+    private void RepositionAndroidRefreshIndicator(object? sender, EventArgs e) =>
+        ApplyAndroidRefreshIndicatorOffset();
+
+    private void ApplyAndroidRefreshIndicatorOffset()
+    {
+        if (nativeRefreshView.Handler?.PlatformView is not SwipeRefreshLayout refreshLayout)
+        {
+            return;
+        }
+
+        var density = Platform.CurrentActivity?.Resources?.DisplayMetrics?.Density ?? 1f;
+        var insets = ViewCompat.GetRootWindowInsets(refreshLayout);
+        var statusBarInsetPx = insets?.GetInsets(WindowInsetsCompat.Type.StatusBars())?.Top ?? 0;
+        var appBarHeightPx = (int)Math.Round(AppBarHeightDip * density);
+        var indicatorGapPx = (int)Math.Round(RefreshIndicatorGapDip * density);
+        var startOffsetPx = statusBarInsetPx + appBarHeightPx - refreshLayout.ProgressCircleDiameter;
+        var endOffsetPx = statusBarInsetPx + appBarHeightPx + indicatorGapPx;
+
+        refreshLayout.SetProgressViewOffset(false, startOffsetPx, endOffsetPx);
     }
 #endif
 
@@ -147,6 +176,7 @@ public partial class MainPage : ContentPage
             _statusBarBehavior.StatusBarStyle = useLightContent
                 ? StatusBarStyle.LightContent
                 : StatusBarStyle.DarkContent;
+            ApplyAndroidRefreshIndicatorOffset();
         });
 #else
         return Task.CompletedTask;

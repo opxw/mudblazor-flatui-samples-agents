@@ -28,7 +28,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $showcaseRoot "Opx.MudBlazor.FlatUi.
 }
 
 Require-Tokens "Opx.MudBlazor.FlatUi.MauiHost.Sample.csproj" @(
-    'PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.6"',
+    'PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.10"',
     'ProjectReference Include="..\Opx.MudBlazor.FlatUi.Showcase\Opx.MudBlazor.FlatUi.Showcase.csproj"',
     'MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="1,1"'
 )
@@ -124,4 +124,4 @@ if ($violations.Count -gt 0) {
     exit 1
 }
 
-Write-Output "MAUI shared-page audit passed: $($showcaseRoutes.Count) Showcase routes load once; $($hostRoutes.Count) MAUI-only routes remain in the host; OPX UI uses NuGet 2.1.6."
+Write-Output "MAUI shared-page audit passed: $($showcaseRoutes.Count) Showcase routes load once; $($hostRoutes.Count) MAUI-only routes remain in the host; OPX UI uses NuGet 2.1.10."

@@ -25,6 +25,17 @@ $restore = @("restore", $project[0].FullName, "-p:TargetFramework=$framework", "
 if ($Target -eq "Windows") { $restore += @("-r", "win-x64") }
 dotnet @restore
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+# TargetFramework is intentionally constrained for the MAUI host restore, but
+# that property also flows into the shared Showcase ProjectReference. Restore
+# the shared net10.0 project explicitly so a following --no-restore build has
+# both target graphs available.
+$showcaseProject = [IO.Path]::GetFullPath((Join-Path $projectRoot "..\Opx.MudBlazor.FlatUi.Showcase\Opx.MudBlazor.FlatUi.Showcase.csproj"))
+if (Test-Path -LiteralPath $showcaseProject) {
+    dotnet restore $showcaseProject --configfile $config
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+
 if ($PrepareOnly) { Write-Output "MAUIHost initial-run preparation completed for $Target."; exit 0 }
 
 $build = @("build", $project[0].FullName, "-f", $framework, "-c", "Debug", "--no-restore")

@@ -15,7 +15,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 ## Current canonical snapshot
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.6`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.10`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.9.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
@@ -26,7 +26,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Package-first reuse is mandatory: inspect the supported NuGet public API and mapped canonical sample, use an existing capability through its public seam, and never duplicate package behavior or assets in a consumer. A verified missing domain-neutral capability is proposed as a package addition; a domain, authorization, persistence, integration, or native need is proposed as a host-owned seam. Package changes and publication require explicit approval.
 - When analysis finds a material improvement, report it as `Saran UI/UX` with need/risk, one concrete recommendation, user/business impact, priority (`Wajib`, `Disarankan`, or `Opsional`), and scope/approval boundary. Do not add filler suggestions or silently expand scope.
 
-## Imported 2.1.6 package capabilities
+## Imported 2.1.10 package capabilities
 
 - Settings/About modals now own complete resolved semantic surface tokens as portal-like roots. Light mode keeps neutral/white panel, header, body, and footer surfaces rather than inheriting a palette accent-subtle color.
 - MudBlazor date/time picker portal paper remains square and the selected calendar day keeps the resolved primary-contrast foreground on its primary background across Light, Dark/Night, and Auto.
@@ -47,9 +47,9 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Content-panel bodies have a positive logical horizontal inset: default `padding-inline:14px` desktop and `12px` at `<=900px`, unless the mapped compiled sample defines another positive value. Edge-to-edge table/media shells may use outer zero padding only when immediate readable children own a positive inset.
 - Spacing ownership is singular: parent layout owns gaps, panel body owns inner padding, and widgets do not add compensating outer margins or duplicate padding at the same boundary.
 - The initial spacing preset is the package density value `Default`, configured as `OpxFlatUi:Display:DefaultDensity="Default"`. There is no separate `DefaultSpacing` key. Compact/Comfortable remain persisted Settings choices; Restore returns to Default without changing canonical gutters, panel insets, safe areas, or component-specific spacing.
-- Ordinary buttons default to a `7px` corner radius through package-owned `OpxFlatUi:Display:DefaultRoundedSizePx`. The same bounded `0-12` token controls bottom-sheet top corners; cards, panels, inputs, dialogs, menus, grids, toolbars, and workspaces remain square. Do not create consumer/page-local radius overrides. Package 2.1.6 excludes `.flat-system-loading-spinner` from broad zero-radius resets, so startup/reconnect spinners remain circular inside shells, dialogs, and portals without consumer CSS.
+- Ordinary buttons default to a `7px` corner radius through package-owned `OpxFlatUi:Display:DefaultRoundedSizePx`. The same bounded `0-12` token controls bottom-sheet top corners; cards, panels, inputs, dialogs, menus, grids, toolbars, and workspaces remain square. Do not create consumer/page-local radius overrides. Package 2.1.10 excludes `.flat-system-loading-spinner` from broad zero-radius resets, so startup/reconnect spinners remain circular inside shells, dialogs, and portals without consumer CSS.
 - CRUD uses the visible verb `Edit`, not `Ubah`. Forms preserve validation, dirty-state guard, functional Add/Edit/Save/Cancel/Delete, desktop compact multi-column layout, and mobile one-column/fullscreen editing where appropriate.
-- Back behavior is layered and Blazor-first: an open CRUD/form modal consumes the first Back and keeps the route/application alive; the next Back navigates through prior Blazor WebView history. MAUI Android delegates to native Back/app exit only when no package modal/overlay and no prior WebView history entry remain. Package 2.1.6 owns modal interception; WebView-history fallback is host-owned.
+- Back behavior is layered and Blazor-first: an open CRUD/form modal consumes the first Back and keeps the route/application alive; the next Back navigates through prior Blazor WebView history. MAUI Android delegates to native Back/app exit only when no package modal/overlay and no prior WebView history entry remain. Package 2.1.10 owns modal interception; WebView-history fallback is host-owned.
 - Grids use compact search, hidden metadata icons, type-aware alignment/formatting, one bounded desktop scroll owner, and equivalent responsive cards/lists sharing query, filter, sort, paging, selection, permission, loading, validation, and mutation state.
 - On responsive/mobile search or filter toolbars with at least two secondary actions, the action row defaults to collapsed/hidden because package `FlatPage.MobileToolbarActionsExpandedByDefault` defaults to `false`. The full-width text field and accessible Apps toggle remain visible; desktop toolbar actions remain visible. Initial expansion is opt-in.
 - Initialized admin consumers include Settings, default searchable navigation, Light/Dark/Auto preferences, and right-aligned Logout. Root session validation completes before `Router` is created.
@@ -86,3 +86,22 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - `FlatDisplaySettingsConfiguration` selects and orders sections, locks host-controlled values, localizes component-owned copy, and permits explicit per-section templates without duplicating package markup.
 - Omitted configuration preserves the complete compatibility surface. `IndonesianEssentials` renders only Tema, Palet warna, Ukuran font, and Target sentuh in that order.
 - The host owns the modal, draft/live preview, Save/Cancel/Restore, persistence, authorization, and policy; locked presentation is not server-side authorization.
+
+# 2026-08-31 - Shared navigation route resolver
+
+- Canonical PageId: `opx.page.reference.dynamic-menu`.
+- `IFlatNavigationRouteResolver` applies consumer-owned label mappings before validating fallback URLs, so Web and MAUI consume identical resolved menu records without package domain coupling.
+- Labels use NFKC, Unicode format/zero-width removal, alphanumeric filtering, and invariant uppercase. Fallbacks accept local routes and absolute HTTP(S); empty, fragment-only, protocol-relative, and unsafe-scheme values fail closed.
+- Menu visibility is not authorization. Mapping semantics and route authorization remain consumer-owned.
+
+# 2026-09-01 - Android native refresh indicator inset
+
+- Android edge-to-edge MAUI positions the native `SwipeRefreshLayout` indicator from measured status-bar `WindowInsets` plus the canonical `60dp` AppBar and an `8dp` resting gap.
+- Reapply the offset after load, resize/orientation, and status-bar changes. Keep the persistent `BlazorWebView` stationary; do not compensate with page padding or translation.
+- This is host-owned native integration. Browser previews do not prove its runtime geometry.
+
+# 2026-09-02 - NuGet 2.1.10 Login and grouped-grid contracts
+
+- Public consumer baseline is `Opx.MudBlazor.FlatUi` `2.1.10`; reusable CSS must resolve from that NuGet package and match SHA-256 `3C3BE5D054F89B47EDDC1C0298B3D390BA938F76C66801898DEAE13DCF046FD0`.
+- `FlatApplicationOptions.LoginBrandPanelVisible` defaults to `true`. With `LoginLayout=Default`, `false` centers the unboxed Login form without rendering the brand panel; `Boxed` remains a separate bounded composition.
+- `FlatGroupedDataGrid<TItem>.GroupHeaderAlignment` defaults to `Left` and accepts `Center` or `Right`; the package owns text and content-axis alignment for desktop and responsive headings.

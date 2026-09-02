@@ -12,7 +12,7 @@
         <img class="login-boxed-background-media" src="@boxedBackgroundImageUrl" alt="" />
     }
 
-    @if (!IsBoxed)
+    @if (ShowBrandPanel)
     {
     <div class="login-brand-panel">
         @if (ApplicationOptions.ResolvedLoginBrandBackgroundImageUrl is { } backgroundImageUrl)
@@ -128,12 +128,17 @@
                 Navigation.ToAbsoluteUri(Navigation.Uri).Query)
             .TryGetValue("preview", out var preview) &&
         preview.Any(value => string.Equals(value, "boxed-login", StringComparison.OrdinalIgnoreCase));
+    private bool ShowBrandPanel => !IsBoxed && ApplicationOptions.LoginBrandPanelVisible;
     private string LoginPageClass => IsBoxed
         ? "login-page login-page-boxed"
-        : "login-page login-page-default";
+        : ShowBrandPanel
+            ? "login-page login-page-default"
+            : "login-page login-page-centered";
     private string LoginCardClass => IsBoxed
         ? "login-card login-card-boxed"
-        : "login-card";
+        : ShowBrandPanel
+            ? "login-card"
+            : "login-card login-card-centered";
     private string LoginBrandStyle =>
         $"--login-brand-background:{ApplicationOptions.ResolvedLoginBrandBackgroundColor};" +
         $"--login-brand-overlay:{ApplicationOptions.ResolvedLoginBrandOverlayColor};" +

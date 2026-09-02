@@ -150,6 +150,8 @@ html.opx-root-theme-dark .login-brand-panel{background:var(--login-brand-backgro
 .login-page-boxed::before{content:"";position:absolute;z-index:1;inset:0;background:var(--login-brand-overlay,#000);opacity:var(--login-brand-overlay-opacity,0);pointer-events:none}
 .login-boxed-background-media{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
 .login-page-boxed .login-card-boxed{position:relative;z-index:2;place-self:center;width:min(440px,100%);padding:36px 38px;border:1px solid var(--border);background:var(--surface)!important;color:var(--foreground)}
+.login-page-centered{grid-template-columns:minmax(0,1fr);place-items:center;background:var(--background)}
+.login-page-centered .login-card-centered{place-self:center;width:min(390px,calc(100% - 32px))}
 @media(max-width:760px){
   .login-page{display:block;min-height:100dvh;padding:0;background:var(--background)}
   .login-brand-panel{display:none}
@@ -160,6 +162,8 @@ html.opx-root-theme-dark .login-brand-panel{background:var(--login-brand-backgro
   .login-mobile-copyright{display:block}
   .login-page.login-page-boxed{display:grid;place-items:center;min-height:100dvh;padding:16px;background:color-mix(in srgb,var(--login-brand-background,var(--accent)) 8%,var(--background))}
   .login-page-boxed .login-card-boxed{width:100%;min-height:0;justify-content:initial;margin:0;padding:24px 20px;border:1px solid var(--border)}
+  .login-page.login-page-centered{display:grid;place-items:center;padding:16px}
+  .login-page-centered .login-card-centered{width:min(390px,100%);min-height:0;padding:28px 22px}
 }
 @media(max-width:760px) and (orientation:landscape) and (max-height:640px){
   .login-card{min-height:100dvh;justify-content:flex-start;padding-top:16px;padding-bottom:16px}

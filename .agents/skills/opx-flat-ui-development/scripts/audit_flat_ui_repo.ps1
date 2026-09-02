@@ -173,7 +173,7 @@ if (Test-Path -LiteralPath $roadmapPath) {
 #>
 if (Test-Path -LiteralPath $roadmapPath) {
     $roadmap = Get-Content -LiteralPath $roadmapPath -Raw
-    $markers = @('Current release objective: validate 2.1.6', '### 1.2.0', '### 1.3.0', '### 1.4.0', '### 1.5.0', '### 1.6.0', '### 1.7.0', '### 1.8.0', '### 1.9.0', '### 2.0.0')
+    $markers = @('Current release objective: validate 2.1.10', '### 1.2.0', '### 1.3.0', '### 1.4.0', '### 1.5.0', '### 1.6.0', '### 1.7.0', '### 1.8.0', '### 1.9.0', '### 2.0.0')
     foreach ($marker in $markers) {
         if (-not $roadmap.Contains($marker)) { $violations.Add("ROADMAP.md is missing the approved 2.0 marker: $marker") }
     }
@@ -430,7 +430,9 @@ if (Test-Path -LiteralPath $loginPath) {
         $loginPage -notmatch 'ApplicationOptions\.ResolvedCompanyName' -or
         $loginPage -notmatch 'ApplicationOptions\.HasResolvedLogo' -or
         $loginPage -notmatch 'ApplicationOptions\.ResolvedLoginBrandBackgroundColor' -or
-        $loginPage -notmatch 'ApplicationOptions\.ResolvedLoginBrandBackgroundImageUrl') {
+        $loginPage -notmatch 'ApplicationOptions\.ResolvedLoginBrandBackgroundImageUrl' -or
+        $loginPage -notmatch 'ApplicationOptions\.LoginBrandPanelVisible' -or
+        $loginPage -notmatch 'login-page login-page-centered') {
         $violations.Add('Login branding must render from FlatApplicationOptions')
     }
     if ($loginPage -match 'login-demo-note|login-security-note|mobile-login-brand|Sample only|Protected sign-in') {
@@ -447,6 +449,7 @@ if (Test-Path -LiteralPath $loginPath) {
         $sampleSettings -notmatch '"CompanyName"\s*:' -or
         $sampleSettings -notmatch '"LoginBrandBackgroundColor"\s*:' -or
         $sampleSettings -notmatch '"LoginBrandBackgroundImageUrl"\s*:' -or
+        $sampleSettings -notmatch '"LoginBrandPanelVisible"\s*:' -or
         $sampleSettings -notmatch '"LoginBrandOverlayColor"\s*:' -or
         $sampleSettings -notmatch '"LoginBrandOverlayOpacity"\s*:') {
         $violations.Add('Initial host appsettings must provide the complete OpxFlatUi Application and Login background branding baseline')

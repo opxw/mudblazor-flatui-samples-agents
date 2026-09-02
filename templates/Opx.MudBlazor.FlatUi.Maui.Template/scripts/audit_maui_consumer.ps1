@@ -19,7 +19,7 @@ $expectedExactSampleHashes = [ordered]@{
     "MainPage.xaml" = "5E0FD69C86C9A67BCA5C705E4CB1EAA632801773567E7A36A1342C496CB54108"
     "Platforms\Android\AndroidManifest.xml" = "99473DD217AFF65C62A3198157E794674190858388530E0E3C074FEF63227F56"
     "Resources\Splash\splash.svg" = "2CE5A083499E8A1FB0CD3E81FC6D029563B821C8B63960552F8593A35600821F"
-    "appsettings.json" = "97E304D72B68C75D5ADDD2481041AD83400AE9E95783971FB0AA6F4883FF33BE"
+    "appsettings.json" = "D98A109F0A56A5E52CD3A4E932BB20BFF07E81F4F9075A2424D961E9305A2C04"
     "wwwroot\app.css" = "92FA657E143FAF00348F4E5CEF9CE806F5FBE1D8CB37E45863DE759194B94DDB"
 }
 function Require-Text([string] $path, [string[]] $tokens) {
@@ -60,7 +60,7 @@ Require-Text $project[0].FullName @(
     'net10.0-android;net10.0-ios',
     '<MauiVersion>10.0.90</MauiVersion>',
     'CommunityToolkit.Maui" Version="15.0.1',
-    'Opx.MudBlazor.FlatUi" Version="2.1.6',
+    'Opx.MudBlazor.FlatUi" Version="2.1.10',
     'MudBlazor" Version="9.9.0',
     'MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="1,1"')
 Require-Text (Join-Path $root "NuGet.sources.xml") @("https://api.nuget.org/v3/index.json", 'globalPackagesFolder" value=".nuget\packages')
@@ -104,9 +104,9 @@ if (Test-Path -LiteralPath $assetsPath) {
     try {
         $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json -AsHashtable
         $packageRoot = @($assets.packageFolders.Keys)[0]
-        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.1.6\staticwebassets\opx-flat-ui.css"
+        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.1.10\staticwebassets\opx-flat-ui.css"
         if (-not (Test-Path -LiteralPath $packageCss)) { $violations.Add("Restored OPX package CSS was not found.") }
-        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "58E9285A132609D42A09CC09A309E0DD5DE959CA24AB98FF946AD90443A7A44A") { $violations.Add("Restored OPX 2.1.6 CSS hash does not match the contract.") }
+        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "3C3BE5D054F89B47EDDC1C0298B3D390BA938F76C66801898DEAE13DCF046FD0") { $violations.Add("Restored OPX 2.1.10 CSS hash does not match the contract.") }
     } catch { $violations.Add("Unable to verify restored OPX CSS: $($_.Exception.Message)") }
 } else { $violations.Add("Run restore before the mobile consumer audit; obj/project.assets.json is missing.") }
 
@@ -124,4 +124,4 @@ if ($ExactSample) {
 }
 
 if ($violations.Count -gt 0) { $violations | ForEach-Object { Write-Error $_ }; exit 1 }
-Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.1.6$(if ($ExactSample) { ', Exact Sample Mode' }))."
+Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.1.10$(if ($ExactSample) { ', Exact Sample Mode' }))."

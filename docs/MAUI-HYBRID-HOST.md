@@ -4,7 +4,7 @@ Copyright (c) 2026 opx. All rights reserved.
 
 The executable NuGet-only reference project is
 `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample`. It targets Android and Windows
-and consumes `Opx.MudBlazor.FlatUi` `2.1.6` from NuGet.org.
+and consumes `Opx.MudBlazor.FlatUi` `2.1.10` from NuGet.org.
 
 Every canonical cross-host page route lives once in
 `samples/Opx.MudBlazor.FlatUi.Showcase`. Web and MAUI load that RCL through
@@ -67,6 +67,14 @@ controls remain centered in the lower `60px`, and main content starts below the 
 AppBar. Luminance-aware Light/Dark icons are synchronized after saved theme/palette changes
 and Auto-theme system events. This integration is Android host-owned; Web and Windows keep
 the regular `60px` AppBar.
+
+## Android native refresh indicator
+
+For edge-to-edge Android hosts, configure the underlying `SwipeRefreshLayout` with
+`SetProgressViewOffset`. Derive its offsets from the current status-bar `WindowInsets` plus the
+canonical `60dp` AppBar, and keep the resting circle at least `8dp` below the AppBar. Reapply the
+offset after load, viewport/orientation changes, and status-bar appearance updates. Do not pad or
+translate the persistent `BlazorWebView`; AppBar, content, and Bottom navigation remain stationary.
 
 ## Android Back behavior
 
