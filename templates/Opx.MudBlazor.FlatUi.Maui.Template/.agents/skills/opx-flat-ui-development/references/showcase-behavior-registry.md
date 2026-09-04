@@ -262,6 +262,7 @@ Every PageId in `page-registry.md` must occur exactly once here.
 | `opx.page.operations.kanban` | `kanban-pipeline` | `Kanban.razor` |
 | `opx.page.auth.login` | `auth-form` | `Login.razor` |
 | `opx.page.monitoring.service` | `monitoring` | `Monitoring.razor` |
+| `opx.page.monitoring.computer` | `monitoring` | `MonitoringComputers.razor` |
 | `opx.page.monitoring.database` | `monitoring` | `MonitoringDatabase.razor` |
 | `opx.page.system.not-found` | `system-state` | `NotFound.razor` |
 | `opx.page.reporting.pivot` | `pivot-analysis` | `Pivot.razor` |

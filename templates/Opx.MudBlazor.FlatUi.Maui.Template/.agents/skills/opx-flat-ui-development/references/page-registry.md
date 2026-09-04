@@ -15,10 +15,10 @@ Naming rules:
 | PageId | Canonical page name | Route | Prompt cues | Shell / archetype | Source |
 |---|---|---|---|---|---|
 | `opx.page.dashboard.overview` | Dashboard Overview | `/` | dashboard, overview, KPI | Admin / dashboard widgets | `Home.razor` |
-| `opx.page.reference.maui-host` | MAUI Hybrid Host | `/maui-host` | MAUI host, native adapters, device capabilities | Repository MAUI showroom | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/MauiHost.razor` |
-| `opx.page.reference.maui-performance` | MAUI Performance | `/maui-performance` | startup timing, route render, performance measurement | Repository MAUI runtime diagnostics | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/MauiPerformance.razor` |
-| `opx.page.reference.maui-compatibility` | MAUI Compatibility | `/compatibility` | WebView compatibility, viewport, theme, lifecycle, status bar | Repository MAUI native reference | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/Compatibility.razor` |
-| `opx.page.reference.maui-native-adapters` | MAUI Native Adapters | `/native-adapters` | secure storage, camera, file picker, share, notification | Repository MAUI capability reference | `samples/Opx.MudBlazor.FlatUi.MauiHost.Sample/Components/Pages/NativeAdapters.razor` |
+| `opx.page.reference.maui-host` | MAUI Hybrid Host | `/maui-host` | MAUI host, native adapters, device capabilities | Admin / native host reference | `MauiHost.razor` |
+| `opx.page.reference.maui-performance` | MAUI Performance | `/maui-performance` | startup timing, route render, performance measurement | Admin / runtime diagnostics | `MauiPerformance.razor` |
+| `opx.page.reference.maui-compatibility` | MAUI Compatibility | `/compatibility` | WebView compatibility, viewport, theme, lifecycle, status bar | Admin / native compatibility reference | `Compatibility.razor` |
+| `opx.page.reference.maui-native-adapters` | MAUI Native Adapters | `/native-adapters` | secure storage, camera, file picker, share, notification | Admin / native capability reference | `NativeAdapters.razor` |
 | `opx.page.reference.accordions` | Accordion Showcase | `/accordions` | accordion, FAQ, disclosure | Admin / component showroom | `Accordions.razor` |
 | `opx.page.account.profile-edit` | Account Profile Editor | `/account/edit` | edit account, profile, permissions | Admin / settings form | `EditAccount.razor` |
 | `opx.page.assistant.ai-chat` | AI Chat Workspace | `/ai-chat` | AI chat, assistant, streaming prompt | Admin / AI chat | `AiChat.razor` |
@@ -70,6 +70,7 @@ Naming rules:
 | `opx.page.operations.kanban` | Kanban Board | `/kanban` | kanban, task board | Admin / kanban | `Kanban.razor` |
 | `opx.page.auth.login` | Login | `/login` | login, sign in | Auth / login | `Login.razor` |
 | `opx.page.monitoring.service` | Service Monitoring | `/monitoring` | service monitor, health | Admin / monitoring | `Monitoring.razor` |
+| `opx.page.monitoring.computer` | Computer Monitoring | `/monitoring/computers` | computer monitor, master asset registration | Admin / monitoring grid | `MonitoringComputers.razor` |
 | `opx.page.monitoring.database` | Database Monitoring | `/monitoring-database` | database monitor, connection health | Admin / monitoring grid | `MonitoringDatabase.razor` |
 | `opx.page.system.not-found` | Not Found | `/not-found` | 404, unknown route | System / not found | `NotFound.razor` |
 | `opx.page.reporting.pivot` | Pivot Analysis | `/pivot` | pivot, aggregation, measures | Admin / reporting pivot | `Pivot.razor` |
@@ -94,8 +95,9 @@ Naming rules:
 ## Prompt resolution contract
 
 1. Match explicit route or canonical name first.
-2. Otherwise analyze the user or role, primary job, information hierarchy, data/action risk, permissions, device/input context, required states, accessibility, localization/RTL, and responsive needs; then match prompt cues and business intent.
-3. If one archetype clearly fits, select the simplest composition that completes the job and state the chosen `PageId` plus the relevant assumptions in the working update.
-4. If two choices would materially change shell or interaction—for example public Careers Landing versus admin Job Management—ask or infer only from explicit context.
-5. For a new concept, create a new unique `PageId`, choose the nearest archetype, and update this registry, navigation, title mapping, docs/rules when relevant, and audit coverage in the same change.
-6. For a layout request, state the layout blueprint defined in [layout-decision.md](layout-decision.md) before implementation; infer standard OPX visual structure instead of returning the design decision to the user.
+2. The user does not need to know or mention a `PageId`; infer it from the requested job, business workflow, data shape, shell, and device context, then state the selected ID in the working update.
+3. Otherwise analyze the user or role, primary job, information hierarchy, data/action risk, permissions, device/input context, required states, accessibility, localization/RTL, and responsive needs; then match prompt cues and business intent.
+4. If one archetype clearly fits, select the simplest composition that completes the job and state the chosen `PageId` plus the relevant assumptions in the working update.
+5. If two choices would materially change shell or interaction—for example public Careers Landing versus admin Job Management—ask or infer only from explicit context.
+6. For a new concept, create a new unique `PageId`, choose the nearest archetype, and update this registry, navigation, title mapping, docs/rules when relevant, and audit coverage in the same change.
+7. For a layout request, state the layout blueprint defined in [layout-decision.md](layout-decision.md) before implementation; infer standard OPX visual structure instead of returning the design decision to the user.

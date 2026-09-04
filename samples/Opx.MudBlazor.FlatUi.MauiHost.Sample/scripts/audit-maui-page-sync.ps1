@@ -28,7 +28,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $showcaseRoot "Opx.MudBlazor.FlatUi.
 }
 
 Require-Tokens "Opx.MudBlazor.FlatUi.MauiHost.Sample.csproj" @(
-    'PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.10"',
+    'PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.12"',
     'ProjectReference Include="..\Opx.MudBlazor.FlatUi.Showcase\Opx.MudBlazor.FlatUi.Showcase.csproj"',
     'MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="1,1"'
 )
@@ -38,6 +38,7 @@ Require-Tokens "Components\Routes.razor" @(
 )
 Require-Tokens "Components\Layout\MainLayout.razor" @(
     'ShowcaseNavigationCatalog.NavigationItems',
+    'SearchVisible="@Preferences.Options.AppBarSearchVisible"',
     'new("MAUI Host", "/maui-host"',
     'new("MAUI Performance", "/maui-performance"'
 )
@@ -54,6 +55,7 @@ Require-Tokens "wwwroot\index.html" @(
     '_content/Opx.MudBlazor.FlatUi.Showcase/opx-flat-ui-showcase.css'
 )
 Require-Tokens "appsettings.json" @(
+    '"AppBarSearchVisible": true',
     '"DefaultThemeMode": "Light"',
     '"StartupTitle": "Memuat halaman"',
     '"StartupMessage": "Menyiapkan aplikasi..."'
@@ -124,4 +126,4 @@ if ($violations.Count -gt 0) {
     exit 1
 }
 
-Write-Output "MAUI shared-page audit passed: $($showcaseRoutes.Count) Showcase routes load once; $($hostRoutes.Count) MAUI-only routes remain in the host; OPX UI uses NuGet 2.1.10."
+Write-Output "MAUI shared-page audit passed: $($showcaseRoutes.Count) Showcase routes load once; $($hostRoutes.Count) MAUI-only routes remain in the host; OPX UI uses NuGet 2.1.12."

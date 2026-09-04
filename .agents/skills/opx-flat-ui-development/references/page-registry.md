@@ -70,6 +70,7 @@ Naming rules:
 | `opx.page.operations.kanban` | Kanban Board | `/kanban` | kanban, task board | Admin / kanban | `Kanban.razor` |
 | `opx.page.auth.login` | Login | `/login` | login, sign in | Auth / login | `Login.razor` |
 | `opx.page.monitoring.service` | Service Monitoring | `/monitoring` | service monitor, health | Admin / monitoring | `Monitoring.razor` |
+| `opx.page.monitoring.computer` | Computer Monitoring | `/monitoring/computers` | computer monitor, master asset registration | Admin / monitoring grid | `MonitoringComputers.razor` |
 | `opx.page.monitoring.database` | Database Monitoring | `/monitoring-database` | database monitor, connection health | Admin / monitoring grid | `MonitoringDatabase.razor` |
 | `opx.page.system.not-found` | Not Found | `/not-found` | 404, unknown route | System / not found | `NotFound.razor` |
 | `opx.page.reporting.pivot` | Pivot Analysis | `/pivot` | pivot, aggregation, measures | Admin / reporting pivot | `Pivot.razor` |

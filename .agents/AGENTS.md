@@ -30,6 +30,7 @@ Before creating or changing a page, layout, reusable component, CSS rule, naviga
 - `samples/Opx.MudBlazor.FlatUi.Showcase` is the shared behavioral and composition source of truth for page development.
 - For initialized admin consumers, host `MainLayout.razor` plus shared `ShowcaseNavigationCatalog` are the source of truth for mandatory Settings and the default searchable navigation scaffold.
 - NuGet `Opx.MudBlazor.FlatUi` is the only consumer dependency for reusable components; the package-source checkout is inspection authority, not a local reference.
+- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.1.12. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
 - `docs` and `README.md` explain the implemented contract but do not override compiled source.
 
 When source, rules, and documentation disagree, do not silently choose one. Preserve the accepted behavior, update stale documentation/rules in the same change, and report any unresolved conflict.

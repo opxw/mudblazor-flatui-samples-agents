@@ -1,0 +1,30 @@
+@if (IsConnected || IsDisconnected)
+{
+    <MudTooltip Text="@AccessibleLabel">
+        <span role="img"
+              aria-label="@AccessibleLabel"
+              title="@AccessibleLabel"
+              style="display:inline-flex;align-items:center;color:@IconColor">
+            <MudIcon Icon="@Icon" Size="Size.Small" />
+        </span>
+    </MudTooltip>
+}
+else
+{
+    <FlatStatusChip Text="@Status" Color="Color.Warning" AccessibleLabel="@Status" />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Status { get; set; } = string.Empty;
+
+    private bool IsConnected => Status.Equals("Online", StringComparison.OrdinalIgnoreCase)
+        || Status.Equals("Connected", StringComparison.OrdinalIgnoreCase);
+
+    private bool IsDisconnected => Status.Equals("Offline", StringComparison.OrdinalIgnoreCase)
+        || Status.Equals("Disconnected", StringComparison.OrdinalIgnoreCase);
+
+    private string AccessibleLabel => IsConnected ? "Connected" : IsDisconnected ? "Disconnected" : Status;
+    private string Icon => IsConnected ? Icons.Material.Outlined.Link : Icons.Material.Outlined.LinkOff;
+    private string IconColor => IsConnected ? "var(--mud-palette-success)" : "var(--mud-palette-text-disabled)";
+}

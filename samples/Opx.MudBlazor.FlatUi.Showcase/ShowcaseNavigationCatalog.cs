@@ -60,6 +60,7 @@ public static class ShowcaseNavigationCatalog
             new("Chat", "/chat", Icons.Material.Outlined.Chat),
             new("AI Chat", "/ai-chat", Icons.Material.Outlined.AutoAwesome),
             new("Email", "/email", Icons.Material.Outlined.MailOutline),
+            new("Computer Monitoring", "/monitoring/computers", Icons.Material.Outlined.Computer),
             new("Service Monitoring", "/monitoring", Icons.Material.Outlined.MonitorHeart),
             new("Database Monitoring", "/monitoring-database", Icons.Material.Outlined.Dns)
         ]),

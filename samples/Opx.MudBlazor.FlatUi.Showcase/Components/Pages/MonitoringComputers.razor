@@ -1,0 +1,171 @@
+@page "/monitoring/computers"
+@inject FlatMessageBoxService MessageBox
+@inject ISnackbar Snackbar
+
+<FlatPage Kind="FlatPageKind.Module"
+          PageCssClass="monitoring-computers-page"
+          RefreshEnabled="true"
+          PullToRefreshEnabled="true"
+          OnRefresh="Refresh"
+          ReadOnlySource="Monitoring snapshot">
+    <ToolbarContent>
+        <MudTextField T="string"
+                      @bind-Value="_search"
+                      Immediate="true"
+                      Placeholder="Cari komputer..."
+                      Variant="@FlatPreferences.InputVariant"
+                      Margin="Margin.Dense"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search"
+                      Class="module-search" />
+    </ToolbarContent>
+    <ChildContent>
+        <div class="table-scroll">
+            <table class="monitor-table module-table">
+                <thead>
+                    <tr>
+                        <th>Komputer</th>
+                        <th>Pengguna</th>
+                        <th>Alamat</th>
+                        <th>Status</th>
+                        <th>Terakhir terlihat</th>
+                        <th aria-label="Aksi"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Rows)
+                    {
+                        <tr>
+                            <td>
+                                <div class="primary-cell">
+                                    <span class="row-icon"><MudIcon Icon="@Icons.Material.Outlined.Computer" /></span>
+                                    <div><strong>@row.Name</strong><small>@row.DeviceId</small></div>
+                                </div>
+                            </td>
+                            <td>@row.User</td>
+                            <td>@row.Address</td>
+                            <td><SampleConnectionStatus Status="@row.ConnectionStatus" /></td>
+                            <td>@row.LastSeen</td>
+                            <td class="row-actions">
+                                <MudTooltip Text="Lihat detail">
+                                    <MudIconButton Icon="@Icons.Material.Outlined.Visibility"
+                                                   Size="Size.Small"
+                                                   aria-label="@($"Lihat detail {row.Name}")"
+                                                   OnClick="() => ViewComputer(row)" />
+                                </MudTooltip>
+                                <MudTooltip Text="@RegistrationTooltip(row)">
+                                    <MudIconButton Icon="@RegistrationIcon(row)"
+                                                   Color="@RegistrationColor(row)"
+                                                   Size="Size.Small"
+                                                   aria-label="@RegistrationAriaLabel(row)"
+                                                   OnClick="() => RegisterAsset(row)" />
+                                </MudTooltip>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <FlatMobileGrid TItem="MonitoredComputer" Items="Rows">
+            <CardTemplate Context="row">
+                <article class="mobile-card">
+                    <header>
+                        <div><strong>@row.Name</strong><small>@row.DeviceId · @row.Address</small></div>
+                        <SampleConnectionStatus Status="@row.ConnectionStatus" />
+                    </header>
+                    <div class="sample-mobile-facts">
+                        <FlatInfoItem Label="Pengguna" Value="@row.User" />
+                        <FlatInfoItem Label="Master Asset" Value="@(row.AssetCode ?? "Belum terdaftar")" />
+                        <FlatInfoItem Label="Terakhir terlihat" Value="@row.LastSeen" />
+                    </div>
+                    <footer class="crud-card-footer">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Visibility"
+                                       aria-label="@($"Lihat detail {row.Name}")"
+                                       OnClick="() => ViewComputer(row)" />
+                        <MudIconButton Icon="@RegistrationIcon(row)"
+                                       Color="@RegistrationColor(row)"
+                                       aria-label="@RegistrationAriaLabel(row)"
+                                       OnClick="() => RegisterAsset(row)" />
+                    </footer>
+                </article>
+            </CardTemplate>
+            <EmptyContent>
+                <FlatEmptyState CssClass="empty-state compact"
+                                Title="Komputer tidak ditemukan"
+                                Message="Ubah kata pencarian lalu coba lagi." />
+            </EmptyContent>
+        </FlatMobileGrid>
+    </ChildContent>
+</FlatPage>
+
+@code {
+    private string _search = string.Empty;
+
+    private static readonly IReadOnlyList<MonitoredComputer> Computers =
+    [
+        new("CMP-001", "Notebook Finance 01", "Rina", "10.10.8.21", "Online", "Baru saja", "NB-OPS-001"),
+        new("CMP-002", "Notebook HR 02", "Dimas", "10.10.8.22", "Online", "1 menit lalu", "NB-OPS-002"),
+        new("CMP-003", "Production Scanner Gate", "Line A", "10.10.12.10", "Online", "2 menit lalu", null),
+        new("CMP-004", "Warehouse Packing", "Sari", "10.10.14.21", "Offline", "12 menit lalu", "PC-WHS-021"),
+        new("CMP-005", "Developer Mobile Rig", "Bayu", "10.10.6.17", "Online", "Baru saja", "NB-DEV-017")
+    ];
+
+    private IReadOnlyList<MonitoredComputer> Rows => Computers
+        .Where(row => string.IsNullOrWhiteSpace(_search)
+            || row.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.DeviceId.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.User.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || row.Address.Contains(_search, StringComparison.OrdinalIgnoreCase))
+        .ToArray();
+
+    private static string RegistrationIcon(MonitoredComputer row) =>
+        row.IsRegistered ? Icons.Material.Outlined.Inventory : Icons.Material.Outlined.Inventory2;
+
+    private static Color RegistrationColor(MonitoredComputer row) =>
+        row.IsRegistered ? Color.Success : Color.Default;
+
+    private static string RegistrationTooltip(MonitoredComputer row) =>
+        row.IsRegistered ? $"Terdaftar sebagai {row.AssetCode}; klik untuk registrasi ulang" : "Registrasi ke Master Asset";
+
+    private static string RegistrationAriaLabel(MonitoredComputer row) =>
+        row.IsRegistered ? $"Registrasi ulang {row.Name}" : $"Registrasi {row.Name} ke Master Asset";
+
+    private async Task RegisterAsset(MonitoredComputer row)
+    {
+        var confirmed = await MessageBox.QuestionAsync(
+            row.IsRegistered
+                ? $"{row.Name} sudah terdaftar sebagai {row.AssetCode}. Lanjutkan registrasi ulang?"
+                : $"Registrasikan {row.Name} ke Master Asset?",
+            title: row.IsRegistered ? "Registrasi Ulang ?" : "Registrasi Asset ?",
+            confirmText: row.IsRegistered ? "Registrasi Ulang" : "Registrasi",
+            cancelText: "Batal");
+
+        if (confirmed)
+        {
+            Snackbar.Add(
+                row.IsRegistered
+                    ? $"Intent registrasi ulang {row.Name} diteruskan ke host."
+                    : $"Intent registrasi {row.Name} diteruskan ke host.",
+                Severity.Success);
+        }
+    }
+
+    private Task ViewComputer(MonitoredComputer row) => MessageBox.InfoAsync(
+        $"{row.DeviceId} · {row.Address} · {row.ConnectionStatus}",
+        row.Name);
+
+    private void Refresh() => StateHasChanged();
+
+    private sealed record MonitoredComputer(
+        string DeviceId,
+        string Name,
+        string User,
+        string Address,
+        string ConnectionStatus,
+        string LastSeen,
+        string? AssetCode)
+    {
+        public bool IsRegistered => !string.IsNullOrWhiteSpace(AssetCode);
+    }
+}

@@ -9,19 +9,19 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.1.10"
+$expectedContractVersion = "2.1.12"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.1.10"
+    "Opx.MudBlazor.FlatUi" = "2.1.12"
     "MudBlazor" = "9.9.0"
 }
 $expectedHostCssSha256 = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
-$expectedPackageCssSha256 = "3C3BE5D054F89B47EDDC1C0298B3D390BA938F76C66801898DEAE13DCF046FD0"
+$expectedPackageCssSha256 = "A2FA1F6D709A580920731D4B681A0DBBD83B561B6720D33BF22284043AB816AD"
 $expectedExactSampleHashes = [ordered]@{
-    "Components\Layout\MainLayout.razor" = "EF037586F11C4A8B144C52F91135B3F841D80FAC234A471F648D524B03F41549"
-    "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "215AAD5AFA5E90A634C2EDB59E83138CD9428D43B4C596122BAA640ACB05CD2D"
+    "Components\Layout\MainLayout.razor" = "6DEE59C280F9E1345DB1592D1E08FAF7FBDA96A28CBFABDBC38509F6DCE07C19"
+    "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "6011B13E06F70D3ABCA101FC8D42CB826CD86468A8C4980097D5FE3A41388875"
     "..\Opx.MudBlazor.FlatUi.Showcase\Components\Pages\Home.razor" = "E46EBA5E931C90FFBE1A15337015AB180B8E0E4A86554B97EC7F20ABD148947A"
     "Components\RootStartupGate.razor" = "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F"
-    "appsettings.json" = "019806E238B54648AB24189696C9C124EB6BED16C972891F4490004FF9F3922F"
+    "appsettings.json" = "810676C917F3FFD014019122634E478EA81632B11190ED2AB0D98655972E857A"
     "..\Opx.MudBlazor.FlatUi.Showcase\wwwroot\opx-flat-ui-showcase.css" = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
 }
 $violations = [System.Collections.Generic.List[string]]::new()
@@ -690,7 +690,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.10; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.12; found $packageCssHash."
     }
 }
 
@@ -861,6 +861,7 @@ if (Test-Path -LiteralPath $mainLayoutPath) {
         "Display settings editor" = "<FlatDisplaySettings"
         "Composable display settings" = "FlatDisplaySettingsConfiguration.IndonesianEssentials"
         "Default sidebar mount" = 'NavigationItems="@ShowcaseNavigationCatalog.NavigationItems"'
+        "AppBar search visibility binding" = 'SearchVisible="@DisplayPreferences.Options.AppBarSearchVisible"'
         "Bottom navigation sample threshold" = 'BottomNavigationMaxWidthPx="900"'
         "Logout action icon" = "Icons.Material.Outlined.Logout"
         "Logout action class" = 'Class="logout-action"'
@@ -902,6 +903,9 @@ if (Test-Path -LiteralPath $settingsPath) {
         }
 
         $display = Get-JsonProperty $opxSettings "Display"
+        if ((Get-JsonProperty $display "AppBarSearchVisible") -ne $true) {
+            Add-Violation "OpxFlatUi:Display:AppBarSearchVisible must start true for compatibility."
+        }
         if ((Get-JsonProperty $display "UseAppFontSize") -ne $false) {
             Add-Violation "OpxFlatUi:Display:UseAppFontSize must start false so Device/browser font ownership is the default."
         }
