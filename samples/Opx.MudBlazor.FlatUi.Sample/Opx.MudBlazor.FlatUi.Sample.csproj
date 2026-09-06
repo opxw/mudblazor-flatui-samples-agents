@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.12" />
+    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.19" />
     <ProjectReference Include="..\Opx.MudBlazor.FlatUi.Showcase\Opx.MudBlazor.FlatUi.Showcase.csproj" />
     <PackageReference Include="MudBlazor" Version="9.9.0" />
   </ItemGroup>

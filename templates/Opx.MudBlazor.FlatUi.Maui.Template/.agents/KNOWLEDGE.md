@@ -15,7 +15,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 ## Current canonical snapshot
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.12`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.18`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.9.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
@@ -26,7 +26,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Package-first reuse is mandatory: inspect the supported NuGet public API and mapped canonical sample, use an existing capability through its public seam, and never duplicate package behavior or assets in a consumer. A verified missing domain-neutral capability is proposed as a package addition; a domain, authorization, persistence, integration, or native need is proposed as a host-owned seam. Package changes and publication require explicit approval.
 - When analysis finds a material improvement, report it as `Saran UI/UX` with need/risk, one concrete recommendation, user/business impact, priority (`Wajib`, `Disarankan`, or `Opsional`), and scope/approval boundary. Do not add filler suggestions or silently expand scope.
 
-## Imported 2.1.12 package capabilities
+## Imported 2.1.16 package capabilities
 
 - Settings/About modals now own complete resolved semantic surface tokens as portal-like roots. Light mode keeps neutral/white panel, header, body, and footer surfaces rather than inheriting a palette accent-subtle color.
 - MudBlazor date/time picker portal paper remains square and the selected calendar day keeps the resolved primary-contrast foreground on its primary background across Light, Dark/Night, and Auto.
@@ -47,9 +47,9 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Content-panel bodies have a positive logical horizontal inset: default `padding-inline:14px` desktop and `12px` at `<=900px`, unless the mapped compiled sample defines another positive value. Edge-to-edge table/media shells may use outer zero padding only when immediate readable children own a positive inset.
 - Spacing ownership is singular: parent layout owns gaps, panel body owns inner padding, and widgets do not add compensating outer margins or duplicate padding at the same boundary.
 - The initial spacing preset is the package density value `Default`, configured as `OpxFlatUi:Display:DefaultDensity="Default"`. There is no separate `DefaultSpacing` key. Compact/Comfortable remain persisted Settings choices; Restore returns to Default without changing canonical gutters, panel insets, safe areas, or component-specific spacing.
-- Ordinary buttons default to a `7px` corner radius through package-owned `OpxFlatUi:Display:DefaultRoundedSizePx`. The same bounded `0-12` token controls bottom-sheet top corners; cards, panels, inputs, dialogs, menus, grids, toolbars, and workspaces remain square. Do not create consumer/page-local radius overrides. Package 2.1.12 excludes `.flat-system-loading-spinner` from broad zero-radius resets, so startup/reconnect spinners remain circular inside shells, dialogs, and portals without consumer CSS.
+- Ordinary buttons default to a `7px` corner radius through package-owned `OpxFlatUi:Display:DefaultRoundedSizePx`. The same bounded `0-12` token controls bottom-sheet top corners; cards, panels, inputs, dialogs, menus, grids, toolbars, and workspaces remain square. Do not create consumer/page-local radius overrides. Package 2.1.16 excludes `.flat-system-loading-spinner` from broad zero-radius resets, so startup/reconnect spinners remain circular inside shells, dialogs, and portals without consumer CSS.
 - CRUD uses the visible verb `Edit`, not `Ubah`. Forms preserve validation, dirty-state guard, functional Add/Edit/Save/Cancel/Delete, desktop compact multi-column layout, and mobile one-column/fullscreen editing where appropriate.
-- Back behavior is layered and Blazor-first: an open CRUD/form modal consumes the first Back and keeps the route/application alive; the next Back navigates through prior Blazor WebView history. MAUI Android delegates to native Back/app exit only when no package modal/overlay and no prior WebView history entry remain. Package 2.1.12 owns modal interception; WebView-history fallback is host-owned.
+- Back behavior is layered and Blazor-first: an open CRUD/form modal consumes the first Back and keeps the route/application alive; the next Back navigates through prior Blazor WebView history. MAUI Android delegates to native Back/app exit only when no package modal/overlay and no prior WebView history entry remain. Package 2.1.16 owns modal interception; WebView-history fallback is host-owned.
 - Grids use compact search, hidden metadata icons, type-aware alignment/formatting, one bounded desktop scroll owner, and equivalent responsive cards/lists sharing query, filter, sort, paging, selection, permission, loading, validation, and mutation state.
 - On responsive/mobile search or filter toolbars with at least two secondary actions, the action row defaults to collapsed/hidden because package `FlatPage.MobileToolbarActionsExpandedByDefault` defaults to `false`. The full-width text field and accessible Apps toggle remain visible; desktop toolbar actions remain visible. Initial expansion is opt-in.
 - Initialized admin consumers include Settings, default searchable navigation, Light/Dark/Auto preferences, and right-aligned Logout. Root session validation completes before `Router` is created.
@@ -100,16 +100,16 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Reapply the offset after load, resize/orientation, and status-bar changes. Keep the persistent `BlazorWebView` stationary; do not compensate with page padding or translation.
 - This is host-owned native integration. Browser previews do not prove its runtime geometry.
 
-# 2026-09-02 - NuGet 2.1.12 Login and grouped-grid contracts
+# 2026-09-02 - NuGet 2.1.16 Login and grouped-grid contracts
 
-- Public consumer baseline is `Opx.MudBlazor.FlatUi` `2.1.12`; reusable CSS must resolve from that NuGet package and match SHA-256 `A2FA1F6D709A580920731D4B681A0DBBD83B561B6720D33BF22284043AB816AD`.
+- Public consumer baseline is `Opx.MudBlazor.FlatUi` `2.1.16`; reusable CSS must resolve from that NuGet package and match SHA-256 `9960B55C5DE921957960496B6342776267070FE404B47C74569C043347EFA57F`.
 - `FlatApplicationOptions.LoginBrandPanelVisible` defaults to `true`. With `LoginLayout=Default`, `false` centers the unboxed Login form without rendering the brand panel; `Boxed` remains a separate bounded composition.
 - `FlatGroupedDataGrid<TItem>.GroupHeaderAlignment` defaults to `Left` and accepts `Center` or `Right`; the package owns text and content-axis alignment for desktop and responsive headings.
 
-# 2026-09-03 - NuGet 2.1.12 responsive card scroll chaining
+# 2026-09-03 - NuGet 2.1.16 responsive card scroll chaining
 
-- Public/signed NuGet 2.1.12 has the same payload as the supplied local artifact; the official archive additionally contains `.signature.p7s`.
-- Package CSS SHA-256 is `A2FA1F6D709A580920731D4B681A0DBBD83B561B6720D33BF22284043AB816AD`.
+- Public/signed NuGet 2.1.16 has the same payload as the supplied local artifact; the official archive additionally contains `.signature.p7s`.
+- Package CSS SHA-256 is `9960B55C5DE921957960496B6342776267070FE404B47C74569C043347EFA57F`.
 - At `<=900px`, `.mobile-grid-list` contains horizontal overscroll but lets vertical gestures chain to the page when the list is not overflowed or reaches its boundary. Consumer CSS must not reintroduce `overscroll-behavior:contain`.
 
 # 2026-09-03 - Binary computer connectivity status
@@ -119,8 +119,42 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - PageId `opx.page.monitoring.computer` maps to `/monitoring/computers` and `MonitoringComputers.razor`. Connectivity and Master Asset membership are distinct states.
 - A computer already linked to Master Asset uses the Success-green outlined `Inventory` icon with its built-in check. Clicking it opens package `FlatMessageBoxService.QuestionAsync` with title exactly `Registrasi Ulang ?`; only confirmation emits the host-owned re-registration intent. Unregistered uses neutral `Inventory2`.
 
-# 2026-09-03 - NuGet 2.1.12 AppBar search visibility
+# 2026-09-03 - NuGet 2.1.16 AppBar search visibility
 
-- Public package 2.1.12 adds `FlatAppShell.SearchVisible` and `FlatAppBar.SearchVisible`; both default to `true` for compatibility.
+- Public package 2.1.16 adds `FlatAppShell.SearchVisible` and `FlatAppBar.SearchVisible`; both default to `true` for compatibility.
 - Bind the host default from `OpxFlatUi:Display:AppBarSearchVisible`. When false, the package omits search input, result popup, reserved width, and keyboard focus target rather than visually hiding them.
 - An empty search catalog is data state, not a visibility setting. Consumer CSS must not conceal package-owned search markup.
+
+# 2026-09-05 - NuGet 2.1.16 compact profile list
+
+- Public/signed NuGet 2.1.16 is the consumer baseline. Package CSS SHA-256 is `9960B55C5DE921957960496B6342776267070FE404B47C74569C043347EFA57F`; the official archive matches the supplied local functional payload and adds NuGet signature metadata.
+- `FlatProfileListItem` is the package-owned compact directory row for `FlatCardGrid` List mode. It presents the circular `FlatProfileAvatar`, identifier, subtitle, metadata, host-defined badges, chevron, disabled state, accessible label, and host navigation callback without page-local row CSS.
+- `/profile-grid` defaults to List mode and demonstrates `FlatProfileListItem`; Grid mode continues to use `FlatProfileCard`. Rows, controls, and badges remain square while only the semantic avatar remains circular.
+- `FlatCardGrid.SearchTrailingActions` owns compact search-related actions such as a filter-sheet toggle inside the search field; unrelated commands remain in `ToolbarActions`, whose container is omitted when empty.
+
+# 2026-09-06 - NuGet 2.1.16 panel and Settings spacing
+
+- Public/signed NuGet `2.1.16` is the active consumer baseline. Official nupkg SHA-256 is `F95A9DFF825A676A4297187662B0BD1548473796B54223CA7F5B0E90DFF70638`; package CSS SHA-256 is `9960B55C5DE921957960496B6342776267070FE404B47C74569C043347EFA57F`.
+- `FlatUiDisplayOptions.PanelHeaderMinHeight` defaults to `48` and `PanelHeaderPaddingY` defaults to `10`; `FlatMudProviders` publishes their bounded package CSS tokens. Headers retain intrinsic growth, existing horizontal gutters, and package ownership.
+- Settings Theme, Density, and Input Style headings/helper text align with their controls at `16px` horizontal inset and `14px` at `<=520px`. The inset is scoped to previously unpadded sections and must not be duplicated in consumer CSS.
+- Package `2.1.15` introduced the Settings alignment and an `8px` logical gap between AppBar menu icons and text; `2.1.16` adds configurable global panel-header minimum height/padding. Consumers upgrade directly from the previous public baseline; version `2.1.14` is not published on NuGet.org.
+
+# 2026-09-06 - NuGet 2.1.17 provider precedence patch
+
+- Public/signed NuGet `2.1.17` is the active consumer baseline. Official nupkg SHA-256 is `E142F896F33C6FF88D01163625E53DEE268CCFCB514451A6612E5231B6D41A12`; package CSS SHA-256 remains `9960B55C5DE921957960496B6342776267070FE404B47C74569C043347EFA57F`.
+- The official DLL, CSS, readable/minified JavaScript, and build props match the source artifact. Compared with public 2.1.16, static assets, dependencies, and public component API are unchanged; the DLL contains the provider-resolution fix.
+- This fixes a **bug package** in `FlatMudProviders`: resolve a directly registered `FlatUiDisplayOptions` instance first, then `IOptions<FlatUiDisplayOptions>`, then defaults. An implicit unconfigured wrapper created by `AddOptions()` must not mask the canonical singleton options used by Web/MAUI hosts.
+
+# 2026-09-06 - NuGet 2.1.18 FlatCardGrid search-action patch
+
+- Public/signed NuGet `2.1.18` is the active consumer baseline. Official nupkg SHA-256 is `4FDE5FD1D18667B51E5FBF77DF66BE02FA33C9DD1551217D20FC9F6F1A4863AC`; package CSS SHA-256 is `6930F27E9FB55C80B4AAD858F6A89D698BDFF4CCB2346D0C035C66FC16FB1136`.
+- Version 2.1.18 adds the public `FlatCardGrid.SearchTrailingActions` slot and package-owned input-boundary layout: reserved search-input space, trailing icon placement, hover/focus styling, and full-width responsive behavior. The toolbar action container is omitted when it has no view, overflow, custom, or Add action.
+- This closes a **bug package** integration gap for the canonical compact profile-directory filter toggle. Consumers use the slot and must not reproduce `.flat-card-grid-search-*` geometry with local CSS. JavaScript and build props remain unchanged from 2.1.17.
+
+# 2026-09-06 - NuGet 2.1.19 multipurpose operational and first-paint patch
+
+- Public/signed NuGet `2.1.19` is the active consumer baseline. Official nupkg SHA-256 is `78FC3C81CF0F91EE6AF46DD8B68320CE3EDB8C932F41F998A9103D4C3F502BC1`; package CSS SHA-256 is `1EC4650E101D814B9F17CA3840A5DE25C63150D1EBAF12BB851B32447413BACB`.
+- The official package functional payload matches the local source artifact: DLL `400B099E7F75A815A8D14E1D846D0E403987D7E5F26C60C11EF44A2DF3C06840`, readable JavaScript `E2A50CCFCC7F5C3B74F5334DF7E095765FF8C0D5B6D442D2461DF92FE981ADF4`, minified JavaScript `ECE1E26FDD1C0CBBC6AEF8BBEBFA5C3A9B0C8471DD85FDCBC821F3E0BEC9E9C5`, and theme bootstrap `190688E03BE1297D69C59BE7FB6851E31D6F08E1029F57A4BEB544EA55F34DA9`.
+- Package 2.1.19 adds domain-neutral `FlatWorkInbox`, `FlatDataFreshnessIndicator`, `FlatScanInput`, `FlatTelemetryPanel`, `FlatRecordRelations`, and `FlatPersonalWorkspace` contracts. Canonical PageId remains `opx.page.reference.enterprise-toolkit`; `MultiPurposeExamples.razor` composes them with existing master-detail, document, scheduler, offline-sync, and dashboard foundations.
+- Package JavaScript owns semantic filled-surface auto contrast and first-paint restoration of saved Device/Manual font mode, bounded font size, and density. Web and static MAUI documents seed the bootstrap data attributes before styles; theme and reconnect synchronization must preserve the restored typography.
+- Scanning, authorization, persistence, per-item actions/results, telemetry transport, device command completion, alarm authority, storage, and native adapters remain host-owned. `Sent` or `Accepted` is not `Succeeded`; online, data quality, freshness, and sync state remain separate signals.

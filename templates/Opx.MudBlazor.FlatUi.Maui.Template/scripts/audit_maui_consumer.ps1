@@ -19,7 +19,7 @@ $expectedExactSampleHashes = [ordered]@{
     "MainPage.xaml" = "5E0FD69C86C9A67BCA5C705E4CB1EAA632801773567E7A36A1342C496CB54108"
     "Platforms\Android\AndroidManifest.xml" = "99473DD217AFF65C62A3198157E794674190858388530E0E3C074FEF63227F56"
     "Resources\Splash\splash.svg" = "2CE5A083499E8A1FB0CD3E81FC6D029563B821C8B63960552F8593A35600821F"
-    "appsettings.json" = "A7B22C699C2E8AC0A0EFE934DEBF2D2C8EDF8A322D45A68A3CE6774BD1489BBB"
+    "appsettings.json" = "563FFB0C899179C76612420CFF9035F1AE418418E64A89C580A2BD3BD8A241D5"
     "wwwroot\app.css" = "92FA657E143FAF00348F4E5CEF9CE806F5FBE1D8CB37E45863DE759194B94DDB"
 }
 function Require-Text([string] $path, [string[]] $tokens) {
@@ -60,7 +60,7 @@ Require-Text $project[0].FullName @(
     'net10.0-android;net10.0-ios',
     '<MauiVersion>10.0.90</MauiVersion>',
     'CommunityToolkit.Maui" Version="15.0.1',
-    'Opx.MudBlazor.FlatUi" Version="2.1.12',
+    'Opx.MudBlazor.FlatUi" Version="2.1.19',
     'MudBlazor" Version="9.9.0',
     'MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="1,1"')
 Require-Text (Join-Path $root "NuGet.sources.xml") @("https://api.nuget.org/v3/index.json", 'globalPackagesFolder" value=".nuget\packages')
@@ -76,9 +76,9 @@ Require-Text (Join-Path $root "Platforms\iOS\Info.plist") @("UIViewControllerBas
 Require-Text (Join-Path $root "Components\RootStartupGate.razor") @("FlatSessionRestore", "ReconnectOptions.StartupTitle", '"Memuat"', "<Router", "IRootStartupGateValidator", "NotFoundPage")
 Require-Text (Join-Path $root "Components\_Imports.razor") @("@using global::Opx.MudBlazor.FlatUi.Components", "@using global::Opx.MudBlazor.FlatUi.Models", "@using global::Opx.MudBlazor.FlatUi.Services")
 Require-Text (Join-Path $root "Components\Layout\MainLayout.razor") @('BottomNavigationMaxWidthPx="900"', 'SearchVisible="@Preferences.Options.AppBarSearchVisible"', "Settings", "FlatDisplaySettings", "logout-action")
-Require-Text (Join-Path $root "wwwroot\index.html") @("<!-- Powered by opx (github.com/opxw) -->", "flat-system-loading-spinner", "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css", "_framework/blazor.webview.js")
+Require-Text (Join-Path $root "wwwroot\index.html") @("<!-- Powered by opx (github.com/opxw) -->", "flat-system-loading-spinner", "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css", "_framework/blazor.webview.js", 'data-opx-use-app-font-size="false"', 'data-opx-font-size="16"', 'data-opx-minimum-font-size="12"', 'data-opx-maximum-font-size="18"', 'data-opx-density="Default"')
 Require-Text (Join-Path $root "wwwroot\app.css") @("overscroll-behavior:none", "user-select:none", 'input:not([type="button"]', "user-select:text")
-Require-Text (Join-Path $root "appsettings.json") @('"AppBarSearchVisible": true', '"HostKind": "MauiHybrid"', '"DefaultThemeMode": "Light"', '"DefaultNavigationLayout": "Bottom"', '"DefaultBottomNavigationChildPresentation": "Sheet"', '"UseAppFontSize": false', '"DefaultRoundedSizePx": 7', '"DefaultColorPalette": "fluent-blue"', '"DefaultDensity": "Default"')
+Require-Text (Join-Path $root "appsettings.json") @('"AppBarSearchVisible": true', '"PanelHeaderMinHeight": 48', '"PanelHeaderPaddingY": 10', '"HostKind": "MauiHybrid"', '"DefaultThemeMode": "Light"', '"DefaultNavigationLayout": "Bottom"', '"DefaultBottomNavigationChildPresentation": "Sheet"', '"UseAppFontSize": false', '"DefaultRoundedSizePx": 7', '"DefaultColorPalette": "fluent-blue"', '"DefaultDensity": "Default"')
 Require-Text (Join-Path $root ".agents\KNOWLEDGE.md") @("UseAppFontSize=false", "system UI font stack", "does not replace the system font family", "Bottom navigation requests default", 'DefaultBottomNavigationChildPresentation="Sheet"', '`MainView` is opt-in only', "MobileToolbarActionsExpandedByDefault", 'defaults to `false`', "collapsed/hidden", "Back behavior is layered and Blazor-first", "next Back navigates through prior Blazor WebView history", "native Back/app exit only when", "Package-first reuse is mandatory", "never duplicate package behavior", "Package changes and publication require explicit approval", "FlatMobileGrid", "article.mobile-card", 'bare manual `div.mobile-grid-list`', "consumer integration defect")
 Require-Text (Join-Path $root ".agents\PROMPTING.md") @("UseAppFontSize=false", "system font", "no custom app font", "bottom navigation", 'DefaultBottomNavigationChildPresentation="Sheet"', 'Select `MainView` only when the user explicitly', "search/filter text visible", "MobileToolbarActionsExpandedByDefault=false", "collapsed/hidden", "modal first", "previous Blazor page second", "native app exit only at the true navigation root", "supported NuGet public API", "do not silently build a substitute", "domain-neutral package suggestion", "host-owned domain/integration/native seam", "FlatMobileGrid", "article.mobile-card", 'Never improvise a bare `div.mobile-grid-list`')
 
@@ -104,9 +104,9 @@ if (Test-Path -LiteralPath $assetsPath) {
     try {
         $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json -AsHashtable
         $packageRoot = @($assets.packageFolders.Keys)[0]
-        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.1.12\staticwebassets\opx-flat-ui.css"
+        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.1.19\staticwebassets\opx-flat-ui.css"
         if (-not (Test-Path -LiteralPath $packageCss)) { $violations.Add("Restored OPX package CSS was not found.") }
-        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "A2FA1F6D709A580920731D4B681A0DBBD83B561B6720D33BF22284043AB816AD") { $violations.Add("Restored OPX 2.1.12 CSS hash does not match the contract.") }
+        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "1EC4650E101D814B9F17CA3840A5DE25C63150D1EBAF12BB851B32447413BACB") { $violations.Add("Restored OPX 2.1.19 CSS hash does not match the contract.") }
     } catch { $violations.Add("Unable to verify restored OPX CSS: $($_.Exception.Message)") }
 } else { $violations.Add("Run restore before the mobile consumer audit; obj/project.assets.json is missing.") }
 
@@ -124,4 +124,4 @@ if ($ExactSample) {
 }
 
 if ($violations.Count -gt 0) { $violations | ForEach-Object { Write-Error $_ }; exit 1 }
-Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.1.12$(if ($ExactSample) { ', Exact Sample Mode' }))."
+Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.1.19$(if ($ExactSample) { ', Exact Sample Mode' }))."

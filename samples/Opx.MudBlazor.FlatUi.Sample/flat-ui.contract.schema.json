@@ -20,7 +20,7 @@
       "const": "3.1"
     },
     "contractVersion": {
-      "const": "2.1.12"
+      "const": "2.1.19"
     },
     "source": {
       "type": "object",
@@ -41,7 +41,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.1.12"
+          "const": "2.1.19"
         },
         "MudBlazor": {
           "const": "9.9.0"
@@ -59,7 +59,7 @@
           "../Opx.MudBlazor.FlatUi.Showcase/ShowcaseNavigationCatalog.cs": "6011B13E06F70D3ABCA101FC8D42CB826CD86468A8C4980097D5FE3A41388875",
           "../Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Home.razor": "E46EBA5E931C90FFBE1A15337015AB180B8E0E4A86554B97EC7F20ABD148947A",
           "Components/RootStartupGate.razor": "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F",
-          "appsettings.json": "810676C917F3FFD014019122634E478EA81632B11190ED2AB0D98655972E857A",
+          "appsettings.json": "B733311902471049360932C69746400DD7E09EDA6A25BD990577561811C277AD",
           "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css": "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
         },
         "allowedAfterBaseline": ["branding", "wording", "data", "authorization", "callbacks", "domain-integration", "persistence"],
@@ -75,6 +75,8 @@
         "archetype",
         "useAppFontSize",
         "baseFontSizePx",
+        "panelHeaderMinHeightPx",
+        "panelHeaderPaddingYPx",
         "defaultRoundedSizePx",
         "defaultColorPalette",
         "defaultDensity",
@@ -111,6 +113,12 @@
         },
         "baseFontSizePx": {
           "const": 16
+        },
+        "panelHeaderMinHeightPx": {
+          "const": 48
+        },
+        "panelHeaderPaddingYPx": {
+          "const": 10
         },
         "defaultRoundedSizePx": {
           "const": 7
@@ -458,7 +466,7 @@
           "properties": {
             "reusableCssSource": { "const": "package-only" },
             "packageStylesheet": { "const": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" },
-            "packageStylesheetSha256": { "const": "A2FA1F6D709A580920731D4B681A0DBBD83B561B6720D33BF22284043AB816AD" },
+            "packageStylesheetSha256": { "const": "1EC4650E101D814B9F17CA3840A5DE25C63150D1EBAF12BB851B32447413BACB" },
             "mudBlazorStylesheet": { "const": "_content/MudBlazor/MudBlazor.min.css" },
             "hostStylesheet": { "const": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css" },
             "hostStylesheetPurpose": { "const": "sample-and-domain-composition-only" },

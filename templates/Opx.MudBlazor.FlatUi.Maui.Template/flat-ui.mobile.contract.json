@@ -1,10 +1,10 @@
 {
   "$schema": "flat-ui.mobile.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.1.12",
+  "contractVersion": "2.1.19",
   "packages": {
     "Microsoft.Maui.Controls": "10.0.90",
-    "Opx.MudBlazor.FlatUi": "2.1.12",
+    "Opx.MudBlazor.FlatUi": "2.1.19",
     "MudBlazor": "9.9.0",
     "CommunityToolkit.Maui": "15.0.1"
   },
@@ -25,7 +25,7 @@
       "MainPage.xaml": "5E0FD69C86C9A67BCA5C705E4CB1EAA632801773567E7A36A1342C496CB54108",
       "Platforms/Android/AndroidManifest.xml": "99473DD217AFF65C62A3198157E794674190858388530E0E3C074FEF63227F56",
       "Resources/Splash/splash.svg": "2CE5A083499E8A1FB0CD3E81FC6D029563B821C8B63960552F8593A35600821F",
-      "appsettings.json": "A7B22C699C2E8AC0A0EFE934DEBF2D2C8EDF8A322D45A68A3CE6774BD1489BBB",
+      "appsettings.json": "563FFB0C899179C76612420CFF9035F1AE418418E64A89C580A2BD3BD8A241D5",
       "wwwroot/app.css": "92FA657E143FAF00348F4E5CEF9CE806F5FBE1D8CB37E45863DE759194B94DDB"
     },
     "allowedAfterBaseline": ["branding", "wording", "data", "authorization", "callbacks", "domain-integration", "persistence"],
@@ -36,6 +36,8 @@
     "appBarSearchVisible": true,
     "fontOwnership": "Device",
     "useAppFontSize": false,
+    "panelHeaderMinHeightPx": 48,
+    "panelHeaderPaddingYPx": 10,
     "defaultRoundedSizePx": 7,
     "defaultColorPalette": "fluent-blue",
     "defaultDensity": "Default",
@@ -74,7 +76,7 @@
     "ordinaryTextSelectable": false,
     "textboxSelectionPreserved": true,
     "reusableCssFromPackageOnly": true,
-    "opxPackageCssSha256": "A2FA1F6D709A580920731D4B681A0DBBD83B561B6720D33BF22284043AB816AD"
+    "opxPackageCssSha256": "1EC4650E101D814B9F17CA3840A5DE25C63150D1EBAF12BB851B32447413BACB"
   },
   "verification": {
     "androidReleaseBuildRequired": true,

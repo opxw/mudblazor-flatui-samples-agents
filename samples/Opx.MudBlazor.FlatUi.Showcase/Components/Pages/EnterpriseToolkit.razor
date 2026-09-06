@@ -2,6 +2,7 @@
 @page "/enterprise-toolkit"
 
 <FlatPage Kind="FlatPageKind.Module" PageCssClass="enterprise-toolkit-page no-mobile-fab">
+    <MultiPurposeExamples />
     <div class="enterprise-release-strip">
         @foreach (var release in Releases) { <span><strong>@release.Version</strong>@release.Scope</span> }
     </div>

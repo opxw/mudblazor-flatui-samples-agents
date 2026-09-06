@@ -1,5 +1,7 @@
 # Sample source map
 
+- Multipurpose ERP/HR/IoT: `EnterpriseToolkit.razor` embeds `MultiPurposeExamples.razor`, reusing `FlatMasterDetailWorkspace`, `FlatScheduler`, `FlatOfflineSyncPanel`, `FlatDocumentWorkspace`, and `FlatDashboardComposer` with work-inbox, freshness, scanner, telemetry, relations, and personal-workspace contracts. See `docs/MULTIPURPOSE-TOOLKIT.md` for host ownership and validation limits.
+
 Copyright (c) 2026 opx. All rights reserved.
 
 Resolve paths from the repository root. Read only the archetypes relevant to the requested change, but read each selected file completely.
@@ -46,6 +48,8 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Account editor and multi-select: `EditAccount.razor`
 - Kanban, calendar, scheduler, chat, AI chat, email, jobs, timeline: `Kanban.razor`, `Calendar.razor`, `Scheduler.razor`, `Components/FlatCalendar.razor`, `Components/FlatScheduler.razor`, `Chat.razor`, `AiChat.razor`, `Email.razor`, `Jobs.razor`, and `Timeline.razor`
 - Provider-neutral SVG floor plan, projected location tracking, and route presentation: `VectorMap.razor`, `Components/FlatVectorMap.razor`, `Models/FlatVectorMapModels.cs`, and `docs/VECTOR-MAP.md`
+- Positioned machine/computer/device workspace: `AssetLayout.razor`, package `FlatAssetLayout`, `FlatVectorMap`, `FlatAssetLayoutModels`, and `docs/ASSET-LAYOUT.md`
+- Profile card and compact people-directory list: `ProfileGrid.razor`, package `FlatCardGrid`, `FlatProfileCard`, `FlatProfileListItem`, and `FlatProfileAvatar`
 - Public landing/storefront/content: `WebsiteHome.razor`, `JobLanding.razor`, `Catalog.razor`, and `Blog.razor`; filter-heavy administration workspace: `ProductManagement.razor`; media/detail composition: `ProductDetail.razor`; large editor/settings rail: `ProductEditor.razor`
 - Authentication: `Login.razor`, `TwoStepVerification.razor`, and `ResetPassword.razor`
 - ERP modules: files prefixed with `Erp` under `samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages`; reusable transaction, lookup, journal, reconciliation, planning, lifecycle, and background-operation composition: `ErpToolkit.razor` and `Models/FlatErpModels.cs`
@@ -55,6 +59,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Page shell, automatic initial skeleton, toolbar, FAB, responsive helpers: `src/Opx.MudBlazor.FlatUi/Components/FlatPage.razor`, `FlatPageSkeleton.razor`, `FlatPanel.razor`, and `FlatFab.razor`
 - Grid/paging/filter/loading state: `src/Opx.MudBlazor.FlatUi/Components/Grid`, including `FlatDataGridSkeleton.razor`, and related grid models/components
 - Spatial operations workspace: `src/Opx.MudBlazor.FlatUi/Components/FlatSpatialWorkspace.razor`, `FlatVectorMap.razor`, and `Models/FlatSpatialModels.cs`; canonical sample: `SpatialOperations.razor`; contract: `docs/SPATIAL-OPERATIONS.md`
+- Machine/computer/device layout workspace: package `FlatAssetLayout`, `FlatVectorMap`, and `FlatAssetLayoutModels`; canonical sample: `AssetLayout.razor`; contract: `docs/ASSET-LAYOUT.md`
 - Metadata-driven list and CRUD: `src/Opx.MudBlazor.FlatUi/Components/FlatModelCrud.razor`, `FlatModelForm.razor`, and `Models/FlatModelMetadata.cs`; canonical sample: `ModelCrud.razor`
 - Visual metadata form design: `src/Opx.MudBlazor.FlatUi/Components/FlatModelFormDesigner.razor`, `Models/FlatModelFormDesignerModels.cs`, and `FlatModelForm.razor`; canonical sample: `ModelFormDesigner.razor`
 - CRUD editor/modal/processing: `CrudEditorShell.razor`, `FlatFormModal.razor`, and `FlatProcessingContainer.razor`
@@ -67,6 +72,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 ## Documentation routing
 
 - Release sequence, feature scope, test/compatibility gates: `ROADMAP.md`
+- Release 2.1 contracts and quality gates: `docs/RELEASE-2.1.md`; canonical sample: `ReleaseQuality.razor`
 - `1.0.x` to `1.1.0` host migration and validation: `docs/MIGRATION-1.1.md`
 - `1.1.x` to `1.5.0` additive migration: `docs/MIGRATION-1.2-1.5.md`
 - Enterprise components and host boundaries: `docs/ENTERPRISE-TOOLKIT.md`

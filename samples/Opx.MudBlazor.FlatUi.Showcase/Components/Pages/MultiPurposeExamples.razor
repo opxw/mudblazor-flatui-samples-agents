@@ -1,0 +1,61 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+<section class="enterprise-sample-grid">
+    <article class="flat-panel enterprise-span-2">
+        <header class="panel-header"><div><h2>ERP · HR · IoT work inbox</h2><p>Local demonstration only. Host authorizes and executes actions.</p></div></header>
+        <FlatWorkInbox Items="_work" Actions="WorkActions" Results="_results" Selected="OpenWork" ActionSelected="Act" />
+        <FlatScanInput Scanned="HandleScan" />
+        <p role="status">@_message</p>
+    </article>
+    <article class="flat-panel enterprise-span-2">
+        <FlatMasterDetailWorkspace TItem="FlatWorkItem" Items="_work" @bind-SelectedItem="_selected">
+            <ItemTemplate Context="item"><strong>@item.Title</strong><small>@item.Category</small></ItemTemplate>
+            <DetailTemplate Context="item">
+                <h3>@item.Title</h3>
+                <MudTabs Elevation="0">
+                    <MudTabPanel Text="Summary"><FlatInfoItem Label="Reference" Value="@item.Key" /><FlatInfoItem Label="Assignee" Value="@item.Assignee" /><FlatStatusChip Text="@item.State" Color="Color.Success" /></MudTabPanel>
+                    <MudTabPanel Text="Relations"><FlatRecordRelations Records="Records" Relations="@(item.Key == "PR-1" ? Relations : Array.Empty<FlatRecordRelation>())" Selected="OpenRelation" /></MudTabPanel>
+                    <MudTabPanel Text="Activity"><p>Host-owned activity for @item.Key</p></MudTabPanel>
+                    <MudTabPanel Text="Documents"><FlatDocumentWorkspace Documents="Documents" /></MudTabPanel>
+                </MudTabs>
+            </DetailTemplate>
+            <EmptyDetail><FlatEmptyState Title="Select a record" /></EmptyDetail>
+        </FlatMasterDetailWorkspace>
+    </article>
+    <article class="flat-panel enterprise-span-2">
+        <FlatTelemetryPanel Readings="Readings" Alarms="_alarms" Commands="Commands" Acknowledge="Acknowledge" Now="Now">
+            <TrendContent><MudChart T="double" ChartType="ChartType.Line" ChartSeries="TrendSeries" ChartLabels="TrendTimes" Width="100%" Height="180px" /><p>Local temperature samples; host owns live time-series queries.</p></TrendContent>
+        </FlatTelemetryPanel>
+    </article>
+    <article class="flat-panel enterprise-span-2">
+        <FlatPersonalWorkspace Shortcuts="_shortcuts" Selected="OpenShortcut" FavoriteChanged="Favorite" Widgets="_widgets" WidgetsChanged="items => _widgets = items" Reset="ResetWidgets">
+            <SavedViews><p>Saved views use the existing host grid-preference provider.</p></SavedViews>
+            <WidgetTemplate Context="widget"><p>@widget.Title — local sample widget</p></WidgetTemplate>
+        </FlatPersonalWorkspace>
+    </article>
+</section>
+@code {
+    private static readonly DateTimeOffset Now = DateTimeOffset.UtcNow;
+    private static readonly List<ChartSeries<double>> TrendSeries = [new() { Name = "Temperature °C", Data = new ChartData<double>([39, 40, 41, 40, 42]) }];
+    private static readonly string[] TrendTimes = ["-4m", "-3m", "-2m", "-1m", "Now"];
+    private IReadOnlyList<FlatWorkItem> _work = [new("PR-1", "Purchase request", "ERP", "Pending", "Procurement", Now.AddDays(1), "Normal"), new("LV-1", "Leave request", "HR", "Pending", "HR", Now.AddHours(4), "High"), new("AL-1", "Pump inspection", "IoT", "Pending", "Maintenance", Now.AddHours(1), "High")];
+    private static readonly IReadOnlyList<FlatWorkAction> WorkActions = [new("review", "Mark reviewed")];
+    private IReadOnlyList<FlatWorkActionResult> _results = [];
+    private FlatWorkItem? _selected;
+    private string? _message;
+    private static readonly IReadOnlyList<FlatRelatedRecord> Records = [new("PR-1", "PR-1", "Purchase request", "Reviewed"), new("PO-1", "PO-1", "Purchase order", "Draft")];
+    private static readonly IReadOnlyList<FlatRecordRelation> Relations = [new("R1", "PR-1", "PO-1", "Converted to")];
+    private static readonly IReadOnlyList<FlatDocumentItem> Documents = [new("D1", "Supporting document.pdf", "application/pdf", 1024)];
+    private static readonly IReadOnlyList<FlatTelemetryReading> Readings = [new("T1", "Temperature", "42", "°C", new(Now, FlatConnectionState.Online, FlatDataQuality.Good)), new("T2", "Pressure", "3.2", "bar", new(Now.AddHours(-1), FlatConnectionState.Offline, FlatDataQuality.Uncertain))];
+    private IReadOnlyList<FlatAlarm> _alarms = [new("AL-1", "Inspection required", "Warning", Now.AddMinutes(-4))];
+    private static readonly IReadOnlyList<FlatDeviceCommand> Commands = [new("CMD-1", "PUMP-1", "Read diagnostics", FlatDeviceCommandState.Sent, Now, "Awaiting device acknowledgement; not completed.")];
+    private IReadOnlyList<FlatWorkspaceShortcut> _shortcuts = [new("ERP", "Purchasing", true), new("HR", "Team", false), new("IoT", "Devices", false)];
+    private IReadOnlyList<FlatDashboardWidgetDefinition> _widgets = [new("tasks", "My tasks", 0), new("devices", "Device status", 1)];
+    private void ResetWidgets() => _widgets = [new("tasks", "My tasks", 0), new("devices", "Device status", 1)];
+    private void OpenWork(FlatWorkItem item) { _selected = item; _message = $"Opened {item.Key}"; }
+    private void OpenRelation(FlatRelatedRecord record) => _message = $"Selected {record.Key}";
+    private void Act(FlatWorkActionRequest request) { _results = request.ItemKeys.Select(key => new FlatWorkActionResult(key, true, "Reviewed in local sample")).ToArray(); _work = _work.Select(x => request.ItemKeys.Contains(x.Key) ? x with { State = "Reviewed" } : x).ToArray(); }
+    private void HandleScan(FlatScanResult code) { var item = _work.FirstOrDefault(x => x.Key.Equals(code.Value, StringComparison.OrdinalIgnoreCase)); if (item is not null) OpenWork(item); else _message = "No matching sample record. Try PR-1, LV-1, or AL-1."; }
+    private void Acknowledge(FlatAlarm alarm) => _alarms = _alarms.Select(x => x.Key == alarm.Key ? x with { Acknowledged = true } : x).ToArray();
+    private void Favorite(FlatShortcutFavoriteRequest request) => _shortcuts = _shortcuts.Select(x => x.Key == request.Key ? x with { Favorite = request.Favorite } : x).ToArray();
+    private void OpenShortcut(FlatWorkspaceShortcut item) { _shortcuts = _shortcuts.Select(x => x.Key == item.Key ? x with { LastUsed = DateTimeOffset.UtcNow } : x).ToArray(); _message = $"Opened {item.Label} in local sample"; }
+}

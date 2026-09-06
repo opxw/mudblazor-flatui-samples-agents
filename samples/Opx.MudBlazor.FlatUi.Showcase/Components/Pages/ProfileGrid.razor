@@ -16,7 +16,6 @@
     <ChildContent>
         <FlatCardGrid TItem="MemberCard"
                       Items="@FilteredMembers"
-                      ItemTemplate="MemberTemplate"
                       SearchText="@_search"
                       SearchTextChanged="SearchChanged"
                       SearchPlaceholder="Search for name or designation..."
@@ -24,10 +23,48 @@
                       ViewChanged="ViewChanged"
                       AddText="Add member"
                       OnAdd="OpenAddMember"
-                      OnOverflow="ShowGridMenu"
+                      ShowOverflow="false"
                       EmptyTitle="No members found"
                       EmptyMessage="Try another name or designation."
-                      AriaLabel="Member profile grid" />
+                      AriaLabel="Member profile grid">
+            <SearchTrailingActions>
+                <MudIconButton Icon="@Icons.Material.Outlined.FilterAlt"
+                               Class="grid-action-button"
+                               OnClick="ShowFilter"
+                               aria-label="Filter members"
+                               title="Filter members" />
+            </SearchTrailingActions>
+            <ItemTemplate Context="member">
+                @if (_view == FlatCardGridView.List)
+                {
+                    <FlatProfileListItem Name="@member.Name"
+                                         Identifier="@member.Identifier"
+                                         Subtitle="@member.Role"
+                                         MetaText="@member.Department"
+                                         Initials="@member.Initials"
+                                         ImageUrl="@member.ImageUrl"
+                                         OnClick="@(() => OpenProfile(member))">
+                        <Badges>
+                            <FlatStatusChip Text="@member.Category" Color="Color.Secondary" />
+                            <FlatStatusChip Text="@member.Access" Color="Color.Success" />
+                        </Badges>
+                    </FlatProfileListItem>
+                }
+                else
+                {
+                    <FlatProfileCard Name="@member.Name"
+                                     Subtitle="@member.Role"
+                                     Initials="@member.Initials"
+                                     ImageUrl="@member.ImageUrl"
+                                     CoverTone="@member.CoverTone"
+                                     Favorite="@member.Favorite"
+                                     Stats="@member.Stats"
+                                     OnFavorite="@(() => ToggleFavorite(member))"
+                                     OnMore="@(() => Snackbar.Add($"Actions for {member.Name} are host-defined.", Severity.Info))"
+                                     OnView="@(() => OpenProfile(member))" />
+                }
+            </ItemTemplate>
+        </FlatCardGrid>
     </ChildContent>
 </FlatPage>
 
@@ -47,18 +84,18 @@
 @code {
     private readonly List<MemberCard> _members =
     [
-        new("Nancy Martino", "Team Leader & HR", "NM", "/sample-profile.svg", "cover-primary", 225, 197, true),
-        new("Henry Baird", "Full Stack Developer", "HB", null, "cover-info", 352, 376, false),
-        new("Frank Hook", "Project Manager", "FH", null, "cover-success", 164, 182, true),
-        new("Jennifer Carter", "UI/UX Designer", "JC", "/sample-profile.svg", "cover-secondary", 241, 204, true),
-        new("Megan Elmore", "Team Leader & Web Developer", "ME", null, "cover-warning", 201, 263, false),
-        new("Alexis Clarke", "Backend Developer", "AC", null, "cover-success", 132, 147, false),
-        new("Nathan Cole", "Front-End Developer", "NC", null, "cover-primary", 352, 376, true),
-        new("Joseph Parker", "Full Stack Developer", "JP", null, "cover-info", 64, 93, true)
+        new("Nancy Martino", "EMP-2026-001", "Team Leader", "Human Resources", "People", "Lead", "NM", "/sample-profile.svg", "cover-primary", 225, 197, true),
+        new("Henry Baird", "EMP-2026-002", "Staff", "Information Technology", "Platform", "Staff", "HB", null, "cover-info", 352, 376, false),
+        new("Frank Hook", "EMP-2026-003", "Supervisor", "Operations", "Field", "Supervisor", "FH", null, "cover-success", 164, 182, true),
+        new("Jennifer Carter", "EMP-2026-004", "Staff", "Product Design", "Creative", "Staff", "JC", "/sample-profile.svg", "cover-secondary", 241, 204, true),
+        new("Megan Elmore", "EMP-2026-005", "Team Leader", "Engineering", "Web", "Lead", "ME", null, "cover-warning", 201, 263, false),
+        new("Alexis Clarke", "EMP-2026-006", "Staff", "Engineering", "Backend", "Staff", "AC", null, "cover-success", 132, 147, false),
+        new("Nathan Cole", "EMP-2026-007", "Staff", "Engineering", "Frontend", "Staff", "NC", null, "cover-primary", 352, 376, true),
+        new("Joseph Parker", "EMP-2026-008", "Staff", "Information Technology", "Support", "Staff", "JP", null, "cover-info", 64, 93, true)
     ];
 
     private string _search = "";
-    private string _view = FlatCardGridView.Grid;
+    private string _view = FlatCardGridView.List;
     private bool _addOpen;
     private string _newName = "";
     private string _newRole = "";
@@ -72,21 +109,11 @@
     private bool CanAdd => !string.IsNullOrWhiteSpace(_newName) && !string.IsNullOrWhiteSpace(_newRole);
     private bool IsAddDirty => !string.IsNullOrWhiteSpace(_newName) || !string.IsNullOrWhiteSpace(_newRole) || !string.IsNullOrWhiteSpace(_newInitials);
 
-    private RenderFragment<MemberCard> MemberTemplate => member => @<FlatProfileCard Name="@member.Name"
-        Subtitle="@member.Role"
-        Initials="@member.Initials"
-        ImageUrl="@member.ImageUrl"
-        CoverTone="@member.CoverTone"
-        Favorite="@member.Favorite"
-        Stats="@member.Stats"
-        OnFavorite="@(() => ToggleFavorite(member))"
-        OnMore="@(() => Snackbar.Add($"Actions for {member.Name} are host-defined.", Severity.Info))"
-        OnView="@(() => Snackbar.Add($"Open profile: {member.Name}", Severity.Info))" />;
-
     private void SearchChanged(string value) => _search = value ?? "";
     private void ViewChanged(string value) => _view = value;
     private void ToggleFavorite(MemberCard member) => member.Favorite = !member.Favorite;
-    private void ShowGridMenu() => Snackbar.Add("Additional grid actions are supplied by the host app.", Severity.Info);
+    private void ShowFilter() => Snackbar.Add("Member filters are supplied by the host app.", Severity.Info);
+    private void OpenProfile(MemberCard member) => Snackbar.Add($"Open profile: {member.Name}", Severity.Info);
 
     private void OpenAddMember()
     {
@@ -102,15 +129,19 @@
     {
         if (!CanAdd) return Task.CompletedTask;
         var initials = string.IsNullOrWhiteSpace(_newInitials) ? null : _newInitials.Trim();
-        _members.Insert(0, new(_newName.Trim(), _newRole.Trim(), initials, null, "cover-primary", 0, 0, false));
+        _members.Insert(0, new(_newName.Trim(), $"EMP-2026-{_members.Count + 1:000}", _newRole.Trim(), "Unassigned", "General", "Staff", initials, null, "cover-primary", 0, 0, false));
         Snackbar.Add("Member added to sample page memory.", Severity.Success);
         return Task.CompletedTask;
     }
 
-    private sealed class MemberCard(string name, string role, string? initials, string? imageUrl, string coverTone, int projects, int tasks, bool favorite)
+    private sealed class MemberCard(string name, string identifier, string role, string department, string category, string access, string? initials, string? imageUrl, string coverTone, int projects, int tasks, bool favorite)
     {
         public string Name { get; } = name;
+        public string Identifier { get; } = identifier;
         public string Role { get; } = role;
+        public string Department { get; } = department;
+        public string Category { get; } = category;
+        public string Access { get; } = access;
         public string? Initials { get; } = initials;
         public string? ImageUrl { get; } = imageUrl;
         public string CoverTone { get; } = coverTone;
