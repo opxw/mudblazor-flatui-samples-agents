@@ -6,11 +6,11 @@
   "properties": {
     "$schema": { "const": "flat-ui.mobile.contract.schema.json" },
     "schemaVersion": { "const": "3.1" },
-    "contractVersion": { "const": "2.1.22" },
+    "contractVersion": { "const": "2.1.25" },
     "packages": {
       "const": {
         "Microsoft.Maui.Controls": "10.0.90",
-        "Opx.MudBlazor.FlatUi": "2.1.22",
+        "Opx.MudBlazor.FlatUi": "2.1.25",
         "MudBlazor": "9.9.0",
         "CommunityToolkit.Maui": "15.0.1"
       }

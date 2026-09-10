@@ -1,5 +1,9 @@
 # Repository agent instructions
 
+NuGet 2.1.25 includes Bottom-menu history and hybrid recovery. Read `docs/AUTH-AND-NAVIGATION.md` and `docs/HYBRID-RECOVERY.md`; use `opx.page.erp.finance.general-ledger` for Back and `opx.page.reference.experience-toolkit` for recovery. Both Sheet/MainView restore the visited submenu, parent, then actual origin; preserve Forward and IME/modal/dirty priority. Direct URLs never invent a trail, and replaced authorized menu collections invalidate snapshots. Retain inactive Bottom history across sidebar transitions but release overlay/refresh leases. Reuse `FlatWorkspaceRecovery`, `FlatDraftRecovery<T>` and `FlatDeepLinkGate`: scoped/versioned storage, explicit draft consent and mandatory host authorization. Encryption, data validation and persistence remain host-owned. Upgrade DLL and matching source/minified JavaScript together; stale static assets can break Back. Keep native evidence tied to its exact package/APK, separate from browser/source checks.
+
+For dynamic navigation, use the NuGet 2.1.25 shared URL normalization contract in `docs/DYNAMIC-MENU.md`. Single-leading-slash routes must survive the resolver-to-builder path on Unix/Android; no domain mapping is required for valid dynamic Url values. Do not add a consumer URL-normalization workaround.
+
 For mobile reliability, hybrid hardening, refresh, native Back, Settings safe areas, or keyboard avoidance, read `docs/MOBILE-RELIABILITY.md` and `docs/HYBRID-HARDENING.md` plus the mapped Experience Toolkit sample before editing. Preserve the canonical host adapters; package-only upgrades do not replace native integration work.
 
 Model CRUD and shared editor samples use per-session value snapshots, immediate focused-change detection, revert-to-clean behavior, the default discard question, and single-flight mutations. Keep committed persistence success separate from later notification/reload failures.
@@ -40,7 +44,7 @@ Before creating or changing a page, layout, reusable component, CSS rule, naviga
 - `samples/Opx.MudBlazor.FlatUi.Showcase` is the shared behavioral and composition source of truth for page development.
 - For initialized admin consumers, host `MainLayout.razor` plus shared `ShowcaseNavigationCatalog` are the source of truth for mandatory Settings and the default searchable navigation scaffold.
 - NuGet `Opx.MudBlazor.FlatUi` is the only consumer dependency for reusable components; the package-source checkout is inspection authority, not a local reference.
-- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.1.22. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
+- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.1.25. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
 - `docs` and `README.md` explain the implemented contract but do not override compiled source.
 
 When source, rules, and documentation disagree, do not silently choose one. Preserve the accepted behavior, update stale documentation/rules in the same change, and report any unresolved conflict.

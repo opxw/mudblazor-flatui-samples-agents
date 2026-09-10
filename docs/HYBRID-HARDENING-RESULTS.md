@@ -47,7 +47,7 @@ Consumer MAUI adapters must be updated. Earlier broader counts below belong to
 the prior hardening run, not this APK.
 
 Implementation contract: [HYBRID-HARDENING.md](HYBRID-HARDENING.md).
-At the time of this historical verification run, package source remained 2.1.21 and no publication or consumer deployment was performed. The accepted consumer baseline is now the separately verified official 2.1.22 package.
+At the time of this historical verification run, package source remained 2.1.21 and no publication or consumer deployment was performed. The accepted consumer baseline is now the separately verified official 2.1.25 package.
 Extensive pre-existing dirty worktree preserved.
 
 ## Executed

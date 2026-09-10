@@ -41,6 +41,9 @@
             @RulePanel("20", "Coordinate overlays and release evidence", "Register FlatOverlayCoordinator in Web and MAUI. Back closes only the topmost overlay and repeated Back is single-flight. Use typed enterprise data, transaction validation, offline draft, conflict, and native capability contracts without moving host effects into the RCL. Display sanitized release evidence through the Release Quality page.", "opx.page.reference.release-quality")
         </div>
 
+        @RulePanel("21", "Restore the originating bottom menu", "In Sheet and MainView, Back from a leaf restores its visited submenu, then its parent and the origin page. ERP / Finance / General Ledger returns to Finance, not directly to Dashboard. Preserve browser Forward and modal, dirty-form and keyboard priority; direct URLs do not invent a menu trail.", "Visited menu history")
+        @RulePanel("22", "Recover hybrid state safely", "Keep Bottom history across sidebar transitions without active overlay leases. Restore scoped workspace queries before scroll, require host access checks for deep links and explicit consent for compatible stored drafts. Validate all sample hosts against the same exact NuGet; browser tests are not native process-death proof.", "opx.page.reference.experience-toolkit")
+
         <FlatPanel Title="Canonical development path" Subtitle="Follow this order for every new or revised page" CssClass="flat-panel development-rules-flow">
             <ol>
                 <li><strong>Read</strong><span><code>RULES.md</code>, <code>.agents/RULES.md</code>, and the development skill.</span></li>

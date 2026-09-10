@@ -9,9 +9,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.1.22"
+$expectedContractVersion = "2.1.25"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.1.22"
+    "Opx.MudBlazor.FlatUi" = "2.1.25"
     "MudBlazor" = "9.9.0"
 }
 $expectedHostCssSha256 = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
@@ -690,7 +690,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.22; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.25; found $packageCssHash."
     }
 }
 

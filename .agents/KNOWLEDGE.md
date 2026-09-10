@@ -14,8 +14,15 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 ## Current canonical snapshot
 
+- Current patch 2.1.25 adds retained Bottom menu history and host-controlled hybrid recovery; follow docs/HYBRID-RECOVERY.md and docs/AUTH-AND-NAVIGATION.md. Draft recovery requires explicit consent and deep links require host authorization. DLL and matching JavaScript must deploy together.
+- All 12 functional payload entries match source artifact `20260910-203021-2.1.25`. JavaScript SHA-256 is `999725AFF8F22261FB42578065D49C99DE7C08A13C0A8C1392489DDAFA6CEC29`; minified JavaScript is `63FB390ED43388B3521043AD44FC32B424F9CF484D84AC869FACFEBD562EEFA5`. Prior source Debug/emulator evidence does not certify this consumer Release package.
+- Official 2.1.25 NuGet signature verified; nupkg SHA-256: 9D9B050005C125B26AA4E30907959E3280C60DE3012CDB2F51CB58D1E5B25929. Original CSS remains unchanged from 2.1.22/2.1.23.
+
+- Patch 2.1.23 imports the shared resolver/builder URL-normalization contract from `D:\projects\git\mudblazor-flat-ui`. Single-leading-slash local routes are accepted before absolute URI parsing on Unix/Android; Unicode normalization precedes rejection of protocol-relative URLs and backslashes. Dynamic Url values need no business mapping; consumers reuse the package implementation.
+- Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
+
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.22`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.25`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.9.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
@@ -169,7 +176,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 # 2026-09-10 - NuGet 2.1.22 hybrid reliability and productivity baseline
 
-- Public/signed NuGet `2.1.22` is the active consumer baseline. Official nupkg SHA-256 is `08CE66780D1ECA664043F2A506D7EAC1BAD71224C9EB9A809A282B3880032BEB`; CSS SHA-256 is `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; DLL SHA-256 is `46990AD2F812602CDB84633B09703966AB280DE5C6714B11EDCE78F718C80D96`.
+- Public/signed NuGet `2.1.22` was the consumer baseline. Official nupkg SHA-256 is `08CE66780D1ECA664043F2A506D7EAC1BAD71224C9EB9A809A282B3880032BEB`; CSS SHA-256 is `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; DLL SHA-256 is `46990AD2F812602CDB84633B09703966AB280DE5C6714B11EDCE78F718C80D96`.
 - The official archive has a valid NuGet.org repository signature and its functional payload is byte-identical to canonical local artifact `20260909-213441-2.1.22`; the local archive itself is unsigned. Readable JavaScript SHA-256 is `F8FB8DE2E1824EA9767C70A999E99349F80365053D9A6B2749F08719E5BCFCBD`; minified JavaScript SHA-256 is `9544D02B8D17E0FCDE72038B5CE4BFA3AFD17A4C0CAE0F7E3188B50430D9A9AF`.
 - `FlatRefreshMode.Auto` coordinates native MAUI refresh versus Web gesture refresh; `Disabled` overrides legacy native/Web/dashboard flags without disabling ordinary scrolling. Native Android still needs the canonical host handler, per-gesture scroll-boundary gate, overlay coordination, and exact Back pipeline.
 - Model CRUD uses per-session value snapshots, revert-to-clean behavior, single-flight Delete, and separates committed persistence success from later callback failures. Shared editors use the default discard question and keep clean guards out of `NavigationLock`.

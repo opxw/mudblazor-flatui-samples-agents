@@ -1,0 +1,93 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@inject IJSRuntime JS
+<FlatPanel Title="Hybrid recovery" Subtitle="Synthetic demo only. Production storage and access checks belong to the host.">
+    <div class="flat-productivity-body flat-business-component">
+        <p>Save workspace explicitly, navigate away and return. Draft storage contains only a generated demo value, never entered personal data.</p>
+        <label>Recovery search<input aria-label="Recovery search" value="@_state.Search" @oninput="e => _state = _state with { Search = e.Value?.ToString() }" /></label>
+        <button type="button" @onclick="NextPage">Next demo page</button>
+        <button type="button" @onclick="SaveWorkspace">Save demo workspace</button>
+        <FlatScrollRestoration @key="_restoreKey" Ready="_ready" Position="@_state.ScrollPositions.GetValueOrDefault("records")" PositionChanged="RememberScroll" ScrollSelector=".recovery-records">
+            <div class="recovery-records" style="max-height:160px;overflow-y:auto;touch-action:pan-y;overscroll-behavior-y:auto">
+                @foreach (var number in Enumerable.Range((_state.Page - 1) * 20 + 1, 20))
+                {
+                    <button type="button" style="display:block;min-height:44px;width:100%" aria-pressed="@(_state.SelectedKey == number.ToString() ? "true" : "false")" @onclick="() => Select(number)">Demo record @number</button>
+                }
+            </div>
+        </FlatScrollRestoration>
+        <p>Page @_state.Page · Selection @(_state.SelectedKey ?? "none")</p>
+        <button type="button" @onclick="SaveDraft">Save synthetic draft</button>
+        <button type="button" @onclick="InspectDraft">Check saved draft</button>
+        @if (_candidate is not null)
+        {
+            <p role="status">A compatible draft is available. Restore it?</p>
+            <button type="button" @onclick="RestoreDraft">Restore draft</button>
+            <button type="button" @onclick="DiscardDraft">Discard saved draft</button>
+        }
+        <p>Restored value: @_restored</p>
+        <button type="button" @onclick="() => CheckLink(false)">Test denied deep link</button>
+        <button type="button" @onclick="() => CheckLink(true)">Test allowed deep link</button>
+        <p role="status">@_message</p>
+    </div>
+</FlatPanel>
+@code {
+    private const string WorkspaceKey = "opx:synthetic:hybrid-workspace:v1";
+    private const string DraftKey = "opx:synthetic:hybrid-draft:v1";
+    private FlatWorkspaceState _state = new(WorkspaceKey);
+    private bool _ready;
+    private int _restoreKey;
+    private string _message = "", _restored = "none";
+    private FlatOfflineDraft<string>? _candidate;
+    private DemoStore Store => new(JS);
+    private FlatDraftRecovery<string> Drafts => new(Store, value => value);
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            _state = await new FlatWorkspaceRecovery(Store).LoadAsync(WorkspaceKey) ?? _state;
+            // Only synthetic fixed values are persisted by this demo.
+            _state = _state with { Page = Math.Clamp(_state.Page, 1, 3) };
+            _candidate = await Drafts.InspectAsync(DraftKey, TimeSpan.FromDays(1));
+        }
+        catch (Exception ex) when (ex is JSException or System.Text.Json.JsonException)
+        { _message = "Demo storage unavailable; continue without recovery."; }
+        _ready = true; _restoreKey++; StateHasChanged();
+    }
+    private void NextPage() => _state = _state with { Page = _state.Page % 3 + 1 };
+    private void Select(int number) => _state = _state with { SelectedKey = number.ToString() };
+    private void RememberScroll(double value) => _state = _state with { ScrollPositions = new Dictionary<string, double> { ["records"] = value } };
+    private async Task SaveWorkspace()
+    {
+        // Search text is deliberately excluded: this is not a production user-scoped storage adapter.
+        await Run(async () => { await new FlatWorkspaceRecovery(Store).SaveAsync(_state with { Search = "demo" }); _message = "Demo workspace saved."; });
+    }
+    private Task SaveDraft() => Run(async () => { await Drafts.SaveAsync(DraftKey, "Synthetic draft"); _message = "Synthetic draft saved. Restart and choose Restore draft."; });
+    private Task InspectDraft() => Run(async () => { _candidate = await Drafts.InspectAsync(DraftKey, TimeSpan.FromDays(1)); });
+    private void RestoreDraft() { _restored = _candidate!.Value; _candidate = null; }
+    private Task DiscardDraft() => Run(async () => { await Drafts.RemoveAsync(DraftKey); _candidate = null; });
+    private async Task CheckLink(bool allowed)
+    {
+        var result = await new FlatDeepLinkGate().ResolveAsync("/experience-toolkit", (_, _) => ValueTask.FromResult(allowed
+            ? FlatOperationResult.Success() : FlatOperationResult.Failure(FlatOperationFailureKind.Forbidden, "Demo access denied.")));
+        _message = result.Succeeded ? "Demo host allowed the route; navigation remains host-owned." : result.Message!;
+    }
+    private async Task Run(Func<Task> action)
+    {
+        try { await action(); }
+        catch (Exception ex) when (ex is JSException or System.Text.Json.JsonException)
+        { _message = "Demo storage unavailable; nothing was submitted."; }
+    }
+    private sealed class DemoStore(IJSRuntime js) : IFlatWorkspaceStateProvider, IFlatOfflineDraftStore<string>
+    {
+        private async ValueTask<T?> Read<T>(string key, CancellationToken token)
+        {
+            var json = await js.InvokeAsync<string?>("localStorage.getItem", token, key);
+            return json is null ? default : System.Text.Json.JsonSerializer.Deserialize<T>(json);
+        }
+        public ValueTask<FlatWorkspaceState?> LoadAsync(string key, CancellationToken cancellationToken = default) => Read<FlatWorkspaceState>(key, cancellationToken);
+        ValueTask<FlatOfflineDraft<string>?> IFlatOfflineDraftStore<string>.LoadAsync(string key, CancellationToken cancellationToken) => Read<FlatOfflineDraft<string>>(key, cancellationToken);
+        public ValueTask SaveAsync(FlatWorkspaceState state, CancellationToken cancellationToken = default) => js.InvokeVoidAsync("localStorage.setItem", cancellationToken, state.Key, System.Text.Json.JsonSerializer.Serialize(state));
+        public ValueTask SaveAsync(FlatOfflineDraft<string> draft, CancellationToken cancellationToken = default) => js.InvokeVoidAsync("localStorage.setItem", cancellationToken, draft.Key, System.Text.Json.JsonSerializer.Serialize(draft));
+        public ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default) => js.InvokeVoidAsync("localStorage.removeItem", cancellationToken, key);
+    }
+}

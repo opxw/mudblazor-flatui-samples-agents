@@ -20,7 +20,7 @@
       "const": "3.1"
     },
     "contractVersion": {
-      "const": "2.1.22"
+      "const": "2.1.25"
     },
     "source": {
       "type": "object",
@@ -41,7 +41,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.1.22"
+          "const": "2.1.25"
         },
         "MudBlazor": {
           "const": "9.9.0"
