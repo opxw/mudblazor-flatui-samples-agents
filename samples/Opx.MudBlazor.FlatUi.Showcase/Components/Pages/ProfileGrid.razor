@@ -74,7 +74,6 @@
                Size="@FlatFormModalSize.Small"
                CanSubmit="@CanAdd"
                IsDirty="@IsAddDirty"
-               ConfirmClose="ConfirmDiscardAsync"
                OnSubmit="AddMemberAsync">
     <MudTextField T="string" @bind-Value="_newName" Immediate="true" Label="Name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
     <MudTextField T="string" @bind-Value="_newRole" Immediate="true" Label="Designation" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
@@ -100,6 +99,7 @@
     private string _newName = "";
     private string _newRole = "";
     private string _newInitials = "";
+    private (string, string, string) _initialDraft = ("", "", "");
 
     private IReadOnlyList<MemberCard> FilteredMembers => _members
         .Where(member => string.IsNullOrWhiteSpace(_search)
@@ -107,7 +107,7 @@
             || member.Role.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase))
         .ToList();
     private bool CanAdd => !string.IsNullOrWhiteSpace(_newName) && !string.IsNullOrWhiteSpace(_newRole);
-    private bool IsAddDirty => !string.IsNullOrWhiteSpace(_newName) || !string.IsNullOrWhiteSpace(_newRole) || !string.IsNullOrWhiteSpace(_newInitials);
+    private bool IsAddDirty => (_newName, _newRole, _newInitials) != _initialDraft;
 
     private void SearchChanged(string value) => _search = value ?? "";
     private void ViewChanged(string value) => _view = value;
@@ -120,16 +120,17 @@
         _newName = "";
         _newRole = "";
         _newInitials = "";
+        _initialDraft = (_newName, _newRole, _newInitials);
         _addOpen = true;
     }
 
-    private Task<bool> ConfirmDiscardAsync() => MessageBox.QuestionAsync("Discard the new member form?", title: "Close form");
 
     private Task AddMemberAsync()
     {
         if (!CanAdd) return Task.CompletedTask;
         var initials = string.IsNullOrWhiteSpace(_newInitials) ? null : _newInitials.Trim();
         _members.Insert(0, new(_newName.Trim(), $"EMP-2026-{_members.Count + 1:000}", _newRole.Trim(), "Unassigned", "General", "Staff", initials, null, "cover-primary", 0, 0, false));
+        _initialDraft = (_newName, _newRole, _newInitials);
         Snackbar.Add("Member added to sample page memory.", Severity.Success);
         return Task.CompletedTask;
     }

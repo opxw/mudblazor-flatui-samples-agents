@@ -152,18 +152,18 @@
                   @bind-Value="_draft.Title"
                   Label="Job title"
                   Variant="@FlatPreferences.InputVariant"
-                  Margin="Margin.Dense" />
+                  Margin="Margin.Dense" Immediate="true" />
     <MudTextField T="string"
                   @bind-Value="_draft.Company"
                   Label="Company"
                   Variant="@FlatPreferences.InputVariant"
-                  Margin="Margin.Dense" />
+                  Margin="Margin.Dense" Immediate="true" />
     <div class="jobs-form-grid">
         <MudTextField T="string"
                       @bind-Value="_draft.Location"
                       Label="Location"
                       Variant="@FlatPreferences.InputVariant"
-                      Margin="Margin.Dense" />
+                      Margin="Margin.Dense" Immediate="true" />
         <MudSelect T="string"
                    @bind-Value="_draft.EmploymentType"
                    Label="Employment type"
@@ -187,13 +187,13 @@
                   @bind-Value="_draft.SalaryRange"
                   Label="Salary range"
                   Variant="@FlatPreferences.InputVariant"
-                  Margin="Margin.Dense" />
+                  Margin="Margin.Dense" Immediate="true" />
     <MudTextField T="string"
                   @bind-Value="_draft.Summary"
                   Label="Short summary"
                   Variant="@FlatPreferences.InputVariant"
                   Lines="3"
-                  Margin="Margin.Dense" />
+                  Margin="Margin.Dense" Immediate="true" />
     <MudTextField T="string"
                   @bind-Value="_draft.Skills"
                   Label="Required skills (comma separated)"
@@ -215,7 +215,7 @@
     private bool _createSaving;
     private string? _editingJobId;
     private JobDraft _draft = new();
-    private string _draftBaseline = string.Empty;
+    private JobDraft _draftBaseline = new();
     private IReadOnlyList<JobRecord> _jobs = [];
     private readonly HashSet<string> _publishedJobIds = new(StringComparer.Ordinal);
 
@@ -364,7 +364,7 @@
             SalaryRange = "IDR",
             Published = false
         };
-        _draftBaseline = DraftSignature(_draft);
+        _draftBaseline = _draft with { };
         _createOpen = true;
     }
 
@@ -382,7 +382,7 @@
             Summary = job.Summary,
             Published = IsPublished(job)
         };
-        _draftBaseline = DraftSignature(_draft);
+        _draftBaseline = _draft with { };
         _createOpen = true;
     }
 
@@ -425,6 +425,7 @@
             _publishedJobIds.Remove(saved.Id);
         }
 
+        _draftBaseline = _draft with { };
         _createSaving = false;
         Snackbar.Add($"Vacancy {(existingIndex >= 0 ? "updated" : "created")} in page memory only.", Severity.Success);
     }
@@ -462,20 +463,10 @@
 
     private bool CanSubmitCreate => !string.IsNullOrWhiteSpace(_draft.Title) && !string.IsNullOrWhiteSpace(_draft.Company);
 
-    private bool IsCreateDirty => !string.Equals(DraftSignature(_draft), _draftBaseline, StringComparison.Ordinal);
+    private bool IsCreateDirty => _draft != _draftBaseline;
 
-    private static string DraftSignature(JobDraft draft) => string.Join('\u001f',
-        draft.Title,
-        draft.Company,
-        draft.Location,
-        draft.EmploymentType,
-        draft.WorkMode,
-        draft.SalaryRange,
-        draft.Summary,
-        draft.Skills,
-        draft.Published);
 
-    private sealed class JobDraft
+    private sealed record JobDraft
     {
         public string Title { get; set; } = string.Empty;
         public string Company { get; set; } = string.Empty;

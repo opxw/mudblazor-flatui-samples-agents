@@ -1,5 +1,7 @@
 # Sample source map
 
+- Mobile reliability P0/P1/P2: `ExperienceToolkit.razor` embeds `MobileReliabilityExamples.razor` using `FlatPage.RefreshMode`, `FlatScrollRestoration`, `FlatSearchComboBox`, `FlatFormModal`, and opt-in `FlatMobileDiagnostics`. Read `docs/MOBILE-RELIABILITY.md`; native adapters and scoped durable workspace persistence remain host-owned.
+
 - Multipurpose ERP/HR/IoT: `EnterpriseToolkit.razor` embeds `MultiPurposeExamples.razor`, reusing `FlatMasterDetailWorkspace`, `FlatScheduler`, `FlatOfflineSyncPanel`, `FlatDocumentWorkspace`, and `FlatDashboardComposer` with work-inbox, freshness, scanner, telemetry, relations, and personal-workspace contracts. See `docs/MULTIPURPOSE-TOOLKIT.md` for host ownership and validation limits.
 
 Copyright (c) 2026 opx. All rights reserved.
@@ -20,6 +22,8 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Authentication shell: `samples/Opx.MudBlazor.FlatUi.Showcase/Components/Layout/AuthLayout.razor`
 
 ## Page archetypes
+
+- P1/P2 saved views, company/branch/site context, advanced nested filters, record sections, and bulk progress: `samples/Opx.MudBlazor.FlatUi.Showcase/Components/ProductivityExamples.razor`, composed by `Components/Pages/EnterpriseToolkit.razor`; contracts in `docs/P1-P2-PRODUCTIVITY.md`.
 
 - Full responsive CRUD/grid/filter/paging/FAB/modal: `samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Crud.razor`
 - Compact/simple CRUD: `samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/SimpleCrud.razor`

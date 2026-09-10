@@ -170,13 +170,12 @@
                      IsDirty="@ComposeDirty"
                      CanSubmit="@CanSend"
                      OnClose="CloseCompose"
-                     OnSubmit="SendEmail"
-                     ConfirmClose="ConfirmDiscard">
+                     OnSubmit="SendEmail">
         <div class="flat-crud-form-grid flat-email-compose-form">
-            <MudTextField T="string" @bind-Value="_draft.To" Label="To" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" />
-            <MudTextField T="string" @bind-Value="_draft.Cc" Label="Cc" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" />
-            <MudTextField T="string" @bind-Value="_draft.Subject" Label="Subject" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" />
-            <MudTextField T="string" @bind-Value="_draft.Body" Label="Message" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="10" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.To" Label="To" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" Immediate="true" />
+            <MudTextField T="string" @bind-Value="_draft.Cc" Label="Cc" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" Immediate="true" />
+            <MudTextField T="string" @bind-Value="_draft.Subject" Label="Subject" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Class="wide" Immediate="true" />
+            <MudTextField T="string" @bind-Value="_draft.Body" Label="Message" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="10" Class="wide" Immediate="true" />
             <div class="flat-email-compose-tools wide">
                 <MudIconButton Icon="@Icons.Material.Outlined.AttachFile" OnClick="@(() => ShowPlaceholder("Add attachment"))" aria-label="Add attachment" title="Add attachment" />
                 <MudIconButton Icon="@Icons.Material.Outlined.InsertLink" OnClick="@(() => ShowPlaceholder("Insert link"))" aria-label="Insert link" title="Insert link" />
@@ -220,6 +219,7 @@
     private bool _composeOpen;
     private bool _sending;
     private ComposeDraft _draft = new();
+    private ComposeDraft _initialDraft = new();
 
     private List<MailMessage> FilteredMessages => _messages
         .Where(message => FolderMatches(message))
@@ -232,7 +232,7 @@
     private MailMessage? SelectedMessage => _messages.FirstOrDefault(message => message.Id == _selectedMessageId);
     private string SelectedFolderLabel => Folders.First(folder => folder.Key == _selectedFolder).Label;
     private bool CanSend => !string.IsNullOrWhiteSpace(_draft.To) && !string.IsNullOrWhiteSpace(_draft.Subject) && !string.IsNullOrWhiteSpace(_draft.Body);
-    private bool ComposeDirty => !string.IsNullOrWhiteSpace(_draft.To) || !string.IsNullOrWhiteSpace(_draft.Cc) || !string.IsNullOrWhiteSpace(_draft.Subject) || !string.IsNullOrWhiteSpace(_draft.Body);
+    private bool ComposeDirty => _draft != _initialDraft;
 
     private bool FolderMatches(MailMessage message) => _selectedFolder switch
     {
@@ -276,18 +276,21 @@
     private void OpenCompose()
     {
         _draft = new ComposeDraft();
+        _initialDraft = _draft with { };
         _composeOpen = true;
     }
 
     private void Reply(MailMessage message)
     {
         _draft = new ComposeDraft { To = message.Sender, Subject = $"Re: {message.Subject}" };
+        _initialDraft = _draft with { };
         _composeOpen = true;
     }
 
     private void Forward(MailMessage message)
     {
         _draft = new ComposeDraft { Subject = $"Fwd: {message.Subject}", Body = $"\n\n---------- Forwarded message ----------\nFrom: {message.Sender}\n\n{string.Join("\n\n", message.Body)}" };
+        _initialDraft = _draft with { };
         _composeOpen = true;
     }
 
@@ -305,7 +308,6 @@
         return Task.CompletedTask;
     }
 
-    private Task<bool> ConfirmDiscard() => Task.FromResult(true);
 
     private async Task SendEmail()
     {
@@ -313,6 +315,7 @@
         await Task.Delay(350);
         var id = $"sent-{Guid.NewGuid():N}";
         _messages.Insert(0, new MailMessage(id, "sent", _draft.To, InitialsFor(_draft.To), _draft.Subject, _draft.Body, "Now", DateTimeOffset.Now.ToString("O"), "Just now", false, false, false, [_draft.Body]));
+        _initialDraft = _draft with { };
         _sending = false;
         _composeOpen = false;
         _selectedFolder = "sent";
@@ -349,7 +352,7 @@
         public IReadOnlyList<string> Body { get; } = body;
     }
 
-    private sealed class ComposeDraft
+    private sealed record ComposeDraft
     {
         public string To { get; set; } = "";
         public string Cc { get; set; } = "";

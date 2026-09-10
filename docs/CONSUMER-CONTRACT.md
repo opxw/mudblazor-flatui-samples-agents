@@ -30,7 +30,7 @@ Set-Location MyCompany.MyMobileApp
 dotnet build -f net10.0-android -c Release --no-restore
 ```
 
-Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.19`. Android compilation is required source evidence; iOS build/runtime and all native UX claims still require macOS/Xcode plus simulator/device evidence.
+Its `flat-ui.mobile.contract.json` pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.22`. Android compilation is required source evidence; iOS build/runtime and all native UX claims still require macOS/Xcode plus simulator/device evidence.
 
 ## Required workflow
 
@@ -91,7 +91,7 @@ Use `run-clean.ps1` for the first Web application start. It resolves the thin ho
 
 ## Stylesheet ownership
 
-- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.1.19` pins SHA-256 `1EC4650E101D814B9F17CA3840A5DE25C63150D1EBAF12BB851B32447413BACB` so a stale or substituted package asset fails audit. Its search, first-paint typography/density, contrast, and reusable component rules are package-owned and must not be duplicated locally.
+- Reusable OPX styling comes only from the restored NuGet static web asset `_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css`. Contract `2.1.22` pins SHA-256 `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2` so a stale or substituted package asset fails audit. Its search, first-paint typography/density, contrast, and reusable component rules are package-owned and must not be duplicated locally.
 - Host HTML seeds the package bootstrap attributes for Device/Manual font ownership, bounded size, and density before styles. The package restores saved values before first paint; theme changes and reconnect mounting must preserve them.
 - Login composition uses typed `LoginBrandPanelVisible` configuration, and grouped-grid heading alignment uses the public `GroupHeaderAlignment` parameter. Consumers must not recreate either package-owned behavior with CSS overrides.
 - Responsive card lists own vertical scrolling only while their content overflows. In 2.1.16, vertical pan chains to the page at a non-overflowing list or list boundary, while horizontal overscroll remains contained; consumers must not restore the older trapped-scroll behavior with local CSS.

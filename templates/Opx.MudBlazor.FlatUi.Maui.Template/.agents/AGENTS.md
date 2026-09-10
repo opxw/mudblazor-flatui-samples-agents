@@ -1,5 +1,15 @@
 # Repository agent instructions
 
+For mobile reliability, hybrid hardening, refresh, native Back, Settings safe areas, or keyboard avoidance, read `docs/MOBILE-RELIABILITY.md` and `docs/HYBRID-HARDENING.md` plus the mapped Experience Toolkit sample before editing. Preserve the canonical host adapters; package-only upgrades do not replace native integration work.
+
+Model CRUD and shared editor samples use per-session value snapshots, immediate focused-change detection, revert-to-clean behavior, the default discard question, and single-flight mutations. Keep committed persistence success separate from later notification/reload failures.
+
+Android Back is layered and paired-key single-flight: IME, topmost overlay, explicit WebView history, then root fallback. Responsive Vertical drawers and sheets participate in the shared overlay coordinator and suspend native refresh while open.
+
+`FlatRefreshMode.Auto` chooses native MAUI refresh or the package Web gesture. An unqualified request to disable pull-to-refresh means `FlatRefreshMode.Disabled`, which overrides legacy gesture flags without disabling ordinary scrolling or unrelated loading.
+
+For P0 compatibility, test the exact restored/packed binary. For P1/P2 productivity, use the shared enterprise-toolkit saved-view, context, nested-filter, record-workspace, and bulk-progress contracts while keeping host authorization, persistence, queries, and idempotency outside the UI package.
+
 Copyright (c) 2026 opx. All rights reserved.
 
 These instructions apply to every file in this repository.
@@ -30,13 +40,15 @@ Before creating or changing a page, layout, reusable component, CSS rule, naviga
 - `samples/Opx.MudBlazor.FlatUi.Showcase` is the shared behavioral and composition source of truth for page development.
 - For initialized admin consumers, host `MainLayout.razor` plus shared `ShowcaseNavigationCatalog` are the source of truth for mandatory Settings and the default searchable navigation scaffold.
 - NuGet `Opx.MudBlazor.FlatUi` is the only consumer dependency for reusable components; the package-source checkout is inspection authority, not a local reference.
-- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.1.19. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
+- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.1.22. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
 - `docs` and `README.md` explain the implemented contract but do not override compiled source.
 
 When source, rules, and documentation disagree, do not silently choose one. Preserve the accepted behavior, update stale documentation/rules in the same change, and report any unresolved conflict.
 
 ## Delivery boundary
 
+- For Tree Grid changes, read `docs/TREE-GRID.md`: `AllowReorder` is opt-in; persist destination sibling index after removing the source together with parent in the host. Expand/collapse follows stable keys and must survive reorder and collapse-all.
+- IconPicker requests reuse `FlatMaterialIconPicker` and `docs/ICON-PICKER.md`. Keep case-sensitive style/name keys and configurable button/empty-state text. Test zero matches, clearing, and style changes; a canonical picker test does not prove an unrelated consumer circuit defect is fixed.
 - Keep reusable source domain-neutral and keep domain examples in the sample project.
 - Keep `FlatEmptyState` centered against the complete available content region. A direct child of a multi-column grid spans all columns; do not center it inside only the first grid track.
 - Preserve copyright headers on new source, scripts, rules, and documentation.

@@ -8,7 +8,9 @@
                          CloseBlocked="OnGlobalCloseBlocked"
                          DiscardConfirmed="OnGlobalDiscardConfirmed" />
 
-<FlatPage Kind="FlatPageKind.Module" PageCssClass="experience-toolkit-page no-mobile-fab">
+<FlatPage Kind="FlatPageKind.Module" PageCssClass="experience-toolkit-page no-mobile-fab" RefreshMode="_refreshMode" PullToRefreshScrollSelector=".reliability-scroll" OnRefresh="() => _refreshCount++">
+    <p role="status">Local demonstration refreshes: @_refreshCount</p>
+    <MobileReliabilityExamples @bind-Mode="_refreshMode" />
     <section class="experience-release-strip" aria-label="Application experience release train">
         @foreach (var release in Releases)
         {
@@ -147,6 +149,8 @@
                     SignOut="CloseSessionPreview" />
 
 @code {
+    private FlatRefreshMode _refreshMode = FlatRefreshMode.Disabled;
+    private int _refreshCount;
     private FlatCommandPalette? _localPalette;
     private string _draftStatus = "Draft has not changed.";
     private string _conflictStatus = "Choose one source for every field.";

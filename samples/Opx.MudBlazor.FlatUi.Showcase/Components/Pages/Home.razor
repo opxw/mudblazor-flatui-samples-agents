@@ -5,6 +5,7 @@
           PageCssClass="dashboard-page"
           UsePanel="false"
           RefreshVisible="false"
+          RefreshMode="FlatRefreshMode.Auto"
           OnRefresh="RefreshDashboardAsync">
     <div class="stat-grid">
         <FlatStatCard Label="Total Assets" Value="@Catalog.Assets.Count.ToString()" Icon="@Icons.Material.Outlined.Devices" Note="@DashboardSyncNote" />

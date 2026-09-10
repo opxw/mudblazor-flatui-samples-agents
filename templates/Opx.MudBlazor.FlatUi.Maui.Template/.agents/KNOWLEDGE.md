@@ -15,7 +15,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 ## Current canonical snapshot
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.18`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.22`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.9.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
@@ -158,3 +158,21 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Package 2.1.19 adds domain-neutral `FlatWorkInbox`, `FlatDataFreshnessIndicator`, `FlatScanInput`, `FlatTelemetryPanel`, `FlatRecordRelations`, and `FlatPersonalWorkspace` contracts. Canonical PageId remains `opx.page.reference.enterprise-toolkit`; `MultiPurposeExamples.razor` composes them with existing master-detail, document, scheduler, offline-sync, and dashboard foundations.
 - Package JavaScript owns semantic filled-surface auto contrast and first-paint restoration of saved Device/Manual font mode, bounded font size, and density. Web and static MAUI documents seed the bootstrap data attributes before styles; theme and reconnect synchronization must preserve the restored typography.
 - Scanning, authorization, persistence, per-item actions/results, telemetry transport, device command completion, alarm authority, storage, and native adapters remain host-owned. `Sent` or `Accepted` is not `Succeeded`; online, data quality, freshness, and sync state remain separate signals.
+
+# 2026-09-06 - NuGet 2.1.20 Tree Grid and IconPicker patch
+
+- Public/signed NuGet `2.1.20` was the consumer baseline. Official nupkg SHA-256 is `3FC315ADBDD72A38822A8F61DFC2027033B0DBD11A2A59D59354D4FAC6290BC3`; package CSS SHA-256 is `3FF9B8E8C3E1769F02BFCC68C0EC485C65A1B90E0E159B888297756D8509C37B`.
+- The official package functional payload matches the local source artifact. Package JavaScript and build-transitive props remain unchanged from 2.1.19; the DLL/public API and CSS changed for Tree Grid reordering and IconPicker configuration.
+- `FlatTreeGrid.AllowReorder` is opt-in. Stable item keys own expansion and keyed DOM identity; `DefaultExpanded` seeds newly observed nodes only. `Before`/`After` provides `TargetKey` plus post-removal `NewSiblingIndex`; the host persists parent and sibling order atomically and refreshes `Items`.
+- `FlatMaterialIconPicker` adds `SelectText`, `CancelText`, `EmptyTitle`, `EmptyMessage`, and `ShowMoreText`. Icon keys remain case-sensitive, and the host persists stable `Name`/`Style` rather than copied SVG.
+- MAUI template source must protect the real `#if ANDROID` WebView-history block with `cnd:noEmit`; otherwise `dotnet new` consumes the block as a template condition and generated apps lose `CanGoBack()`/`GoBack()`. Fresh generated output, not a direct template-folder build alone, proves this contract.
+
+# 2026-09-10 - NuGet 2.1.22 hybrid reliability and productivity baseline
+
+- Public/signed NuGet `2.1.22` is the active consumer baseline. Official nupkg SHA-256 is `08CE66780D1ECA664043F2A506D7EAC1BAD71224C9EB9A809A282B3880032BEB`; CSS SHA-256 is `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; DLL SHA-256 is `46990AD2F812602CDB84633B09703966AB280DE5C6714B11EDCE78F718C80D96`.
+- The official archive has a valid NuGet.org repository signature and its functional payload is byte-identical to canonical local artifact `20260909-213441-2.1.22`; the local archive itself is unsigned. Readable JavaScript SHA-256 is `F8FB8DE2E1824EA9767C70A999E99349F80365053D9A6B2749F08719E5BCFCBD`; minified JavaScript SHA-256 is `9544D02B8D17E0FCDE72038B5CE4BFA3AFD17A4C0CAE0F7E3188B50430D9A9AF`.
+- `FlatRefreshMode.Auto` coordinates native MAUI refresh versus Web gesture refresh; `Disabled` overrides legacy native/Web/dashboard flags without disabling ordinary scrolling. Native Android still needs the canonical host handler, per-gesture scroll-boundary gate, overlay coordination, and exact Back pipeline.
+- Model CRUD uses per-session value snapshots, revert-to-clean behavior, single-flight Delete, and separates committed persistence success from later callback failures. Shared editors use the default discard question and keep clean guards out of `NavigationLock`.
+- Hybrid Back order is IME, topmost overlay, explicit WebView history, then root. Responsive Vertical drawers and sheets participate in overlay coordination and suspend native refresh while active. Native Settings uses measured top/bottom insets; standalone `FlatPage` forms and CRUD modals use visual-viewport keyboard avoidance.
+- P1/P2 productivity remains on `opx.page.reference.enterprise-toolkit`: saved views keep query/layout snapshots, nested `FilterTree` is authoritative, context changes guard unsaved work, record selection uses stable keys, and bulk retry targets failed retryable items only. Host authorization, scoped persistence, query execution, cancellation, and idempotency remain authoritative.
+- Browser tests and Android compilation do not prove physical-device/iOS behavior. Native refresh, edge/predictive Back, IME, safe areas, lifecycle, notifications, screen readers, and performance require matching emulator/device evidence.

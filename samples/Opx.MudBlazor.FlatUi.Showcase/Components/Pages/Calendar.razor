@@ -49,12 +49,12 @@
                Title="Create event"
                Mode="Create"
                CanSubmit="@(!string.IsNullOrWhiteSpace(_draft.Title))"
-               IsDirty="@(!string.IsNullOrWhiteSpace(_draft.Title))"
+               IsDirty="@(_draft != _initialDraft)"
                OnSubmit="SaveEvent"
                CloseOnOutsideClick="false"
                AutoRefreshOnSuccess="false">
     <div class="flat-crud-form-grid calendar-event-form">
-        <MudTextField T="string" @bind-Value="_draft.Title" Label="Event title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
+        <MudTextField T="string" @bind-Value="_draft.Title" Label="Event title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" Immediate="true" />
         <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             <MudSelectItem Value="@("Planning")">Planning</MudSelectItem>
             <MudSelectItem Value="@("Meeting")">Meeting</MudSelectItem>
@@ -64,7 +64,7 @@
         <MudDatePicker @bind-Date="_draft.Date" Label="Date" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
         <MudTimePicker @bind-Time="_draft.Time" Label="Start time" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="@_draft.AllDay" />
         <MudCheckBox T="bool" @bind-Value="_draft.AllDay" Label="All-day event" Color="Color.Primary" />
-        <MudTextField T="string" @bind-Value="_draft.Description" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" Class="wide" />
+        <MudTextField T="string" @bind-Value="_draft.Description" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" Class="wide" Immediate="true" />
     </div>
 </FlatFormModal>
 
@@ -87,12 +87,14 @@
     private FlatCalendarView _view = FlatCalendarView.Year;
     private bool _editorOpen;
     private EventDraft _draft = NewDraft(new DateTime(2026, 8, 14));
+    private EventDraft _initialDraft = NewDraft(new DateTime(2026, 8, 14));
 
     private IEnumerable<FlatSchedulerItem> UpcomingEvents => _events.Where(item => item.End >= _displayDate.Date).OrderBy(item => item.Start).Take(4);
 
     private void OpenCreate()
     {
         _draft = NewDraft(_displayDate.Date);
+        _initialDraft = _draft with { };
         _editorOpen = true;
     }
 
@@ -120,6 +122,7 @@
             Category = _draft.Category,
             Description = _draft.Description.Trim()
         });
+        _initialDraft = _draft with { };
         Snackbar.Add("Event created in sample memory.", Severity.Success);
     }
 
@@ -134,7 +137,7 @@
     private static string CategoryTone(string category) => category switch { "Planning" => "green", "Reporting" => "amber", "Deadline" => "red", _ => "blue" };
     private static EventDraft NewDraft(DateTime date) => new() { Date = date, Time = new TimeSpan(9, 0, 0), Category = "Meeting" };
 
-    private sealed class EventDraft
+    private sealed record EventDraft
     {
         public string Title { get; set; } = string.Empty;
         public string Category { get; set; } = "Meeting";

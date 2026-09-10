@@ -38,7 +38,7 @@
                         <td>@asset.Department</td>
                         <td>@asset.Owner</td>
                         <td>@asset.Location</td>
-                        <td><SampleConnectionStatus Status="@asset.Status" /></td>
+                        <td><span class="@StatusClass(asset.Status)"><i></i>@asset.Status</span></td>
                         <td>@asset.Health%</td>
                         <td class="row-actions"><MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" OnClick="() => Edit(asset)" /></td>
                     </tr>
@@ -52,7 +52,7 @@
                 <article class="mobile-card">
                     <header>
                         <div><strong>@asset.Name</strong><small>@asset.Code</small></div>
-                        <SampleConnectionStatus Status="@asset.Status" />
+                        <span class="@StatusClass(asset.Status)"><i></i>@asset.Status</span>
                     </header>
                     <div class="sample-mobile-facts">
                         <FlatInfoItem Label="Department" Value="@asset.Department" />
@@ -84,20 +84,19 @@
                OnResult="HandleEditorResult"
                AutoRefreshOnSuccess="true"
                OnRefreshRequested="ReloadPage"
-               OnSubmit="Save"
-               ConfirmClose="ConfirmClose">
+               OnSubmit="Save">
         <div class="flat-crud-form-grid">
-            <MudTextField T="string" @bind-Value="_draft.Code" Label="Asset Code" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" />
-            <MudTextField T="string" @bind-Value="_draft.Name" Label="Asset Name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
-            <MudTextField T="string" @bind-Value="_draft.Department" Label="Department" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
-            <MudTextField T="string" @bind-Value="_draft.Owner" Label="Owner" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Code" Immediate="true" Label="Asset Code" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" />
+            <MudTextField T="string" @bind-Value="_draft.Name" Immediate="true" Label="Asset Name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Department" Immediate="true" Label="Department" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Owner" Immediate="true" Label="Owner" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
             <MudSelect T="string" @bind-Value="_draft.Status" Label="Status" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("Online")">Online</MudSelectItem>
                 <MudSelectItem Value="@("Pending")">Pending</MudSelectItem>
                 <MudSelectItem Value="@("Offline")">Offline</MudSelectItem>
             </MudSelect>
-            <MudTextField T="string" @bind-Value="_draft.Location" Label="Location" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
-            <MudTextField T="string" @bind-Value="_draft.Notes" Label="Notes" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="4" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Location" Immediate="true" Label="Location" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Notes" Immediate="true" Label="Notes" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="4" Class="wide" />
         </div>
 </FlatFormModal>
 
@@ -106,11 +105,12 @@
     private bool _filterOpen;
     private bool _editorOpen;
     private bool _saving;
-    private bool _dirty = true;
+    private bool _dirty => _draft != _initialDraft;
     private string _search = "";
     private string _editorTitle = "Add Asset";
     private string _editorMode = "Create";
     private AssetDraft _draft = new();
+    private AssetDraft _initialDraft = new();
     private IReadOnlyList<AssetRecord> PagedAssets = [];
     private bool? _lastEditorResult;
 
@@ -157,6 +157,7 @@
         _editorMode = "Create";
         _editorTitle = "Add Asset";
         _draft = new AssetDraft { Code = $"NEW-{DateTime.Now:HHmm}", Status = "Online", Location = "Jakarta" };
+        _initialDraft = _draft with { };
         _editorOpen = true;
     }
 
@@ -174,6 +175,7 @@
             Location = asset.Location,
             Notes = "Sample form. Save only simulates state processing."
         };
+        _initialDraft = _draft with { };
         _editorOpen = true;
     }
 
@@ -182,14 +184,19 @@
         _saving = true;
         await Task.Delay(450);
         _saving = false;
-        _dirty = false;
+        _initialDraft = _draft with { };
     }
 
     private void HandleEditorResult(bool result) => _lastEditorResult = result;
 
-    private Task<bool> ConfirmClose() => Task.FromResult(true);
+    private static string StatusClass(string status) => status switch
+    {
+        "Online" => "status-chip online",
+        "Offline" => "status-chip offline",
+        _ => "status-chip pending"
+    };
 
-    private sealed class AssetDraft
+    private sealed record AssetDraft
     {
         public string Code { get; set; } = "";
         public string Name { get; set; } = "";

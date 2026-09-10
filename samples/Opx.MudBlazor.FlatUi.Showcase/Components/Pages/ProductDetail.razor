@@ -23,7 +23,7 @@
                 <span>Northstar Apparel</span><span>Seller: <strong>OPX Commerce</strong></span><span>Published: <strong>12 Aug 2026</strong></span>
             </MetadataContent>
             <HeaderActions>
-                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Class="grid-action-button" aria-label="Edit product" title="Edit product" OnClick="() => _editorOpen = true" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Class="grid-action-button" aria-label="Edit product" title="Edit product" OnClick="OpenEditor" />
             </HeaderActions>
             <RatingContent>
                 <span class="product-detail-stars" aria-label="4.8 out of 5 stars">★★★★★</span><span>4.8 (1,248 customer reviews)</span>
@@ -60,12 +60,12 @@
     </ChildContent>
 </FlatPage>
 
-<FlatFormModal @bind-Open="_editorOpen" Title="Edit product" Mode="Edit" CanSubmit="true" OnSubmit="SaveProduct">
+<FlatFormModal @bind-Open="_editorOpen" Title="Edit product" IsDirty="@((_draftName, _draftBrand, _draftPrice, _draftDescription) != _initialDraft)" Mode="Edit" CanSubmit="true" OnSubmit="SaveProduct">
     <div class="flat-crud-form-grid">
-        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
-        <MudTextField T="string" @bind-Value="_draftBrand" Label="Brand" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
-        <MudNumericField T="decimal" @bind-Value="_draftPrice" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" />
-        <MudTextField T="string" @bind-Value="_draftDescription" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="4" Class="wide" />
+        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
+        <MudTextField T="string" @bind-Value="_draftBrand" Label="Brand" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
+        <MudNumericField T="decimal" @bind-Value="_draftPrice" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" Immediate="true" />
+        <MudTextField T="string" @bind-Value="_draftDescription" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="4" Class="wide" Immediate="true" />
     </div>
 </FlatFormModal>
 
@@ -82,6 +82,13 @@
     private decimal _draftPrice = 59m;
     private string _draftDescription = "A comfortable everyday sweatshirt.";
 
+    private (string, string, decimal, string) _initialDraft = ("Everyday Rose Sweatshirt", "Northstar Apparel", 59m, "A comfortable everyday sweatshirt.");
+    private void OpenEditor()
+    {
+        (_draftName, _draftBrand, _draftPrice, _draftDescription) = _initialDraft;
+        _editorOpen = true;
+    }
+
     private void PreviousImage() => _activeImage = (_activeImage + 3) % 4;
     private void NextImage() => _activeImage = (_activeImage + 1) % 4;
     private bool IsSpecificationTab => _tab == "Specification";
@@ -90,5 +97,5 @@
     private string? DetailsTabClass => IsDetailsTab ? "active" : null;
     private void SelectSpecificationTab() => _tab = "Specification";
     private void SelectDetailsTab() => _tab = "Details";
-    private Task SaveProduct() => Task.CompletedTask;
+    private Task SaveProduct() { _initialDraft = (_draftName, _draftBrand, _draftPrice, _draftDescription); return Task.CompletedTask; }
 }

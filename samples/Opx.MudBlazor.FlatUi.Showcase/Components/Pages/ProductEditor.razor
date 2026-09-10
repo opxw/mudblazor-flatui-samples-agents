@@ -1,4 +1,8 @@
 @page "/product-editor"
+@inject NavigationManager Navigation
+@inject FlatMessageBoxService MessageBox
+
+<FlatUnsavedChangesGuard HasUnsavedChanges="@(DraftSignature != _baseline)" ConfirmDiscard="ConfirmDiscard" />
 
 <FlatPage Kind="FlatPageKind.CrudForm"
           UsePanel="false"
@@ -12,7 +16,7 @@
         <FlatEditorWorkspace MainAriaLabel="Product content" SidebarAriaLabel="Product publishing settings">
             <MainContent>
                 <FlatEditorSection>
-                    <MudTextField T="string" @bind-Value="_title" Label="Product title" Placeholder="Enter product title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" />
+                    <MudTextField T="string" @bind-Value="_title" Label="Product title" Placeholder="Enter product title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Required="true" Immediate="true" />
                     <div class="product-editor-rich-field">
                         <label>Product description</label>
                         <div class="product-editor-rich-toolbar" role="toolbar" aria-label="Description formatting">
@@ -21,7 +25,7 @@
                                 <MudIconButton Icon="@action.Icon" Size="Size.Small" aria-label="@action.Label" title="@action.Label" />
                             }
                         </div>
-                        <textarea @bind="_description" aria-label="Product description"></textarea>
+                        <textarea @bind="_description" @bind:event="oninput" aria-label="Product description"></textarea>
                     </div>
                 </FlatEditorSection>
 
@@ -39,9 +43,9 @@
 
                 <FlatEditorSection Title="Inventory and pricing">
                     <div class="product-editor-field-grid">
-                        <MudTextField T="string" @bind-Value="_sku" Label="SKU" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
-                        <MudNumericField T="decimal" @bind-Value="_price" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" />
-                        <MudNumericField T="int" @bind-Value="_stock" Label="Stock" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" />
+                        <MudTextField T="string" @bind-Value="_sku" Label="SKU" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
+                        <MudNumericField T="decimal" @bind-Value="_price" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" Immediate="true" />
+                        <MudNumericField T="int" @bind-Value="_stock" Label="Stock" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" Immediate="true" />
                         <MudSelect T="string" @bind-Value="_taxClass" Label="Tax class" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                             <MudSelectItem Value="@("Standard")">Standard</MudSelectItem><MudSelectItem Value="@("Reduced")">Reduced</MudSelectItem><MudSelectItem Value="@("Exempt")">Exempt</MudSelectItem>
                         </MudSelect>
@@ -64,7 +68,7 @@
                     <FlatMultiSelect T="string" Items="TagOptions" Label="Tags" Placeholder="Select tags" SelectedValues="_tags" SelectedValuesChanged="SetTags" ShowItemLeading="false" MaxDisplayedSelectionItems="3" />
                 </FlatEditorSection>
                 <FlatEditorSection Title="Short description">
-                    <MudTextField T="string" @bind-Value="_shortDescription" Placeholder="Catalog and search summary" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="4" />
+                    <MudTextField T="string" @bind-Value="_shortDescription" Placeholder="Catalog and search summary" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="4" Immediate="true" />
                 </FlatEditorSection>
             </SidebarContent>
         </FlatEditorWorkspace>
@@ -98,7 +102,17 @@
 
     private void SetTags(IReadOnlyCollection<string> values) => _tags = values;
     private void FilesChanged(IReadOnlyList<FlatFileUploadItem> files) => _files = files;
-    private Task Save() => Task.CompletedTask;
-    private void Cancel() { }
+    private string _baseline = string.Empty;
+    private string DraftSignature => System.Text.Json.JsonSerializer.Serialize(new
+    {
+        _title, _description, _sku, _price, _stock, _taxClass, _status, _visibility,
+        _publishDate, _category, Tags = _tags.Order().ToArray(), _shortDescription,
+        Files = _files.Select(file => file.Id).Order().ToArray()
+    });
+    protected override void OnInitialized() => _baseline = DraftSignature;
+    private Task<bool> ConfirmDiscard(FlatUnsavedCloseRequest request) =>
+        MessageBox.QuestionAsync("You have unsaved changes. Discard them and leave this form?", "Discard changes?", "Discard changes", "Continue editing");
+    private Task Save() { _baseline = DraftSignature; return Task.CompletedTask; }
+    private void Cancel() => Navigation.NavigateTo("/product-management");
     private sealed record EditorAction(string Label, string Icon);
 }

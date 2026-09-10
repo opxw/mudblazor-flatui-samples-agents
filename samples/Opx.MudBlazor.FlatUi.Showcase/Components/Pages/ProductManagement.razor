@@ -102,15 +102,16 @@
 
 <FlatFormModal @bind-Open="_editorOpen"
                Title="Add product"
+               IsDirty="@((_draftName, _draftCategory, _draftPrice) != _initialDraft)"
                Mode="Create"
                CanSubmit="@(!string.IsNullOrWhiteSpace(_draftName))"
                OnSubmit="SaveProduct">
     <div class="flat-crud-form-grid">
-        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+        <MudTextField T="string" @bind-Value="_draftName" Label="Product name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
         <MudSelect T="string" @bind-Value="_draftCategory" Label="Category" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
             @foreach (var category in Categories) { <MudSelectItem Value="@category">@category</MudSelectItem> }
         </MudSelect>
-        <MudNumericField T="decimal?" @bind-Value="_draftPrice" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" />
+        <MudNumericField T="decimal?" @bind-Value="_draftPrice" Label="Price" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Min="0" Immediate="true" />
     </div>
 </FlatFormModal>
 
@@ -152,6 +153,7 @@
     private string _draftName = "";
     private string _draftCategory = "Accessories";
     private decimal? _draftPrice;
+    private (string, string, decimal?) _initialDraft;
 
     private IReadOnlyList<string> Categories => Products.Select(x => x.Category).Distinct().Order().ToArray();
     private IReadOnlyList<string> Brands => Products.Select(x => x.Brand).Distinct().Order().ToArray();
@@ -214,8 +216,8 @@
     private void ClearStagedFilters() { _stagedCategory = "All"; _stagedBrands.Clear(); _stagedMinPrice = null; _stagedMaxPrice = null; _stagedBrandSearch = ""; }
     private void ApplyStagedFilters() { _category = _stagedCategory; _brands = [.. _stagedBrands]; _minPrice = _stagedMinPrice; _maxPrice = _stagedMaxPrice; Reload(); }
     private void ClearFilters() { _category = "All"; _brands.Clear(); _minPrice = null; _maxPrice = null; StageMobileFilters(); Reload(); }
-    private void AddProduct() { _draftName = ""; _draftCategory = Categories.First(); _draftPrice = null; _editorOpen = true; }
-    private Task SaveProduct() => Task.CompletedTask;
+    private void AddProduct() { _draftName = ""; _draftCategory = Categories.First(); _draftPrice = null; _initialDraft = (_draftName, _draftCategory, _draftPrice); _editorOpen = true; }
+    private Task SaveProduct() { _initialDraft = (_draftName, _draftCategory, _draftPrice); return Task.CompletedTask; }
 
     private sealed record ProductAdminRecord(string Code, string Name, string Category, string Brand, int Stock, decimal Price, int Orders, decimal Rating, string Status, DateTime Published, string Icon, string Tone);
 }

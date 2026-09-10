@@ -2,7 +2,7 @@
 
 This project is the canonical package-mode starting point for OPX Flat UI Android and iOS Blazor Hybrid applications.
 
-It uses NuGet `Opx.MudBlazor.FlatUi` 2.1.19, restores Device/Manual font size and density before first paint, and configures package-owned panel headers with `PanelHeaderMinHeight=48` and `PanelHeaderPaddingY=10`. Preserve those public options; do not replace them with consumer CSS overrides.
+It uses NuGet `Opx.MudBlazor.FlatUi` 2.1.22, restores Device/Manual font size and density before first paint, and configures package-owned panel headers with `PanelHeaderMinHeight=48` and `PanelHeaderPaddingY=10`. Preserve those public options; do not replace them with consumer CSS overrides.
 
 ## First preparation
 

@@ -315,7 +315,6 @@
                CanSubmit="@CanSubmitSample"
                IsDirty="@IsSampleDirty"
                CloseOnOutsideClick="@_sampleCloseOnOutside"
-               ConfirmClose="ConfirmFormModalCloseAsync"
                SubmitHandler="SaveFormModalAsync"
                OnResult="HandleFormModalResult"
                AutoRefreshOnSuccess="true"
@@ -378,8 +377,9 @@
     private string _sampleName = "";
     private string _sampleCategory = "Operations";
     private string _sampleNotes = "";
+    private (string, string, string) _initialSampleDraft = ("", "Operations", "");
     private bool CanSubmitSample => !string.IsNullOrWhiteSpace(_sampleName) && !string.IsNullOrWhiteSpace(_sampleCategory);
-    private bool IsSampleDirty => !string.IsNullOrWhiteSpace(_sampleName) || !string.IsNullOrWhiteSpace(_sampleNotes) || _sampleCategory != "Operations";
+    private bool IsSampleDirty => (_sampleName, _sampleCategory, _sampleNotes) != _initialSampleDraft;
 
     private readonly string[] LineChartLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
     private readonly List<ChartSeries<double>> LineChartSeries =
@@ -499,6 +499,7 @@
         _sampleName = "";
         _sampleCategory = "Operations";
         _sampleNotes = "";
+        _initialSampleDraft = (_sampleName, _sampleCategory, _sampleNotes);
         _formModalResult = null;
         _formModalOpen = true;
     }
@@ -508,6 +509,7 @@
 
     private void FormProcessingCompleted()
     {
+        _initialSampleDraft = (_sampleName, _sampleCategory, _sampleNotes);
         Snackbar.Add("Sample record saved in page memory only.", Severity.Success);
     }
 
@@ -518,9 +520,6 @@
     private void FormProcessingCanceled() =>
         Snackbar.Add("Sample save was cancelled. The form remains editable.", Severity.Info);
 
-    private Task<bool> ConfirmFormModalCloseAsync() => MessageBox.QuestionAsync(
-        "Discard the unsaved sample changes?",
-        title: "Close form");
 
     private void OnSamplePermissionsChanged(IReadOnlyCollection<string> values)
     {

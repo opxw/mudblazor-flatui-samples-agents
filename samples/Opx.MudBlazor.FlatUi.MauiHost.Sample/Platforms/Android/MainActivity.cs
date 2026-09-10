@@ -21,13 +21,58 @@ namespace Opx.MudBlazor.FlatUi.MauiHost.Sample;
 public class MainActivity : MauiAppCompatActivity
 {
     private ModalAwareBackPressedCallback? _modalAwareBackPressedCallback;
+    private bool _modalBackKeyConsumed;
+
+    public override bool DispatchKeyEvent(Android.Views.KeyEvent? e)
+    {
+        if (e?.KeyCode == Android.Views.Keycode.Back)
+        {
+            if (e.Action == Android.Views.KeyEventActions.Up && _modalBackKeyConsumed)
+            {
+                _modalBackKeyConsumed = false;
+                return true;
+            }
+            var page = Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault()?.Page as MainPage;
+            if (e.Action == Android.Views.KeyEventActions.Down &&
+                (_modalBackKeyConsumed || page is not null))
+            {
+                // MAUI 10.0.20 WebView.OnKeyDown calls GoBack before Activity callbacks.
+                // One dispatch owns IME, overlays, WebView history and finally root.
+                // Consume the paired key-up so MAUI cannot perform a second Back.
+                if (!_modalBackKeyConsumed)
+                {
+                    _modalBackKeyConsumed = true;
+                    _modalAwareBackPressedCallback?.HandleOnBackPressed();
+                }
+                return true;
+            }
+        }
+        return base.DispatchKeyEvent(e);
+    }
+
+    public override bool DispatchTouchEvent(Android.Views.MotionEvent? e)
+    {
+        if (e is null) return base.DispatchTouchEvent(e);
+        var page = Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault()?.Page as MainPage;
+        page?.BeforeNativeTouch(e);
+        try { return base.DispatchTouchEvent(e); }
+        finally { page?.AfterNativeTouch(e); }
+    }
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
         WindowCompat.SetDecorFitsSystemWindows(Window, false);
 
-        _modalAwareBackPressedCallback = new ModalAwareBackPressedCallback(this);
+        EnsureModalBackPriority();
+    }
+
+    internal void EnsureModalBackPriority()
+    {
+        // MAUI may register its WebView history callback after Activity.OnCreate.
+        // Reattach after handler/overlay changes so modal handling wins on non-root routes too.
+        _modalAwareBackPressedCallback ??= new ModalAwareBackPressedCallback(this);
+        _modalAwareBackPressedCallback.Remove();
         OnBackPressedDispatcher.AddCallback(this, _modalAwareBackPressedCallback);
     }
 
@@ -47,6 +92,15 @@ public class MainActivity : MauiAppCompatActivity
 
             try
             {
+                var decor = activity.Window?.DecorView;
+                if (decor is not null && ViewCompat.GetRootWindowInsets(decor)?
+                    .IsVisible(WindowInsetsCompat.Type.Ime()) == true)
+                {
+                    WindowCompat.GetInsetsController(activity.Window!, decor)?
+                        .Hide(WindowInsetsCompat.Type.Ime());
+                    return;
+                }
+
                 var page = Microsoft.Maui.Controls.Application.Current?
                     .Windows
                     .FirstOrDefault()?
@@ -57,7 +111,7 @@ public class MainActivity : MauiAppCompatActivity
                     return;
                 }
 
-                if (page is not null && await page.TryHandleBlazorBackAsync())
+                if (page?.TryNavigateBack() == true)
                 {
                     return;
                 }

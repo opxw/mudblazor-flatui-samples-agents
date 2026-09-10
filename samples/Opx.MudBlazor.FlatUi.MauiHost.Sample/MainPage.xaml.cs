@@ -21,8 +21,13 @@ public partial class MainPage : ContentPage
 #endif
     private readonly FlatNativePullToRefreshState _nativePullToRefreshState;
     private readonly Command _nativeRefreshCommand;
+    private IDisposable? _backgroundRefreshLease;
+    internal bool HasSuspendedOverlay => _nativePullToRefreshState.IsSuspended;
+    internal void SuspendRefreshForBackground() => _backgroundRefreshLease ??= _nativePullToRefreshState.Suspend();
+    internal void ResumeRefreshFromBackground() { _backgroundRefreshLease?.Dispose(); _backgroundRefreshLease = null; }
 #if ANDROID
     private readonly StatusBarBehavior _statusBarBehavior = new();
+    private NativeRefreshGestureGate? _refreshGestureGate;
 #endif
 
     public MainPage(FlatNativePullToRefreshState nativePullToRefreshState)
@@ -80,6 +85,9 @@ public partial class MainPage : ContentPage
 
     private void ApplyNativePullToRefreshState()
     {
+#if ANDROID
+        (Platform.CurrentActivity as MainActivity)?.EnsureModalBackPriority();
+#endif
         nativeRefreshView.IsRefreshEnabled = _nativePullToRefreshState.IsEnabled;
         if (!_nativePullToRefreshState.IsRefreshing)
         {
@@ -97,8 +105,7 @@ public partial class MainPage : ContentPage
         {
             var dispatched = await blazorWebView.TryDispatchAsync(services =>
             {
-                var js = services.GetRequiredService<IJSRuntime>();
-                modalBackTask = js.InvokeAsync<bool>("opxFlatModalHistory.tryHandleBack").AsTask();
+                modalBackTask = DispatchOverlayBackAsync(services);
             });
 
             return dispatched
@@ -115,35 +122,59 @@ public partial class MainPage : ContentPage
         }
     }
 
-    public Task<bool> TryHandleBlazorBackAsync()
+    private static async Task<bool> DispatchOverlayBackAsync(IServiceProvider services)
     {
-#if ANDROID
-        return Dispatcher.DispatchAsync(() =>
+        // JS-invokable modal callbacks run on the Blazor renderer dispatcher.
+        // Native TryDispatchAsync supplies scoped services, not a component dispatcher.
+        if (await services.GetRequiredService<IJSRuntime>()
+            .InvokeAsync<bool>("opxFlatModalHistory.tryHandleBack")) return true;
+        var overlays = services.GetService<FlatOverlayCoordinator>();
+        if (overlays?.HasActiveOverlay == true)
         {
-            if (blazorWebView.Handler?.PlatformView is not Android.Webkit.WebView webView
-                || !webView.CanGoBack())
-            {
-                return false;
-            }
-
-            webView.GoBack();
+            await overlays.TryHandleBackAsync();
+            // Rejected dismissal still consumes Back; it must never exit the app.
             return true;
-        });
-#else
-        return Task.FromResult(false);
-#endif
+        }
+        return false;
     }
 
 #if ANDROID
+    internal bool TryNavigateBack()
+    {
+        // Activity fallback does not invoke BlazorAndroidWebView.OnKeyDown.
+        // Consult the actual WebView history rather than guessing a parent URL.
+        if (blazorWebView.Handler?.PlatformView is Android.Webkit.WebView webView
+            && webView.CanGoBack())
+        {
+            webView.GoBack();
+            return true;
+        }
+        return false;
+    }
+
     private void ConfigureAndroidHost(object? sender, EventArgs e)
     {
+        (Platform.CurrentActivity as MainActivity)?.EnsureModalBackPriority();
         if (blazorWebView.Handler?.PlatformView is Android.Webkit.WebView webView)
         {
             webView.OverScrollMode = OverScrollMode.Never;
         }
 
         ApplyAndroidRefreshIndicatorOffset();
+        if (nativeRefreshView.Handler?.PlatformView is GatedMauiSwipeRefreshLayout refreshLayout)
+        {
+            _refreshGestureGate ??= new NativeRefreshGestureGate(_nativePullToRefreshState);
+            refreshLayout.GestureGate = _refreshGestureGate;
+        }
     }
+
+    internal void BeforeNativeTouch(MotionEvent e)
+    {
+        if (blazorWebView.Handler?.PlatformView is Android.Webkit.WebView webView)
+            _refreshGestureGate?.BeforeDispatch(e, webView);
+    }
+
+    internal void AfterNativeTouch(MotionEvent e) => _refreshGestureGate?.AfterDispatch(e);
 
     private void RepositionAndroidRefreshIndicator(object? sender, EventArgs e) =>
         ApplyAndroidRefreshIndicatorOffset();
@@ -158,6 +189,13 @@ public partial class MainPage : ContentPage
         var density = Platform.CurrentActivity?.Resources?.DisplayMetrics?.Density ?? 1f;
         var insets = ViewCompat.GetRootWindowInsets(refreshLayout);
         var statusBarInsetPx = insets?.GetInsets(WindowInsetsCompat.Type.StatusBars())?.Top ?? 0;
+        var navigationInsetPx = insets?.GetInsets(WindowInsetsCompat.Type.NavigationBars())?.Bottom ?? 0;
+        if (blazorWebView.Handler?.PlatformView is Android.Webkit.WebView webView)
+        {
+            var bottomDip = Math.Clamp(navigationInsetPx / Math.Max(density, 1f), 0, 96)
+                .ToString(System.Globalization.CultureInfo.InvariantCulture);
+            webView.EvaluateJavascript($"document.documentElement.style.setProperty('--opx-native-navigationbar-height','{bottomDip}px')", null);
+        }
         var appBarHeightPx = (int)Math.Round(AppBarHeightDip * density);
         var indicatorGapPx = (int)Math.Round(RefreshIndicatorGapDip * density);
         var startOffsetPx = statusBarInsetPx + appBarHeightPx - refreshLayout.ProgressCircleDiameter;

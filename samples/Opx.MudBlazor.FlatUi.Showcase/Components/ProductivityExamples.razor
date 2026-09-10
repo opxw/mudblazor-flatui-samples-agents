@@ -1,0 +1,150 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@using System.Globalization
+@implements IDisposable
+@inject FlatMessageBoxService Messages
+
+<section class="flat-productivity-sample" aria-label="Productivity P1 and P2">
+    <FlatPanel Title="Workspace productivity" Subtitle="P1 / P2 · local sample, no server mutations or durable storage">
+        <div class="flat-productivity-body">
+            <FlatContextSwitcher Contexts="Contexts" Value="_context" ValueChanged="ContextChanged" HasUnsavedChanges="_dirty"
+                                 ConfirmDiscard="ConfirmContext" ChangeContextAsync="ChangeContext" Disabled="_running" />
+            <label><input type="checkbox" @bind="_dirty" /> Simulate unsaved changes</label>
+            <FlatSavedViewPicker Views="_views" Value="_view" ValueChanged="ApplyView" SaveRequested="SaveView" />
+            <div class="flat-business-component flat-productivity-actions">
+                <label>Search records<input value="@_view.SearchText" @oninput="SearchChanged" /></label>
+                <label>Presentation<select aria-label="Presentation" value="@_view.Presentation" @onchange="PresentationChanged"><option value="Auto">Auto</option><option value="Table">Table</option><option value="Cards">Cards</option></select></label>
+            </div>
+            <details><summary>Columns and layout</summary><FlatGridPreferencesPanel GridKey="productivity" Columns="Columns" Value="_view" ValueChanged="ApplyView" SaveRequested="SaveView" /></details>
+            <FlatQueryBuilder Fields="Fields" Value="@(_view.Query ?? new([], [], []))" ValueChanged="QueryChanged" Presets="Presets" RunRequested="RunQuery" Title="Advanced filters" />
+            <div class="flat-productivity-results @(_view.Presentation == FlatSavedViewPresentation.Cards ? "prefer-cards" : "prefer-table")" aria-label="Saved view preview">
+                @foreach (var group in VisibleRecords.GroupBy(x => _view.Query?.Groups.FirstOrDefault() is { } key ? Text(x, key) : "Records"))
+                {
+                    <strong>@group.Key</strong>
+                    <div class="flat-productivity-table"><FlatDataGrid TItem="DemoRecord" State="_grid" Columns="Columns" Preferences="_view" Items="group.ToArray()" Changed="GridChanged" /></div>
+                    <div class="flat-productivity-cards">
+                        <FlatCardGrid TItem="DemoRecord" Items="group.ToArray()" SearchText="@_view.SearchText" SearchTextChanged="SetSearch" AddVisible="false" ShowOverflow="false" ShowViewToggle="false">
+                            <ItemTemplate Context="record"><div class="flat-productivity-record-card">
+                                @foreach (var column in FlatGridPreferenceResolver.Normalize(_view, "productivity", 1, Columns.Select(x => x.Key)).Columns.Where(x => x.Visible))
+                                { <FlatInfoItem Label="@(Columns.First(x => x.Key == column.Key).Label)" Value="@Text(record, column.Key)" /> }
+                            </div></ItemTemplate>
+                        </FlatCardGrid>
+                    </div>
+                }
+                @if (VisibleRecords.Count == 0) { <FlatEmptyState Title="No matching records" /> }
+            </div>
+            <p role="status" class="flat-productivity-status">@_status</p>
+        </div>
+    </FlatPanel>
+    <FlatPanel Title="Record workspace" Subtitle="One selected key for details, documents, activity, approval and relations">
+        <FlatRecordWorkspace TItem="DemoRecord" Items="VisibleRecords" ItemKey="x => x.Key" @bind-SelectedKey="_selectedKey" @bind-Section="_section">
+            <ItemTemplate Context="record"><strong>@record.Label</strong><small>@record.Category · @record.Key</small></ItemTemplate>
+            <HeaderTemplate Context="record"><strong>@record.Label</strong></HeaderTemplate>
+            <DetailContent Context="record"><FlatInfoItem Label="Reference" Value="@record.Key" /><FlatInfoItem Label="Category" Value="@record.Category" /></DetailContent>
+            <DocumentsContent Context="record"><FlatDocumentWorkspace Documents="Documents(record)" /></DocumentsContent>
+            <ActivityContent Context="record"><FlatAuditTrail Events="Activity(record)" /></ActivityContent>
+            <ApprovalContent Context="record"><FlatWorkflowPanel Steps="Workflow(record)" Actions="Array.Empty<FlatWorkflowActionKind>()" /></ApprovalContent>
+            <RelatedContent Context="record"><FlatRecordRelations Records="RelatedRecords" Relations="Relations(record)" Selected="RelatedSelected" /></RelatedContent>
+        </FlatRecordWorkspace>
+    </FlatPanel>
+    <FlatPanel Title="Bulk progress" Subtitle="Simulated per-record outcomes; cancellation never implies server rollback">
+        <div class="flat-productivity-body">
+            <MudButton Variant="Variant.Outlined" Disabled="_running" OnClick="StartBulk">Start sample operation</MudButton>
+            <FlatBulkOperationProgress OperationKey="sample-bulk" Items="_progress" Busy="_running" CanCancel="true" RetryFailed="RetryBulk" CancelRequested="CancelBulk" />
+        </div>
+    </FlatPanel>
+</section>
+
+@code {
+    private static readonly FlatApplicationContext[] Contexts = [new("plant-a", "Example company", "North branch", "Plant A"), new("plant-b", "Example company", "South branch", "Plant B")];
+    private FlatApplicationContext _context = Contexts[0];
+    private bool _dirty, _running, _disposed;
+    private string? _selectedKey = "R-1";
+    private FlatRecordSection _section;
+    private string _status = "Save a view, change the controls, then load it again. All data stays in this sample instance.";
+    private static readonly GridColumnDefinition[] Columns = [new("Label", "Record", FilterEnabled: false), new("Category", "Category", FilterEnabled: false), new("Amount", "Amount", GridColumnFilterType.Number, FilterEnabled: false), new("Date", "Date", GridColumnFilterType.Date, FilterEnabled: false)];
+    private static readonly FlatQueryField[] Fields = [new("Label", "Record"), new("Category", "Category") { ValueKind = FlatRuleValueKind.Lookup, Options = [new("Operations", "Operations"), new("Support", "Support")] }, new("Amount", "Amount") { ValueKind = FlatRuleValueKind.Number }, new("Date", "Date") { ValueKind = FlatRuleValueKind.Date }];
+    private static readonly FlatRulePreset[] Presets = [new("operations", "Operations only", new(FlatLogicalOperator.And, [new("category", "Category", FlatRuleOperator.Equals, "Operations")])), new("range", "Amount 10 to 50", new(FlatLogicalOperator.And, [new("amount", "Amount", FlatRuleOperator.Between, "10") { UpperValue = "50" }]))];
+    private FlatGridPreferenceState _view = FlatGridPreferenceResolver.Normalize(null, "productivity", 1, Columns.Select(x => x.Key)) with { Query = new([], [], []) };
+    private IReadOnlyList<FlatGridPreferenceState> _views = [];
+    private GridViewState _grid = new();
+    private static readonly DemoRecord[] Records = [new("R-1", "Inspection request", "Operations", 20, new(2026, 9, 1)), new("R-2", "Service request", "Support", 70, new(2026, 9, 2)), new("R-3", "Stock request", "Operations", 40, new(2026, 9, 3))];
+    private IReadOnlyList<DemoRecord> VisibleRecords
+    {
+        get
+        {
+            var query = _view.Query;
+            IEnumerable<DemoRecord> rows = Records.Where(x => x.Label.Contains(_view.SearchText, StringComparison.OrdinalIgnoreCase));
+            if (query?.FilterTree is { } tree)
+            {
+                var fields = Fields.Select(x => new FlatRuleField(x.Key, x.Label) { ValueKind = x.ValueKind, Options = x.Options }).ToArray();
+                rows = FlatRuleValidation.Validate(tree, fields).Count == 0 ? rows.Where(x => Matches(x, tree)) : [];
+            }
+            if (query?.Sorts.FirstOrDefault() is { } sort)
+                rows = sort.Direction == FlatQuerySortDirection.Descending ? rows.OrderByDescending(x => FieldValue(x, sort.FieldKey)) : rows.OrderBy(x => FieldValue(x, sort.FieldKey));
+            return rows.ToArray();
+        }
+    }
+    private static object FieldValue(DemoRecord row, string key) => key switch { "Amount" => row.Amount, "Date" => row.Date, "Category" => row.Category, _ => row.Label };
+    private static string Text(DemoRecord row, string key) => FieldValue(row, key) switch { DateOnly date => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), decimal amount => amount.ToString(CultureInfo.InvariantCulture), var value => value.ToString() ?? "" };
+    private static bool Matches(DemoRecord row, FlatRuleDefinition group)
+    {
+        var matches = group.Conditions.Select(c => Match(row, c)).Concat(group.Groups.Select(g => Matches(row, g))).ToArray();
+        return matches.Length == 0 || (group.LogicalOperator == FlatLogicalOperator.And ? matches.All(x => x) : matches.Any(x => x));
+    }
+    private static bool Match(DemoRecord row, FlatRuleCondition condition)
+    {
+        var text = Text(row, condition.FieldKey);
+        var compare = string.Compare(text, condition.Value, StringComparison.OrdinalIgnoreCase);
+        var upperCompare = string.Compare(text, condition.UpperValue, StringComparison.OrdinalIgnoreCase);
+        if (condition.FieldKey == "Amount" && decimal.TryParse(condition.Value, CultureInfo.InvariantCulture, out var number))
+        { compare = row.Amount.CompareTo(number); if (decimal.TryParse(condition.UpperValue, CultureInfo.InvariantCulture, out var upper)) upperCompare = row.Amount.CompareTo(upper); }
+        return condition.Operator switch { FlatRuleOperator.Equals => compare == 0, FlatRuleOperator.NotEquals => compare != 0, FlatRuleOperator.Contains => text.Contains(condition.Value ?? "", StringComparison.OrdinalIgnoreCase), FlatRuleOperator.GreaterThan => compare > 0, FlatRuleOperator.LessThan => compare < 0, FlatRuleOperator.Between => compare >= 0 && upperCompare <= 0, FlatRuleOperator.IsEmpty => text.Length == 0, FlatRuleOperator.IsNotEmpty => text.Length > 0, _ => false };
+    }
+    private void QueryChanged(FlatQueryDefinition query) { _view = _view with { Query = query }; SyncGrid(); }
+    private void ApplyView(FlatGridPreferenceState view) { _view = FlatSavedViewSnapshot.Copy(view); SyncGrid(); }
+    private void SyncGrid() { _grid = new(); if (_view.Query?.Sorts.FirstOrDefault() is { } sort) { _grid.ToggleSort(sort.FieldKey); if (sort.Direction == FlatQuerySortDirection.Descending) _grid.ToggleSort(sort.FieldKey); } }
+    private void GridChanged() => _view = _view with { Query = (_view.Query ?? new([], [], [])) with { Sorts = [new(_grid.SortKey, _grid.SortDescending ? FlatQuerySortDirection.Descending : FlatQuerySortDirection.Ascending)] } };
+    private void SaveView(FlatGridPreferenceState view) { _views = [.._views.Where(x => x.ViewName != view.ViewName), FlatSavedViewSnapshot.Copy(view)]; _status = $"Saved '{view.ViewName}' in memory."; }
+    private void SetSearch(string value) => _view = _view with { SearchText = value };
+    private void SearchChanged(ChangeEventArgs e) => SetSearch(e.Value?.ToString() ?? "");
+    private void PresentationChanged(ChangeEventArgs e) { if (Enum.TryParse<FlatSavedViewPresentation>(e.Value?.ToString(), out var value)) _view = _view with { Presentation = value }; }
+    private void RunQuery(FlatQueryDefinition query) => _status = $"Validated local query: {VisibleRecords.Count} records. No remote query was sent.";
+    private Task<bool> ConfirmContext(FlatUnsavedCloseRequest _) => Messages.QuestionAsync("Discard unsaved changes and switch context?", "Switch context", "Discard and switch", "Keep editing");
+    private Task<bool> ChangeContext(FlatContextChangeRequest request, CancellationToken token) { token.ThrowIfCancellationRequested(); return Task.FromResult(Contexts.Contains(request.Next)); }
+    private void ContextChanged(FlatApplicationContext context) { _context = context; _dirty = false; _selectedKey = null; _views = []; _view = FlatGridPreferenceResolver.Normalize(null, "productivity", 1, Columns.Select(x => x.Key)) with { Query = new([], [], []) }; SyncGrid(); _status = $"Context changed to {context.Site}. Views and selection cleared; demo records are synthetic."; }
+    private static FlatDocumentItem[] Documents(DemoRecord row) => [new($"{row.Key}-doc", $"{row.Key} notes.pdf", "application/pdf", 2048, null, "v1")];
+    private static FlatAuditEvent[] Activity(DemoRecord row) => [new($"{row.Key}-audit", FlatAuditAction.Create, "Sample operator", new(2026, 9, 1, 8, 0, 0, TimeSpan.Zero), row.Key, "Local demonstration", [])];
+    private static FlatWorkflowStep[] Workflow(DemoRecord row) => [new($"{row.Key}-review", "Review", "Pending")];
+    private static FlatRelatedRecord[] RelatedRecords => Records.Select(x => new FlatRelatedRecord(x.Key, x.Label, x.Category, "Sample")).ToArray();
+    private static FlatRecordRelation[] Relations(DemoRecord row) => Records.Where(x => x.Key != row.Key).Select(x => new FlatRecordRelation($"{row.Key}-{x.Key}", row.Key, x.Key, "Related")).ToArray();
+    private void RelatedSelected(FlatRelatedRecord row) => _selectedKey = row.Key;
+    private IReadOnlyList<FlatBulkItemProgress> _progress = [];
+    private CancellationTokenSource? _operation;
+    private Task StartBulk() => Process(Records.Select(x => x.Key).ToArray(), false);
+    private Task RetryBulk(FlatBulkRetryRequest request) => Process(request.Keys.Where(key => _progress.Any(x => x.Key == key && x.State == FlatBackgroundOperationState.Failed && x.CanRetry)).ToArray(), true);
+    private void CancelBulk(string _) => _operation?.Cancel();
+    private async Task Process(IReadOnlyList<string> keys, bool retry)
+    {
+        if (_running || _disposed) return;
+        _running = true;
+        using var operation = new CancellationTokenSource(); _operation = operation;
+        if (!retry) _progress = Records.Select(x => new FlatBulkItemProgress(x.Key, x.Label, FlatBackgroundOperationState.Queued)).ToArray();
+        else _progress = _progress.Select(x => keys.Contains(x.Key) ? x with { State = FlatBackgroundOperationState.Queued, CanRetry = false, Message = null } : x).ToArray();
+        try
+        {
+            foreach (var key in keys)
+            {
+                operation.Token.ThrowIfCancellationRequested();
+                SetProgress(key, FlatBackgroundOperationState.Running);
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(800, operation.Token);
+                SetProgress(key, !retry && key == "R-2" ? FlatBackgroundOperationState.Failed : FlatBackgroundOperationState.Completed);
+            }
+        }
+        catch (OperationCanceledException) { _progress = _progress.Select(x => x.State is FlatBackgroundOperationState.Running or FlatBackgroundOperationState.Queued ? x with { State = FlatBackgroundOperationState.Cancelled } : x).ToArray(); }
+        finally { _running = false; _operation = null; }
+    }
+    private void SetProgress(string key, FlatBackgroundOperationState state) => _progress = _progress.Select(x => x.Key == key ? x with { State = state, CanRetry = state == FlatBackgroundOperationState.Failed, Message = state == FlatBackgroundOperationState.Failed ? "Simulated temporary failure" : null } : x).ToArray();
+    public void Dispose() { _disposed = true; _operation?.Cancel(); }
+    private sealed record DemoRecord(string Key, string Label, string Category, decimal Amount, DateOnly Date);
+}

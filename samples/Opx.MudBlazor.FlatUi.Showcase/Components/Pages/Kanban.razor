@@ -123,8 +123,7 @@
                      IsDirty="@IsDirty"
                      CloseOnOutsideClick="false"
                      OnClose="CloseEditor"
-                     OnSubmit="SaveTask"
-                     ConfirmClose="ConfirmClose">
+                     OnSubmit="SaveTask">
         <MudTextField T="string" Label="Title" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.Title" Immediate="true" />
         <MudTextField T="string" Label="Description" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" @bind-Value="_draft.Description" Immediate="true" />
         <MudSelect T="string" Label="Column" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" @bind-Value="_draft.ColumnKey">
@@ -188,13 +187,12 @@
     private bool _editorOpen;
     private KanbanTask? _editingTask;
     private TaskDraft _draft = new();
+    private TaskDraft _initialDraft = new();
 
     private bool CanSave => !string.IsNullOrWhiteSpace(_draft.Title)
                             && !string.IsNullOrWhiteSpace(_draft.Assignee)
                             && Columns.Any(column => column.Key == _draft.ColumnKey);
-    private bool IsDirty => _editorOpen && (_editingTask is null
-        ? !string.IsNullOrWhiteSpace(_draft.Title) || !string.IsNullOrWhiteSpace(_draft.Description)
-        : !_draft.EqualsTask(_editingTask));
+    private bool IsDirty => _draft != _initialDraft;
 
     private void SetSearch(string value) => _search = value ?? "";
     private bool KanbanFilterActive => _assigneeFilter != AllFilter || _priorityFilter != AllFilter;
@@ -246,6 +244,7 @@
             Priority = Priorities[1],
             Assignee = Assignees[0]
         };
+        _initialDraft = _draft with { };
         _editorOpen = true;
     }
 
@@ -253,6 +252,7 @@
     {
         _editingTask = task;
         _draft = TaskDraft.FromTask(task);
+        _initialDraft = _draft with { };
         _editorOpen = true;
     }
 
@@ -285,10 +285,10 @@
             Snackbar.Add("Task updated.", Severity.Success);
         }
 
+        _initialDraft = _draft with { };
         CloseEditor();
     }
 
-    private Task<bool> ConfirmClose() => Task.FromResult(true);
 
     private void MoveTask(FlatKanbanMoveEventArgs<KanbanTask> move)
     {
@@ -323,7 +323,7 @@
         public IReadOnlyList<string> Tags { get; set; } = tags;
     }
 
-    private sealed class TaskDraft
+    private sealed record TaskDraft
     {
         public string Title { get; set; } = "";
         public string Description { get; set; } = "";

@@ -1,22 +1,30 @@
 # Composable display settings
 
-Copyright (c) 2026 opx. All rights reserved.
+In edge-to-edge MAUI, Settings overlays use `--opx-native-statusbar-height` and `--opx-native-navigationbar-height` under `html.opx-native-transparent-statusbar`. The panel fits the inset-adjusted overlay instead of a raw `100dvh`; header/footer remain visible and only the body scrolls. Landscape keeps bounded desktop-style margins. Hosts without the native marker retain existing Web geometry. See `tests/responsive/settings-safe-area.spec.ts` for simulated-inset regression; native validation is separate.
 
-The package theme bootstrap restores saved Device/Manual font mode, bounded font size, and density before styles and Blazor first paint. Web hosts seed `data-opx-use-app-font-size`, `data-opx-font-size`, `data-opx-minimum-font-size`, `data-opx-maximum-font-size`, and `data-opx-density` from `FlatUiDisplayOptions`; static MAUI HTML must seed values matching its appsettings defaults. Device mode remains `1rem`, and later theme or reconnect synchronization must not reset typography.
+2026-09-09 verification: 3 browser projects passed inset/resize/Web-restoration tests, 297 .NET tests passed, Android Release built with zero warnings/errors, and repository audit passed 66 pages. Pixel 7 API36 portrait screenshots confirm native Settings header/footer clearance before and after touch-scrolling to Local notification. Evidence: `artifacts/settings-safe-area-20260909/settings-fixed.png` and `settings-scrolled.png`; installed/copied APK SHA256 `BD53C7E706A5E23E4A449EFBEC6B909B39D12BF85A1A132FEED3C8CC5C144E3E`. Native landscape/Windows were not retested; landscape coverage here is browser-simulated insets. No NuGet publication.
 
-Panel headers use global `OpxFlatUi:Display:PanelHeaderMinHeight` (default `48px`, clamped to `0-240`) and `PanelHeaderPaddingY` (default `10px`, clamped to `0-64`). `FlatMudProviders` applies both package tokens as CSS variables. Headers keep intrinsic growth for subtitles and actions; horizontal padding is unchanged. These values are host configuration, not persisted user preferences.
+FAB shape is independent of ordinary button rounding: `OpxFlatUi:Display:DefaultFabShape` defaults to `Circle`; `Square` stays at zero radius, and Extended Circle is pill-shaped. `FlatFab.Shape` remains the local override. The global flat reset keeps exclusions specificity-neutral so spinner exceptions cannot flatten a configured Circle FAB or semantic avatar. Regression coverage: `tests/responsive/fab-shape.spec.ts` (themes, shells, shape variants and live resize), plus CRUD pager tests.
+
+The theme bootstrap also restores saved font mode, bounded font size, and density before styles/Blazor first paint. Host HTML can seed `data-opx-use-app-font-size`, `data-opx-font-size`, `data-opx-minimum-font-size`, `data-opx-maximum-font-size`, and `data-opx-density`; keep these aligned with Display options. Device mode remains `1rem`. Theme changes and reconnect shell mounting must not reset typography. Native static HTML hosts must seed matching defaults if their appsettings differ from 16px/manual-off and 12–18 bounds.
+
+`FlatMudProviders` resolves a directly registered `FlatUiDisplayOptions` instance first (the canonical Web/MAUI registration), then `IOptions<FlatUiDisplayOptions>`, then defaults. Direct registration deliberately wins when both exist, including when `AddOptions` supplies an implicit default wrapper. No consumer DI bridge is required.
+
+Panel headers use global `OpxFlatUi:Display:PanelHeaderMinHeight` (default 48px, clamped to 0–240) and `PanelHeaderPaddingY` (default 10px, clamped to 0–64). `FlatMudProviders` applies these settings as CSS variables; headers retain intrinsic height for subtitles/actions. Horizontal padding is unchanged. These are host configuration, not persisted user preferences or AppBar settings.
 
 ```json
 { "OpxFlatUi": { "Display": { "PanelHeaderMinHeight": 48, "PanelHeaderPaddingY": 10 } } }
 ```
 
-Theme, Density, and Input Style headings/helper text align with their option controls using a package-owned `16px` horizontal inset, reduced to `14px` at `520px` and below. Do not double-pad sections whose parent already owns spacing and do not reproduce this behavior in consumer CSS.
+Theme, Density, and Input Style headings and helper text align with their options using 16px horizontal padding, or 14px at widths of 520px and below. Sections with parent-owned padding do not receive another inset.
 
-`FlatDisplaySettings` remains backward compatible: when `Configuration` is omitted it renders the complete Settings surface in its established order. Consumers may opt into a smaller, localized, or reordered surface through package-owned `FlatDisplaySettingsConfiguration` without copying component markup or CSS.
+Copyright (c) 2026 opx. All rights reserved.
+
+`FlatDisplaySettings` remains backward compatible: when `Configuration` is not supplied it renders the existing complete settings surface in its established order. Hosts may opt into a smaller, localized, or reordered surface through `FlatDisplaySettingsConfiguration` without duplicating package markup.
 
 ## Indonesian essentials preset
 
-Use `FlatDisplaySettingsConfiguration.IndonesianEssentials` when a host needs only Tema, Palet warna, Ukuran font, and Target sentuh in Bahasa Indonesia. The preset orders sections as `Theme`, `ColorPalette`, `FontSize`, then `Density`; navigation, sidebar colors, input style, backdrop opacity, and rounded corners are not rendered.
+Use the built-in preset when a host needs only Tema, Palet warna, Ukuran font, and Target sentuh in Bahasa Indonesia:
 
 ```razor
 <FlatDisplaySettings Configuration="FlatDisplaySettingsConfiguration.IndonesianEssentials"
@@ -33,12 +41,14 @@ Use `FlatDisplaySettingsConfiguration.IndonesianEssentials` when a host needs on
                      DensityChanged="SetDensityAsync" />
 ```
 
-## Composition contract
+The preset orders sections as `Theme`, `ColorPalette`, `FontSize`, then `Density`. Navigation, sidebar colors, input style, backdrop opacity, and rounded corners are not rendered.
 
-- `Sections` is the exact visible order.
-- `LockedSections` displays host values while suppressing component change intents.
-- `Text` accepts `FlatDisplaySettingsText.Indonesian`, `English`, or host-supplied immutable copy.
-- `ShowSectionHeadings=true` shows localized headings.
-- `SectionTemplates` replaces only explicitly selected section bodies.
+## Select, reorder, lock, and replace sections
 
-The component emits normalized change intents only. The host owns the modal, draft/live preview, Save, Cancel, Restore defaults, persistence, authorization, and policy. A locked UI value is presentation policy, not server-side authorization.
+- Set `Sections` to the exact ordered list that should appear.
+- Put sections in `LockedSections` to display the host value while disabling user changes. For example, keep `RoundedSizePx="7"` and lock `RoundedCorners`.
+- Set `Text` to `FlatDisplaySettingsText.Indonesian`, `English`, or a host-created immutable text record.
+- Set `ShowSectionHeadings=true` when each selected section needs a visible localized heading.
+- Supply `SectionTemplates` to replace only selected section bodies with host-owned `RenderFragment` content while retaining deterministic section order.
+
+The component emits normalized change intents only. The host continues to own the modal, draft/live preview, Save, Cancel, Restore defaults, persistence, authorization, and policy. A locked UI value is presentation policy, not server-side authorization.

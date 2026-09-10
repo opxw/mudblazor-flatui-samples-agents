@@ -19,6 +19,10 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit();
 
+#if ANDROID
+        builder.ConfigureMauiHandlers(handlers => handlers.AddHandler<RefreshView, NativeRefreshViewHandler>());
+#endif
+
         using var settings = typeof(MauiProgram).Assembly
             .GetManifestResourceStream("appsettings.json")
             ?? throw new InvalidOperationException("Embedded appsettings.json was not found.");
@@ -35,14 +39,17 @@ public static class MauiProgram
         RegisterFlatUiOptions(builder.Services, builder.Configuration);
         builder.Services.AddOpxFlatUiShowcase();
         builder.Services.AddSingleton<FlatNativePullToRefreshState>();
+        FlatMobileConfigurationValidator.ValidateOrThrow(
+            builder.Configuration.GetSection("OpxFlatUi:Mobile:Pages").Get<FlatPageRefreshConfiguration[]>() ?? [],
+            FlatUiHostKind.MauiHybrid, nativeAdapterRegistered: true);
         builder.Services.AddScoped<FlatPageLoadingState>();
         builder.Services.AddScoped<FlatMessageBoxService>();
+        builder.Services.AddScoped<FlatOverlayCoordinator>();
         builder.Services.AddScoped<FlatUiPreferencesService>();
         builder.Services.AddSingleton<IHybridDeviceAdapter, MauiHybridDeviceAdapter>();
         builder.Services.AddSingleton<IHybridStatusBarService, MauiHybridStatusBarService>();
         builder.Services.AddSingleton<IHybridSessionBootstrapper, SampleHybridSessionBootstrapper>();
         builder.Services.AddSingleton<IDeviceNotificationService, MauiDeviceNotificationService>();
-        builder.Services.AddSingleton<MauiPerformanceTracker>();
         builder.Services.AddSingleton<MainPage>();
 
 #if DEBUG

@@ -50,6 +50,7 @@ public partial class MainPage : ContentPage
 
     public Task<bool> TryHandleBlazorBackAsync()
     {
+//-:cnd:noEmit
 #if ANDROID
         return Dispatcher.DispatchAsync(() =>
         {
@@ -65,5 +66,6 @@ public partial class MainPage : ContentPage
 #else
         return Task.FromResult(false);
 #endif
+//+:cnd:noEmit
     }
 }

@@ -1,0 +1,90 @@
+@* Copyright (c) 2026 opx. All rights reserved. *@
+@inject IServiceProvider Services
+<FlatPanel Title="Mobile reliability" Subtitle="Local state demo; host owns durable workspace storage and remote search">
+    <div class="flat-productivity-body">
+        <div class="flat-business-component flat-productivity-actions">
+        <label>Refresh mode<select aria-label="Refresh mode" value="@Mode" @onchange="ChangeMode">
+            @foreach (var mode in Enum.GetValues<FlatRefreshMode>()) { <option value="@mode">@mode</option> }
+        </select></label>
+        <label>Workspace search<input aria-label="Workspace search" value="@_workspace.Search" @oninput="e => _workspace = _workspace with { Search = e.Value?.ToString() }" /></label>
+        </div>
+        <p>Disabled overrides all legacy flags. Native requires a registered MAUI adapter; Auto may use Web.</p>
+        @if (!_detail)
+        {
+            <FlatScrollRestoration Position="@ScrollPosition" PositionChanged="RememberScroll" ScrollSelector=".reliability-scroll">
+                <div class="reliability-scroll flat-business-component" style="display:block;max-height:180px;overflow-y:auto;overscroll-behavior-y:auto;touch-action:pan-y">
+                    @foreach (var number in Enumerable.Range(1, 30).Where(x => $"Record {x}".Contains(_workspace.Search ?? "", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        <button type="button" style="display:block;width:100%;min-height:42px;text-align:left" @onclick="() => Select(number)">Record @number</button>
+                    }
+                </div>
+            </FlatScrollRestoration>
+        }
+        else
+        {
+            <p>Selected record: @_workspace.SelectedKey</p>
+            <button type="button" @onclick="() => _detail = false">Back to workspace</button>
+        }
+        <p role="status">Remembered scroll: @ScrollPosition.ToString("F0") px. Search and selection stay in the same workspace state.</p>
+        <FlatSearchComboBox T="string" Label="Cancellable lookup" SearchAsync="Search" />
+        <MudButton Variant="Variant.Outlined" OnClick="OpenKeyboardForm">Open keyboard test form</MudButton>
+        <FlatMobileDiagnostics DevelopmentEnabled="@IsDevelopment" />
+        <section class="flat-business-component" aria-label="Host-owned connection recovery">
+            <p>Connection recovery demo: simulated host result, no network request or automatic retry.</p>
+            <MudButton OnClick="SimulateOffline">Simulate offline</MudButton>
+            <MudButton OnClick="SimulateDenied">Simulate access denied</MudButton>
+            <FlatOperationState Result="_connectionResult" Retry="RetryConnection" />
+            <p role="status">Recovery attempts: @_retryCount</p>
+        </section>
+    </div>
+</FlatPanel>
+<FlatFormModal @bind-Open="_form" Title="Keyboard-safe form" IsDirty="@(!_formValues.SequenceEqual(_initialFormValues))" CanSubmit="true" OnSubmit="SaveKeyboardForm">
+    @for (var index = 1; index <= 14; index++)
+    {
+        var fieldIndex = index - 1;
+        <div style="margin-bottom:16px">
+            <MudTextField T="string" Value="@_formValues[fieldIndex]" ValueChanged="value => SetFormValue(fieldIndex, value)" Immediate="true" Label="@($"Field {index}")" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </div>
+    }
+</FlatFormModal>
+@code {
+    [Parameter] public FlatRefreshMode Mode { get; set; } = FlatRefreshMode.Disabled;
+    [Parameter] public EventCallback<FlatRefreshMode> ModeChanged { get; set; }
+    private bool _detail, _form;
+    private string[] _formValues = Enumerable.Repeat(string.Empty, 14).ToArray();
+    private string[] _initialFormValues = Enumerable.Repeat(string.Empty, 14).ToArray();
+    private void OpenKeyboardForm()
+    {
+        _formValues = Enumerable.Repeat(string.Empty, 14).ToArray();
+        _initialFormValues = [.. _formValues];
+        _form = true;
+    }
+    private void SaveKeyboardForm() => _initialFormValues = [.. _formValues];
+    private void SetFormValue(int index, string value)
+    {
+        _formValues[index] = value;
+        StateHasChanged();
+    }
+    private FlatOperationResult? _connectionResult;
+    private int _retryCount;
+    private void SimulateOffline() => _connectionResult = FlatOperationResult.Failure(FlatOperationFailureKind.Offline, "Connection unavailable. Existing records are retained.", canRetry: true);
+    private void SimulateDenied() => _connectionResult = FlatOperationResult.Failure(FlatOperationFailureKind.Forbidden, "Access denied. Contact the host administrator.");
+    private async Task RetryConnection()
+    {
+        _retryCount++;
+        await Task.Delay(400);
+        _connectionResult = FlatOperationResult.Success();
+    }
+    private FlatWorkspaceState _workspace = new("mobile-reliability");
+    private double ScrollPosition => _workspace.ScrollPositions.GetValueOrDefault("records");
+    private bool IsDevelopment => (Services.GetService(typeof(FlatMobileDiagnosticsOptions)) as FlatMobileDiagnosticsOptions)?.DevelopmentEnabled == true;
+    private void RememberScroll(double position) => _workspace = _workspace with { ScrollPositions = new Dictionary<string, double> { ["records"] = position } };
+    private void Select(int number) { _workspace = _workspace with { SelectedKey = number.ToString() }; _detail = true; }
+    private Task ChangeMode(ChangeEventArgs e) => Enum.TryParse<FlatRefreshMode>(e.Value?.ToString(), out var mode) ? ModeChanged.InvokeAsync(mode) : Task.CompletedTask;
+    private static async Task<IEnumerable<FlatSearchComboOption<string>>> Search(string? query, CancellationToken cancellationToken)
+    {
+        await Task.Delay(250, cancellationToken);
+        return Enumerable.Range(1, 20).Select(x => new FlatSearchComboOption<string>($"option-{x}", $"Option {x}"))
+            .Where(x => x.Text.Contains(query ?? "", StringComparison.OrdinalIgnoreCase)).ToArray();
+    }
+}

@@ -33,14 +33,13 @@
     <CrudEditorShell Title="@_editorTitle"
                      Mode="@_editorMode"
                      Saving="_saving"
-                     IsDirty="true"
+                     IsDirty="@(_draft != _initialDraft)"
                      CanSubmit="@(!string.IsNullOrWhiteSpace(_draft.Name))"
                      OnClose="CloseEditor"
-                     OnSubmit="Save"
-                     ConfirmClose="ConfirmClose">
+                     OnSubmit="Save">
         <div class="flat-crud-form-grid simple-crud-form">
-            <MudTextField T="string" @bind-Value="_draft.Code" Label="Code" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" />
-            <MudTextField T="string" @bind-Value="_draft.Name" Label="Name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" />
+            <MudTextField T="string" @bind-Value="_draft.Code" Label="Code" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Disabled="@(_editorMode == "Edit")" Immediate="true" />
+            <MudTextField T="string" @bind-Value="_draft.Name" Label="Name" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Immediate="true" />
             <MudSelect T="string" @bind-Value="_draft.Category" Label="Category" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
                 <MudSelectItem Value="@("Hardware")">Hardware</MudSelectItem>
                 <MudSelectItem Value="@("Software")">Software</MudSelectItem>
@@ -51,7 +50,7 @@
                 <MudSelectItem Value="@("Draft")">Draft</MudSelectItem>
                 <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
             </MudSelect>
-            <MudTextField T="string" @bind-Value="_draft.Notes" Label="Notes" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" Class="wide" />
+            <MudTextField T="string" @bind-Value="_draft.Notes" Label="Notes" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense" Lines="3" Class="wide" Immediate="true" />
         </div>
     </CrudEditorShell>
 }
@@ -69,6 +68,7 @@
     private string _editorTitle = "Add Data";
     private string _editorMode = "Create";
     private SimpleDraft _draft = new();
+    private SimpleDraft _initialDraft = new();
 
     private void Create()
     {
@@ -80,6 +80,7 @@
             Category = "Hardware",
             Status = "Active"
         };
+        _initialDraft = _draft with { };
         _editorOpen = true;
     }
 
@@ -95,6 +96,7 @@
             Status = item.Status,
             Notes = item.Notes
         };
+        _initialDraft = _draft with { };
         _editorOpen = true;
     }
 
@@ -120,11 +122,11 @@
             _items.Insert(0, saved);
         }
 
+        _initialDraft = _draft with { };
         _saving = false;
         _editorOpen = false;
     }
 
-    private Task<bool> ConfirmClose() => Task.FromResult(true);
 
     private static string StatusClass(string status) => status switch
     {
@@ -135,7 +137,7 @@
 
     private sealed record SimpleRecord(string Code, string Name, string Category, string Status, string Notes);
 
-    private sealed class SimpleDraft
+    private sealed record SimpleDraft
     {
         public string Code { get; set; } = "";
         public string Name { get; set; } = "";

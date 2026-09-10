@@ -1,6 +1,6 @@
 # OPX MudBlazor Flat UI
 
-[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.19)
+[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.22)
 ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)
 ![MudBlazor](https://img.shields.io/badge/Powered%20by-MudBlazor-594AE2)
 ![Web and Mobile](https://img.shields.io/badge/ready-Web%20%2B%20MAUI%20Hybrid-0A7B83)
@@ -9,9 +9,13 @@ OPX Flat UI is a NuGet-first UI reference and project template for responsive Bl
 
 **Web ready. MAUI Hybrid ready by contract. Powered by [MudBlazor](https://www.mudblazor.com/).**
 
-The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.19). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
+The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.22). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
 
-NuGet 2.1.19 is the current signed package. It adds reusable ERP/HR/IoT operational compositions (`FlatWorkInbox`, freshness, scan, telemetry, record relationships, and personal workspace), semantic filled-surface contrast, and first-paint restoration of saved Device/Manual font size plus density. The Web and MAUI hosts seed the bootstrap contract before styles so theme or reconnect mounting cannot reset typography. See [Multipurpose operational toolkit](docs/MULTIPURPOSE-TOOLKIT.md).
+NuGet 2.1.22 is the current signed package. In addition to the 2.1.20 Tree Grid and IconPicker APIs, it adds hybrid reliability and productivity contracts: explicit `FlatRefreshMode`, MAUI refresh/overlay/Back coordination, visual-viewport keyboard avoidance, snapshot-based Model CRUD dirty state, `FlatPage.Title` as an optional accessible region label, scroll restoration, latest-search cancellation, diagnostics, saved views, guarded context switching, nested filter trees, stable-key record workspaces, and failed-only bulk retry. See [Mobile reliability](docs/MOBILE-RELIABILITY.md), [Hybrid hardening](docs/HYBRID-HARDENING.md), [P0 compatibility](docs/P0-COMPATIBILITY.md), and [P1/P2 productivity](docs/P1-P2-PRODUCTIVITY.md).
+
+The package remains UI-only: hosts own authentication and authorization, scoped persistence, API queries, transactions, refresh data loaders, cancellation/idempotency, native permissions, notification delivery, and native lifecycle evidence. A NuGet upgrade does not replace the canonical MAUI host adapters.
+
+NuGet 2.1.19 added reusable ERP/HR/IoT operational compositions (`FlatWorkInbox`, freshness, scan, telemetry, record relationships, and personal workspace), semantic filled-surface contrast, and first-paint restoration of saved Device/Manual font size plus density. The Web and MAUI hosts seed the bootstrap contract before styles so theme or reconnect mounting cannot reset typography. See [Multipurpose operational toolkit](docs/MULTIPURPOSE-TOOLKIT.md).
 
 NuGet 2.1.18 added the public `FlatCardGrid.SearchTrailingActions` slot and package-owned input-boundary positioning, hover/focus treatment, responsive width, and reserved input space. Compact filter toggles therefore stay inside the search field while the separate toolbar action container is omitted when empty. This fixed the prior package integration gap; consumers must not recreate it with local CSS.
 
@@ -144,7 +148,7 @@ Navigation, theme, palette, density, and typography are available from the manda
 
 | Dependency | Version |
 |---|---:|
-| `Opx.MudBlazor.FlatUi` | `2.1.19` |
+| `Opx.MudBlazor.FlatUi` | `2.1.22` |
 | `MudBlazor` | `9.9.0` |
 | MAUI mobile template | `10.0.90` |
 | `CommunityToolkit.Maui` | `15.0.1` |
@@ -154,7 +158,7 @@ Navigation, theme, palette, density, and typography are available from the manda
 Install the public package from NuGet.org:
 
 ```powershell
-dotnet add package Opx.MudBlazor.FlatUi --version 2.1.19
+dotnet add package Opx.MudBlazor.FlatUi --version 2.1.22
 ```
 
 ## Create a consumer project
@@ -173,7 +177,7 @@ Set-Location MyOpxApp\MyOpxApp
 .\run-clean.ps1
 ```
 
-The Web template produces sibling `MyOpxApp` (thin executable host) and `Opx.MudBlazor.FlatUi.Showcase` (shared page composition) projects. The first run cleans both projects' exact `bin` and `obj`, restores reusable OPX UI 2.1.19 from NuGet.org, and starts with the canonical Light theme, Settings menu, default navigation, package-owned CSS, responsive rules, first-paint typography/density restoration, and runtime OPX attribution.
+The Web template produces sibling `MyOpxApp` (thin executable host) and `Opx.MudBlazor.FlatUi.Showcase` (shared page composition) projects. The first run cleans both projects' exact `bin` and `obj`, restores reusable OPX UI 2.1.22 from NuGet.org, and starts with the canonical Light theme, Settings menu, default navigation, package-owned CSS, responsive rules, first-paint typography/density restoration, and runtime OPX attribution.
 
 Audit a generated consumer before accepting its output:
 
@@ -192,7 +196,7 @@ Set-Location MyOpxMobileApp
 dotnet build -f net10.0-android -c Release --no-restore
 ```
 
-The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.19`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes first-paint Device/Manual font and density restoration, the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
+The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.22`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes first-paint Device/Manual font and density restoration, the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
 
 The 2.1.16 MAUIHost rule keeps the native pull-to-refresh circle below the edge-to-edge AppBar by deriving its offset from the measured status-bar inset plus the canonical `60dp` AppBar and an `8dp` resting gap. The host reapplies this geometry after load, resize/orientation, and status-bar changes without translating the persistent WebView.
 

@@ -12,6 +12,7 @@
                       TreeTemplate="TreeCell"
                       DetailTemplate="DetailCell"
                       MoveItem="MoveNodeAsync"
+                      AllowReorder="true"
                       MoveResult="HandleMoveResult"
                       Changed="RefreshTree">
             <EmptyContent><FlatEmptyState CssClass="empty-state compact" Title="No hierarchy" Message="Add a root item to begin." /></EmptyContent>
@@ -35,7 +36,10 @@
         new("support", "it", "IT Support", "Service desk and device support", "Team"),
         new("production", "company", "Production", "Manufacturing operations", "Division"),
         new("line-a", "production", "Line A", "Assembly and packing", "Work center"),
-        new("finance", "company", "Finance", "Accounting and treasury", "Division")
+        new("finance", "company", "Finance", "Accounting and treasury", "Division"),
+        new("ai-chat", null, "AI Chat", "ai-chat", "Menu"),
+        new("me", null, "Saya", "Personal menu", "Folder"),
+        new("profile", "me", "Profil", "me/profile", "Menu")
     ];
     private FlatTreeGridMoveResult<OrganizationNode, string>? _lastResult;
 
@@ -48,7 +52,12 @@
         var index = _nodes.FindIndex(node => node.Id == request.Key);
         if (index < 0) return FlatTreeGridMoveResult<OrganizationNode, string>.Failure(request, "The item no longer exists.");
         var persisted = _nodes[index] with { ParentId = request.NewParentKey };
-        _nodes[index] = persisted;
+        _nodes.RemoveAt(index);
+        var siblings = _nodes.Where(node => node.ParentId == request.NewParentKey).ToList();
+        var destination = request.NewSiblingIndex is int requested && requested < siblings.Count
+            ? _nodes.IndexOf(siblings[requested])
+            : siblings.Count > 0 ? _nodes.IndexOf(siblings[^1]) + 1 : _nodes.Count;
+        _nodes.Insert(destination, persisted);
         return FlatTreeGridMoveResult<OrganizationNode, string>.Success(request, persisted);
     }
 
