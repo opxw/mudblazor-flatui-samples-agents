@@ -2,7 +2,7 @@
 
 Canonical PageId: `opx.page.reference.experience-toolkit` (`/experience-toolkit`).
 
-Consumer import: this repository already uses public NuGet 2.1.25 in all hosts and Showcase. The package-mode switches/local-feed commands below describe upstream artifact testing, not a requirement to add source references or a local feed to this consumer. Earlier upstream native runs certify only their recorded artifacts; this upgrade requires its own device evidence.
+Consumer import: this repository already uses public NuGet 2.1.26 in all hosts and Showcase. The package-mode switches/local-feed commands below describe upstream artifact testing, not a requirement to add source references or a local feed to this consumer. Earlier upstream native runs certify only their recorded artifacts; this upgrade requires its own device evidence.
 
 ## P0 — retained menu history and package-mode hosts
 

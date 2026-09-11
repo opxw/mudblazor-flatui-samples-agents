@@ -70,7 +70,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Visual metadata form design: `src/Opx.MudBlazor.FlatUi/Components/FlatModelFormDesigner.razor`, `Models/FlatModelFormDesignerModels.cs`, and `FlatModelForm.razor`; canonical sample: `ModelFormDesigner.razor`
 - CRUD editor/modal/processing: `CrudEditorShell.razor`, `FlatFormModal.razor`, and `FlatProcessingContainer.razor`
 - App shell/navigation: `FlatAppShell.razor`, `FlatAppBar.razor`, `FlatSidebar.razor`, `FlatNavigationBadge.razor`, `FlatHorizontalNavigation.razor`, and `FlatBottomNavigation.razor`
-- Dynamic navigation autoload: `FlatDynamicMenu.razor`, `FlatDynamicMenuNodeView.razor`, and `Models/FlatDynamicMenuModels.cs`; canonical sample: `DynamicMenu.razor`. See `docs/DYNAMIC-MENU.md` for the 2.1.25 shared resolver/builder URL-normalization contract and cross-platform verification boundary.
+- Dynamic navigation autoload: `FlatDynamicMenu.razor`, `FlatDynamicMenuNodeView.razor`, and `Models/FlatDynamicMenuModels.cs`; canonical sample: `DynamicMenu.razor`. See `docs/DYNAMIC-MENU.md` for the 2.1.26 shared resolver/builder URL-normalization contract and cross-platform verification boundary.
 - Theme/configuration/preferences/loading defaults: `src/Opx.MudBlazor.FlatUi/Models/FlatUiTheme.cs`, `FlatUiDisplayPreferences.cs`, `FlatLoadingOptions.cs`, and `Services/FlatUiPreferencesService.cs`
 - Shared styling/interop: `src/Opx.MudBlazor.FlatUi/wwwroot/opx-flat-ui.css` and canonical source `opx-flat-ui.js`; `opx-flat-ui.min.js` is Release/Pack output and must not be edited manually.
 - Asset selection/build: `src/Opx.MudBlazor.FlatUi/Models/FlatAssetOptions.cs`, the RCL project targets, root `package.json`/`package-lock.json`, and the host `Components/App.razor`.

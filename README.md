@@ -1,6 +1,6 @@
 # OPX MudBlazor Flat UI
 
-[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.25)
+[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.26)
 ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)
 ![MudBlazor](https://img.shields.io/badge/Powered%20by-MudBlazor-594AE2)
 ![Web and Mobile](https://img.shields.io/badge/ready-Web%20%2B%20MAUI%20Hybrid-0A7B83)
@@ -9,11 +9,80 @@ OPX Flat UI is a NuGet-first UI reference and project template for responsive Bl
 
 **Web ready. MAUI Hybrid ready by contract. Powered by [MudBlazor](https://www.mudblazor.com/).**
 
-The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.25). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
+## Just describe what you need in Codex
 
-Patch 2.1.25 includes visited Bottom-menu Back history and hybrid workspace, deep-link, and opt-in draft recovery. Upgrade matching DLL and JavaScript assets together. Draft recovery requires consent; authorization and scoped storage remain host-owned. It retains the 2.1.23 dynamic URL normalization fix and unchanged original CSS. See [Hybrid recovery](docs/HYBRID-RECOVERY.md), [Navigation](docs/AUTH-AND-NAVIGATION.md), and [Dynamic menu](docs/DYNAMIC-MENU.md).
+This repository provides samples, templates, skills, and rules so you can build by describing the application or feature you need. Codex reads the repository contracts, selects the closest canonical sample, and adapts the layout, components, forms, grids, spacing, responsive behavior, and Web/MAUI interactions. You do not need to specify each `PageId`, component name, or padding value.
 
-NuGet 2.1.25 is the current signed package. In addition to the 2.1.20 Tree Grid and IconPicker APIs, it adds hybrid reliability and productivity contracts: explicit `FlatRefreshMode`, MAUI refresh/overlay/Back coordination, visual-viewport keyboard avoidance, snapshot-based Model CRUD dirty state, `FlatPage.Title` as an optional accessible region label, scroll restoration, latest-search cancellation, diagnostics, saved views, guarded context switching, nested filter trees, stable-key record workspaces, and failed-only bulk retry. See [Mobile reliability](docs/MOBILE-RELIABILITY.md), [Hybrid hardening](docs/HYBRID-HARDENING.md), [P0 compatibility](docs/P0-COMPATIBILITY.md), and [P1/P2 productivity](docs/P1-P2-PRODUCTIVITY.md).
+Open this repository as a workspace in Codex. Start your first task with:
+
+```text
+Read RULES.md, .agents/AGENTS.md, .agents/RULES.md, .agents/KNOWLEDGE.md,
+.agents/PROMPTING.md, and the local opx-flat-ui-development skill.
+Use the canonical samples as the source of truth and consume OPX through NuGet.
+Build a supplier master page with search, Add, Edit, and Delete.
+Choose a contract-compliant desktop/mobile layout, then run the audits and build.
+```
+
+Once the repository context is loaded, describe the business requirement. Copy-ready examples:
+
+```text
+Build an employee leave request form with dates, leave type,
+reason, and attachments. Use the closest canonical form pattern.
+```
+
+```text
+Build a sales dashboard for managers with monthly trends,
+target versus actual results, and drill-down to transactions.
+Use demo data for now; do not invent unspecified business formulas.
+```
+
+```text
+Build a purchase approval page for supervisors with document details,
+Approve, Reject, and a rejection reason. Use sample data and prepare
+integration callbacks; keep authorization and transaction decisions in the backend.
+```
+
+```text
+Create a MAUI Hybrid version of this application sharing its UI with Web.
+Follow the MAUIHost sample for native pull-to-refresh, Back navigation,
+AppBar/theme-matched status bars, safe areas, keyboard behavior, and startup loading.
+Use Bottom navigation with Bottom Sheet and preserve unsaved-form guards.
+```
+
+```text
+Match the employee directory to the profile-grid sample in List mode.
+Preserve the canonical layout, padding, typography, and behavior;
+replace only application data and integrations.
+```
+
+### Use this source in another project
+
+Open the destination project folder in Codex and make sure the following source checkout is accessible. Adjust the path to your clone location:
+
+```text
+Use D:\projects\git\mudblazor-flatui-samples-agents as this project's source of truth.
+Read its rules, knowledge, prompting contract, and local skill;
+import the relevant guidance into the destination project's .agents folder.
+
+For a new project, start from the canonical template. For an existing project,
+audit differences and preserve existing code and business integrations.
+Use the NuGet version pinned by the source contract, original package CSS without
+overrides, and the closest sample for layout and behavior. Do not add a
+ProjectReference to the package source. Keep Settings, default navigation,
+Light theme, Device font, Default spacing, and panel padding.
+
+Build a Web and MAUI inventory application with an item master
+and goods receipt transactions. Use demo data until the API is available.
+Run the audits and build, and report which behaviors still need device testing.
+```
+
+Provide API endpoints, data models, user roles, and transaction rules when available. Codex selects routine UI details from the contract; unclear business rules, permissions, formulas, and integrations still require clarification. Results are checked through audits, builds, and appropriate tests. Device validation and production readiness require their own verification. See the [prompting contract](.agents/PROMPTING.md).
+
+The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.1.26). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
+
+Patch 2.1.26 corrects double status-bar inset in native fullscreen modal headers through package CSS: one panel inset, a 60px header, 40px Back target and 6px leading gutter. It retains Bottom-menu history and hybrid recovery from 2.1.25. Upgrade matching package assets and rebuild the native host. See [Native editor header](docs/NATIVE-EDITOR-HEADER.md), [Hybrid recovery](docs/HYBRID-RECOVERY.md), and [Navigation](docs/AUTH-AND-NAVIGATION.md).
+
+NuGet 2.1.26 is the current signed package. In addition to the 2.1.20 Tree Grid and IconPicker APIs, it adds hybrid reliability and productivity contracts: explicit `FlatRefreshMode`, MAUI refresh/overlay/Back coordination, visual-viewport keyboard avoidance, snapshot-based Model CRUD dirty state, `FlatPage.Title` as an optional accessible region label, scroll restoration, latest-search cancellation, diagnostics, saved views, guarded context switching, nested filter trees, stable-key record workspaces, and failed-only bulk retry. See [Mobile reliability](docs/MOBILE-RELIABILITY.md), [Hybrid hardening](docs/HYBRID-HARDENING.md), [P0 compatibility](docs/P0-COMPATIBILITY.md), and [P1/P2 productivity](docs/P1-P2-PRODUCTIVITY.md).
 
 The package remains UI-only: hosts own authentication and authorization, scoped persistence, API queries, transactions, refresh data loaders, cancellation/idempotency, native permissions, notification delivery, and native lifecycle evidence. A NuGet upgrade does not replace the canonical MAUI host adapters.
 
@@ -22,8 +91,6 @@ NuGet 2.1.19 added reusable ERP/HR/IoT operational compositions (`FlatWorkInbox`
 NuGet 2.1.18 added the public `FlatCardGrid.SearchTrailingActions` slot and package-owned input-boundary positioning, hover/focus treatment, responsive width, and reserved input space. Compact filter toggles therefore stay inside the search field while the separate toolbar action container is omitted when empty. This fixed the prior package integration gap; consumers must not recreate it with local CSS.
 
 NuGet 2.1.17 introduced the `FlatMudProviders` DI precedence patch: resolve a directly registered `FlatUiDisplayOptions` instance before `IOptions<FlatUiDisplayOptions>` and defaults, so an implicit wrapper created by `AddOptions()` cannot mask the canonical Web/MAUI singleton configuration.
-
-NuGet 2.1.16 centralizes panel-header geometry through `OpxFlatUi:Display:PanelHeaderMinHeight=48` and `PanelHeaderPaddingY=10`. Headers may grow for subtitles/actions, while Settings Theme, Density, and Input Style labels use the package-owned responsive inset. Consumers configure these public options and must not patch `.panel-header`, `.flat-*`, `.mud-*`, or `--opx-*` locally.
 
 ## Web preview
 
@@ -40,6 +107,23 @@ Horizontal is optimized for desktop Web. It moves the product identity and modul
 ![OPX Flat UI Web dashboard with Horizontal navigation](docs/images/opx-flat-ui-web-horizontal.jpg)
 
 ## Mobile preview
+
+### MAUI Hybrid follows native interaction patterns
+
+MAUI Hybrid shares the Blazor/MudBlazor UI with Web and integrates platform interactions through the native host. The canonical behavior covers gestures, Back navigation, keyboard, system bars, and lifecycle—not only a responsive mobile layout. Razor content still renders inside `BlazorWebView`; native adapters own the platform integration.
+
+- **Native pull-to-refresh:** eligible pages with a real refresh handler use the host's native `RefreshView`. `FlatRefreshMode.Auto` selects the available native adapter in MAUI and the package gesture on Web. Refresh starts only when the actual scroll chain is already at the top; active overlays, busy state, and editing gestures suspend it. `Disabled` turns off package refresh gestures while ordinary scrolling remains available. Position the native spinner below the measured status-bar inset + 60dp AppBar + 8dp gap without moving the WebView.
+- **Back navigation:** Android system/gesture Back follows one pipeline: dismiss the visible keyboard, handle the topmost modal/sheet and its unsaved-change guard, traverse actual Blazor/WebView history, then use native root behavior. Rejected discard keeps the editor and route intact. Bottom navigation restores the visited submenu and parent before the actual origin: General Ledger → Finance → ERP → origin. Direct links do not invent a menu trail.
+- **System bars and safe areas:** the Toolkit host bridge follows the resolved AppBar/theme with contrast-aware status-bar icons. Use measured insets on rotation and layout changes. Native fullscreen editors consume the top inset once at the panel boundary, keep Back aligned with the AppBar, and leave the footer reachable.
+- **Touch, scrolling, and keyboard:** preserve normal scrolling while disabling native bounce/edge glow. Ordinary UI text is not selectable; text-bearing editors retain caret, selection, and clipboard behavior. Device typography and accessibility scaling remain the default. Focused fields stay visible above the keyboard through their actual scroll owner.
+- **Startup and recovery:** show the continuous theme-aware loading spinner (the sample label is `Memuat`, Indonesian for “Loading”) before interactivity and during session validation; create the Router only after the root check. Keep visited Bottom history across responsive sidebar transitions. Durable workspace/draft recovery is opt-in and host-scoped; restore drafts only with consent, and authorize deep links before navigation.
+- **Native capabilities:** connectivity, notifications, camera/gallery, permissions, and resume behavior use host-owned adapters. Request permissions at the appropriate user action and report unsupported or denied capabilities explicitly.
+
+Use [MAUIHost.Sample](samples/Opx.MudBlazor.FlatUi.MauiHost.Sample) as the complete native-integration reference. A generated MAUI consumer must wire the required adapters when enabling a capability such as native pull-to-refresh; upgrading NuGet alone does not install those host integrations. Reuse package components/assets and canonical host seams rather than adding consumer CSS or duplicate gesture handlers. See [Hybrid hardening](docs/HYBRID-HARDENING.md), [Back navigation](docs/AUTH-AND-NAVIGATION.md), [Native editor header](docs/NATIVE-EDITOR-HEADER.md), and [Recovery](docs/HYBRID-RECOVERY.md).
+
+These are implementation contracts. Validate Android gestures, IME, rotation, resume, and process recovery against the exact built APK on an emulator/device; validate iOS on macOS/Xcode and an iOS simulator/device. Responsive Web screenshots and successful builds do not establish native runtime parity.
+
+### Responsive views
 
 The mobile composition is responsive, touch-aware, safe-area ready, and designed for both mobile Web and MAUI Blazor Hybrid. Tables can become equivalent cards, dialogs become full-screen editors, and controls retain usable touch geometry.
 
@@ -60,23 +144,9 @@ The mobile composition is responsive, touch-aware, safe-area ready, and designed
 
 Bottom navigation reuses the same route tree as the other layouts and is selected from viewport width alone. The package default threshold is `600px`; this template explicitly uses `900px`, so tablet and phone widths receive the bottom bar while wider Web and Windows desktop windows receive the sidebar. It supports up to five root actions, a More entry for overflow, recursive child navigation, and safe-area spacing. Child and overflow navigation defaults to the package Bottom Sheet; the in-content `MainView` tile presentation is explicit opt-in.
 
-Package `2.1.16` keeps labels such as **Settings** fully readable by using a descender-safe `1.25` line-height plus a `1px` bottom inset. Single-line ellipsis and the `60px` bar height remain unchanged; consumer CSS does not override this package-owned geometry.
-
-Package `2.1.16` also provides `IFlatNavigationRouteResolver` for one consumer-owned API-label-to-route mapping shared by Web and MAUI. It normalizes hidden/compatibility Unicode, gives explicit mappings precedence, accepts only local or absolute HTTP(S) fallbacks, and fails closed for placeholder or unsafe schemes. Menu visibility remains separate from route authorization.
-
 ## Application Settings
 
 Every initialized consumer keeps **Settings → Application preferences** in the AppBar overflow menu. The surface previews changes immediately, persists them only after **Save**, restores the current saved state on **Cancel**, and returns to host-configured defaults through **Restore application defaults**.
-
-Package `2.1.16` adds composable Settings through `FlatDisplaySettingsConfiguration`. Hosts can select and reorder sections, show locked host-controlled values, localize package-owned copy, or replace explicit section bodies without copying package markup. `IndonesianEssentials` provides Tema, Palet warna, Ukuran font, and Target sentuh while the host retains modal lifecycle, preview, persistence, authorization, and policy ownership. See [Composable display settings](docs/DISPLAY-SETTINGS.md).
-
-Package `2.1.16` keeps the Settings/About modal's Light surface neutral/white even when another palette is selected. It also keeps date/time picker portals square and preserves selected-day text contrast; consumers must not add local CSS workarounds for these package-owned surfaces.
-
-Package `2.1.16` adds `FlatApplicationOptions.LoginBrandPanelVisible`. The default remains `true`; set it to `false` with `LoginLayout=Default` to hide the brand panel and center the unboxed Login form without consumer CSS. `FlatGroupedDataGrid<TItem>.GroupHeaderAlignment` now owns Left (default), Center, or Right alignment consistently on desktop and responsive group headings.
-
-Package `2.1.16` also fixes responsive card scroll chaining: a bounded `.mobile-grid-list` scrolls internally only while it has overflow, then lets vertical gestures continue on the page at its boundary. Horizontal overscroll remains contained. This behavior comes from package CSS and must not be duplicated or overridden by consumers.
-
-Package `2.1.16` makes AppBar global search explicitly configurable. `OpxFlatUi:Display:AppBarSearchVisible` defaults to `true`; bind it to `FlatAppShell.SearchVisible`. When false, the search input, result popup, reserved toolbar width, and keyboard focus target are not rendered.
 
 ![OPX Flat UI Application preferences in the canonical Light Web sample](docs/images/opx-flat-ui-settings.png)
 
@@ -150,18 +220,12 @@ Navigation, theme, palette, density, and typography are available from the manda
 
 | Dependency | Version |
 |---|---:|
-| `Opx.MudBlazor.FlatUi` | `2.1.25` |
+| `Opx.MudBlazor.FlatUi` | `2.1.26` |
 | `MudBlazor` | `9.9.0` |
 | MAUI mobile template | `10.0.90` |
 | `CommunityToolkit.Maui` | `15.0.1` |
 | Target framework | `.NET 10` |
 | Consumer contract schema | `3.1` |
-
-Install the public package from NuGet.org:
-
-```powershell
-dotnet add package Opx.MudBlazor.FlatUi --version 2.1.25
-```
 
 ## Create a consumer project
 
@@ -179,7 +243,7 @@ Set-Location MyOpxApp\MyOpxApp
 .\run-clean.ps1
 ```
 
-The Web template produces sibling `MyOpxApp` (thin executable host) and `Opx.MudBlazor.FlatUi.Showcase` (shared page composition) projects. The first run cleans both projects' exact `bin` and `obj`, restores reusable OPX UI 2.1.25 from NuGet.org, and starts with the canonical Light theme, Settings menu, default navigation, package-owned CSS, responsive rules, first-paint typography/density restoration, and runtime OPX attribution.
+The Web template produces sibling `MyOpxApp` (thin executable host) and `Opx.MudBlazor.FlatUi.Showcase` (shared page composition) projects. The first run cleans both projects' exact `bin` and `obj`, restores reusable OPX UI 2.1.26 from NuGet.org, and starts with the canonical Light theme, Settings menu, default navigation, package-owned CSS, responsive rules, first-paint typography/density restoration, and runtime OPX attribution.
 
 Audit a generated consumer before accepting its output:
 
@@ -198,9 +262,7 @@ Set-Location MyOpxMobileApp
 dotnet build -f net10.0-android -c Release --no-restore
 ```
 
-The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.25`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes first-paint Device/Manual font and density restoration, the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
-
-The 2.1.16 MAUIHost rule keeps the native pull-to-refresh circle below the edge-to-edge AppBar by deriving its offset from the measured status-bar inset plus the canonical `60dp` AppBar and an `8dp` resting gap. The host reapplies this geometry after load, resize/orientation, and status-bar changes without translating the persistent WebView.
+The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.9.0`, and OPX Flat UI `2.1.26`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes first-paint Device/Manual font and density restoration, the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
 
 When a prompt requests UI that is the same, exact, canonical, or matches the sample/source of truth, use **Exact Sample Mode**. Generate a fresh Web or MAUI template, resolve the `PageId`, and pass `-ExactSample` before wiring host data or services. The audit rejects drift in canonical shell/page files; branding, wording, data, authorization, callbacks, and persistence may then change through existing seams without changing geometry or behavior.
 
@@ -210,7 +272,7 @@ When a prompt requests UI that is the same, exact, canonical, or matches the sam
 - `samples/Opx.MudBlazor.FlatUi.Sample` — thin NuGet Web host and one half of the multi-project Web template.
 - `.agents/skills/opx-flat-ui-development` — UI/UX, business/data analysis, implementation, responsive, Web, and MAUI rules.
 - `docs/CONSUMER-CONTRACT.md` — consumer ownership and integration contract.
-- `docs/DATA-GRID-EXCEL-EXPORT.md`, `docs/JOB-LANDING.md`, and `docs/JOBS-DASHBOARD.md` — 2.1.16 feature and sample ownership contracts.
+- `docs/DATA-GRID-EXCEL-EXPORT.md`, `docs/JOB-LANDING.md`, and `docs/JOBS-DASHBOARD.md` — feature and sample ownership contracts.
 - `RULES.md` and `.agents/RULES.md` — mandatory implementation rules.
 - `flat-ui.contract.json` and its schema inside the sample — machine-readable baseline enforced by the audit.
 - `templates/Opx.MudBlazor.FlatUi.Maui.Template` — Android/iOS Blazor Hybrid source-of-truth template, mobile contract, and native audit.

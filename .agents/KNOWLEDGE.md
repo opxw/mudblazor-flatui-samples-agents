@@ -14,7 +14,10 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 ## Current canonical snapshot
 
-- Current patch 2.1.25 adds retained Bottom menu history and host-controlled hybrid recovery; follow docs/HYBRID-RECOVERY.md and docs/AUTH-AND-NAVIGATION.md. Draft recovery requires explicit consent and deep links require host authorization. DLL and matching JavaScript must deploy together.
+- Active patch 2.1.26 fixes double status-bar inset in native fullscreen editor headers. Keep the panel as sole inset owner, header height 60px, Back target 40px and leading gutter 6px at <=760px. Verify absolute header top and long processing forms; native proof remains artifact/device-specific.
+- Official NuGet 2.1.26 signature verified. Nupkg SHA-256: 786AB21B276D10548D2F73D4790C3E9B7A82FCB8A98E756739395208A96A2BA0. CSS SHA-256: 195B0111B3F1F8592034C1B123DC8B977607FA293F49A02D1A034EAFAC483FA3.
+
+- Previous patch 2.1.25 added retained Bottom menu history and host-controlled hybrid recovery; follow docs/HYBRID-RECOVERY.md and docs/AUTH-AND-NAVIGATION.md. Draft recovery requires explicit consent and deep links require host authorization. DLL and matching JavaScript must deploy together.
 - All 12 functional payload entries match source artifact `20260910-203021-2.1.25`. JavaScript SHA-256 is `999725AFF8F22261FB42578065D49C99DE7C08A13C0A8C1392489DDAFA6CEC29`; minified JavaScript is `63FB390ED43388B3521043AD44FC32B424F9CF484D84AC869FACFEBD562EEFA5`. Prior source Debug/emulator evidence does not certify this consumer Release package.
 - Official 2.1.25 NuGet signature verified; nupkg SHA-256: 9D9B050005C125B26AA4E30907959E3280C60DE3012CDB2F51CB58D1E5B25929. Original CSS remains unchanged from 2.1.22/2.1.23.
 
@@ -22,7 +25,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.25`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.26`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.9.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
