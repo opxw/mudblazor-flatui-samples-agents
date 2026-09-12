@@ -1,5 +1,7 @@
 # Sample source map
 
+2.1.29 import source: `D:\projects\git\mudblazor-flat-ui`, commit `26d476b`. Reporting maps to `opx.page.reporting.operational`, local `Reports.razor` and `docs/REPORTING.md`; the responsive correction is package CSS, not consumer styling. Hybrid-operations/document-transfer maps to `opx.page.reference.experience-toolkit` / `opx.page.reporting.pdf-viewer` and `docs/HYBRID-OPERATIONS.md`. New transfer adapters/examples remain upstream references, not yet wired into this consumer by this dependency/rules import.
+
 PDF printing: `opx.page.reporting.pdf-viewer` -> `PdfViewer.razor` and shared `SamplePdfDocument.cs`; use `docs/PRINT-SUPPORT.md`. Web registers `FlatWebPrintService`; MAUIHost uses `MauiPrintService`, `AndroidPdfPrintAdapter`, and `WindowsPdfPrintPage`. These native adapters are host-owned, not installed by NuGet or the minimal MAUI template.
 
 Hybrid recovery: `HybridRecoveryExamples.razor`, composed by `MobileReliabilityExamples.razor` under `opx.page.reference.experience-toolkit`; see `docs/HYBRID-RECOVERY.md`. Bottom Back acceptance uses `opx.page.erp.finance.general-ledger` and `docs/AUTH-AND-NAVIGATION.md`; follow actual visited menu history, not inferred route parents.
@@ -72,7 +74,7 @@ First resolve the request to a stable `PageId` in [page-registry.md](page-regist
 - Visual metadata form design: `src/Opx.MudBlazor.FlatUi/Components/FlatModelFormDesigner.razor`, `Models/FlatModelFormDesignerModels.cs`, and `FlatModelForm.razor`; canonical sample: `ModelFormDesigner.razor`
 - CRUD editor/modal/processing: `CrudEditorShell.razor`, `FlatFormModal.razor`, and `FlatProcessingContainer.razor`
 - App shell/navigation: `FlatAppShell.razor`, `FlatAppBar.razor`, `FlatSidebar.razor`, `FlatNavigationBadge.razor`, `FlatHorizontalNavigation.razor`, and `FlatBottomNavigation.razor`
-- Dynamic navigation autoload: `FlatDynamicMenu.razor`, `FlatDynamicMenuNodeView.razor`, and `Models/FlatDynamicMenuModels.cs`; canonical sample: `DynamicMenu.razor`. See `docs/DYNAMIC-MENU.md` for the 2.1.27 shared resolver/builder URL-normalization contract and cross-platform verification boundary.
+- Dynamic navigation autoload: `FlatDynamicMenu.razor`, `FlatDynamicMenuNodeView.razor`, and `Models/FlatDynamicMenuModels.cs`; canonical sample: `DynamicMenu.razor`. See `docs/DYNAMIC-MENU.md` for the 2.1.29 shared resolver/builder URL-normalization contract and cross-platform verification boundary.
 - Theme/configuration/preferences/loading defaults: `src/Opx.MudBlazor.FlatUi/Models/FlatUiTheme.cs`, `FlatUiDisplayPreferences.cs`, `FlatLoadingOptions.cs`, and `Services/FlatUiPreferencesService.cs`
 - Shared styling/interop: `src/Opx.MudBlazor.FlatUi/wwwroot/opx-flat-ui.css` and canonical source `opx-flat-ui.js`; `opx-flat-ui.min.js` is Release/Pack output and must not be edited manually.
 - Asset selection/build: `src/Opx.MudBlazor.FlatUi/Models/FlatAssetOptions.cs`, the RCL project targets, root `package.json`/`package-lock.json`, and the host `Components/App.razor`.

@@ -1,0 +1,1622 @@
+{
+  "capturedAt": "2026-09-12T00:42:01.517Z",
+  "package": "2.1.27",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "expandedGroups": 11,
+  "assetChecks": [
+    {
+      "url": "http://127.0.0.1:58739/_content/MudBlazor/MudBlazor.min.vxalfe72eb.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:58739/_content/Opx.MudBlazor.FlatUi/opx-flat-ui.hquizfdm2p.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:58739/_content/Opx.MudBlazor.FlatUi.Showcase/opx-flat-ui-showcase.ty2fo06029.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:58739/Opx.MudBlazor.FlatUi.Sample.styles.css",
+      "status": 404
+    }
+  ],
+  "entries": [
+    {
+      "route": "/accordions",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Accordions.razor",
+      "components": [
+        "FlatAccordion",
+        "FlatAccordionItem",
+        "FlatPage",
+        "FlatPanel"
+      ],
+      "image": "accordions.png",
+      "panels": [
+        {
+          "title": "Default accordion",
+          "image": "accordions-panel-1.png"
+        },
+        {
+          "title": "Accordion flush",
+          "image": "accordions-panel-2.png"
+        },
+        {
+          "title": "Accordions with icons",
+          "image": "accordions-panel-3.png"
+        },
+        {
+          "title": "Accordions without toggle icons",
+          "image": "accordions-panel-4.png"
+        }
+      ]
+    },
+    {
+      "route": "/advanced-editable-grid",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/AdvancedEditableGrid.razor",
+      "components": [
+        "FlatAdvancedEditableGrid",
+        "FlatAdvancedGridCommandKind",
+        "FlatNumberInput",
+        "FlatNumberText",
+        "FlatPage"
+      ],
+      "image": "advanced-editable-grid.png",
+      "panels": [
+        {
+          "title": "Advanced editable grid",
+          "image": "advanced-editable-grid-detail-1.png"
+        }
+      ]
+    },
+    {
+      "route": "/ai-chat",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/AiChat.razor",
+      "components": [
+        "FlatChatConversationItem",
+        "FlatChatMessage",
+        "FlatChatShell",
+        "FlatChatTypingIndicator",
+        "FlatEmptyState",
+        "FlatPage"
+      ],
+      "image": "ai-chat.png",
+      "panels": []
+    },
+    {
+      "route": "/blog",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Blog.razor",
+      "components": [],
+      "image": "blog.png",
+      "panels": []
+    },
+    {
+      "route": "/business-toolkit",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/BusinessToolkit.razor",
+      "components": [
+        "FlatApprovalLevel",
+        "FlatApprovalMatrixDesigner",
+        "FlatBomNode",
+        "FlatBomRoutingEditor",
+        "FlatDataComparisonGrid",
+        "FlatDataComparisonRow",
+        "FlatDocumentAttachment",
+        "FlatDocumentAttachmentManager",
+        "FlatInventoryTraceabilityWorkspace",
+        "FlatPage",
+        "FlatQueryBuilder",
+        "FlatQueryField",
+        "FlatRecurrenceEditor",
+        "FlatRuleBuilder",
+        "FlatRuleField",
+        "FlatTraceabilityNode"
+      ],
+      "image": "business-toolkit.png",
+      "panels": [
+        {
+          "title": "Inventory Traceability",
+          "image": "business-toolkit-detail-1.png"
+        },
+        {
+          "title": "BOM and Routing",
+          "image": "business-toolkit-detail-2.png"
+        },
+        {
+          "title": "Rule Builder",
+          "image": "business-toolkit-detail-3.png"
+        },
+        {
+          "title": "Approval Matrix",
+          "image": "business-toolkit-detail-4.png"
+        },
+        {
+          "title": "Document Attachments",
+          "image": "business-toolkit-detail-5.png"
+        },
+        {
+          "title": "Recurrence Editor",
+          "image": "business-toolkit-detail-6.png"
+        },
+        {
+          "title": "Query Builder",
+          "image": "business-toolkit-detail-7.png"
+        },
+        {
+          "title": "Data Comparison",
+          "image": "business-toolkit-detail-8.png"
+        }
+      ]
+    },
+    {
+      "route": "/calendar",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Calendar.razor",
+      "components": [
+        "FlatCalendar",
+        "FlatFormModal",
+        "FlatPage",
+        "FlatSchedulerItem"
+      ],
+      "image": "calendar.png",
+      "panels": []
+    },
+    {
+      "route": "/catalog",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Catalog.razor",
+      "components": [
+        "FlatCatalogCard",
+        "FlatCatalogGrid",
+        "FlatFilterWorkspace",
+        "FlatPage"
+      ],
+      "image": "catalog.png",
+      "panels": []
+    },
+    {
+      "route": "/charts",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Charts.razor",
+      "components": [
+        "FlatPage",
+        "FlatPanel"
+      ],
+      "image": "charts.png",
+      "panels": [
+        {
+          "title": "Line",
+          "image": "charts-panel-1.png"
+        },
+        {
+          "title": "Line",
+          "image": "charts-panel-2.png"
+        },
+        {
+          "title": "Bar",
+          "image": "charts-panel-3.png"
+        },
+        {
+          "title": "Stacked Bar",
+          "image": "charts-panel-4.png"
+        },
+        {
+          "title": "Pie",
+          "image": "charts-panel-5.png"
+        },
+        {
+          "title": "Donut",
+          "image": "charts-panel-6.png"
+        },
+        {
+          "title": "Timeseries",
+          "image": "charts-panel-7.png"
+        },
+        {
+          "title": "Heat Map",
+          "image": "charts-panel-8.png"
+        },
+        {
+          "title": "Rose",
+          "image": "charts-panel-9.png"
+        },
+        {
+          "title": "Radar",
+          "image": "charts-panel-10.png"
+        },
+        {
+          "title": "Sankey",
+          "image": "charts-panel-11.png"
+        },
+        {
+          "title": "Scatter Plot",
+          "image": "charts-panel-12.png"
+        }
+      ]
+    },
+    {
+      "route": "/chat",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Chat.razor",
+      "components": [
+        "FlatChatConversationItem",
+        "FlatChatMessage",
+        "FlatChatShell",
+        "FlatChatTypingIndicator",
+        "FlatEmptyState",
+        "FlatPage",
+        "FlatProfileAvatar"
+      ],
+      "image": "chat.png",
+      "panels": []
+    },
+    {
+      "route": "/colors",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Colors.razor",
+      "components": [
+        "FlatColorReference",
+        "FlatPage"
+      ],
+      "image": "colors.png",
+      "panels": []
+    },
+    {
+      "route": "/components",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ComponentsGallery.razor",
+      "components": [
+        "FlatDetailSection",
+        "FlatEmptyState",
+        "FlatFormModal",
+        "FlatInfoItem",
+        "FlatMaterialIconPicker",
+        "FlatMultiSelect",
+        "FlatMultiSelectOption",
+        "FlatNumberInput",
+        "FlatPageHeading",
+        "FlatPanel",
+        "FlatProcessingContainer",
+        "FlatProfileAvatar",
+        "FlatReconnectModal",
+        "FlatSearchComboBox",
+        "FlatSearchComboOption",
+        "FlatSessionRestore",
+        "FlatStatCard"
+      ],
+      "image": "components.png",
+      "panels": [
+        {
+          "title": "Theme Tokens",
+          "image": "components-panel-1.png"
+        },
+        {
+          "title": "Empty State",
+          "image": "components-panel-2.png"
+        },
+        {
+          "title": "Button States",
+          "image": "components-panel-3.png"
+        },
+        {
+          "title": "Info Items",
+          "image": "components-panel-4.png"
+        },
+        {
+          "title": "Formatted Number Input",
+          "image": "components-panel-5.png"
+        },
+        {
+          "title": "Profile Avatar",
+          "image": "components-panel-6.png"
+        },
+        {
+          "title": "Optional Page Heading",
+          "image": "components-panel-7.png"
+        },
+        {
+          "title": "Processing State",
+          "image": "components-panel-8.png"
+        },
+        {
+          "title": "Message Box",
+          "image": "components-panel-9.png"
+        },
+        {
+          "title": "Reconnect Notice",
+          "image": "components-panel-10.png"
+        },
+        {
+          "title": "Form Modal",
+          "image": "components-panel-11.png"
+        },
+        {
+          "title": "MudBlazor Line Chart",
+          "image": "components-panel-12.png"
+        },
+        {
+          "title": "MudBlazor Pie Chart",
+          "image": "components-panel-13.png"
+        },
+        {
+          "title": "Multi Select",
+          "image": "components-panel-14.png"
+        },
+        {
+          "title": "Search Combo Box",
+          "image": "components-panel-15.png"
+        },
+        {
+          "title": "Material Icon Picker",
+          "image": "components-panel-16.png"
+        },
+        {
+          "title": "Multi Select with leading visuals",
+          "image": "components-panel-17.png"
+        }
+      ]
+    },
+    {
+      "route": "/crud",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Crud.razor",
+      "components": [
+        "FlatDataGrid",
+        "FlatEmptyState",
+        "FlatFormModal",
+        "FlatInfoItem",
+        "FlatMobileGrid",
+        "FlatPage",
+        "FlatPager"
+      ],
+      "image": "crud.png",
+      "panels": []
+    },
+    {
+      "route": "/data-grid-large",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/DataGridLarge.razor",
+      "components": [
+        "FlatDataGrid",
+        "FlatEmptyState",
+        "FlatInfoItem",
+        "FlatMobileGrid",
+        "FlatPage",
+        "FlatPager",
+        "FlatStatusChip"
+      ],
+      "image": "data-grid-large.png",
+      "panels": []
+    },
+    {
+      "route": "/development-rules",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/DevelopmentRules.razor",
+      "components": [
+        "FlatPage",
+        "FlatPanel"
+      ],
+      "image": "development-rules.png",
+      "panels": [
+        {
+          "title": "Canonical development path",
+          "image": "development-rules-panel-1.png"
+        }
+      ]
+    },
+    {
+      "route": "/dynamic-menu",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/DynamicMenu.razor",
+      "components": [
+        "FlatDynamicMenu",
+        "FlatDynamicMenuItem",
+        "FlatInfoItem",
+        "FlatNavigationMenuItem",
+        "FlatPage"
+      ],
+      "image": "dynamic-menu.png",
+      "panels": []
+    },
+    {
+      "route": "/account/edit",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/EditAccount.razor",
+      "components": [
+        "FlatMultiSelect",
+        "FlatMultiSelectOption",
+        "FlatPage",
+        "FlatPanel",
+        "FlatProfileAvatar"
+      ],
+      "image": "account-edit.png",
+      "panels": [
+        {
+          "title": "Profile picture",
+          "image": "account-edit-panel-1.png"
+        },
+        {
+          "title": "Account details",
+          "image": "account-edit-panel-2.png"
+        },
+        {
+          "title": "Security",
+          "image": "account-edit-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/email",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Email.razor",
+      "components": [
+        "FlatEmailFolderItem",
+        "FlatEmailMessageItem",
+        "FlatEmailShell",
+        "FlatEmptyState",
+        "FlatFab",
+        "FlatPage",
+        "FlatProfileAvatar"
+      ],
+      "image": "email.png",
+      "panels": []
+    },
+    {
+      "route": "/enterprise-toolkit",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/EnterpriseToolkit.razor",
+      "components": [
+        "FlatAuditEvent",
+        "FlatAuditTrail",
+        "FlatBulkAction",
+        "FlatBulkActionBar",
+        "FlatDashboardComposer",
+        "FlatDashboardWidgetDefinition",
+        "FlatDataImport",
+        "FlatDataImportColumn",
+        "FlatDataImportField",
+        "FlatDataImportRow",
+        "FlatDocumentItem",
+        "FlatDocumentWorkspace",
+        "FlatDocumentWorkspaceAction",
+        "FlatFormFieldDefinition",
+        "FlatInfoItem",
+        "FlatMasterDetailWorkspace",
+        "FlatNotificationCenter",
+        "FlatNotificationItem",
+        "FlatOfflineSyncPanel",
+        "FlatPage",
+        "FlatPivotFieldChooser",
+        "FlatPivotFieldDefinition",
+        "FlatPrintLayout",
+        "FlatScheduler",
+        "FlatSchedulerItem",
+        "FlatSchemaForm",
+        "FlatSyncItem",
+        "FlatWorkflowPanel",
+        "FlatWorkflowStep"
+      ],
+      "image": "enterprise-toolkit.png",
+      "panels": [
+        {
+          "title": "Workspace productivity",
+          "image": "enterprise-toolkit-panel-1.png"
+        },
+        {
+          "title": "Workspace productivity",
+          "image": "enterprise-toolkit-panel-2.png"
+        },
+        {
+          "title": "Record workspace",
+          "image": "enterprise-toolkit-panel-3.png"
+        },
+        {
+          "title": "Bulk progress",
+          "image": "enterprise-toolkit-panel-4.png"
+        },
+        {
+          "title": "ERP · HR · IoT work inbox",
+          "image": "enterprise-toolkit-detail-1.png"
+        },
+        {
+          "title": "Telemetry and alarms",
+          "image": "enterprise-toolkit-detail-3.png"
+        },
+        {
+          "title": "My workspace",
+          "image": "enterprise-toolkit-detail-4.png"
+        },
+        {
+          "title": "Data Import Wizard",
+          "image": "enterprise-toolkit-detail-5.png"
+        },
+        {
+          "title": "Pivot Field Chooser",
+          "image": "enterprise-toolkit-detail-6.png"
+        },
+        {
+          "title": "Master–Detail Workspace",
+          "image": "enterprise-toolkit-detail-7.png"
+        },
+        {
+          "title": "Audit Trail and Diff",
+          "image": "enterprise-toolkit-detail-8.png"
+        },
+        {
+          "title": "Schema Form",
+          "image": "enterprise-toolkit-detail-9.png"
+        },
+        {
+          "title": "Approval Workflow",
+          "image": "enterprise-toolkit-detail-10.png"
+        },
+        {
+          "title": "Bulk Actions",
+          "image": "enterprise-toolkit-detail-11.png"
+        },
+        {
+          "title": "Scheduler",
+          "image": "enterprise-toolkit-detail-12.png"
+        },
+        {
+          "title": "Dashboard Composer",
+          "image": "enterprise-toolkit-detail-13.png"
+        },
+        {
+          "title": "Notification Center",
+          "image": "enterprise-toolkit-detail-14.png"
+        },
+        {
+          "title": "Offline Sync",
+          "image": "enterprise-toolkit-detail-15.png"
+        },
+        {
+          "title": "Document Workspace",
+          "image": "enterprise-toolkit-detail-16.png"
+        },
+        {
+          "title": "Print Layout",
+          "image": "enterprise-toolkit-detail-17.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/finance",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpFinance.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-finance.png",
+      "panels": [
+        {
+          "title": "Profit and loss trend",
+          "image": "erp-finance-panel-1.png"
+        },
+        {
+          "title": "Period close",
+          "image": "erp-finance-panel-2.png"
+        },
+        {
+          "title": "Recent journal activity",
+          "image": "erp-finance-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/finance/general-ledger",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpFinance.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-finance-general-ledger.png",
+      "panels": []
+    },
+    {
+      "route": "/erp/finance/payables",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpFinance.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-finance-payables.png",
+      "panels": [
+        {
+          "title": "Supplier open items",
+          "image": "erp-finance-payables-panel-1.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/finance/receivables",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpFinance.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-finance-receivables.png",
+      "panels": [
+        {
+          "title": "Customer open items",
+          "image": "erp-finance-receivables-panel-1.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/hr",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpHr.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-hr.png",
+      "panels": [
+        {
+          "title": "Workforce by department",
+          "image": "erp-hr-panel-1.png"
+        },
+        {
+          "title": "People actions",
+          "image": "erp-hr-panel-2.png"
+        },
+        {
+          "title": "Recent employees",
+          "image": "erp-hr-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/hr/employees",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpHr.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-hr-employees.png",
+      "panels": []
+    },
+    {
+      "route": "/erp/hr/attendance",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpHr.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-hr-attendance.png",
+      "panels": [
+        {
+          "title": "Today's attendance",
+          "image": "erp-hr-attendance-panel-1.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpOverview.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp.png",
+      "panels": [
+        {
+          "title": "Revenue and operating cost",
+          "image": "erp-panel-1.png"
+        },
+        {
+          "title": "Workflow inbox",
+          "image": "erp-panel-2.png"
+        },
+        {
+          "title": "Business exceptions",
+          "image": "erp-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/production",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpProduction.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-production.png",
+      "panels": [
+        {
+          "title": "Output by production line",
+          "image": "erp-production-panel-1.png"
+        },
+        {
+          "title": "Shift performance",
+          "image": "erp-production-panel-2.png"
+        },
+        {
+          "title": "Active production orders",
+          "image": "erp-production-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/production/work-orders",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpProduction.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-production-work-orders.png",
+      "panels": []
+    },
+    {
+      "route": "/erp/production/quality",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpProduction.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-production-quality.png",
+      "panels": [
+        {
+          "title": "Quality inspection queue",
+          "image": "erp-production-quality-panel-1.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp-release-train",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpReleaseTrain.razor",
+      "components": [
+        "FlatApprovalInbox",
+        "FlatApprovalInboxItem",
+        "FlatCapacityBucket",
+        "FlatGovernanceCheck",
+        "FlatGovernancePanel",
+        "FlatIntegrationCenter",
+        "FlatIntegrationRun",
+        "FlatInventoryAllocation",
+        "FlatInventoryAllocationWorkspace",
+        "FlatJournalEntryGrid",
+        "FlatMaterialRequirement",
+        "FlatMrpCapacityWorkspace",
+        "FlatNumberText",
+        "FlatPage",
+        "FlatTransactionEngine",
+        "FlatValidationIssue",
+        "FlatWorkflowDesigner",
+        "FlatWorkflowNode"
+      ],
+      "image": "erp-release-train.png",
+      "panels": [
+        {
+          "title": "2.1 · Transaction Engine",
+          "image": "erp-release-train-detail-1.png"
+        },
+        {
+          "title": "2.2 · Inventory Allocation",
+          "image": "erp-release-train-detail-2.png"
+        },
+        {
+          "title": "2.3 · Finance",
+          "image": "erp-release-train-detail-3.png"
+        },
+        {
+          "title": "2.4 · Workflow Designer",
+          "image": "erp-release-train-detail-4.png"
+        },
+        {
+          "title": "2.4 · Approval Inbox",
+          "image": "erp-release-train-detail-5.png"
+        },
+        {
+          "title": "2.5 · Integration Center",
+          "image": "erp-release-train-detail-6.png"
+        },
+        {
+          "title": "3.0 · MRP and Capacity",
+          "image": "erp-release-train-detail-7.png"
+        },
+        {
+          "title": "3.0 · Governance",
+          "image": "erp-release-train-detail-8.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/sales",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpSales.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-sales.png",
+      "panels": [
+        {
+          "title": "Sales versus target",
+          "image": "erp-sales-panel-1.png"
+        },
+        {
+          "title": "Fulfillment pipeline",
+          "image": "erp-sales-panel-2.png"
+        },
+        {
+          "title": "Sales orders",
+          "image": "erp-sales-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/sales/orders",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpSales.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-sales-orders.png",
+      "panels": [
+        {
+          "title": "Sales versus target",
+          "image": "erp-sales-orders-panel-1.png"
+        },
+        {
+          "title": "Fulfillment pipeline",
+          "image": "erp-sales-orders-panel-2.png"
+        },
+        {
+          "title": "Sales orders",
+          "image": "erp-sales-orders-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/procurement",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpSupplyChain.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-procurement.png",
+      "panels": [
+        {
+          "title": "Spend by category",
+          "image": "erp-procurement-panel-1.png"
+        },
+        {
+          "title": "Procurement actions",
+          "image": "erp-procurement-panel-2.png"
+        },
+        {
+          "title": "Recent purchase orders",
+          "image": "erp-procurement-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/erp/inventory",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpSupplyChain.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "erp-inventory.png",
+      "panels": []
+    },
+    {
+      "route": "/erp-toolkit",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ErpToolkit.razor",
+      "components": [
+        "FlatBackgroundOperation",
+        "FlatBackgroundOperationCenter",
+        "FlatEntityLookup",
+        "FlatInfoItem",
+        "FlatJournalEntryGrid",
+        "FlatLifecycleStep",
+        "FlatMoneyInput",
+        "FlatPage",
+        "FlatPlanningBoard",
+        "FlatQuantityInput",
+        "FlatReconciliationWorkspace",
+        "FlatRecordLifecycleHeader",
+        "FlatTransactionAction",
+        "FlatTransactionWorkspace"
+      ],
+      "image": "erp-toolkit.png",
+      "panels": [
+        {
+          "title": "Transaction Workspace",
+          "image": "erp-toolkit-detail-1.png"
+        },
+        {
+          "title": "Entity Lookup and Composite Inputs",
+          "image": "erp-toolkit-detail-2.png"
+        },
+        {
+          "title": "Background Operations",
+          "image": "erp-toolkit-detail-3.png"
+        },
+        {
+          "title": "Journal Entry Grid",
+          "image": "erp-toolkit-detail-4.png"
+        },
+        {
+          "title": "Reconciliation Workspace",
+          "image": "erp-toolkit-detail-5.png"
+        },
+        {
+          "title": "Planning Board",
+          "image": "erp-toolkit-detail-6.png"
+        }
+      ]
+    },
+    {
+      "route": "/experience-toolkit",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ExperienceToolkit.razor",
+      "components": [
+        "FlatAccessibilitySettings",
+        "FlatCollaborationComment",
+        "FlatCollaborationPanel",
+        "FlatCommandDefinition",
+        "FlatCommandPalette",
+        "FlatConflictField",
+        "FlatConflictResolver",
+        "FlatFeatureView",
+        "FlatFormFieldDefinition",
+        "FlatFormStepDefinition",
+        "FlatFormValidationIssue",
+        "FlatOperationState",
+        "FlatPage",
+        "FlatPermissionView",
+        "FlatPresenceUser",
+        "FlatSchemaForm",
+        "FlatSessionTimeout",
+        "FlatUnsavedChangesGuard"
+      ],
+      "image": "experience-toolkit.png",
+      "panels": [
+        {
+          "title": "Hybrid recovery",
+          "image": "experience-toolkit-panel-1.png"
+        },
+        {
+          "title": "Hybrid recovery",
+          "image": "experience-toolkit-panel-2.png"
+        },
+        {
+          "title": "Mobile reliability",
+          "image": "experience-toolkit-panel-3.png"
+        },
+        {
+          "title": "Command Palette",
+          "image": "experience-toolkit-detail-1.png"
+        },
+        {
+          "title": "Advanced Schema Form",
+          "image": "experience-toolkit-detail-2.png"
+        },
+        {
+          "title": "Accessibility Gate",
+          "image": "experience-toolkit-detail-3.png"
+        },
+        {
+          "title": "Realtime Collaboration UI",
+          "image": "experience-toolkit-detail-4.png"
+        },
+        {
+          "title": "Offline Conflict Workspace",
+          "image": "experience-toolkit-detail-5.png"
+        },
+        {
+          "title": "Global Application Foundation",
+          "image": "experience-toolkit-detail-6.png"
+        },
+        {
+          "title": "Workspace State & Server Data",
+          "image": "experience-toolkit-detail-7.png"
+        },
+        {
+          "title": "Undo, Redo & Observability",
+          "image": "experience-toolkit-detail-8.png"
+        },
+        {
+          "title": "Security & Accessibility UX",
+          "image": "experience-toolkit-detail-9.png"
+        }
+      ]
+    },
+    {
+      "route": "/file-upload",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/FileUpload.razor",
+      "components": [
+        "FlatFileUpload",
+        "FlatFileUploadResult",
+        "FlatImageUpload",
+        "FlatPage",
+        "FlatPanel"
+      ],
+      "image": "file-upload.png",
+      "panels": [
+        {
+          "title": "Flat File Upload",
+          "image": "file-upload-panel-1.png"
+        },
+        {
+          "title": "Flat File Upload",
+          "image": "file-upload-panel-2.png"
+        },
+        {
+          "title": "Multiple Image Upload",
+          "image": "file-upload-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/grid-editor",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/GridEditor.razor",
+      "components": [
+        "FlatEditableGrid",
+        "FlatEmptyState",
+        "FlatGridEditResult",
+        "FlatInfoItem",
+        "FlatPage"
+      ],
+      "image": "grid-editor.png",
+      "panels": []
+    },
+    {
+      "route": "/grid-preferences",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/GridPreferences.razor",
+      "components": [
+        "FlatDataGrid",
+        "FlatGridCellContext",
+        "FlatGridPreferencesPanel",
+        "FlatPage",
+        "FlatPanel"
+      ],
+      "image": "grid-preferences.png",
+      "panels": [
+        {
+          "title": "Advanced Grid Preferences",
+          "image": "grid-preferences-panel-1.png"
+        },
+        {
+          "title": "Advanced Grid Preferences",
+          "image": "grid-preferences-panel-2.png"
+        }
+      ]
+    },
+    {
+      "route": "/grouped-data-grid",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/GroupedDataGrid.razor",
+      "components": [
+        "FlatGroupedDataGrid",
+        "FlatGroupedGridGroup",
+        "FlatInfoItem",
+        "FlatPage"
+      ],
+      "image": "grouped-data-grid.png",
+      "panels": []
+    },
+    {
+      "route": "/hierarchy-designer",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/HierarchyDesigner.razor",
+      "components": [
+        "FlatHierarchyDesigner",
+        "FlatHierarchyDesignerItem",
+        "FlatPage",
+        "FlatPanel"
+      ],
+      "image": "hierarchy-designer.png",
+      "panels": []
+    },
+    {
+      "route": "/",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Home.razor",
+      "components": [
+        "FlatPage",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "dashboard.png",
+      "panels": [
+        {
+          "title": "Ticket Trend",
+          "image": "dashboard-panel-1.png"
+        },
+        {
+          "title": "Recent Activity",
+          "image": "dashboard-panel-2.png"
+        },
+        {
+          "title": "Priority Assets",
+          "image": "dashboard-panel-3.png"
+        }
+      ]
+    },
+    {
+      "route": "/job-landing",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/JobLanding.razor",
+      "components": [
+        "FlatEmptyState",
+        "FlatJobEmailApplicationDialog"
+      ],
+      "image": "job-landing.png",
+      "panels": []
+    },
+    {
+      "route": "/jobs",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Jobs.razor",
+      "components": [
+        "FlatCardGrid",
+        "FlatFormModal",
+        "FlatJobCard",
+        "FlatPage",
+        "FlatPanel",
+        "FlatVacancyActions"
+      ],
+      "image": "jobs.png",
+      "panels": [
+        {
+          "title": "Hiring trend",
+          "image": "jobs-panel-1.png"
+        },
+        {
+          "title": "Hiring trend",
+          "image": "jobs-panel-2.png"
+        },
+        {
+          "title": "Recent activity",
+          "image": "jobs-panel-3.png"
+        },
+        {
+          "title": "Open roles",
+          "image": "jobs-panel-4.png"
+        }
+      ]
+    },
+    {
+      "route": "/kanban",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Kanban.razor",
+      "components": [
+        "FlatFab",
+        "FlatKanbanBoard",
+        "FlatKanbanCard",
+        "FlatPage"
+      ],
+      "image": "kanban.png",
+      "panels": []
+    },
+    {
+      "route": "/login",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Login.razor",
+      "components": [],
+      "image": "login.png",
+      "panels": []
+    },
+    {
+      "route": "/model-crud",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ModelCrud.razor",
+      "components": [
+        "FlatEntityLookup",
+        "FlatFileUploadResult",
+        "FlatGridEditResult",
+        "FlatImageUpload",
+        "FlatModelCrud",
+        "FlatModelFieldDefinition",
+        "FlatPage"
+      ],
+      "image": "model-crud.png",
+      "panels": []
+    },
+    {
+      "route": "/model-form-designer",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ModelFormDesigner.razor",
+      "components": [
+        "FlatModelFieldDefinition",
+        "FlatModelFormDesigner",
+        "FlatPage"
+      ],
+      "image": "model-form-designer.png",
+      "panels": []
+    },
+    {
+      "route": "/monitoring",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Monitoring.razor",
+      "components": [
+        "FlatInfoItem",
+        "FlatPanel",
+        "FlatStatCard"
+      ],
+      "image": "monitoring.png",
+      "panels": [
+        {
+          "title": "Live endpoint status",
+          "image": "monitoring-panel-1.png"
+        },
+        {
+          "title": "Incident feed",
+          "image": "monitoring-panel-2.png"
+        },
+        {
+          "title": "Notebook Finance 01",
+          "image": "monitoring-panel-3.png"
+        },
+        {
+          "title": "Notebook HR 02",
+          "image": "monitoring-panel-4.png"
+        },
+        {
+          "title": "Production Scanner Gate",
+          "image": "monitoring-panel-5.png"
+        },
+        {
+          "title": "Warehouse Packing",
+          "image": "monitoring-panel-6.png"
+        },
+        {
+          "title": "Developer Mobile Rig",
+          "image": "monitoring-panel-7.png"
+        },
+        {
+          "title": "Quality Station",
+          "image": "monitoring-panel-8.png"
+        }
+      ]
+    },
+    {
+      "route": "/monitoring/computers",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/MonitoringComputers.razor",
+      "components": [
+        "FlatEmptyState",
+        "FlatInfoItem",
+        "FlatMobileGrid",
+        "FlatPage"
+      ],
+      "image": "monitoring-computers.png",
+      "panels": []
+    },
+    {
+      "route": "/monitoring-database",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/MonitoringDatabase.razor",
+      "components": [
+        "FlatEmptyState",
+        "FlatInfoItem",
+        "FlatMobileGrid",
+        "FlatPage"
+      ],
+      "image": "monitoring-database.png",
+      "panels": []
+    },
+    {
+      "route": "/not-found",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/NotFound.razor",
+      "components": [],
+      "image": "not-found.png",
+      "panels": []
+    },
+    {
+      "route": "/operations-workspace",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/OperationsWorkspace.razor",
+      "components": [
+        "FlatEmptyState",
+        "FlatInfoItem",
+        "FlatOperationalWorkItem",
+        "FlatPage",
+        "FlatStatusChip"
+      ],
+      "image": "operations-workspace.png",
+      "panels": [
+        {
+          "title": "VPN access is unavailable",
+          "image": "operations-workspace-detail-1.png"
+        },
+        {
+          "title": "Replace warehouse scanner",
+          "image": "operations-workspace-detail-2.png"
+        }
+      ]
+    },
+    {
+      "route": "/pdf-viewer",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/PdfViewer.razor",
+      "components": [
+        "FlatPage",
+        "FlatPdfViewer"
+      ],
+      "image": "pdf-viewer.png",
+      "panels": []
+    },
+    {
+      "route": "/pivot",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Pivot.razor",
+      "components": [
+        "FlatFormModal",
+        "FlatInfoItem",
+        "FlatPage",
+        "FlatPivotGrid"
+      ],
+      "image": "pivot.png",
+      "panels": []
+    },
+    {
+      "route": "/product-detail",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ProductDetail.razor",
+      "components": [
+        "FlatFormModal",
+        "FlatPage",
+        "FlatProductDetail",
+        "FlatProductMetric"
+      ],
+      "image": "product-detail.png",
+      "panels": []
+    },
+    {
+      "route": "/product-editor",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ProductEditor.razor",
+      "components": [
+        "FlatEditorSection",
+        "FlatEditorWorkspace",
+        "FlatFileUpload",
+        "FlatFileUploadItem",
+        "FlatMultiSelect",
+        "FlatMultiSelectOption",
+        "FlatPage",
+        "FlatUnsavedChangesGuard"
+      ],
+      "image": "product-editor.png",
+      "panels": []
+    },
+    {
+      "route": "/product-management",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ProductManagement.razor",
+      "components": [
+        "FlatDataGrid",
+        "FlatEmptyState",
+        "FlatFilterWorkspace",
+        "FlatFormModal",
+        "FlatInfoItem",
+        "FlatMobileGrid",
+        "FlatPage",
+        "FlatPager"
+      ],
+      "image": "product-management.png",
+      "panels": []
+    },
+    {
+      "route": "/profile-grid",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ProfileGrid.razor",
+      "components": [
+        "FlatCardGrid",
+        "FlatFab",
+        "FlatFormModal",
+        "FlatPage",
+        "FlatProfileCard",
+        "FlatProfileCardStat",
+        "FlatProfileListItem",
+        "FlatStatusChip"
+      ],
+      "image": "profile-grid.png",
+      "panels": []
+    },
+    {
+      "route": "/reports",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Reports.razor",
+      "components": [
+        "FlatFormModal",
+        "FlatInfoItem",
+        "FlatOperationalReportViewer",
+        "FlatPage",
+        "FlatStatCard"
+      ],
+      "image": "reports.png",
+      "panels": []
+    },
+    {
+      "route": "/reset-password",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/ResetPassword.razor",
+      "components": [],
+      "image": "reset-password.png",
+      "panels": []
+    },
+    {
+      "route": "/sales-pipeline",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/SalesPipeline.razor",
+      "components": [
+        "FlatKanbanBoard",
+        "FlatPage",
+        "FlatPipelineCard"
+      ],
+      "image": "sales-pipeline.png",
+      "panels": []
+    },
+    {
+      "route": "/scheduler",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Scheduler.razor",
+      "components": [
+        "FlatPage",
+        "FlatScheduler",
+        "FlatSchedulerCalendar",
+        "FlatSchedulerItem"
+      ],
+      "image": "scheduler.png",
+      "panels": []
+    },
+    {
+      "route": "/crud-simple",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/SimpleCrud.razor",
+      "components": [
+        "FlatPage"
+      ],
+      "image": "crud-simple.png",
+      "panels": []
+    },
+    {
+      "route": "/spatial-operations",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/SpatialOperations.razor",
+      "components": [
+        "FlatMapPoint",
+        "FlatPage",
+        "FlatSpatialGeofence",
+        "FlatSpatialLayer",
+        "FlatSpatialWorkspace",
+        "FlatVectorMap",
+        "FlatVectorMapMarker",
+        "FlatVectorMapRegion",
+        "FlatVectorMapRoute"
+      ],
+      "image": "spatial-operations.png",
+      "panels": []
+    },
+    {
+      "route": "/static-data",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/StaticData.razor",
+      "components": [
+        "FlatEmptyState",
+        "FlatInfoItem",
+        "FlatMobileGrid",
+        "FlatPage"
+      ],
+      "image": "static-data.png",
+      "panels": []
+    },
+    {
+      "route": "/timeline",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Timeline.razor",
+      "components": [
+        "FlatPage",
+        "FlatProfileAvatar",
+        "FlatTimeline"
+      ],
+      "image": "timeline.png",
+      "panels": []
+    },
+    {
+      "route": "/tree-grid",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/TreeGrid.razor",
+      "components": [
+        "FlatEmptyState",
+        "FlatPage",
+        "FlatPanel",
+        "FlatTreeGrid",
+        "FlatTreeGridMoveResult"
+      ],
+      "image": "tree-grid.png",
+      "panels": []
+    },
+    {
+      "route": "/two-step-verification",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/TwoStepVerification.razor",
+      "components": [],
+      "image": "two-step-verification.png",
+      "panels": []
+    },
+    {
+      "route": "/vector-map",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/VectorMap.razor",
+      "components": [
+        "FlatMapPoint",
+        "FlatPage",
+        "FlatVectorMap",
+        "FlatVectorMapMarker",
+        "FlatVectorMapRegion",
+        "FlatVectorMapRoute"
+      ],
+      "image": "vector-map.png",
+      "panels": []
+    },
+    {
+      "route": "/website",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/WebsiteHome.razor",
+      "components": [
+        "FlatCatalogCard",
+        "FlatCatalogGrid"
+      ],
+      "image": "website.png",
+      "panels": []
+    },
+    {
+      "route": "/widgets",
+      "source": "samples/Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Widgets.razor",
+      "components": [
+        "FlatActionMetricWidget",
+        "FlatActivityItem",
+        "FlatCompactMetric",
+        "FlatMetricWidget",
+        "FlatPage",
+        "FlatProgressWidget",
+        "FlatSegmentProgressWidget",
+        "FlatTaskItem",
+        "FlatWidget"
+      ],
+      "image": "widgets.png",
+      "panels": [
+        {
+          "title": "Tile boxes",
+          "image": "widgets-detail-1.png"
+        },
+        {
+          "title": "Compact metrics",
+          "image": "widgets-detail-2.png"
+        },
+        {
+          "title": "Statistics",
+          "image": "widgets-detail-3.png"
+        },
+        {
+          "title": "Other widgets",
+          "image": "widgets-detail-4.png"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "overlays": [
+    {
+      "route": "/components",
+      "title": "Question message box",
+      "image": "message-box-question.png"
+    },
+    {
+      "route": "/components",
+      "title": "Warning message box",
+      "image": "message-box-warning.png"
+    },
+    {
+      "route": "/components",
+      "title": "Information message box",
+      "image": "message-box-info.png"
+    },
+    {
+      "route": "/components",
+      "title": "Error message box",
+      "image": "message-box-error.png"
+    },
+    {
+      "route": "/components",
+      "title": "Form modal",
+      "image": "form-modal.png"
+    },
+    {
+      "route": "/experience-toolkit",
+      "title": "Command palette",
+      "image": "command-palette.png"
+    }
+  ]
+}

@@ -20,7 +20,7 @@
       "const": "3.1"
     },
     "contractVersion": {
-      "const": "2.1.27"
+      "const": "2.1.29"
     },
     "source": {
       "type": "object",
@@ -41,7 +41,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.1.27"
+          "const": "2.1.29"
         },
         "MudBlazor": {
           "const": "9.9.0"
@@ -466,7 +466,7 @@
           "properties": {
             "reusableCssSource": { "const": "package-only" },
             "packageStylesheet": { "const": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" },
-            "packageStylesheetSha256": { "const": "195B0111B3F1F8592034C1B123DC8B977607FA293F49A02D1A034EAFAC483FA3" },
+            "packageStylesheetSha256": { "const": "EFBBB7475A05C6ED0B82CDC380E6DC36F374E8879CABAFF9F94899C40009C684" },
             "mudBlazorStylesheet": { "const": "_content/MudBlazor/MudBlazor.min.css" },
             "hostStylesheet": { "const": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css" },
             "hostStylesheetPurpose": { "const": "sample-and-domain-composition-only" },
