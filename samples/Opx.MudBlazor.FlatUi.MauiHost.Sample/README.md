@@ -38,7 +38,7 @@ dotnet build .\samples\Opx.MudBlazor.FlatUi.MauiHost.Sample\Opx.MudBlazor.FlatUi
 dotnet build .\samples\Opx.MudBlazor.FlatUi.MauiHost.Sample\Opx.MudBlazor.FlatUi.MauiHost.Sample.csproj -f net10.0-android -c Debug --no-restore
 ```
 
-This consumer repository restores reusable UI from public NuGet `2.1.26`; the local `Showcase` project contains composition only. To prove package consumption, build with:
+This consumer repository restores reusable UI from public NuGet `2.1.27`; the local `Showcase` project contains composition only. To prove package consumption, build with:
 
 ```powershell
 dotnet build .\samples\Opx.MudBlazor.FlatUi.MauiHost.Sample\Opx.MudBlazor.FlatUi.MauiHost.Sample.csproj -f net10.0-windows10.0.19041.0 -p:UseFlatUiProjectReference=false

@@ -1,13 +1,13 @@
 {
   "$schema": "flat-ui.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.1.26",
+  "contractVersion": "2.1.27",
   "source": {
     "repository": "mudblazor-flat-ui",
     "samplePath": "samples/Opx.MudBlazor.FlatUi.Showcase"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.1.26",
+    "Opx.MudBlazor.FlatUi": "2.1.27",
     "MudBlazor": "9.9.0"
   },
   "canonicalSample": {

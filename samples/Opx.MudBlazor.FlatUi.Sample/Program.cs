@@ -30,6 +30,7 @@ builder.Services.AddMudServices(options =>
 builder.Services.AddOpxFlatUiShowcase();
 builder.Services.AddScoped<FlatPageLoadingState>();
 builder.Services.AddScoped<FlatMessageBoxService>();
+builder.Services.AddScoped<IFlatPrintService, FlatWebPrintService>();
 builder.Services.AddScoped<IDeviceNotificationService, FlatWebDeviceNotificationService>();
 var applicationOptions = builder.Configuration
     .GetSection("OpxFlatUi:Application")

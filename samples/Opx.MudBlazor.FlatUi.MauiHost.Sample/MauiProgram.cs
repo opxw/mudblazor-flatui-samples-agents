@@ -50,6 +50,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IHybridStatusBarService, MauiHybridStatusBarService>();
         builder.Services.AddSingleton<IHybridSessionBootstrapper, SampleHybridSessionBootstrapper>();
         builder.Services.AddSingleton<IDeviceNotificationService, MauiDeviceNotificationService>();
+        builder.Services.AddSingleton<IFlatPrintService, MauiPrintService>();
         builder.Services.AddSingleton<MainPage>();
 
 #if DEBUG

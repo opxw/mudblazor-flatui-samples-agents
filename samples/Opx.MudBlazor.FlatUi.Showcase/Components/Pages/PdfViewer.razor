@@ -2,9 +2,10 @@
 @page "/pdf-viewer"
 @inject FlatMessageBoxService MessageBox
 @inject FlatPageLoadingState PageLoading
+@inject IFlatPrintService PrintService
 
 <FlatPage Kind="FlatPageKind.Detail" PageCssClass="pdf-viewer-page no-mobile-fab">
-    <FlatPdfViewer SourceUrl="/sample-documents/sales-report.pdf"
+    <FlatPdfViewer SourceUrl="@_pdfUrl"
                    Title="Sales Report"
                    Subtitle="August 2026"
                    Busy="@_busy"
@@ -13,6 +14,7 @@
                    OnDownload="DownloadAsync"
                    OnShare="ShareAsync"
                    OnOpenExternal="OpenExternalAsync"
+                   OnPrint="PrintAsync"
                    StateChanged="StateChangedAsync">
         <ParametersContent>
             <MudSelect T="string" @bind-Value="_period" Label="Period" Variant="@FlatPreferences.InputVariant" Margin="Margin.Dense">
@@ -30,6 +32,26 @@
 </FlatPage>
 
 @code {
+    private readonly byte[] _pdfBytes = Opx.MudBlazor.FlatUi.Showcase.SamplePdfDocument.Create();
+    private string _pdfUrl = string.Empty;
+    protected override void OnInitialized() => _pdfUrl = "data:application/pdf;base64," + Convert.ToBase64String(_pdfBytes);
+
+    private async Task PrintAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        try
+        {
+            var capability = await PrintService.GetCapabilitiesAsync();
+            var result = capability.CanPrintPdf
+                ? await PrintService.PrintAsync(new FlatPrintRequest(_pdfBytes, "Sales Report"))
+                : new FlatPrintResult(FlatPrintStatus.Unsupported);
+            await MessageBox.InfoAsync(result.Status == FlatPrintStatus.Submitted
+                ? "Print dialog requested. This host cannot confirm physical printing or the final outcome."
+                : $"Print result: {result.Status}", "PDF printing");
+        }
+        finally { _busy = false; }
+    }
     private string _period = "August 2026";
     private string _branch = "All branches";
     private bool _busy;
