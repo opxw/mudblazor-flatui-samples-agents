@@ -14,7 +14,13 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 ## Current canonical snapshot
 
-- Active dependency: public NuGet 2.1.29; imported source commit `26d476b`. Reporting preserves package-owned responsive toolbar and bounded mobile-card scrolling with a fixed sibling pager. See docs/REPORTING.md.
+- Active dependency is NuGet.org 2.1.31, source commit e7c743d. Rules/skill deltas are routed through references/upstream-2.1.31.md, including non-overlap, input/sidebar behavior and new component/layout references. New upstream pages and host integrations are not imported by this package/guidance change; local coverage remains 72 shared + 4 MAUI-only routes.
+- Official NuGet repository signature verified. Nupkg SHA-256 61B1E1C8960C2163FEDDBF812B359E992DB365BBB0F74FA6F0D01E87F95CF83F; CSS SHA-256 724A258069E71A73F592B6406C4E7FD714448D0EE4EB94876F4542B6DA7CF832. Web/MAUI snackbar fade-out is 200ms; visible duration is unchanged.
+
+- Previous dependency was NuGet.org 2.1.30. Official repository signature verified; nupkg SHA-256 775FC1666E55CBA1864721F0D643C973E5FDE390ADC6C4EC1CF1D9D128CD5BF9; CSS SHA-256 E9D5108276D87FAB3A43BD945A812221AAC85E677B2BF485CC764FE285CFD2D8 matches the upstream working-tree CSS. Lookup sticky headers keep an opaque resolved background in Light/Dark.
+- Historical 2.1.30 provenance: upstream HEAD remained 26d476b with uncommitted 2.1.30 package/CSS changes; its agent/rules/skill files have no new delta. Preserve the previous import and consumer-specific rules, rather than replacing them with package-development defaults. Native device verification remains separate.
+
+- Previous dependency: public NuGet 2.1.29; imported source commit `26d476b`. Reporting preserves package-owned responsive toolbar and bounded mobile-card scrolling with a fixed sibling pager. See docs/REPORTING.md.
 - Official 2.1.29 repository signature verified. Nupkg SHA-256: 8E5823D31FC620F194B2C3B0529CE713937017D0A0E6956C43A147406AD9B433. CSS SHA-256: EFBBB7475A05C6ED0B82CDC380E6DC36F374E8879CABAFF9F94899C40009C684.
 - Document transfer/hybrid operations rules are imported; newer transfer adapters and example wiring require separate consumer integration. NuGet contains shared APIs, not automatic host registrations. Existing gallery screenshots remain 2.1.27 evidence.
 
@@ -32,7 +38,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.29`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.31`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.9.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.

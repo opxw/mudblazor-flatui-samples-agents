@@ -20,7 +20,7 @@
       "const": "3.1"
     },
     "contractVersion": {
-      "const": "2.1.29"
+      "const": "2.1.31"
     },
     "source": {
       "type": "object",
@@ -41,7 +41,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.1.29"
+          "const": "2.1.31"
         },
         "MudBlazor": {
           "const": "9.9.0"
@@ -59,7 +59,7 @@
           "../Opx.MudBlazor.FlatUi.Showcase/ShowcaseNavigationCatalog.cs": "6011B13E06F70D3ABCA101FC8D42CB826CD86468A8C4980097D5FE3A41388875",
           "../Opx.MudBlazor.FlatUi.Showcase/Components/Pages/Home.razor": "78C721DCBD7F30FD6AB6F6D2CAB8683D4940DB395B15239B9215F32AC3A24032",
           "Components/RootStartupGate.razor": "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F",
-          "appsettings.json": "B733311902471049360932C69746400DD7E09EDA6A25BD990577561811C277AD",
+          "appsettings.json": "E60D6F1B291CEFB747910F58FBE7A19D950635D6BBD0416CC77366B99D136661",
           "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css": "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
         },
         "allowedAfterBaseline": ["branding", "wording", "data", "authorization", "callbacks", "domain-integration", "persistence"],
@@ -466,7 +466,7 @@
           "properties": {
             "reusableCssSource": { "const": "package-only" },
             "packageStylesheet": { "const": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" },
-            "packageStylesheetSha256": { "const": "EFBBB7475A05C6ED0B82CDC380E6DC36F374E8879CABAFF9F94899C40009C684" },
+            "packageStylesheetSha256": { "const": "724A258069E71A73F592B6406C4E7FD714448D0EE4EB94876F4542B6DA7CF832" },
             "mudBlazorStylesheet": { "const": "_content/MudBlazor/MudBlazor.min.css" },
             "hostStylesheet": { "const": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css" },
             "hostStylesheetPurpose": { "const": "sample-and-domain-composition-only" },

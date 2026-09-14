@@ -9,19 +9,19 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.1.29"
+$expectedContractVersion = "2.1.31"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.1.29"
+    "Opx.MudBlazor.FlatUi" = "2.1.31"
     "MudBlazor" = "9.9.0"
 }
 $expectedHostCssSha256 = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
-$expectedPackageCssSha256 = "EFBBB7475A05C6ED0B82CDC380E6DC36F374E8879CABAFF9F94899C40009C684"
+$expectedPackageCssSha256 = "724A258069E71A73F592B6406C4E7FD714448D0EE4EB94876F4542B6DA7CF832"
 $expectedExactSampleHashes = [ordered]@{
     "Components\Layout\MainLayout.razor" = "6DEE59C280F9E1345DB1592D1E08FAF7FBDA96A28CBFABDBC38509F6DCE07C19"
     "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "6011B13E06F70D3ABCA101FC8D42CB826CD86468A8C4980097D5FE3A41388875"
     "..\Opx.MudBlazor.FlatUi.Showcase\Components\Pages\Home.razor" = "78C721DCBD7F30FD6AB6F6D2CAB8683D4940DB395B15239B9215F32AC3A24032"
     "Components\RootStartupGate.razor" = "73F8016F245BE7D55C5103677B28F7927EBDC069E39BF22BC49A542CDAD18A7F"
-    "appsettings.json" = "B733311902471049360932C69746400DD7E09EDA6A25BD990577561811C277AD"
+    "appsettings.json" = "E60D6F1B291CEFB747910F58FBE7A19D950635D6BBD0416CC77366B99D136661"
     "..\Opx.MudBlazor.FlatUi.Showcase\wwwroot\opx-flat-ui-showcase.css" = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
 }
 $violations = [System.Collections.Generic.List[string]]::new()
@@ -690,7 +690,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.29; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.31; found $packageCssHash."
     }
 }
 

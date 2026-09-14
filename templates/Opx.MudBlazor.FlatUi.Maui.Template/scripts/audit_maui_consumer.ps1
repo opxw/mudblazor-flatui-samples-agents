@@ -60,7 +60,7 @@ Require-Text $project[0].FullName @(
     'net10.0-android;net10.0-ios',
     '<MauiVersion>10.0.90</MauiVersion>',
     'CommunityToolkit.Maui" Version="15.0.1',
-    'Opx.MudBlazor.FlatUi" Version="2.1.29',
+    'Opx.MudBlazor.FlatUi" Version="2.1.31',
     'MudBlazor" Version="9.9.0',
     'MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="1,1"')
 Require-Text (Join-Path $root "NuGet.sources.xml") @("https://api.nuget.org/v3/index.json", 'globalPackagesFolder" value=".nuget\packages')
@@ -104,9 +104,9 @@ if (Test-Path -LiteralPath $assetsPath) {
     try {
         $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json -AsHashtable
         $packageRoot = @($assets.packageFolders.Keys)[0]
-        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.1.29\staticwebassets\opx-flat-ui.css"
+        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.1.31\staticwebassets\opx-flat-ui.css"
         if (-not (Test-Path -LiteralPath $packageCss)) { $violations.Add("Restored OPX package CSS was not found.") }
-        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "EFBBB7475A05C6ED0B82CDC380E6DC36F374E8879CABAFF9F94899C40009C684") { $violations.Add("Restored OPX 2.1.29 CSS hash does not match the contract.") }
+        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "724A258069E71A73F592B6406C4E7FD714448D0EE4EB94876F4542B6DA7CF832") { $violations.Add("Restored OPX 2.1.31 CSS hash does not match the contract.") }
     } catch { $violations.Add("Unable to verify restored OPX CSS: $($_.Exception.Message)") }
 } else { $violations.Add("Run restore before the mobile consumer audit; obj/project.assets.json is missing.") }
 
@@ -124,4 +124,4 @@ if ($ExactSample) {
 }
 
 if ($violations.Count -gt 0) { $violations | ForEach-Object { Write-Error $_ }; exit 1 }
-Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.1.29$(if ($ExactSample) { ', Exact Sample Mode' }))."
+Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.1.31$(if ($ExactSample) { ', Exact Sample Mode' }))."
