@@ -79,6 +79,18 @@ Browser credential autofill uses the shared field theme instead of Chromium's in
 
 ## Navigation configuration
 
+### MAUI versus Web Back ownership
+
+In a hybrid MAUI/Web solution, shared Razor pages share user intent and dirty-state rules, **not the native Back implementation**. This host distinction qualifies every native Back/IME statement below.
+
+- **Web, including mobile browsers and PWA:** use browser/Blazor navigation history and the existing package Web overlay/unsaved-change integration. Visible Back actions must use the Web path. Never call MAUI dispatchers, native `WebView.CanGoBack()`/`GoBack()`, hardware-key handlers, native IME interception or native app-exit logic from Web. Preserve normal browser Back/Forward and native browser confirmation for external reload/tab close; do not install an extra competing `popstate` handler or synthetic route stack.
+- **MAUI Hybrid:** register the canonical native adapter only in the MAUI host. Android Back has one paired-key, single-flight owner: visible IME first, then topmost registered overlay/modal with its dirty guard, then actual `WebView.CanGoBack()`/`GoBack()`, then the host's native root policy only when nothing remains to consume Back. Do not apply Android hardware-key handling to iOS; validate its supported native navigation separately.
+- **Host selection:** use explicit host configuration and registered capabilities/adapters. Viewport width, responsive Bottom navigation, touch support, user-agent and an Android browser do not prove a MAUI host. Keep native APIs and registrations in the native project; shared callbacks resolve to the correct host implementation. Reuse existing package contracts before proposing additional abstractions.
+- **Shared outcome:** Back closes an active modal without leaving its page; a later Back follows actual visited history. A rejected discard keeps draft, modal and route unchanged. Cancel/Back never becomes Save or triggers a data reload. Preserve package-owned Sheet/MainView menu history and Forward; do not guess parent URLs, force Dashboard redirects, or exit from a non-root page.
+- **Lifecycle:** keep one owner per Back event. Dispose registrations on teardown; do not invoke both native and Web handlers for the same press. MAUI overlay ownership suspends native pull-to-refresh and releases that lease on close, route/layout transition or disposal; Web must not acquire a native refresh lease.
+
+Before accepting a change, test Web desktop and mobile-browser Back/Forward, modal close, rejected discard and direct-entry routes independently of MAUI. On Android test IME -> modal -> current page -> previous visited page -> actual root, including rapid/repeated presses. Test Bottom Sheet/MainView against their visited menu trail in each host. Record browser and exact native artifact/device evidence separately; a narrow viewport or passing build is not native Back proof. If package ownership is demonstrated, report **bug package**; proven host misrouting is **bug integrasi aplikasi**. Otherwise report **belum terklasifikasi** and the missing evidence.
+
 ### Bottom menu Back history
 
 Delivered in the 2.1.24 package line. Upgrade the DLL and bundled OPX JavaScript

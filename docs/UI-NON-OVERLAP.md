@@ -1,5 +1,9 @@
 # UI composition: spacing and non-overlap
 
+The `FlatPanel.Footer` API and shared footer inset are packaged starting with 2.1.32. Earlier artifacts, including 2.1.31, do not contain this addition. Upgrade package DLL and static assets together before using the new slot.
+
+For summary text touching panel/table edges, use `FlatPanel.Footer` or `FlatWidget.Footer`; custom compositions may use `.flat-content-note`. Footer inset follows responsive Display.PanelBodyPadding (16px desktop/14px mobile defaults), independently of edge-to-edge body content. Preserve parent-owned WidgetGap and natural wrapping, normalize first/last child margins only, and reserve no space when Footer is absent. Bare consumer text requires explicit slot/wrapper adoption; never blanket-pad paragraphs or cells. See docs/UI-NON-OVERLAP.md.
+
 Applies whenever adding or changing any UI element: label, helper/error text, icon, input, button, badge, toolbar, panel, widget or nested component.
 
 ## Required composition checks

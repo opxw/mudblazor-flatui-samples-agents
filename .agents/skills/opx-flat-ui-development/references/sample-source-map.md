@@ -1,5 +1,9 @@
 # Sample source map
 
+2.1.33 guidance import: read docs/CHAT-CONTENT.md, docs/METRIC-STRIP.md and docs/PROFILE-PORTRAIT.md. Upstream AiChat.razor and MetricStripPreview.razor show new rich blocks and compact metrics; these source edits are not copied by this package/rules-only upgrade. Existing local PageIds remain authoritative; preserve the Web/MAUI Back separation in docs/AUTH-AND-NAVIGATION.md.
+
+2.1.32 footer import (retained in 2.1.33): use the package `FlatPanel.Footer` / `FlatWidget.Footer` or `.flat-content-note` and docs/UI-NON-OVERLAP.md. Upstream DashboardReadinessPreview demonstrates adoption; that new preview is still upstream-only. Existing local sample bodies are not automatically wrapped by a package upgrade.
+
 Current import: 2.1.31 at upstream commit e7c743d. See [upstream-2.1.31.md](upstream-2.1.31.md) for new PageIds and component previews; those additional routes remain upstream-only. Existing local route/profile registry still describes the compiled consumer. Earlier import notes below are historical provenance.
 
 2.1.31 verification: source HEAD is still `26d476b`; the package/CSS bump is in the upstream working tree. No newer skill/rule/agent delta exists there. Current lookup-header guidance is derived from its CSS and exact NuGet stylesheet; prior imported reporting and transfer references remain applicable.

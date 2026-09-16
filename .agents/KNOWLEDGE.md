@@ -1,5 +1,11 @@
 # Repository knowledge
 
+## MAUI/Web Back ownership decision
+
+- Shared UI does not imply shared native navigation. Mobile browser/PWA remains Web: browser/Blazor history plus package Web overlay/dirty guards, never MAUI native dispatch or app-exit logic.
+- Select native adapters through explicit host configuration/capability registration, not screen width or device appearance. MAUI owns IME/native Back/WebView history; retain one event owner and one action per Back.
+- Follow `docs/AUTH-AND-NAVIGATION.md` (MAUI versus Web Back ownership). Test Web Back/Forward separately from Android native Back; documentation or successful builds do not prove runtime behavior.
+
 Copyright (c) 2026 opx. All rights reserved.
 
 This repository-local ledger preserves accepted OPX Flat UI knowledge for agents and generated consumers. It travels with the repository. User-folder memory and ChatGPT handoff files are supplementary recall only; they never replace this file, current source, compiled samples, package inspection, Git history, or live/device evidence.
@@ -14,7 +20,15 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 ## Current canonical snapshot
 
-- Active dependency is NuGet.org 2.1.31, source commit e7c743d. Rules/skill deltas are routed through references/upstream-2.1.31.md, including non-overlap, input/sidebar behavior and new component/layout references. New upstream pages and host integrations are not imported by this package/guidance change; local coverage remains 72 shared + 4 MAUI-only routes.
+- Current dependency: official NuGet.org 2.1.34, MudBlazor 9.10.0, Blazor Components Authorization/Web 10.0.12. NU1605 from older direct pins requires aligning dependencies, not suppressing warnings. Repository signature verified; nupkg SHA-256 E8B15C903AAC143EEF8535DCA0F4827FD6FF3D2A6059D731F6962FAE47BC03AB; CSS unchanged from 2.1.33 (EE8519C20EF637D586C2F6254B7DB8C79F18AF6D52590998571786ED72D8A9B1). Package repository metadata points to 4cd157abfa823476504b898d95451f361104f44e. Prior imported guidance and Web/MAUI Back separation remain; no new upstream sample import in this upgrade.
+
+- Previous dependency was official NuGet.org 2.1.33; repository signature verified, nupkg SHA-256 D4F77AC2C2BAE3B00384EABCC55D72A660C92242808A77A49D384885B898E725; CSS SHA-256 EE8519C20EF637D586C2F6254B7DB8C79F18AF6D52590998571786ED72D8A9B1. DLL metadata confirms rich chat Blocks, FlatChatBlockView, Compact, Portrait and PortraitAvatar. New transitive dependencies: Markdig 1.3.2 and HtmlSanitizer 9.2.1039. Source working tree remains based on e7c743d; stale unpublished-candidate notes are not release authority.
+- Imported rich-chat, compact-metric and portrait guidance into repository agent/rules/skill and docs. Preserve host-specific Web versus MAUI Back ownership. Source previews/tests are not automatically local sample additions or native proof; local 72 shared + 4 native routes and historical gallery evidence remain unchanged.
+
+- Previous dependency: NuGet.org 2.1.32. Imported footer/summary rules from the source working tree based on e7c743d; new FlatPanel.Footer, existing FlatWidget.Footer and .flat-content-note own responsive body inset without padding edge-to-edge tables or reserving absent-footer space. Previous source/sample import boundaries remain unchanged.
+- Official repository signature verified. Nupkg SHA-256 0FCC871F26D16594D95068371CE61BB0189D98741878848975947108B50B1B7C; CSS SHA-256 1F7D9ECB9C94EBAB1125A0C7981C8F207F2BF530F734CC1D1253334BC9930CF1.
+
+- Previous dependency was NuGet.org 2.1.31, source commit e7c743d. Rules/skill deltas are routed through references/upstream-2.1.31.md, including non-overlap, input/sidebar behavior and new component/layout references. New upstream pages and host integrations are not imported by this package/guidance change; local coverage remains 72 shared + 4 MAUI-only routes.
 - Official NuGet repository signature verified. Nupkg SHA-256 61B1E1C8960C2163FEDDBF812B359E992DB365BBB0F74FA6F0D01E87F95CF83F; CSS SHA-256 724A258069E71A73F592B6406C4E7FD714448D0EE4EB94876F4542B6DA7CF832. Web/MAUI snackbar fade-out is 200ms; visible duration is unchanged.
 
 - Previous dependency was NuGet.org 2.1.30. Official repository signature verified; nupkg SHA-256 775FC1666E55CBA1864721F0D643C973E5FDE390ADC6C4EC1CF1D9D128CD5BF9; CSS SHA-256 E9D5108276D87FAB3A43BD945A812221AAC85E677B2BF485CC764FE285CFD2D8 matches the upstream working-tree CSS. Lookup sticky headers keep an opaque resolved background in Light/Dark.
@@ -38,8 +52,8 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.31`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
-- MudBlazor baseline: `9.9.0`; consumer contract schema: `3.1`; default theme: Light.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.34`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- MudBlazor baseline: `9.10.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
 - The canonical registry has 76 unique PageIds and routes. Every PageId maps exactly once to one of 45 declared profiles in `showcase-behavior-registry.md`.
