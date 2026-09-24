@@ -1,5 +1,13 @@
 # Sample source map
 
+Latest guidance import: [upstream-2.1.42.md](upstream-2.1.42.md), from source working tree based on c3d1f91. Map chat visibility to opx.page.assistant.ai-chat and scroll/draft containment to opx.page.operations.asset-crud. New upstream ?single=true page wiring and regression scripts remain reference-only; no local route additions in this import.
+
+2.1.37 guidance: read [upstream-2.1.37.md](upstream-2.1.37.md). Forms/cards/choice lists map to opx.page.reference.components; upstream query previews and new shared account-menu wiring are not copied by this package/rules import.
+
+2.1.36 guidance: docs/USER-MENU.md routes AppBar account prompts to FlatUserMenu; docs/RIBBON.md routes edge-status bands to FlatRibbon / opx.page.reference.components. Upstream ShowcaseUserMenu and /components?preview=ribbon additions remain reference-only until separately copied; package API availability does not prove local preview parity.
+
+2.1.35 safe-area guidance: docs/HYBRID-SAFE-AREA.md maps to opx.page.reference.experience-toolkit and FlatAppShell/MAUI MainLayout. Upstream host changes and scripts/test-package-safe-area.mjs are reference-only in this import; local native adapters and legacy app.css have not been migrated. Preserve host-specific Back behavior and require separate device proof.
+
 2.1.33 guidance import: read docs/CHAT-CONTENT.md, docs/METRIC-STRIP.md and docs/PROFILE-PORTRAIT.md. Upstream AiChat.razor and MetricStripPreview.razor show new rich blocks and compact metrics; these source edits are not copied by this package/rules-only upgrade. Existing local PageIds remain authoritative; preserve the Web/MAUI Back separation in docs/AUTH-AND-NAVIGATION.md.
 
 2.1.32 footer import (retained in 2.1.33): use the package `FlatPanel.Footer` / `FlatWidget.Footer` or `.flat-content-note` and docs/UI-NON-OVERLAP.md. Upstream DashboardReadinessPreview demonstrates adoption; that new preview is still upstream-only. Existing local sample bodies are not automatically wrapped by a package upgrade.

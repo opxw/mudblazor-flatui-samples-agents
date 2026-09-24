@@ -1,6 +1,24 @@
 # Rich chat content
 
-> Import scope (2.1.33): guidance from the upstream working tree. Referenced new preview content and upstream tests are not automatically copied or rerun in this consumer; inspect the local source map. Package API availability is verified separately from browser/native/backend behavior.
+> Import 2026-09-24 for NuGet 2.1.42: upstream guidance, examples and historical test reports below are not a claim that new page/host wiring or regression scripts are installed or tested in this consumer. See the local skill reference upstream-2.1.42.md and local source map for scope. Package/current-source CSS matches; native/runtime validation remains separate.
+
+## Single conversation
+
+Use `HeaderVisible="false"` to omit the conversation header and its grid row completely, leaving messages plus composer. Default true preserves existing behavior. `/ai-chat?single=true` hides both sidebar and header. Header visibility is available starting with 2.1.40; hiding it also removes its Back/action controls, so the host must retain any required navigation elsewhere.
+
+The canonical AI Chat page fills the available main content width with 2px clearance on each inline edge and 2px above the chat beneath the app shell, without the ordinary 1500px page cap. This explicit page exception does not change other pages, app navigation width, native safe-area ownership, or the chat's internal header/message/composer padding.
+
+Set `FlatChatShell.SidebarVisible="false"` to omit the sidebar and its reserved desktop column. The thread stays open at every width regardless of `ConversationOpen`; no Back-to-history control is rendered. `Sidebar` is optional. Default `true` preserves existing history behavior. Changing visibility does not reset host messages/drafts; route and native Back remain host-owned.
+
+```razor
+<FlatChatShell SidebarVisible="false">
+    <Header>Assistant</Header>
+    <Messages>@* Host-owned messages *@</Messages>
+    <Composer>@* Host-owned composer *@</Composer>
+</FlatChatShell>
+```
+
+Canonical demonstration: `/ai-chat?single=true`; `/ai-chat` retains history. This additive API is available starting with 2.1.39. Retain existing header/message/composer padding, scroll ownership and safe-area behavior.
 
 `FlatChatMessage.Text` remains encoded plain text. Supply `Blocks` to render ordered rich content instead. Reuse stable message keys and unique block IDs when replacing immutable snapshots during streaming. `IsStreaming` displays an updating state; transport, cancellation and conversation storage belong to the host. See the offline `/ai-chat` sample.
 
@@ -27,6 +45,8 @@ Images use a separate block. Remote image loading is disabled by default; `Allow
 Dependencies: [Markdig](https://github.com/xoofx/markdig) and [HtmlSanitizer](https://github.com/mganss/HtmlSanitizer). Maintain security updates and regression tests; sanitizer tests are not a universal security guarantee.
 
 ## Limits and layout
+
+MAUI responsive table surfaces (<=900px) allow vertical scroll chaining to the nearest scrollable ancestor once at their top/bottom limit. This covers data-grid, standard table-scroll and rich-chat table wrappers; horizontal scrolling remains contained. An ancestor modal or chat-message scroller still owns its boundary, so this does not unlock the background page through overlays. Desktop/Web behavior is unchanged. `scripts/test-mobile-table-scroll.mjs` verifies touch chaining in Chromium; Android/iOS WebView evidence remains separate.
 
 Each message permits 64 unique blocks. Each block permits 65,536 text characters, 2,048 title/value characters, 32 columns, 500 rows, 200 chart labels and 12 series. Chart data must be finite and match label counts. Malformed/missing fields and duplicate keys produce explicit display states. The host must additionally bound request size, aggregate conversation size and payload deserialization; render limits do not limit network allocation. Pass table scalar values, not executable/custom formatter objects.
 
