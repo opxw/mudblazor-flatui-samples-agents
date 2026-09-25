@@ -29,6 +29,6 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
     <PackageReference Include="MudBlazor" Version="9.10.0" />
-    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.42" />
+    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.43" />
   </ItemGroup>
 </Project>

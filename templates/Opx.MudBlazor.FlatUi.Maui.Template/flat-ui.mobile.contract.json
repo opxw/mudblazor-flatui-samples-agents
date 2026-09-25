@@ -1,10 +1,10 @@
 {
   "$schema": "flat-ui.mobile.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.1.42",
+  "contractVersion": "2.1.43",
   "packages": {
     "Microsoft.Maui.Controls": "10.0.90",
-    "Opx.MudBlazor.FlatUi": "2.1.42",
+    "Opx.MudBlazor.FlatUi": "2.1.43",
     "MudBlazor": "9.10.0",
     "CommunityToolkit.Maui": "15.0.1"
   },
@@ -76,7 +76,7 @@
     "ordinaryTextSelectable": false,
     "textboxSelectionPreserved": true,
     "reusableCssFromPackageOnly": true,
-    "opxPackageCssSha256": "DF655DC5B0AB9B4C453C178C86E6F81276DA67A46A250DF2D0DC1FD2F1D29A57"
+    "opxPackageCssSha256": "066754D730E3830D76C32FC8EE1C0BA7D995AA77CBC9276F51AF78A87696D193"
   },
   "verification": {
     "androidReleaseBuildRequired": true,

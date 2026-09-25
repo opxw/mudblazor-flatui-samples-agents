@@ -9,13 +9,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.1.42"
+$expectedContractVersion = "2.1.43"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.1.42"
+    "Opx.MudBlazor.FlatUi" = "2.1.43"
     "MudBlazor" = "9.10.0"
 }
 $expectedHostCssSha256 = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
-$expectedPackageCssSha256 = "DF655DC5B0AB9B4C453C178C86E6F81276DA67A46A250DF2D0DC1FD2F1D29A57"
+$expectedPackageCssSha256 = "066754D730E3830D76C32FC8EE1C0BA7D995AA77CBC9276F51AF78A87696D193"
 $expectedExactSampleHashes = [ordered]@{
     "Components\Layout\MainLayout.razor" = "6DEE59C280F9E1345DB1592D1E08FAF7FBDA96A28CBFABDBC38509F6DCE07C19"
     "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "6011B13E06F70D3ABCA101FC8D42CB826CD86468A8C4980097D5FE3A41388875"
@@ -690,7 +690,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.42; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.1.43; found $packageCssHash."
     }
 }
 

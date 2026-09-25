@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.42" />
+    <PackageReference Include="Opx.MudBlazor.FlatUi" Version="2.1.43" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.11" />

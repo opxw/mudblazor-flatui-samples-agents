@@ -2,13 +2,13 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "opx",
   "classifications": ["Web", "Blazor", "MudBlazor", "OPX"],
-  "identity": "Opx.MudBlazor.FlatUi.Web.Template.2.1.42.MudBlazor990",
+  "identity": "Opx.MudBlazor.FlatUi.Web.Template.2.1.43.MudBlazor990",
   "name": "OPX MudBlazor Flat UI Web",
   "shortName": "opx-flatui-web",
   "sourceName": "Opx.MudBlazor.FlatUi.Sample",
   "defaultName": "Opx.FlatUi.App",
   "preferNameDirectory": true,
-  "description": "Creates an OPX Flat UI Blazor Web app pinned to the verified 2.1.42 consumer contract with MudBlazor 9.10.0, including first-paint font/density restoration, a theme-aware root startup gate before Router, configurable reconnect-style Memuat halaman spinner, Device/Manual font ownership, accessibility-scaled mobile button sizing, adaptive responsive rules, MAUI Android/iOS Community Toolkit, AppBar-synchronized status bar, bounce-free WebView and textbox-only selection guidance, clean initial run, package-owned reusable CSS, runtime OPX attribution, Settings, the default sidebar, and canonical widget spacing.",
+  "description": "Creates an OPX Flat UI Blazor Web app pinned to the verified 2.1.43 consumer contract with MudBlazor 9.10.0, including first-paint font/density restoration, a theme-aware root startup gate before Router, configurable reconnect-style Memuat halaman spinner, Device/Manual font ownership, accessibility-scaled mobile button sizing, adaptive responsive rules, MAUI Android/iOS Community Toolkit, AppBar-synchronized status bar, bounce-free WebView and textbox-only selection guidance, clean initial run, package-owned reusable CSS, runtime OPX attribution, Settings, the default sidebar, and canonical widget spacing.",
   "tags": {
     "language": "C#",
     "type": "project"
