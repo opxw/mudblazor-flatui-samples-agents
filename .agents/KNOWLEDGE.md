@@ -20,7 +20,11 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 ## Current canonical snapshot
 
-- Current dependency: official NuGet.org 2.1.43, repository signature verified on 2026-09-24. Nupkg SHA-256 E38F0B3A946AFF6F2749A336C9FD3F7E9CF1E060597890B4A9678B47BF6C6034; CSS SHA-256 066754D730E3830D76C32FC8EE1C0BA7D995AA77CBC9276F51AF78A87696D193. Dependencies remain MudBlazor 9.10.0 and Blazor Components 10.0.12. Package/contract baseline update only; retain imported 2.1.42 guidance, Web/MAUI Back separation and pending native safe-area migration. No new upstream skill/sample import or native runtime certification.
+- Current dependency: official NuGet.org 2.1.46, signature verified 2026-10-06. Nupkg SHA256 A382F145878A3AC49DC0026B889AFCB67CA5FA79F7EDFF19E1D1D1420E113166; CSS SHA256 71BF6AE517ED4292944710BA144666DBABF9AF4FAB3E5959B6642F8F49F63CEA. Dependencies remain MudBlazor 9.10.0 and Blazor Components 10.0.12. Imported working-tree guidance based on a0742d4 through references/upstream-2.1.46.md: chat states/actions/composer, conditional grid height, Horizontal seam and fixed attribution. No runtime sample/native adapter import; preserve Web/MAUI Back separation and pending safe-area migration. Earlier version entries below are historical.
+
+- Previous dependency: official NuGet.org 2.1.44, repository signature verified on 2026-09-27. Nupkg SHA-256 3CA70B213A74DC1F156D075476F6ED055BDD4213D461924E7664796266B0ACA5. Package CSS SHA-256 remains 066754D730E3830D76C32FC8EE1C0BA7D995AA77CBC9276F51AF78A87696D193, identical to 2.1.43. Dependencies remain MudBlazor 9.10.0 and Blazor Components 10.0.12. Package/contract upgrade only; preserve existing imported guidance and Web/MAUI Back separation. No new upstream skill/sample import or native runtime certification.
+
+- Previous dependency: official NuGet.org 2.1.43, repository signature verified on 2026-09-24. Nupkg SHA-256 E38F0B3A946AFF6F2749A336C9FD3F7E9CF1E060597890B4A9678B47BF6C6034; CSS SHA-256 066754D730E3830D76C32FC8EE1C0BA7D995AA77CBC9276F51AF78A87696D193. Dependencies remain MudBlazor 9.10.0 and Blazor Components 10.0.12. Package/contract baseline update only; retain imported 2.1.42 guidance, Web/MAUI Back separation and pending native safe-area migration. No new upstream skill/sample import or native runtime certification.
 
 - 2026-09-24 guidance import for unchanged NuGet 2.1.42: merged source single/headerless chat, AI Chat-only 2px composition, MAUI table chaining, DIV CRUD scroll containment, root-only overlay locking and Horizontal typography/safe-area rules. See references/upstream-2.1.42.md. Restored chat API properties verified; package CSS matches upstream. No new runtime/sample/native code, global user skill or package pins changed; preserve Back separation and pending legacy host migration. Source historical tests are not consumer evidence.
 
@@ -66,7 +70,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.43`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.1.46`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.10.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.

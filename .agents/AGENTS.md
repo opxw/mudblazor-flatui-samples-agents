@@ -1,5 +1,7 @@
 # Repository agent instructions
 
+For the 2.1.46 source import, read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.46.md`: immediate chat composer clearing, rich-content state/action ownership, conditional desktop grid height, continuous Horizontal shell and fixed package attribution. Preserve consumer NuGet-only/CSS ownership and separate Web/MAUI Back handlers; upstream previews and tests are not local runtime proof.
+
 For single-conversation/headerless chat, native table chaining, CRUD body containment or dialog scroll-position regressions, read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.42.md` before implementation. Use existing package APIs/CSS, preserve independent host navigation and drafts, and never apply the AI Chat 2px page exception globally. Follow package-owned scroll boundaries; do not add consumer scroll timers, forwarded gestures or CSS overrides. Imported source tests and previews are not consumer/native proof.
 
 NuGet 2.1.37 guidance: read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.37.md` for manual form labels/grid, content cards, checkbox/radio/list groups and account-menu placement. Reuse the verified package APIs and original CSS; preserve host-owned validation, authorization and persistence. Mobile FlatUserMenu retains avatar, bounded name and chevron (only subtitle hides); this supersedes older avatar-only guidance. New upstream preview/layout integrations remain reference-only until separately imported.
@@ -72,7 +74,7 @@ Before creating or changing a page, layout, reusable component, CSS rule, naviga
 - `samples/Opx.MudBlazor.FlatUi.Showcase` is the shared behavioral and composition source of truth for page development.
 - For initialized admin consumers, host `MainLayout.razor` plus shared `ShowcaseNavigationCatalog` are the source of truth for mandatory Settings and the default searchable navigation scaffold.
 - NuGet `Opx.MudBlazor.FlatUi` is the only consumer dependency for reusable components; the package-source checkout is inspection authority, not a local reference.
-- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.1.43. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
+- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.1.46. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
 - `docs` and `README.md` explain the implemented contract but do not override compiled source.
 
 When source, rules, and documentation disagree, do not silently choose one. Preserve the accepted behavior, update stale documentation/rules in the same change, and report any unresolved conflict.

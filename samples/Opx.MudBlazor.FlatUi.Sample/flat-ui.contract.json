@@ -1,13 +1,13 @@
 {
   "$schema": "flat-ui.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.1.43",
+  "contractVersion": "2.1.46",
   "source": {
     "repository": "mudblazor-flat-ui",
     "samplePath": "samples/Opx.MudBlazor.FlatUi.Showcase"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.1.43",
+    "Opx.MudBlazor.FlatUi": "2.1.46",
     "MudBlazor": "9.10.0"
   },
   "canonicalSample": {
@@ -175,7 +175,7 @@
     "stylesheetOwnership": {
       "reusableCssSource": "package-only",
       "packageStylesheet": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css",
-      "packageStylesheetSha256": "066754D730E3830D76C32FC8EE1C0BA7D995AA77CBC9276F51AF78A87696D193",
+      "packageStylesheetSha256": "71BF6AE517ED4292944710BA144666DBABF9AF4FAB3E5959B6642F8F49F63CEA",
       "mudBlazorStylesheet": "_content/MudBlazor/MudBlazor.min.css",
       "hostStylesheet": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css",
       "hostStylesheetPurpose": "sample-and-domain-composition-only",

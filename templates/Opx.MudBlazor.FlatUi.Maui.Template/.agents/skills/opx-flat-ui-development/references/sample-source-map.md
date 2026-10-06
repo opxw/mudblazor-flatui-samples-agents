@@ -1,5 +1,7 @@
 # Sample source map
 
+For the 2.1.46 source import, read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.46.md`: immediate chat composer clearing, rich-content state/action ownership, conditional desktop grid height, continuous Horizontal shell and fixed package attribution. Preserve consumer NuGet-only/CSS ownership and separate Web/MAUI Back handlers; upstream previews and tests are not local runtime proof.
+
 Latest guidance import: [upstream-2.1.42.md](upstream-2.1.42.md), from source working tree based on c3d1f91. Map chat visibility to opx.page.assistant.ai-chat and scroll/draft containment to opx.page.operations.asset-crud. New upstream ?single=true page wiring and regression scripts remain reference-only; no local route additions in this import.
 
 2.1.37 guidance: read [upstream-2.1.37.md](upstream-2.1.37.md). Forms/cards/choice lists map to opx.page.reference.components; upstream query previews and new shared account-menu wiring are not copied by this package/rules import.

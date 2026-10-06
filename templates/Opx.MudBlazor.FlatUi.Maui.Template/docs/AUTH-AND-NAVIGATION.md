@@ -42,7 +42,6 @@ Configure the visible identity in `appsettings.json`:
     "Application": {
       "AppName": "OPX Flat UI",
       "CompanyName": "OPX",
-      "Author": "Noviyanto Wibowo",
       "Logo": null,
       "Copyright": "© {Year} {CompanyName}",
       "LoginBrandBackgroundColor": "#5274b9",
@@ -56,7 +55,7 @@ Configure the visible identity in `appsettings.json`:
 }
 ```
 
-Expose the configured author once from the host document so every routed page inherits the same metadata:
+Expose the fixed package author (`opx`) once from the host document so every routed page inherits the same metadata:
 
 ```razor
 @inject FlatApplicationOptions ApplicationOptions
@@ -67,7 +66,7 @@ Expose the configured author once from the host document so every routed page in
 </head>
 ```
 
-Do not duplicate the author tag inside individual page components. `FlatApplicationOptions` normalizes blank values to `opx`.
+Do not duplicate the author tag inside individual page components. The imported package contract fixes `FlatApplicationOptions.Author` and `ResolvedAuthor` to `opx`; legacy setter values are ignored. Do not add Application.Author when scaffolding. Existing local configuration is retained as legacy input in this guidance-only import; chat/comment authors remain independent.
 
 `Logo` and `LogoUrl` are optional. Leave both blank/null to omit the logo element and its reserved gap from the desktop brand identity and form title. `Logo` accepts `Apps`, `Business`, `Computer`, `Dashboard`, `Inventory`, or `Speed`, and also accepts a trusted MudBlazor SVG path. Use `LogoUrl` instead when the host supplies a relative or HTTP(S) image URL. Invalid values resolve to no logo rather than an unrelated fallback icon. The copyright template expands `{Year}` and `{CompanyName}`. A configured logo remains intentionally compact: `34px` in the desktop brand identity and `30px` beside the form title. The duplicate mobile top identity row is not rendered.
 
