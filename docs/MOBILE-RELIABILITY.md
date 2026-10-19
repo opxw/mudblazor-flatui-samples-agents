@@ -1,10 +1,20 @@
 # Mobile reliability: P0, P1 and P2
 
+> Imported 2026-10-13 from source working tree based on e42f494 for the official NuGet 2.1.50 consumer. Source tests, older artifact notes and other application adoption steps below are historical references, not tests run in this repository. Build/package verification does not certify live reconnect, installed PWA or native MAUI IME behavior.
+
+## Native-like PWA keyboard viewport (2026-10-09)
+
+Web/PWA startup now preserves an explicit host `interactive-widget` policy and otherwise adds `interactive-widget=resizes-content` plus `viewport-fit=cover` to the viewport metadata. Supporting browsers resize layout content above the software keyboard. The shared VisualViewport adapter remains the fallback for iOS and other visual-viewport-only behavior.
+
+Keyboard detection now uses the stable pre-IME viewport baseline, so it still works when both `innerHeight` and `visualViewport.height` shrink together. The adapter follows keyboard animation, keeps the active input inside the actual visual viewport, exposes temporary document-level viewport variables, and avoids adding a duplicate keyboard-sized spacer when the browser already resized content. Nested CRUD modals retain ownership and pinch zoom remains excluded. Consumer pages must not add competing focus-scroll or fixed keyboard-height scripts.
+
+This is responsive Web/PWA behavior, not native MAUI IME proof. Installed Android/iOS PWA behavior still requires device validation; iOS may continue to rely on the VisualViewport fallback where `interactive-widget` is unsupported.
+
 ## Standalone form keyboard patch (2026-09-09)
 
-Packaging update: included in the official NuGet.org 2.1.22 payload, which matches the canonical same-version repack at `artifacts/nuget/20260909-213441-2.1.22`. The earlier local `20260909-212749-2.1.22` artifact does not contain it. Consumers that restored that superseded local build under the same version must clear/replace that exact cached package before restoring the official package.
+Packaging update: included in the same-version 2.1.22 repack at `artifacts/nuget/20260909-213441-2.1.22`. The earlier `20260909-212749-2.1.22` artifact does not contain it. Use the new artifact; consumers with cached 2.1.22 must replace that exact cached package before restoring. No publication performed.
 
-`FlatPage` now mounts/disposes the shared visual-viewport keyboard adapter, not only `CrudEditorShell`. Responsive ordinary pages provide temporary trailing keyboard clearance and scroll actual overflow ancestors/document to reveal the focused input. Nested CRUD modals retain their own scroll ownership; pinch zoom is not treated as a keyboard. Account Edit (`opx.page.account.profile-edit`) password fields are covered by `account-keyboard.spec.ts`. Four tablet/phone synthetic viewport cases (account and modal) pass; 304 .NET tests pass. These are browser simulations, not native IME proof. This patch is present in the official 2.1.22 payload.
+`FlatPage` now mounts/disposes the shared visual-viewport keyboard adapter, not only `CrudEditorShell`. Responsive ordinary pages provide temporary trailing keyboard clearance and scroll actual overflow ancestors/document to reveal the focused input. Nested CRUD modals retain their own scroll ownership; pinch zoom is not treated as a keyboard. Account Edit (`opx.page.account.profile-edit`) password fields are covered by `account-keyboard.spec.ts`. Four tablet/phone synthetic viewport cases (account and modal) pass; 304 .NET tests pass. These are browser simulations, not native IME proof. This source patch postdates the 2.1.22 artifact.
 
 Canonical PageId: `opx.page.reference.experience-toolkit`, route `/experience-toolkit`.
 For native gesture arbitration, non-touch refresh, resume, retry and artifact

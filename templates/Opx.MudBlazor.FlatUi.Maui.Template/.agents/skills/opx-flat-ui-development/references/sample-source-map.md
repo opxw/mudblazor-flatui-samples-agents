@@ -1,5 +1,15 @@
 # Sample source map
 
+NuGet 2.2.1 visible-idle recovery: read `.agents/skills/opx-flat-ui-development/references/upstream-2.2.1.md` and `docs/WEB-RECONNECT.md`. After 30 seconds without activity, return/input or retrying/show events may trigger one bounded heartbeat without hidden/pagehide. Keep it event-driven, offline-aware and single-flight; preserve 600ms timeout, unsafe-work guards and separate Web/MAUI ownership.
+
+For NuGet 2.2.0, read `.agents/skills/opx-flat-ui-development/references/upstream-2.2.0.md` and `docs/WEBASSEMBLY-PWA.md`. One public package serves separate Server, WASM and MAUI hosts; browser services stay in core, not companion packages. Pending Server reconnect must not suppress the bounded foreground heartbeat. Preserve original package CSS, host-owned storage/authentication and independent Web/MAUI Back. This guidance import does not install a WASM host.
+
+NuGet 2.1.51 foreground recovery supersedes the earlier 1.2-second policy: read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.51.md` and `docs/WEB-RECONNECT.md`. A single-flight foreground heartbeat takes precedence even in framework failed state; healthy keeps the document, unavailable falls back, and stale/rejected probes use guarded restart after 600ms. Preserve unsafe-work markers, throttle, host-owned state, original package assets and Web/MAUI separation.
+
+For NuGet 2.1.50 Web/PWA foreground recovery and keyboard viewport work, read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.50.md`, `docs/WEB-RECONNECT.md` and `docs/MOBILE-RELIABILITY.md`. Reuse the single-flight foreground heartbeat, guarded restart and stable pre-IME viewport baseline; preserve host policy, unsafe-work markers and separate Web/MAUI Back ownership. Do not add consumer recovery/focus-scroll scripts or claim native runtime proof from builds.
+
+For Web/PWA reconnect recovery on NuGet 2.1.48, read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.48-pending.md` and `docs/WEB-RECONNECT.md`. The official package now contains the Web initializer and bounded retry helper. Preserve unsafe-work reload markers and host-owned durable drafts/authentication. Do not duplicate recovery in consumer JavaScript or activate it in MAUI. Preserve Web/MAUI Back separation; packaged assets and builds do not certify live reconnect behavior.
+
 For the 2.1.46 source import, read `.agents/skills/opx-flat-ui-development/references/upstream-2.1.46.md`: immediate chat composer clearing, rich-content state/action ownership, conditional desktop grid height, continuous Horizontal shell and fixed package attribution. Preserve consumer NuGet-only/CSS ownership and separate Web/MAUI Back handlers; upstream previews and tests are not local runtime proof.
 
 Latest guidance import: [upstream-2.1.42.md](upstream-2.1.42.md), from source working tree based on c3d1f91. Map chat visibility to opx.page.assistant.ai-chat and scroll/draft containment to opx.page.operations.asset-crud. New upstream ?single=true page wiring and regression scripts remain reference-only; no local route additions in this import.
