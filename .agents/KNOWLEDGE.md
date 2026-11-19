@@ -243,3 +243,9 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Hybrid Back order is IME, topmost overlay, explicit WebView history, then root. Responsive Vertical drawers and sheets participate in overlay coordination and suspend native refresh while active. Native Settings uses measured top/bottom insets; standalone `FlatPage` forms and CRUD modals use visual-viewport keyboard avoidance.
 - P1/P2 productivity remains on `opx.page.reference.enterprise-toolkit`: saved views keep query/layout snapshots, nested `FilterTree` is authoritative, context changes guard unsaved work, record selection uses stable keys, and bulk retry targets failed retryable items only. Host authorization, scoped persistence, query execution, cancellation, and idempotency remain authoritative.
 - Browser tests and Android compilation do not prove physical-device/iOS behavior. Native refresh, edge/predictive Back, IME, safe areas, lifecycle, notifications, screen readers, and performance require matching emulator/device evidence.
+
+# 2026-11-19 - Mobile audit and operational-report filter contract
+
+- Audit and read-only operational result pages retain the full inline filter panel above `900px`; at `900px` and below they hide it and use the shared package `BottomSheet` opened by one `FlatPage` Filter action.
+- The sheet stages search, structured filters, sort, and page size. Reset affects staged values only, Apply commits atomically and triggers the host query, and close/backdrop/swipe discards pending changes.
+- Result cards and paging remain outside the sheet. A vertically stacked copy of the desktop filter form above mobile results is not an accepted composition.
