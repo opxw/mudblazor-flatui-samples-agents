@@ -18,6 +18,10 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Reverify drift-prone facts such as NuGet versions, routes, package assets, sample composition, and native runtime behavior. Mark unverified boundaries explicitly.
 - If this ledger conflicts with compiled source or normative rules, stop and reconcile the conflict in the same change; do not silently choose or let this ledger override source.
 
+## UI spacing and record grid defaults
+
+- The rules and docs/UI-NON-OVERLAP.md require four-edge clearance and a shared desktop/mobile query for sortable, searchable, wrapped, filterable record grids. These defaults apply to new or updated compositions through supported NuGet configuration.
+
 ## Current canonical snapshot
 
 - Current dependency: official NuGet.org 2.2.1, restored and signature-verified 2026-10-18. Nupkg SHA256 B0B05ED3BA337155BA391F2B3034F615A7D7B46429F36754CB3E0CB235B7417E. CSS/dependencies unchanged from 2.2.0. Imported upstream-2.2.1.md from a543fa8 working tree: event-driven visible-idle heartbeat after 30s inactivity, no periodic polling, 600ms deadline, offline deferral and unchanged unsafe-work/throttle guards. Preserve Web/MAUI separation; no new runtime host, sample or native adapter.

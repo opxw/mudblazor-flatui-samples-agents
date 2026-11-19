@@ -38,7 +38,7 @@
     {
       "source": "docs",
       "target": "docs",
-      "include": ["CONSUMER-CONTRACT.md", "WIDGETS.md", "TREE-GRID.md", "ICON-PICKER.md"]
+      "include": ["CONSUMER-CONTRACT.md", "WIDGETS.md", "TREE-GRID.md", "ICON-PICKER.md", "UI-NON-OVERLAP.md"]
     }
   ],
   "primaryOutputs": [

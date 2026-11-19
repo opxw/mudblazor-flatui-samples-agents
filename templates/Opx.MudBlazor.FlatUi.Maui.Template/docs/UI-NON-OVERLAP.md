@@ -6,6 +6,21 @@ Applies whenever adding or changing any UI element: label, helper/error text, ic
 
 The `FlatPanel.Footer` API and shared footer inset are packaged starting with 2.1.32. Earlier artifacts, including 2.1.31, do not contain this addition. Upgrade package DLL and static assets together before using the new slot.
 
+## Page and grid edge clearance
+
+- Measure from the usable content boundary after accounting for the shell and fixed UI. Keep equal start/end gutters for regions that share an alignment axis. Standard no-FAB mobile pages use `16px` on all four sides. Use the mapped OPX spacing on desktop and for specialized layouts. Apply each safe-area inset once and leave the last item, pager, and actions reachable above fixed UI.
+- Give each boundary one owner. The page sets the outer gutter, the grid sets row and column gaps, and each panel, card, toolbar, or cell sets its internal inset. Align the toolbar, grid, and pager to the same content axis. Use logical padding for RTL and keep child margins from adding to grid gaps. Documented edge-to-edge table or media surfaces still need internal clearance for readable text, controls, and empty/error states.
+- Apply this geometry to form, card, and data grids. Use shrinkable tracks, consistent alignment, and content-driven row heights. Use equivalent cards for standard record grids at `900px` and below. Keep wide desktop table overflow inside the grid and leave the toolbar and pager outside its scroll region.
+
+## Standard record grid defaults
+
+- **Sortable.** Enable ascending and descending sorting for data columns with meaningful ordering. Use accessible sortable headers on desktop and a labeled sort control on mobile cards. Show the active field and direction. Selection and row-action columns are exempt.
+- **Searchable.** Provide a labeled search input and a way to clear it on desktop and mobile. Search the configured fields across the result set before paging. For server-paged grids, apply search, sort, and filters in the host query before loading each page.
+- **Word wrap.** Set `WordWrap=true` explicitly for readable text columns. Allow row height to grow, top-align all cells in wrapping rows, and give mobile card text equivalent wrapping. Check long unbroken values. Keep short atomic values such as amounts and dates intact where needed and preserve access to full values.
+- **Filters.** Enable `FilterEnabled` for applicable data columns and use criteria appropriate to the data type. Use desktop column filters or the mapped filter rail and the mobile filter sheet. Share one `GridColumnDefinition` collection and the same committed `GridViewState`. Indicate active filters and let users clear them. Where the sheet stages edits, Apply commits them and dismissing the sheet discards them.
+- Preserve committed search, sort, and filter criteria across responsive transitions. Reset to the first page on query changes, drop criteria for disabled or removed columns, and show the same ordered results and totals for the same query. Preserve documented specialized-grid behavior and Exact Sample Mode.
+
+
 ## Required composition checks
 
 - At <=900px, when a page with a table footer places its FAB in normal flow, use16px bottom padding instead of the floating-FAB88px reserve. Add bottom safe area only when Bottom navigation does not already own that clearance. Floating FABs and desktop retain their existing rules.
@@ -28,6 +43,7 @@ The `FlatPanel.Footer` API and shared footer inset are packaged starting with 2.
 
 ## Acceptance evidence
 
+- Measure all four clearances, row and column gaps, and toolbar/grid/pager alignment. Include the first and last items and keyboard focus. For a standard record grid, check above, at, and below `900px` and `600px` with long text and the final action reachable. Apply search, sort, and filters on desktop, resize to mobile and verify the same ordered results, then change or clear the criteria on mobile and verify them back on desktop.
 - Inspect the affected composition in the current built preview, including the element immediately above and below it. Verify the URL/build is current rather than a stale preview process.
 - Check desktop, tablet and phone composition at the relevant OPX breakpoints, live resize, and Light/Dark. Include text scaling, RTL/localization and real keyboard/safe-area cases where the change can affect them.
 - Measure actual bounding boxes, computed gaps and horizontal overflow in addition to taking screenshots. Distinguish intended nested rectangles from unintended overlap; do not blindly flag all intersecting boxes.
