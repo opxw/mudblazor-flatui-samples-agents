@@ -32,7 +32,7 @@
             <FieldTemplate Context="fieldContext">
                 @if (fieldContext.Field.Key == "SupplierCode")
                 {
-                    <FlatEntityLookup TItem="Supplier"
+                    <FlatEntityLookup TItem="Supplier" SearchVisible="true"
                                       Items="Suppliers"
                                       Columns="SupplierLookupColumns"
                                       DefaultSortColumnKey="Name"
@@ -47,7 +47,7 @@
                 }
                 else if (fieldContext.Field.Key == "ApprovalSupplierCodes")
                 {
-                    <FlatEntityLookup TItem="Supplier"
+                    <FlatEntityLookup TItem="Supplier" SearchVisible="true"
                                       Items="Suppliers"
                                       Columns="SupplierLookupColumns"
                                       DefaultSortColumnKey="Name"

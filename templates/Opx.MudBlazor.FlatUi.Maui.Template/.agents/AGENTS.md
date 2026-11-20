@@ -58,6 +58,18 @@ Copyright (c) 2026 opx. All rights reserved.
 
 These instructions apply to every file in this repository.
 
+## Mandatory checklist for UI and grids
+
+Apply this checklist to new and changed UI. Use [RULES.md](../RULES.md) and [UI-NON-OVERLAP.md](../docs/UI-NON-OVERLAP.md) for the mapped values, breakpoints, and documented exceptions.
+
+- **Before coding.** Resolve the user task to the canonical PageId, behavior profile, and closest compiled sample. Inspect the actual parent and adjacent elements. Reuse supported NuGet components, slots, and options, and fix spacing at the boundary that owns it.
+- **Measure all four edges.** Check left, right, top, and bottom against the usable content area. Standard mobile pages without a FAB use `16px` on every side. Use the canonical layout for other insets, apply each safe area once, and keep the final item and actions reachable above fixed UI.
+- **Keep spacing predictable.** The page owns outer gutters, the grid owns row and column gaps, and each surface owns its inner padding. Align toolbar, grid, and pager to the same content axis. Allow long text and validation messages to grow. Keep wide-table overflow inside the grid.
+- **Configure record-grid defaults explicitly.** Enable ascending and descending sort for meaningful data columns, labeled and clearable search, `WordWrap=true` for readable text columns, and typed filters for applicable columns. Provide equivalent sort, search, and filter controls on mobile, with wrapped card text. Preserve specialized-grid behavior and Exact Sample Mode.
+- **Share one query across layouts.** Use the same column metadata and committed search, sort, and filter state for desktop tables and mobile cards. Show active criteria and allow clearing. Apply the query before paging, return to page one when it changes, and preserve criteria through resize. A staged filter sheet commits on Apply and discards pending edits on dismissal.
+- **Verify before marking UI complete.** Inspect the current build on desktop, tablet, and phone around the mapped breakpoints. Measure gutters and gaps, check long content, empty results, focus, overflow, and reachability, and confirm that desktop and mobile show the same ordered results after changing criteria and resizing both ways. For visible fixes, include a current screenshot and report what was measured and which relevant cases could not be checked.
+
+
 ## Required reading order
 
 Before creating or changing a page, layout, reusable component, CSS rule, navigation item, or host configuration:
@@ -84,7 +96,7 @@ Before creating or changing a page, layout, reusable component, CSS rule, naviga
 - `samples/Opx.MudBlazor.FlatUi.Showcase` is the shared behavioral and composition source of truth for page development.
 - For initialized admin consumers, host `MainLayout.razor` plus shared `ShowcaseNavigationCatalog` are the source of truth for mandatory Settings and the default searchable navigation scaffold.
 - NuGet `Opx.MudBlazor.FlatUi` is the only consumer dependency for reusable components; the package-source checkout is inspection authority, not a local reference.
-- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.2.1. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
+- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.2.5. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
 - `docs` and `README.md` explain the implemented contract but do not override compiled source.
 
 When source, rules, and documentation disagree, do not silently choose one. Preserve the accepted behavior, update stale documentation/rules in the same change, and report any unresolved conflict.

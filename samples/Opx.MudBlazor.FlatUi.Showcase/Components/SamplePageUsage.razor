@@ -120,7 +120,7 @@
         "/erp-toolkit" => """
             <FlatMoneyInput @bind-Value="Amount" @bind-Currency="Currency" />
             <FlatQuantityInput @bind-Value="Quantity" @bind-Unit="Unit" />
-            <FlatEntityLookup TItem="Supplier" Items="Suppliers" ItemText="s => s.Name" />
+            <FlatEntityLookup TItem="Supplier" SearchVisible="true" Items="Suppliers" ItemText="s => s.Name" />
             """,
         "/business-toolkit" => """
             <FlatInventoryTraceabilityWorkspace Items="Traceability" Selected="SelectNode" />

@@ -1,22 +1,26 @@
 # OPX MudBlazor Flat UI
 
+NuGet 2.2.5 is the current signed baseline. It keeps the 2.2.4 CSS and JavaScript assets while aligning consumers to MudBlazor 9.14.0, Markdig 1.6.0, and HtmlSanitizer 11.0.26. Package provenance and hashes are recorded in the [2.2.5 consumer baseline](.agents/skills/opx-flat-ui-development/references/upstream-2.2.5.md).
+
+NuGet 2.2.4 gives `FlatEntityLookup<TItem>` one bounded data scroller and optional `SearchVisible` (default false). Enable it explicitly wherever lookup search is required. Column filters follow `GridColumnDefinition.FilterEnabled` independently of search. For a grouped grid that requires explicit desktop height, use `FlatGroupedDataGrid.DesktopViewportHeight` on the package scroller.
+
 The 2.2.1 patch adds event-driven recovery after visible inactivity, retaining the 600ms heartbeat deadline and draft/upload reload guards. Repository skill/rules and template mirrors include the [imported contract](.agents/skills/opx-flat-ui-development/references/upstream-2.2.1.md). CSS and dependencies are unchanged from 2.2.0; runtime/device validation remains separate.
 
 Version 2.2.0 uses one OPX package for separate Server, WebAssembly and MAUI hosts. The imported [WebAssembly/PWA guidance](docs/WEBASSEMBLY-PWA.md) covers runtime selection, static-only caching and host-owned storage/authentication. This repository's existing Web/MAUI hosts are unchanged; a WASM executable is not installed by this upgrade. Pending Server reconnect no longer suppresses the bounded foreground heartbeat. Package CSS and dependencies remain unchanged from 2.1.51.
 
-NuGet 2.2.1 is now restored from NuGet.org and signature-verified. [Web/PWA reconnect guidance](docs/WEB-RECONNECT.md) is imported into repository rules/skills and template mirrors; the package contains the fingerprinted Web initializer and recovery script assets. Live clean/dirty reconnect remains a separate validation gate. No consumer JavaScript/CSS workaround was added.
+NuGet 2.2.1 was restored from NuGet.org and signature-verified. [Web/PWA reconnect guidance](docs/WEB-RECONNECT.md) is imported into repository rules/skills and template mirrors; the package contains the fingerprinted Web initializer and recovery script assets. Live clean/dirty reconnect remains a separate validation gate. No consumer JavaScript/CSS workaround was added.
 
 The 2.1.46 [guidance import](.agents/skills/opx-flat-ui-development/references/upstream-2.1.46.md) covers chat delivery/streaming and composer ownership, conditional desktop grid height, Horizontal shell continuity, and fixed package attribution. Repository rules, skill and MAUI template mirrors are synchronized. Upstream sample wiring and native adapters are not automatically imported; browser/device validation remains separate.
 
 NuGet **2.1.37** includes [form grids and external labels](docs/FORM-GRID.md), [content cards](docs/CONTENT-CARDS.md), [checkbox/radio/list groups](docs/LIST-VARIANTS.md), and updated [AppBar account-menu behavior](docs/USER-MENU.md). Guidance is imported; newer upstream sample integrations are not automatically copied into this showcase. Ribbon and account-menu APIs introduced in 2.1.36 remain available.
 
-The **2.2.1** baseline requires MudBlazor **9.10.0** and Blazor Components **10.0.12**. It includes package-owned MAUI safe-area geometry; see [inset ownership and host migration boundaries](docs/HYBRID-SAFE-AREA.md). Native and CSS environment insets are alternatives, never additive. Existing gallery screenshots retain their original capture version; this upgrade is not native-device certification.
+The **2.2.5** baseline requires MudBlazor **9.14.0** and Blazor Components **10.0.12**. It includes package-owned MAUI safe-area geometry; see [inset ownership and host migration boundaries](docs/HYBRID-SAFE-AREA.md). Native and CSS environment insets are alternatives, never additive. Existing gallery screenshots retain their original capture version; this upgrade is not native-device certification.
 
 NuGet **2.1.37** guidance now includes [UI spacing/non-overlap](docs/UI-NON-OVERLAP.md), input/sidebar refinements, and new component patterns. See the [imported source map](.agents/skills/opx-flat-ui-development/references/upstream-2.1.31.md): new upstream showcase pages and host integrations are reference-only until separately imported. The existing screenshot gallery is unchanged.
 
-Current baseline: **NuGet 2.2.1**, including opaque sticky lookup headers in Light/Dark. Consumer rules and template audits follow this version; the gallery remains labeled with its actual 2.1.27 capture version.
+Current baseline: **NuGet 2.2.5**, including opaque sticky lookup headers in Light/Dark. Consumer rules and template audits follow this version; the gallery remains labeled with its actual 2.1.27 capture version.
 
-[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.2.1)
+[![NuGet](https://img.shields.io/nuget/v/Opx.MudBlazor.FlatUi?label=NuGet&color=005f91)](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.2.5)
 ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)
 ![MudBlazor](https://img.shields.io/badge/Powered%20by-MudBlazor-594AE2)
 ![Web and Mobile](https://img.shields.io/badge/ready-Web%20%2B%20MAUI%20Hybrid-0A7B83)
@@ -94,13 +98,13 @@ Run the audits and build, and report which behaviors still need device testing.
 
 Provide API endpoints, data models, user roles, and transaction rules when available. Codex selects routine UI details from the contract; unclear business rules, permissions, formulas, and integrations still require clarification. Results are checked through audits, builds, and appropriate tests. Device validation and production readiness require their own verification. See the [prompting contract](.agents/PROMPTING.md).
 
-The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.2.1). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
+The reusable component API and original CSS are delivered by [`Opx.MudBlazor.FlatUi`](https://www.nuget.org/packages/Opx.MudBlazor.FlatUi/2.2.5). This repository owns the canonical consumer composition, sample pages, project template, rules, skills, documentation, and validation gates.
 
-The current dependency is **2.2.1**, including the responsive report-toolbar and bounded mobile-card scrolling correction. Imported [hybrid operations guidance](docs/HYBRID-OPERATIONS.md) covers document transfer, scanner/outbox coordination and explicit host obligations; new adapters are not automatically wired by a NuGet upgrade. The screenshot gallery below remains labeled with its actual **2.1.27** capture version.
+The current dependency is **2.2.5**, including the responsive report-toolbar and bounded mobile-card scrolling correction. Imported [hybrid operations guidance](docs/HYBRID-OPERATIONS.md) covers document transfer, scanner/outbox coordination and explicit host obligations; new adapters are not automatically wired by a NuGet upgrade. The screenshot gallery below remains labeled with its actual **2.1.27** capture version.
 
 The current package includes shared PDF printing through `IFlatPrintService`. The Web sample registers the browser service; MAUIHost supplies Android/Windows adapters. Printing uses authorized PDF bytes and reports `Submitted` when the final outcome is unknown. Native adapters require host integration; printer capability is not physical-printer discovery. See [Print support](docs/PRINT-SUPPORT.md).
 
-NuGet 2.2.1 is the current signed package. In addition to the 2.1.20 Tree Grid and IconPicker APIs, it adds hybrid reliability and productivity contracts: explicit `FlatRefreshMode`, MAUI refresh/overlay/Back coordination, visual-viewport keyboard avoidance, snapshot-based Model CRUD dirty state, `FlatPage.Title` as an optional accessible region label, scroll restoration, latest-search cancellation, diagnostics, saved views, guarded context switching, nested filter trees, stable-key record workspaces, and failed-only bulk retry. See [Mobile reliability](docs/MOBILE-RELIABILITY.md), [Hybrid hardening](docs/HYBRID-HARDENING.md), [P0 compatibility](docs/P0-COMPATIBILITY.md), and [P1/P2 productivity](docs/P1-P2-PRODUCTIVITY.md).
+NuGet 2.2.5 is the current signed package. In addition to the 2.1.20 Tree Grid and IconPicker APIs, it adds hybrid reliability and productivity contracts: explicit `FlatRefreshMode`, MAUI refresh/overlay/Back coordination, visual-viewport keyboard avoidance, snapshot-based Model CRUD dirty state, `FlatPage.Title` as an optional accessible region label, scroll restoration, latest-search cancellation, diagnostics, saved views, guarded context switching, nested filter trees, stable-key record workspaces, and failed-only bulk retry. See [Mobile reliability](docs/MOBILE-RELIABILITY.md), [Hybrid hardening](docs/HYBRID-HARDENING.md), [P0 compatibility](docs/P0-COMPATIBILITY.md), and [P1/P2 productivity](docs/P1-P2-PRODUCTIVITY.md).
 
 The package remains UI-only: hosts own authentication and authorization, scoped persistence, API queries, transactions, refresh data loaders, cancellation/idempotency, native permissions, notification delivery, and native lifecycle evidence. A NuGet upgrade does not replace the canonical MAUI host adapters.
 
@@ -1643,7 +1647,7 @@ Navigation, theme, palette, density, and typography are available from the manda
 | Dependency | Version |
 |---|---:|
 | `Opx.MudBlazor.FlatUi` | `2.1.27` |
-| `MudBlazor` | `9.10.0` |
+| `MudBlazor` | `9.14.0` |
 | MAUI mobile template | `10.0.90` |
 | `CommunityToolkit.Maui` | `15.0.1` |
 | Target framework | `.NET 10` |
@@ -1684,7 +1688,7 @@ Set-Location MyOpxMobileApp
 dotnet build -f net10.0-android -c Release --no-restore
 ```
 
-The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.10.0`, and OPX Flat UI `2.1.27`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes first-paint Device/Manual font and density restoration, the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
+The MAUI template pins MAUI `10.0.90`, CommunityToolkit.Maui `15.0.1`, MudBlazor `9.14.0`, and OPX Flat UI `2.2.5`. It replaces stock .NET/MAUI splash artwork with a neutral white-on-white invisible launch asset, then hands off to the continuous `Memuat` spinner. It also includes first-paint Device/Manual font and density restoration, the native status-bar bridge, root-before-`Router` authorization gate, Settings, default sidebar/Bottom navigation, Device typography, no-bounce WebView handlers, textbox-only text selection, package-only reusable CSS, a machine-readable mobile contract, and its audit script. Android 12+ still owns a mandatory system splash frame; the template removes its stock artwork rather than claiming that OS frame can be eliminated. Replace the sample authorization validator and sample business data before production use.
 
 When a prompt requests UI that is the same, exact, canonical, or matches the sample/source of truth, use **Exact Sample Mode**. Generate a fresh Web or MAUI template, resolve the `PageId`, and pass `-ExactSample` before wiring host data or services. The audit rejects drift in canonical shell/page files; branding, wording, data, authorization, callbacks, and persistence may then change through existing seams without changing geometry or behavior.
 

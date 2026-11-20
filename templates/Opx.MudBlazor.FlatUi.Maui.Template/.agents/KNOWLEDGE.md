@@ -24,7 +24,11 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 ## Current canonical snapshot
 
-- Current dependency: official NuGet.org 2.2.1, restored and signature-verified 2026-10-18. Nupkg SHA256 B0B05ED3BA337155BA391F2B3034F615A7D7B46429F36754CB3E0CB235B7417E. CSS/dependencies unchanged from 2.2.0. Imported upstream-2.2.1.md from a543fa8 working tree: event-driven visible-idle heartbeat after 30s inactivity, no periodic polling, 600ms deadline, offline deferral and unchanged unsafe-work/throttle guards. Preserve Web/MAUI separation; no new runtime host, sample or native adapter.
+- Current dependency: official NuGet.org 2.2.5, repository signature verified 2026-11-20. Nupkg SHA256 DF71CB104008A743AE13C32DA9BB64A2F8E9EF3CA767F5AEA8CE8057479FB1C0. CSS and JavaScript are unchanged from 2.2.4. Package metadata records source commit 5ab69c5. Dependencies are MudBlazor 9.14.0, Markdig 1.6.0, HtmlSanitizer 11.0.26, and Blazor Components 10.0.12. Preserve opt-in lookup search, independent lookup column filters, and the package-owned bounded grouped-grid desktop scroller.
+
+- Previous dependency: official NuGet.org 2.2.4, repository signature verified 2026-11-20. Nupkg SHA256 3256289014BC21EB4468E88C71C79529E37E0F6D9FFB51EA81A3EF38CC1869EA. CSS SHA256 7D9F87283043369ED37D11E45EEB8252F32B62C33ED07E7BAB49FCE9602423EE. MudBlazor 9.10.0 and Blazor Components 10.0.12 were pinned. Lookup search is opt-in and grouped grids support a bounded desktop viewport through the package API.
+
+- Previous dependency: official NuGet.org 2.2.1, restored and signature-verified 2026-10-18. Nupkg SHA256 B0B05ED3BA337155BA391F2B3034F615A7D7B46429F36754CB3E0CB235B7417E. CSS/dependencies unchanged from 2.2.0. Imported upstream-2.2.1.md from a543fa8 working tree: event-driven visible-idle heartbeat after 30s inactivity, no periodic polling, 600ms deadline, offline deferral and unchanged unsafe-work/throttle guards. Preserve Web/MAUI separation; no new runtime host, sample or native adapter.
 
 - Previous dependency: official NuGet.org 2.2.0, restored and signature-verified 2026-10-16. Nupkg SHA256 C17BFAFDF0EE28A73C47B6C2B5B6D969738F3F77ADF70405C3D8AE820E9C3910. CSS and dependencies unchanged from 2.1.51. Imported source a543fa8 through upstream-2.2.0.md: one package for separate Server/WASM/MAUI hosts, explicit host-scoped browser storage/lifecycle and static-only PWA cache. Pending reconnect must not suppress foreground heartbeat. No WASM executable/sample migration or native adapter change; preserve Web/MAUI Back and legacy safe-area migration boundary.
 
@@ -86,8 +90,8 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.2.1`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
-- MudBlazor baseline: `9.10.0`; consumer contract schema: `3.1`; default theme: Light.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.2.5`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- MudBlazor baseline: `9.14.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
 - The canonical registry has 76 unique PageIds and routes. Every PageId maps exactly once to one of 45 declared profiles in `showcase-behavior-registry.md`.
@@ -247,3 +251,9 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Hybrid Back order is IME, topmost overlay, explicit WebView history, then root. Responsive Vertical drawers and sheets participate in overlay coordination and suspend native refresh while active. Native Settings uses measured top/bottom insets; standalone `FlatPage` forms and CRUD modals use visual-viewport keyboard avoidance.
 - P1/P2 productivity remains on `opx.page.reference.enterprise-toolkit`: saved views keep query/layout snapshots, nested `FilterTree` is authoritative, context changes guard unsaved work, record selection uses stable keys, and bulk retry targets failed retryable items only. Host authorization, scoped persistence, query execution, cancellation, and idempotency remain authoritative.
 - Browser tests and Android compilation do not prove physical-device/iOS behavior. Native refresh, edge/predictive Back, IME, safe areas, lifecycle, notifications, screen readers, and performance require matching emulator/device evidence.
+
+# 2026-11-19 - Mobile audit and operational-report filter contract
+
+- Audit and read-only operational result pages retain the full inline filter panel above `900px`; at `900px` and below they hide it and use the shared package `BottomSheet` opened by one `FlatPage` Filter action.
+- The sheet stages search, structured filters, sort, and page size. Reset affects staged values only, Apply commits atomically and triggers the host query, and close/backdrop/swipe discards pending changes.
+- Result cards and paging remain outside the sheet. A vertically stacked copy of the desktop filter form above mobile results is not an accepted composition.
