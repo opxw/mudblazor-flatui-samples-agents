@@ -9,13 +9,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.2.6"
+$expectedContractVersion = "2.2.8"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.2.6"
+    "Opx.MudBlazor.FlatUi" = "2.2.8"
     "MudBlazor" = "9.14.0"
 }
 $expectedHostCssSha256 = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
-$expectedPackageCssSha256 = "79E060542CB0B1B1B869F85917D1D502221D3765FA8F470CF20EE9C99396F660"
+$expectedPackageCssSha256 = "A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123"
+$expectedGroupedGridScrollbarModuleSha256 = "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93"
 $expectedExactSampleHashes = [ordered]@{
     "Components\Layout\MainLayout.razor" = "6DEE59C280F9E1345DB1592D1E08FAF7FBDA96A28CBFABDBC38509F6DCE07C19"
     "..\Opx.MudBlazor.FlatUi.Showcase\ShowcaseNavigationCatalog.cs" = "6011B13E06F70D3ABCA101FC8D42CB826CD86468A8C4980097D5FE3A41388875"
@@ -690,7 +691,17 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.2.6; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.2.8; found $packageCssHash."
+    }
+}
+$groupedGridScrollbarModulePath = Join-Path $nugetPackagesRoot "opx.mudblazor.flatui\$($expectedPackages['Opx.MudBlazor.FlatUi'])\staticwebassets\grouped-grid-scrollbars.js"
+if (-not (Test-Path -LiteralPath $groupedGridScrollbarModulePath)) {
+    Add-Violation "Restored OPX grouped-grid scrollbar module was not found at '$groupedGridScrollbarModulePath'."
+}
+else {
+    $groupedGridScrollbarModuleHash = (Get-FileHash -LiteralPath $groupedGridScrollbarModulePath -Algorithm SHA256).Hash
+    if ($groupedGridScrollbarModuleHash -cne $expectedGroupedGridScrollbarModuleSha256) {
+        Add-Violation "Restored grouped-grid scrollbar module hash must be $expectedGroupedGridScrollbarModuleSha256 for package 2.2.8; found $groupedGridScrollbarModuleHash."
     }
 }
 

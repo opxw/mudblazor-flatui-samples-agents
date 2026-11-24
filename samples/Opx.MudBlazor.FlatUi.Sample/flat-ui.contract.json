@@ -1,13 +1,13 @@
 {
   "$schema": "flat-ui.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.2.6",
+  "contractVersion": "2.2.8",
   "source": {
     "repository": "mudblazor-flat-ui",
     "samplePath": "samples/Opx.MudBlazor.FlatUi.Showcase"
   },
   "packages": {
-    "Opx.MudBlazor.FlatUi": "2.2.6",
+    "Opx.MudBlazor.FlatUi": "2.2.8",
     "MudBlazor": "9.14.0"
   },
   "canonicalSample": {
@@ -175,7 +175,9 @@
     "stylesheetOwnership": {
       "reusableCssSource": "package-only",
       "packageStylesheet": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css",
-      "packageStylesheetSha256": "79E060542CB0B1B1B869F85917D1D502221D3765FA8F470CF20EE9C99396F660",
+      "packageStylesheetSha256": "A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123",
+      "groupedGridScrollbarModule": "_content/Opx.MudBlazor.FlatUi/grouped-grid-scrollbars.js",
+      "groupedGridScrollbarModuleSha256": "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93",
       "mudBlazorStylesheet": "_content/MudBlazor/MudBlazor.min.css",
       "hostStylesheet": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css",
       "hostStylesheetPurpose": "sample-and-domain-composition-only",

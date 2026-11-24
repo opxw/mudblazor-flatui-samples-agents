@@ -1,5 +1,7 @@
 # Repository knowledge
 
+- Current dependency: official NuGet.org 2.2.8, repository signature verified 2026-11-20. Nupkg SHA256 528F80CADCA82A05615874DAFE1CB5A91824A187C87A86ED71D801B6428317E9. CSS SHA256 A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123; grouped-grid-scrollbars.js SHA256 68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93; readable/minified JavaScript remain 5446D6D616731507E5450E9E543883166314A99BFAB846D83FE6C4AA91174D0E and D588F934C8076DE582325209ED2AB5DAB4243C0C81BF1BE2934EFA52EA11993F. Package metadata records commit 80f88c6. Dependencies remain MudBlazor 9.14.0, Markdig 1.6.0, HtmlSanitizer 11.0.26, and Blazor Components 10.0.12. `AlwaysShowScrollbars=true` now scopes color tokens to the common grouped-grid shell, copies computed colors during attach, retains a local fallback, and reports success only after controls exist; the native data scroller still owns wheel, middle-mouse, touch, keyboard, and position.
+
 ## MAUI/Web Back ownership decision
 
 - Shared UI does not imply shared native navigation. Mobile browser/PWA remains Web: browser/Blazor history plus package Web overlay/dirty guards, never MAUI native dispatch or app-exit logic.
@@ -24,7 +26,9 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 
 ## Current canonical snapshot
 
-- Current dependency: official NuGet.org 2.2.6, repository signature verified 2026-11-20. Nupkg SHA256 DD97C4FBD10C63E21B17546668F8C62FA3DBFE29E868FC3F128179DD1CA23662. CSS SHA256 79E060542CB0B1B1B869F85917D1D502221D3765FA8F470CF20EE9C99396F660; readable/minified JavaScript remain 5446D6D616731507E5450E9E543883166314A99BFAB846D83FE6C4AA91174D0E and D588F934C8076DE582325209ED2AB5DAB4243C0C81BF1BE2934EFA52EA11993F. Package metadata records commit 5564f00, while the shipped DLL/CSS expose `AlwaysShowScrollbars` from source checkout 80f88c6. Dependencies remain MudBlazor 9.14.0, Markdig 1.6.0, HtmlSanitizer 11.0.26, and Blazor Components 10.0.12. Bounded grouped grids may opt into permanent desktop scrollbar tracks without consumer CSS.
+- Previous dependency: official NuGet.org 2.2.7, repository signature verified 2026-11-20. Nupkg SHA256 710D4CCCFB43BE7DA04C943CB46B0E80BA750ACE69B9EEFB2CB8FC7E6431832F. CSS SHA256 F7313BBF4F1B570CA00D86AAFA0B39B303E7AF4AE99A6E241A21240706BD6B08; grouped-grid-scrollbars.js SHA256 FB826FF5CF1CB6A6F01C7040D5C81A6D0497E66A89B8F34240CAF8EA47181D1A. It introduced persistent grouped-grid controls but could render transparent thumbs because generated tracks are siblings of the native scroller.
+
+- Previous dependency: official NuGet.org 2.2.6, repository signature verified 2026-11-20. Nupkg SHA256 DD97C4FBD10C63E21B17546668F8C62FA3DBFE29E868FC3F128179DD1CA23662. CSS SHA256 79E060542CB0B1B1B869F85917D1D502221D3765FA8F470CF20EE9C99396F660; readable/minified JavaScript remain 5446D6D616731507E5450E9E543883166314A99BFAB846D83FE6C4AA91174D0E and D588F934C8076DE582325209ED2AB5DAB4243C0C81BF1BE2934EFA52EA11993F. Package metadata records commit 5564f00, while the shipped DLL/CSS expose `AlwaysShowScrollbars` from source checkout 80f88c6. Dependencies remain MudBlazor 9.14.0, Markdig 1.6.0, HtmlSanitizer 11.0.26, and Blazor Components 10.0.12. Bounded grouped grids may opt into permanent desktop scrollbar tracks without consumer CSS.
 
 - Previous dependency: official NuGet.org 2.2.5, repository signature verified 2026-11-20. Nupkg SHA256 DF71CB104008A743AE13C32DA9BB64A2F8E9EF3CA767F5AEA8CE8057479FB1C0. CSS and JavaScript are unchanged from 2.2.4. Package metadata records source commit 5ab69c5. Dependencies are MudBlazor 9.14.0, Markdig 1.6.0, HtmlSanitizer 11.0.26, and Blazor Components 10.0.12.
 
@@ -92,7 +96,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.2.6`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.2.8`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.14.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.

@@ -20,7 +20,7 @@
       "const": "3.1"
     },
     "contractVersion": {
-      "const": "2.2.6"
+      "const": "2.2.8"
     },
     "source": {
       "type": "object",
@@ -41,7 +41,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.2.6"
+          "const": "2.2.8"
         },
         "MudBlazor": {
           "const": "9.14.0"
@@ -456,6 +456,8 @@
             "reusableCssSource",
             "packageStylesheet",
             "packageStylesheetSha256",
+            "groupedGridScrollbarModule",
+            "groupedGridScrollbarModuleSha256",
             "mudBlazorStylesheet",
             "hostStylesheet",
             "hostStylesheetPurpose",
@@ -466,7 +468,9 @@
           "properties": {
             "reusableCssSource": { "const": "package-only" },
             "packageStylesheet": { "const": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" },
-            "packageStylesheetSha256": { "const": "79E060542CB0B1B1B869F85917D1D502221D3765FA8F470CF20EE9C99396F660" },
+            "packageStylesheetSha256": { "const": "A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123" },
+            "groupedGridScrollbarModule": { "const": "_content/Opx.MudBlazor.FlatUi/grouped-grid-scrollbars.js" },
+            "groupedGridScrollbarModuleSha256": { "const": "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93" },
             "mudBlazorStylesheet": { "const": "_content/MudBlazor/MudBlazor.min.css" },
             "hostStylesheet": { "const": "../Opx.MudBlazor.FlatUi.Showcase/wwwroot/opx-flat-ui-showcase.css" },
             "hostStylesheetPurpose": { "const": "sample-and-domain-composition-only" },

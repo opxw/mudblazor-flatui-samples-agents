@@ -1,5 +1,7 @@
 # Repository agent instructions
 
+NuGet `2.2.8` is the accepted signed public baseline. It fixes transparent `FlatGroupedDataGrid` thumbs by moving color ownership to the common shell while the existing data scroller remains the sole native wheel, middle-mouse, touch, keyboard and position owner. Keep the consumer NuGet-only and do not emulate package behavior locally.
+
 NuGet 2.2.1 visible-idle recovery: read `.agents/skills/opx-flat-ui-development/references/upstream-2.2.1.md` and `docs/WEB-RECONNECT.md`. After 30 seconds without activity, return/input or retrying/show events may trigger one bounded heartbeat without hidden/pagehide. Keep it event-driven, offline-aware and single-flight; preserve 600ms timeout, unsafe-work guards and separate Web/MAUI ownership.
 
 For NuGet 2.2.0, read `.agents/skills/opx-flat-ui-development/references/upstream-2.2.0.md` and `docs/WEBASSEMBLY-PWA.md`. One public package serves separate Server, WASM and MAUI hosts; browser services stay in core, not companion packages. Pending Server reconnect must not suppress the bounded foreground heartbeat. Preserve original package CSS, host-owned storage/authentication and independent Web/MAUI Back. This guidance import does not install a WASM host.
@@ -96,7 +98,7 @@ Before creating or changing a page, layout, reusable component, CSS rule, naviga
 - `samples/Opx.MudBlazor.FlatUi.Showcase` is the shared behavioral and composition source of truth for page development.
 - For initialized admin consumers, host `MainLayout.razor` plus shared `ShowcaseNavigationCatalog` are the source of truth for mandatory Settings and the default searchable navigation scaffold.
 - NuGet `Opx.MudBlazor.FlatUi` is the only consumer dependency for reusable components; the package-source checkout is inspection authority, not a local reference.
-- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.2.6. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
+- The accepted public baseline is NuGet `Opx.MudBlazor.FlatUi` 2.2.8. Import additive package contracts into rules, skills, templates, and audits while preserving this repository's NuGet-only consumer boundary.
 - `docs` and `README.md` explain the implemented contract but do not override compiled source.
 
 When source, rules, and documentation disagree, do not silently choose one. Preserve the accepted behavior, update stale documentation/rules in the same change, and report any unresolved conflict.
