@@ -20,7 +20,7 @@
       "const": "3.1"
     },
     "contractVersion": {
-      "const": "2.2.8"
+      "const": "2.2.9"
     },
     "source": {
       "type": "object",
@@ -41,7 +41,7 @@
       "required": ["Opx.MudBlazor.FlatUi", "MudBlazor"],
       "properties": {
         "Opx.MudBlazor.FlatUi": {
-          "const": "2.2.8"
+          "const": "2.2.9"
         },
         "MudBlazor": {
           "const": "9.14.0"
@@ -80,6 +80,10 @@
         "defaultRoundedSizePx",
         "defaultColorPalette",
         "defaultDensity",
+        "widgetGapPx",
+        "mobileWidgetGapPx",
+        "minimumWidgetGapPx",
+        "maximumWidgetGapPx",
         "defaultBottomNavigationChildPresentation",
         "responsiveBreakpointPx",
         "adaptiveResponsive",
@@ -128,6 +132,18 @@
         },
         "defaultDensity": {
           "const": "Default"
+        },
+        "widgetGapPx": {
+          "const": 16
+        },
+        "mobileWidgetGapPx": {
+          "const": 12
+        },
+        "minimumWidgetGapPx": {
+          "const": 0
+        },
+        "maximumWidgetGapPx": {
+          "const": 32
         },
         "defaultBottomNavigationChildPresentation": {
           "const": "Sheet"
@@ -468,7 +484,7 @@
           "properties": {
             "reusableCssSource": { "const": "package-only" },
             "packageStylesheet": { "const": "_content/Opx.MudBlazor.FlatUi/opx-flat-ui.css" },
-            "packageStylesheetSha256": { "const": "A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123" },
+            "packageStylesheetSha256": { "const": "184033BB4EBF043465D5064E020DE2DDB21D7AD468FC565C7049A6B271375D8D" },
             "groupedGridScrollbarModule": { "const": "_content/Opx.MudBlazor.FlatUi/grouped-grid-scrollbars.js" },
             "groupedGridScrollbarModuleSha256": { "const": "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93" },
             "mudBlazorStylesheet": { "const": "_content/MudBlazor/MudBlazor.min.css" },

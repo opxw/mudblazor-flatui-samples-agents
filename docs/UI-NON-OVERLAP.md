@@ -54,3 +54,7 @@ The `FlatPanel.Footer` API and shared footer inset are packaged starting with 2.
 - Build/test success alone is not visual proof. Before declaring the UI complete, show a current screenshot and report what was measured; explicitly identify blocked or untested viewport/theme/native cases. Do not claim all-page or native certification from one browser screenshot.
 
 Fix at the correct ownership boundary: reusable component defects belong in the package; page composition spacing belongs in the canonical shared sample/layout. Do not add consumer overrides to hide a package defect.
+
+# CRUD/FormModal two-line headings
+
+When a modal header contains both a mode eyebrow and a title, the header owns their vertical geometry. Use explicit line-height, a small grid/flex gap, vertical padding, and a minimum—not fixed—height that fits supported font scaling. Preserve the Back target and title ellipsis; do not compensate from a consumer with internal `.crud-*`/`.mud-*` selectors. Validate long titles on desktop and mobile at the smallest and largest supported font preferences, with the body and footer still independently reachable.

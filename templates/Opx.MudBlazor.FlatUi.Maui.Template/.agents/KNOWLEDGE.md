@@ -1,6 +1,6 @@
 # Repository knowledge
 
-- Current dependency: official NuGet.org 2.2.8, repository signature verified 2026-11-20. Nupkg SHA256 528F80CADCA82A05615874DAFE1CB5A91824A187C87A86ED71D801B6428317E9. CSS SHA256 A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123; grouped-grid-scrollbars.js SHA256 68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93; readable/minified JavaScript remain 5446D6D616731507E5450E9E543883166314A99BFAB846D83FE6C4AA91174D0E and D588F934C8076DE582325209ED2AB5DAB4243C0C81BF1BE2934EFA52EA11993F. Package metadata records commit 80f88c6. Dependencies remain MudBlazor 9.14.0, Markdig 1.6.0, HtmlSanitizer 11.0.26, and Blazor Components 10.0.12. `AlwaysShowScrollbars=true` now scopes color tokens to the common grouped-grid shell, copies computed colors during attach, retains a local fallback, and reports success only after controls exist; the native data scroller still owns wheel, middle-mouse, touch, keyboard, and position.
+- Current dependency: official NuGet.org 2.2.9, repository signature verified 2026-11-27. Nupkg SHA256 09E75269DCC5319FE9534EB3991DFBDF23DD43783E11C909C3CABB6A15B5329E. DLL SHA256 E09530A6F2D4E6A8B5A05EAC9795FCDFCDA6193FB2B427970271690E58A871FA; CSS SHA256 184033BB4EBF043465D5064E020DE2DDB21D7AD468FC565C7049A6B271375D8D; readable/minified JavaScript SHA256 F4DBFB7741B03133C8844C5F9370E00106BBDA50BE09C6C00FE5AB646EC1DB0A and 41EB96E404B3679352CE450983EF0A8823A0A1C35D791C1C02D76139EFB963A7; grouped-grid-scrollbars.js remains 68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93; theme bootstrap SHA256 is F4E7D397584B79AA13E0A362FFFB7A7D3E47C5CAA9FEBDC97F2C694BD2115D82. Package metadata records commit f0a5102f5f9c21f45d73e676ce1644cdd49f47ca. Dependencies remain MudBlazor 9.14.0, Markdig 1.6.0, HtmlSanitizer 11.0.26, and Blazor Components 10.0.12. Settings now persists independent desktop and tablet/phone component gaps through `WidgetGapPx` and `MobileWidgetGapPx` (defaults 16px/12px, bounds 0-32px), while CRUD/FormModal two-line headers use content-fitting line boxes and preserve Back, ellipsis, body-scroll, and fixed-footer ownership.
 
 ## MAUI/Web Back ownership decision
 
@@ -25,6 +25,8 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - The rules and docs/UI-NON-OVERLAP.md require four-edge clearance and a shared desktop/mobile query for sortable, searchable, wrapped, filterable record grids. These defaults apply to new or updated compositions through supported NuGet configuration.
 
 ## Current canonical snapshot
+
+- Previous dependency: official NuGet.org 2.2.8, repository signature verified 2026-11-20. Nupkg SHA256 528F80CADCA82A05615874DAFE1CB5A91824A187C87A86ED71D801B6428317E9. CSS SHA256 A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123; readable/minified JavaScript SHA256 5446D6D616731507E5450E9E543883166314A99BFAB846D83FE6C4AA91174D0E and D588F934C8076DE582325209ED2AB5DAB4243C0C81BF1BE2934EFA52EA11993F; grouped-grid-scrollbars.js SHA256 68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93. Package metadata records commit 80f88c6. It corrected grouped-grid thumb visibility while preserving native scroll ownership.
 
 - Previous dependency: official NuGet.org 2.2.7, repository signature verified 2026-11-20. Nupkg SHA256 710D4CCCFB43BE7DA04C943CB46B0E80BA750ACE69B9EEFB2CB8FC7E6431832F. CSS SHA256 F7313BBF4F1B570CA00D86AAFA0B39B303E7AF4AE99A6E241A21240706BD6B08; grouped-grid-scrollbars.js SHA256 FB826FF5CF1CB6A6F01C7040D5C81A6D0497E66A89B8F34240CAF8EA47181D1A. It introduced persistent grouped-grid controls but could render transparent thumbs because generated tracks are siblings of the native scroller.
 
@@ -96,7 +98,7 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Official 2.1.23 nupkg SHA-256: `A5BA761FC1BB2C1BB969CAE2AA1C9E7A5E772970D3A6FB86A0043DB02F9645C5`. NuGet.org repository signature verified. CSS SHA-256 remains `43283F075176C584A8AE7EC4D60846CF8BFA4959A09384082D48CE206474BDD2`; device and Linux evidence remain separate from Windows builds.
 
 - Consumer UI authority: this repository and shared `samples/Opx.MudBlazor.FlatUi.Showcase` composition.
-- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.2.8`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
+- Reusable UI dependency: public NuGet `Opx.MudBlazor.FlatUi` `2.2.9`; package source checkout is inspection authority only, never a consumer `ProjectReference`.
 - MudBlazor baseline: `9.14.0`; consumer contract schema: `3.1`; default theme: Light.
 - Default color palette is the built-in package ID `fluent-blue`; Restore returns to it, while an explicitly saved user palette remains authoritative until restored.
 - Web and MAUI load the shared Showcase routes/navigation; native-only diagnostics remain host-owned.
@@ -118,6 +120,9 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - `FlatDataGrid<TItem>` can generate a native `.xlsx` from effective visible columns and localized formatted values when `ExportVisible=true` and no `OnExport` override is supplied. `Items` is the displayed-view default; `ExcelExportItems` must already be materialized in the host-owned filtered/sorted order. Server, virtualized, unbounded, permission-sensitive, background, or native-file exports stay on the compatible `OnExport`/result seams.
 
 ## Durable UI and behavior decisions
+
+- Desktop `FlatPageKind.Module` full-height behavior depends on DOM structure: the rendered `.page-content.module-page` must be a direct child of `.monitor-main`, with the direct `.module-panel` flexing into the remaining shell height. A consumer wrapper around `FlatPage`, including `display: contents`, still breaks the direct-child selector. The page exclusively owns outer gutters; direct filters/results do not repeat side/bottom margins, and one adjacent section owns the inter-section gap. Preserve package-owned bottom spacing, AppBar/safe-area offsets, intrinsic filters/actions, shrinkable content, and fixed sibling pager; do not duplicate the geometry in consumer CSS. Tablet and phone retain their responsive/natural-flow contract.
+- Desktop grid/report paging uses one in-panel horizontal row: summary at logical start, page-size selector and First/Previous/current/Next/Last controls at logical end, vertically centered and non-wrapping. Summary uses `--opx-type-metadata` at normal `400` weight; page-size/navigation typography and geometry remain package-owned. No duplicate footer gutter or blank region may follow the pager. Mobile may stack only when clipping would otherwise occur.
 
 - Exact Sample Mode applies to requests for the same, exact, canonical, sample-matching, or source-of-truth UI. Preserve geometry, hierarchy, responsive transformations, typography, spacing, states, actions, and scroll ownership; adapt host-owned data/integration seams only.
 - Source-to-destination parity is an acceptance gate, not an aspiration. Every destination pins the public NuGet/assets, starts from or compares against a clean generated template, passes `-ExactSample` before integration, preserves canonical structure/classes/responsive/spacing/state behavior, then passes the standard audit and same-state desktop/tablet/phone visual/computed comparison after host integration. Every intentional deviation is recorded and approved; accidental drift is `bug integrasi aplikasi`.
@@ -263,3 +268,8 @@ This repository-local ledger preserves accepted OPX Flat UI knowledge for agents
 - Audit and read-only operational result pages retain the full inline filter panel above `900px`; at `900px` and below they hide it and use the shared package `BottomSheet` opened by one `FlatPage` Filter action.
 - The sheet stages search, structured filters, sort, and page size. Reset affects staged values only, Apply commits atomically and triggers the host query, and close/backdrop/swipe discards pending changes.
 - Result cards and paging remain outside the sheet. A vertically stacked copy of the desktop filter form above mobile results is not an accepted composition.
+
+# 2026-11-26 - CRUD/FormModal two-line header geometry
+
+- The package header is the sole spacing owner for the Back action and the `Mode`/title stack. A two-line heading requires explicit line boxes, a small internal gap, and content-fitting minimum height/padding; fixed-height or consumer-offset fixes are not accepted.
+- Preserve title ellipsis, the 40px Back target, the body as the only content scroller, and the fixed footer. Source inspection alone is not visual proof; desktop/mobile plus minimum/maximum font preferences remain required runtime checks.

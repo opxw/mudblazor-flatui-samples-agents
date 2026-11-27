@@ -1,10 +1,10 @@
 {
   "$schema": "flat-ui.mobile.contract.schema.json",
   "schemaVersion": "3.1",
-  "contractVersion": "2.2.8",
+  "contractVersion": "2.2.9",
   "packages": {
     "Microsoft.Maui.Controls": "10.0.90",
-    "Opx.MudBlazor.FlatUi": "2.2.8",
+    "Opx.MudBlazor.FlatUi": "2.2.9",
     "MudBlazor": "9.14.0",
     "CommunityToolkit.Maui": "15.0.1"
   },
@@ -41,6 +41,10 @@
     "defaultRoundedSizePx": 7,
     "defaultColorPalette": "fluent-blue",
     "defaultDensity": "Default",
+    "widgetGapPx": 16,
+    "mobileWidgetGapPx": 12,
+    "minimumWidgetGapPx": 0,
+    "maximumWidgetGapPx": 32,
     "navigationLayout": "Bottom",
     "defaultBottomNavigationChildPresentation": "Sheet",
     "mobileToolbarActionsExpandedByDefault": false,
@@ -76,7 +80,7 @@
     "ordinaryTextSelectable": false,
     "textboxSelectionPreserved": true,
     "reusableCssFromPackageOnly": true,
-    "opxPackageCssSha256": "A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123",
+    "opxPackageCssSha256": "184033BB4EBF043465D5064E020DE2DDB21D7AD468FC565C7049A6B271375D8D",
     "opxGroupedGridScrollbarModuleSha256": "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93"
   },
   "verification": {

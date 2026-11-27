@@ -9,13 +9,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$expectedContractVersion = "2.2.8"
+$expectedContractVersion = "2.2.9"
 $expectedPackages = [ordered]@{
-    "Opx.MudBlazor.FlatUi" = "2.2.8"
+    "Opx.MudBlazor.FlatUi" = "2.2.9"
     "MudBlazor" = "9.14.0"
 }
 $expectedHostCssSha256 = "3BCB8DDE3956E3ACEF5CD91C779882222871DB6BA53F48D9237CC70F2E5C18F7"
-$expectedPackageCssSha256 = "A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123"
+$expectedPackageCssSha256 = "184033BB4EBF043465D5064E020DE2DDB21D7AD468FC565C7049A6B271375D8D"
 $expectedGroupedGridScrollbarModuleSha256 = "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93"
 $expectedExactSampleHashes = [ordered]@{
     "Components\Layout\MainLayout.razor" = "6DEE59C280F9E1345DB1592D1E08FAF7FBDA96A28CBFABDBC38509F6DCE07C19"
@@ -272,6 +272,15 @@ if ($null -ne $manifest) {
     }
     if ((Get-JsonProperty $baseline "defaultDensity") -cne "Default") {
         Add-Violation "Baseline defaultDensity must be Default."
+    }
+    if ([int](Get-JsonProperty $baseline "widgetGapPx") -ne 16) {
+        Add-Violation "Baseline widgetGapPx must be 16 for the desktop spacing default."
+    }
+    if ([int](Get-JsonProperty $baseline "mobileWidgetGapPx") -ne 12) {
+        Add-Violation "Baseline mobileWidgetGapPx must be 12 for the tablet/phone spacing default."
+    }
+    if ([int](Get-JsonProperty $baseline "minimumWidgetGapPx") -ne 0 -or [int](Get-JsonProperty $baseline "maximumWidgetGapPx") -ne 32) {
+        Add-Violation "Baseline widget-gap bounds must be 0 through 32."
     }
     if ((Get-JsonProperty $baseline "defaultBottomNavigationChildPresentation") -cne "Sheet") {
         Add-Violation "Baseline defaultBottomNavigationChildPresentation must be Sheet."
@@ -691,7 +700,7 @@ if (-not (Test-Path -LiteralPath $packageCssPath)) {
 else {
     $packageCssHash = (Get-FileHash -LiteralPath $packageCssPath -Algorithm SHA256).Hash
     if ($packageCssHash -cne $expectedPackageCssSha256) {
-        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.2.8; found $packageCssHash."
+        Add-Violation "Restored OPX package stylesheet hash must be $expectedPackageCssSha256 for package 2.2.9; found $packageCssHash."
     }
 }
 $groupedGridScrollbarModulePath = Join-Path $nugetPackagesRoot "opx.mudblazor.flatui\$($expectedPackages['Opx.MudBlazor.FlatUi'])\staticwebassets\grouped-grid-scrollbars.js"
@@ -701,7 +710,7 @@ if (-not (Test-Path -LiteralPath $groupedGridScrollbarModulePath)) {
 else {
     $groupedGridScrollbarModuleHash = (Get-FileHash -LiteralPath $groupedGridScrollbarModulePath -Algorithm SHA256).Hash
     if ($groupedGridScrollbarModuleHash -cne $expectedGroupedGridScrollbarModuleSha256) {
-        Add-Violation "Restored grouped-grid scrollbar module hash must be $expectedGroupedGridScrollbarModuleSha256 for package 2.2.8; found $groupedGridScrollbarModuleHash."
+        Add-Violation "Restored grouped-grid scrollbar module hash must be $expectedGroupedGridScrollbarModuleSha256 for package 2.2.9; found $groupedGridScrollbarModuleHash."
     }
 }
 

@@ -60,7 +60,7 @@ Require-Text $project[0].FullName @(
     'net10.0-android;net10.0-ios',
     '<MauiVersion>10.0.90</MauiVersion>',
     'CommunityToolkit.Maui" Version="15.0.1',
-    'Opx.MudBlazor.FlatUi" Version="2.2.8',
+    'Opx.MudBlazor.FlatUi" Version="2.2.9',
     'MudBlazor" Version="9.14.0',
     'MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="1,1"')
 Require-Text (Join-Path $root "NuGet.sources.xml") @("https://api.nuget.org/v3/index.json", 'globalPackagesFolder" value=".nuget\packages')
@@ -104,12 +104,12 @@ if (Test-Path -LiteralPath $assetsPath) {
     try {
         $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json -AsHashtable
         $packageRoot = @($assets.packageFolders.Keys)[0]
-        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.2.8\staticwebassets\opx-flat-ui.css"
-        $groupedGridScrollbarModule = Join-Path $packageRoot "opx.mudblazor.flatui\2.2.8\staticwebassets\grouped-grid-scrollbars.js"
+        $packageCss = Join-Path $packageRoot "opx.mudblazor.flatui\2.2.9\staticwebassets\opx-flat-ui.css"
+        $groupedGridScrollbarModule = Join-Path $packageRoot "opx.mudblazor.flatui\2.2.9\staticwebassets\grouped-grid-scrollbars.js"
         if (-not (Test-Path -LiteralPath $packageCss)) { $violations.Add("Restored OPX package CSS was not found.") }
-        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "A4AA97D7A2330DF6622C8E2A4CDE1CECB25A655F40629E27B9803B112F30E123") { $violations.Add("Restored OPX 2.2.8 CSS hash does not match the contract.") }
+        elseif ((Get-FileHash -LiteralPath $packageCss -Algorithm SHA256).Hash -ne "184033BB4EBF043465D5064E020DE2DDB21D7AD468FC565C7049A6B271375D8D") { $violations.Add("Restored OPX 2.2.9 CSS hash does not match the contract.") }
         if (-not (Test-Path -LiteralPath $groupedGridScrollbarModule)) { $violations.Add("Restored OPX grouped-grid scrollbar module was not found.") }
-        elseif ((Get-FileHash -LiteralPath $groupedGridScrollbarModule -Algorithm SHA256).Hash -ne "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93") { $violations.Add("Restored OPX 2.2.8 grouped-grid scrollbar module hash does not match the contract.") }
+        elseif ((Get-FileHash -LiteralPath $groupedGridScrollbarModule -Algorithm SHA256).Hash -ne "68355696CE6FC902DACCADEB467F3C11B8976CBD816816A1C9CE04887767CA93") { $violations.Add("Restored OPX 2.2.9 grouped-grid scrollbar module hash does not match the contract.") }
     } catch { $violations.Add("Unable to verify restored OPX CSS: $($_.Exception.Message)") }
 } else { $violations.Add("Run restore before the mobile consumer audit; obj/project.assets.json is missing.") }
 
@@ -127,4 +127,4 @@ if ($ExactSample) {
 }
 
 if ($violations.Count -gt 0) { $violations | ForEach-Object { Write-Error $_ }; exit 1 }
-Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.2.8$(if ($ExactSample) { ', Exact Sample Mode' }))."
+Write-Output "OPX Flat UI MAUI consumer audit passed for '$($project[0].FullName)' (contract 2.2.9$(if ($ExactSample) { ', Exact Sample Mode' }))."

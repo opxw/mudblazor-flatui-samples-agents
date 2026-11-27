@@ -1,5 +1,11 @@
 # Composable display settings
 
+## Global component spacing
+
+The default settings surface includes a Spacing section with separate sliders for Desktop and Tablet/phone. Persist `WidgetGapPx` and `MobileWidgetGapPx` independently, then let the package apply `--opx-widget-gap-desktop` and `--opx-widget-gap-mobile`; the responsive alias switches at the canonical `900px` boundary.
+
+Defaults are 16px for desktop and 12px for tablet/phone, with supported bounds of 0-32px. Component spacing is independent from Density, page/container gutters, safe-area insets, and control-internal padding. Do not recreate this behavior with consumer CSS or reinterpret the spacing values as page margins.
+
 ## Input rhythm and sidebar scrolling
 
 Standard reserves 16px above the input for its floating caption (reduced from 22px); the empty-label position uses the same reservation. This closes the caption/value gap without changing inter-field gaps, input padding, or intrinsic textarea height.
